@@ -1,48 +1,47 @@
 <template>
   <div class="navbar" :class="'nav' + navType">
-    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+    <hamburger
+      id="hamburger-container"
+      :is-active="sidebar.opened"
+      class="hamburger-container"
+      @toggleClick="toggleSideBar"
+    />
 
-    <breadcrumb v-if="navType == 1" id="breadcrumb-container" class="breadcrumb-container" />
-    <top-nav v-if="navType == 2" id="topmenu-container" class="topmenu-container" />
-    <template v-if="navType == 3">
-      <logo v-show="showLogo" :collapse="false"></logo>
+    <breadcrumb v-if="navType === 1" id="breadcrumb-container" class="breadcrumb-container" />
+    <top-nav v-if="navType === 2" id="topmenu-container" class="topmenu-container" />
+    <template v-if="navType === 3">
+      <logo v-show="showLogo" :collapse="false" />
       <top-bar id="topbar-container" class="topbar-container" />
     </template>
+
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
-
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
-          <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <el-tooltip content="文档地址" effect="dark" placement="bottom">
-          <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
+      <template v-if="device !== 'mobile'">
+        <search id="header-search" class="right-menu-item search-shell" />
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
 
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
 
-        <el-tooltip content="消息通知" effect="dark" placement="bottom">
+        <el-tooltip content="平台通知" effect="dark" placement="bottom">
           <header-notice id="header-notice" class="right-menu-item hover-effect" />
         </el-tooltip>
-
       </template>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="hover">
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar">
-          <span class="user-nickname"> {{ nickName }} </span>
+          <div class="user-meta">
+            <span class="meta-label">当前账号</span>
+            <span class="user-nickname">{{ nickName }}</span>
+          </div>
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/user/profile">
             <el-dropdown-item>个人中心</el-dropdown-item>
           </router-link>
-          <el-dropdown-item @click.native="setLayout" v-if="setting">
-            <span>布局设置</span>
+          <el-dropdown-item v-if="setting" @click.native="setLayout">
+            <span>界面设置</span>
           </el-dropdown-item>
           <el-dropdown-item @click.native="lockScreen">
             <span>锁定屏幕</span>
@@ -66,8 +65,6 @@ import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
-import RuoYiGit from '@/components/RuoYi/Git'
-import RuoYiDoc from '@/components/RuoYi/Doc'
 import HeaderNotice from './HeaderNotice'
 
 export default {
@@ -80,38 +77,25 @@ export default {
     Screenfull,
     SizeSelect,
     Search,
-    RuoYiGit,
-    RuoYiDoc,
     HeaderNotice
   },
   computed: {
-    ...mapGetters([
-      'sidebar',
-      'avatar',
-      'device',
-      'nickName'
-    ]),
-    setting: {
-      get() {
-        return this.$store.state.settings.showSettings
-      }
+    ...mapGetters(['sidebar', 'avatar', 'device', 'nickName']),
+    setting() {
+      return this.$store.state.settings.showSettings
     },
-    navType: {
-      get() {
-        return this.$store.state.settings.navType
-      }
+    navType() {
+      return this.$store.state.settings.navType
     },
-    showLogo: {
-      get() {
-        return this.$store.state.settings.sidebarLogo
-      }
+    showLogo() {
+      return this.$store.state.settings.sidebarLogo
     }
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    setLayout(event) {
+    setLayout() {
       this.$emit('setLayout')
     },
     lockScreen() {
@@ -121,7 +105,7 @@ export default {
       })
     },
     logout() {
-      this.$confirm('确定注销并退出系统吗？', '提示', {
+      this.$confirm('确认退出当前平台账号吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -143,29 +127,33 @@ export default {
 }
 
 .navbar {
-  height: 50px;
-  overflow: hidden;
-  position: relative;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
   display: flex;
   align-items: center;
-  // padding: 0 8px;
   box-sizing: border-box;
+  height: 62px;
+  margin: 12px 14px 0;
+  padding: 0 16px;
+  overflow: hidden;
+  border: 1px solid rgba(130, 112, 82, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 251, 244, 0.82);
+  box-shadow: 0 12px 28px rgba(55, 62, 47, 0.08);
+  backdrop-filter: blur(10px);
 
   .hamburger-container {
-    line-height: 46px;
-    height: 100%;
-    cursor: pointer;
-    transition: background .3s;
-    -webkit-tap-highlight-color:transparent;
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    margin-right: 8px;
+    height: 42px;
+    margin-right: 10px;
+    padding: 0 12px;
+    border-radius: 14px;
+    line-height: 42px;
+    cursor: pointer;
+    transition: background 0.3s;
 
     &:hover {
-      background: rgba(0, 0, 0, .025)
+      background: rgba(202, 225, 162, 0.22);
     }
   }
 
@@ -179,19 +167,18 @@ export default {
   }
 
   .topbar-container {
-    flex: 1;
-    min-width: 0;
     display: flex;
     align-items: center;
-    overflow: hidden;
+    flex: 1;
+    min-width: 0;
     margin-left: 8px;
+    overflow: hidden;
   }
 
   .right-menu {
-    height: 100%;
-    line-height: 50px;
     display: flex;
     align-items: center;
+    height: 100%;
     margin-left: auto;
 
     &:focus {
@@ -199,55 +186,66 @@ export default {
     }
 
     .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      margin-left: 8px;
+      padding: 0 12px;
+      border-radius: 14px;
+      color: #526054;
       font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
+      vertical-align: middle;
 
       &.hover-effect {
         cursor: pointer;
-        transition: background .3s;
+        transition: all 0.25s ease;
 
         &:hover {
-          background: rgba(0, 0, 0, .025)
+          background: rgba(202, 225, 162, 0.22);
+          color: #314523;
         }
       }
     }
 
+    .search-shell {
+      padding: 0 6px;
+      background: rgba(246, 241, 229, 0.85);
+    }
+
     .avatar-container {
-      margin-right: 0px;
-      padding-right: 0px;
+      padding-right: 10px;
+    }
 
-      .avatar-wrapper {
-        margin-top: 10px;
-        right: 8px;
-        position: relative;
+    .avatar-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .user-avatar {
-          cursor: pointer;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-        }
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(95, 143, 78, 0.24);
+    }
 
-        .user-nickname{
-          position: relative;
-          bottom: 10px;
-          left: 2px;
-          font-size: 14px;
-          font-weight: bold;
-        }
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
 
-        .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
-        }
-      }
+    .meta-label {
+      color: #8b917e;
+      font-size: 11px;
+    }
+
+    .user-nickname {
+      margin-top: 4px;
+      color: #2c382d;
+      font-size: 14px;
+      font-weight: 700;
     }
   }
 }

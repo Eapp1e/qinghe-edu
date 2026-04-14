@@ -1,12 +1,18 @@
 package com.ruoyi.common.core.redis;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,8 +28,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class RedisCache
 {
+    private static final long NO_EXPIRE = -1L;
+
+    private final Map<String, LocalCacheValue> localCache = new ConcurrentHashMap<>();
+
     @Autowired
     public RedisTemplate redisTemplate;
+
+    private static final class LocalCacheValue
+    {
+        private final Object value;
+
+        private final long expireAt;
+
+        private LocalCacheValue(Object value, long expireAt)
+        {
+            this.value = value;
+            this.expireAt = expireAt;
+        }
+    }
 
     /**
      * 缓存基本的对象，Integer、String、实体类等
@@ -33,7 +56,14 @@ public class RedisCache
      */
     public <T> void setCacheObject(final String key, final T value)
     {
-        redisTemplate.opsForValue().set(key, value);
+        try
+        {
+            redisTemplate.opsForValue().set(key, value);
+        }
+        catch (Exception ex)
+        {
+            setLocalCacheObject(key, value, NO_EXPIRE, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -46,7 +76,14 @@ public class RedisCache
      */
     public <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit)
     {
-        redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        try
+        {
+            redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        }
+        catch (Exception ex)
+        {
+            setLocalCacheObject(key, value, timeout.longValue(), timeUnit);
+        }
     }
 
     /**
@@ -71,7 +108,20 @@ public class RedisCache
      */
     public boolean expire(final String key, final long timeout, final TimeUnit unit)
     {
-        return redisTemplate.expire(key, timeout, unit);
+        try
+        {
+            return redisTemplate.expire(key, timeout, unit);
+        }
+        catch (Exception ex)
+        {
+            LocalCacheValue cached = getLocalCacheValue(key);
+            if (cached == null)
+            {
+                return false;
+            }
+            setLocalCacheObject(key, cached.value, timeout, unit);
+            return true;
+        }
     }
 
     /**
@@ -82,7 +132,24 @@ public class RedisCache
      */
     public long getExpire(final String key)
     {
-        return redisTemplate.getExpire(key);
+        try
+        {
+            return redisTemplate.getExpire(key);
+        }
+        catch (Exception ex)
+        {
+            LocalCacheValue cached = getLocalCacheValue(key);
+            if (cached == null)
+            {
+                return 0L;
+            }
+            if (cached.expireAt == NO_EXPIRE)
+            {
+                return NO_EXPIRE;
+            }
+            long ttlMillis = cached.expireAt - System.currentTimeMillis();
+            return Math.max(0L, TimeUnit.MILLISECONDS.toSeconds(ttlMillis));
+        }
     }
 
     /**
@@ -93,7 +160,14 @@ public class RedisCache
      */
     public Boolean hasKey(String key)
     {
-        return redisTemplate.hasKey(key);
+        try
+        {
+            return redisTemplate.hasKey(key);
+        }
+        catch (Exception ex)
+        {
+            return getLocalCacheValue(key) != null;
+        }
     }
 
     /**
@@ -104,8 +178,16 @@ public class RedisCache
      */
     public <T> T getCacheObject(final String key)
     {
-        ValueOperations<String, T> operation = redisTemplate.opsForValue();
-        return operation.get(key);
+        try
+        {
+            ValueOperations<String, T> operation = redisTemplate.opsForValue();
+            return operation.get(key);
+        }
+        catch (Exception ex)
+        {
+            LocalCacheValue cached = getLocalCacheValue(key);
+            return cached == null ? null : (T) cached.value;
+        }
     }
 
     /**
@@ -115,7 +197,14 @@ public class RedisCache
      */
     public boolean deleteObject(final String key)
     {
-        return redisTemplate.delete(key);
+        try
+        {
+            return redisTemplate.delete(key);
+        }
+        catch (Exception ex)
+        {
+            return localCache.remove(key) != null;
+        }
     }
 
     /**
@@ -126,7 +215,19 @@ public class RedisCache
      */
     public boolean deleteObject(final Collection collection)
     {
-        return redisTemplate.delete(collection) > 0;
+        try
+        {
+            return redisTemplate.delete(collection) > 0;
+        }
+        catch (Exception ex)
+        {
+            boolean removed = false;
+            for (Object key : collection)
+            {
+                removed = localCache.remove(String.valueOf(key)) != null || removed;
+            }
+            return removed;
+        }
     }
 
     /**
@@ -263,6 +364,69 @@ public class RedisCache
      */
     public Collection<String> keys(final String pattern)
     {
-        return redisTemplate.keys(pattern);
+        try
+        {
+            return redisTemplate.keys(pattern);
+        }
+        catch (Exception ex)
+        {
+            cleanupExpiredEntries();
+            return getLocalKeys(pattern);
+        }
+    }
+
+    private <T> void setLocalCacheObject(final String key, final T value, final long timeout, final TimeUnit timeUnit)
+    {
+        long expireAt = NO_EXPIRE;
+        if (timeout > 0)
+        {
+            expireAt = System.currentTimeMillis() + timeUnit.toMillis(timeout);
+        }
+        localCache.put(key, new LocalCacheValue(value, expireAt));
+    }
+
+    private LocalCacheValue getLocalCacheValue(String key)
+    {
+        LocalCacheValue cached = localCache.get(key);
+        if (cached == null)
+        {
+            return null;
+        }
+        if (cached.expireAt != NO_EXPIRE && cached.expireAt <= System.currentTimeMillis())
+        {
+            localCache.remove(key);
+            return null;
+        }
+        return cached;
+    }
+
+    private void cleanupExpiredEntries()
+    {
+        for (String key : new ArrayList<>(localCache.keySet()))
+        {
+            getLocalCacheValue(key);
+        }
+    }
+
+    private Collection<String> getLocalKeys(String pattern)
+    {
+        if (pattern == null || pattern.isEmpty())
+        {
+            return Collections.emptySet();
+        }
+        if (!pattern.contains("*"))
+        {
+            return localCache.containsKey(pattern) ? Collections.singleton(pattern) : Collections.emptySet();
+        }
+        String prefix = pattern.substring(0, pattern.indexOf('*'));
+        Set<String> matched = new LinkedHashSet<>();
+        for (String key : localCache.keySet())
+        {
+            if (key.startsWith(prefix) && getLocalCacheValue(key) != null)
+            {
+                matched.add(key);
+            }
+        }
+        return matched;
     }
 }
