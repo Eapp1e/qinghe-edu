@@ -1,115 +1,311 @@
-<p align="center">
-	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
-</p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">RuoYi v3.9.2</h1>
-<h4 align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</h4>
-<p align="center">
-	<a href="https://gitee.com/y_project/RuoYi-Vue/stargazers"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/star.svg?theme=dark"></a>
-	<a href="https://gitee.com/y_project/RuoYi-Vue"><img src="https://img.shields.io/badge/RuoYi-v3.9.2-brightgreen.svg"></a>
-	<a href="https://gitee.com/y_project/RuoYi-Vue/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
-</p>
+# 基于 SpringBoot 与 Vue 的中小学智能课后服务平台
 
-## 平台简介
+## 项目简介
 
-若依是一套全部开源的快速开发平台，毫无保留给个人及企业免费使用。
+本项目是一个面向中小学场景的智能课后服务平台，基于 `RuoYi-Vue` 二次开发完成，结合 `SpringBoot + Vue + MyBatis + JWT` 前后端分离架构，并集成大模型能力实现智能问答与内容生成。
 
-* 前端采用Vue、Element UI。
-* 后端采用Spring Boot、Spring Security、Redis & Jwt。
-* 权限认证使用Jwt，支持多终端认证系统。
-* 支持加载动态权限菜单，多方式轻松权限控制。
-* 高效率开发，使用代码生成器可以一键生成前后端代码。
-* 阿里云折扣场：[点我进入](http://aly.ruoyi.vip)，腾讯云秒杀场：[点我进入](http://txy.ruoyi.vip)&nbsp;&nbsp;
+本课题围绕中小学课后服务业务展开，重点服务以下四类角色：
 
-# 版本分支
+- 学生：查看课后课程、报名兴趣班、提交作业问题并查看 AI 解答
+- 家长：为孩子报名课程、查看学习记录与 AI 互动历史
+- 教师：发布课程、管理报名名单、使用 AI 生成通知或教学建议
+- 管理员：统一管理用户、课程、AI 调用日志，并查看统计报表
 
-RuoYi-Vue 后端项目提供 Spring Boot 2.x / 3.x / 4.x 多版本分支的并行维护。
+## 课题名称
 
-| 名称              | 说明                      | 地址                                                    |
-| :---------------- | :------------------------ | :------------------------------------------------------ |
-| master 默认分支   | Spring Boot 4.x (JDK 17+) | https://gitee.com/y_project/RuoYi-Vue                   |
-| springboot3 分支  | Spring Boot 3.x (JDK 17+) | https://gitee.com/y_project/RuoYi-Vue/tree/springboot3  |
-| springboot2 分支  | Spring Boot 2.x (JDK 8+)  | https://gitee.com/y_project/RuoYi-Vue/tree/springboot2  |  
+基于 SpringBoot 与 Vue 的中小学智能课后服务平台的设计与实现
 
-RuoYi-Vue 前端项目提供 Vue 2.x / 3.x / JavaScript TypeScript 版本均可混用搭配
+## 技术栈
 
-| 项目名称      | **RuoYi-Vue** | **RuoYi-Vue3** | **RuoYi-Vue3-TypeScript**   |
-| :---          | :---          | :---           | :---                        |
-| **前端框架**  | Vue 2        | Vue 3          | Vue 3                       |
-| **脚本语言**  | JavaScript   | JavaScript     | TypeScript                  |
-| **构建工具**  | Vue CLI      | Vite           | Vite                        |
-| **UI 组件库** | Element UI   | Element Plus   | Element Plus                |
-| **状态管理**  | Vuex         | Pinia          | Pinia                       |
-| **路由管理**  | Vue Router 3 | Vue Router 4   | Vue Router 4                |
-| **核心特点**  | 1. 技术栈经典稳定<br>2. 社区资料丰富<br>3. 当前维护重心已转移 | 1. 现代前端技术栈<br>2. 开发体验与性能更优<br>3. 官方主推的活跃版本 | 1. 类型加持，减少沟通成本<br>2. 开发时有提示，效率更高<br>3. 多人协作企业级开发项目 |
-| **仓库地址**  | [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue) | [RuoYi-Vue3](https://gitcode.com/yangzongzhuan/RuoYi-Vue3) | [RuoYi-Vue3-TypeScript](https://gitcode.com/yangzongzhuan/RuoYi-Vue3/tree/typescript) |
+### 后端
 
-## 内置功能
+- Spring Boot
+- Spring Security
+- JWT
+- MyBatis
+- Druid
+- PageHelper
+- Fastjson2
 
-1.  用户管理：用户是系统操作者，该功能主要完成系统用户配置。
-2.  部门管理：配置系统组织机构（公司、部门、小组），树结构展现支持数据权限。
-3.  岗位管理：配置系统用户所属担任职务。
-4.  菜单管理：配置系统菜单，操作权限，按钮权限标识等。
-5.  角色管理：角色菜单权限分配、设置角色按机构进行数据范围权限划分。
-6.  字典管理：对系统中经常使用的一些较为固定的数据进行维护。
-7.  参数管理：对系统动态配置常用参数。
-8.  通知公告：系统通知公告信息发布维护。
-9.  操作日志：系统正常操作日志记录和查询；系统异常信息日志记录和查询。
-10. 登录日志：系统登录日志记录查询包含登录异常。
-11. 在线用户：当前系统中活跃用户状态监控。
-12. 定时任务：在线（添加、修改、删除)任务调度包含执行结果日志。
-13. 代码生成：前后端代码的生成（java、html、xml、sql）支持CRUD下载 。
-14. 系统接口：根据业务代码自动生成相关的api接口文档。
-15. 服务监控：监视当前系统CPU、内存、磁盘、堆栈等相关信息。
-16. 缓存监控：对系统的缓存信息查询，命令统计等。
-17. 在线构建器：拖动表单元素生成相应的HTML代码。
-18. 连接池监视：监视当前系统数据库连接池状态，可进行分析SQL找出系统性能瓶颈。
+### 前端
 
-## 在线体验
+- Vue 2
+- Vuex
+- Vue Router
+- Element UI
+- Axios
 
-- admin/admin123  
-- 陆陆续续收到一些打赏，为了更好的体验已用于演示服务器升级。谢谢各位小伙伴。
+### AI 能力
 
-演示地址：http://vue.ruoyi.vip  
-文档地址：http://doc.ruoyi.vip
+- 支持接入大模型 API
+- 支持作业问题智能解答
+- 支持教师通知生成
+- 支持教学建议生成
+- 支持 AI 调用日志记录与安全限制
 
-## 演示图
+## 系统功能设计
 
-<table>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/cd1f90be5f2684f4560c9519c0f2a232ee8.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/1cbcf0e6f257c7d3a063c0e3f2ff989e4b3.jpg"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-8074972883b5ba0622e13246738ebba237a.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-9f88719cdfca9af2e58b352a20e23d43b12.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-39bf2584ec3a529b0d5a3b70d15c9b37646.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-936ec82d1f4872e1bc980927654b6007307.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-b2d62ceb95d2dd9b3fbe157bb70d26001e9.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-d67451d308b7a79ad6819723396f7c3d77a.png"/></td>
-    </tr>	 
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/5e8c387724954459291aafd5eb52b456f53.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/644e78da53c2e92a95dfda4f76e6d117c4b.jpg"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-8370a0d02977eebf6dbf854c8450293c937.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-49003ed83f60f633e7153609a53a2b644f7.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-d4fe726319ece268d4746602c39cffc0621.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-c195234bbcd30be6927f037a6755e6ab69c.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/b6115bc8c31de52951982e509930b20684a.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-5e4daac0bb59612c5038448acbcef235e3a.png"/></td>
-    </tr>
-</table>
+### 1. 学生端
 
+- 查看课后服务课程
+- 报名兴趣班
+- 提交作业问题
+- 查看 AI 解答内容
+- 查看个人学习记录与 AI 历史
 
-## 若依前后端分离交流群
+### 2. 家长端
 
-QQ群： [![加入QQ群](https://img.shields.io/badge/已满-937441-blue.svg)](https://jq.qq.com/?_wv=1027&k=5bVB1og) [![加入QQ群](https://img.shields.io/badge/已满-887144332-blue.svg)](https://jq.qq.com/?_wv=1027&k=5eiA4DH) [![加入QQ群](https://img.shields.io/badge/已满-180251782-blue.svg)](https://jq.qq.com/?_wv=1027&k=5AxMKlC) [![加入QQ群](https://img.shields.io/badge/已满-104180207-blue.svg)](https://jq.qq.com/?_wv=1027&k=51G72yr) [![加入QQ群](https://img.shields.io/badge/已满-186866453-blue.svg)](https://jq.qq.com/?_wv=1027&k=VvjN2nvu) [![加入QQ群](https://img.shields.io/badge/已满-201396349-blue.svg)](https://jq.qq.com/?_wv=1027&k=5vYAqA05) [![加入QQ群](https://img.shields.io/badge/已满-101456076-blue.svg)](https://jq.qq.com/?_wv=1027&k=kOIINEb5) [![加入QQ群](https://img.shields.io/badge/已满-101539465-blue.svg)](https://jq.qq.com/?_wv=1027&k=UKtX5jhs) [![加入QQ群](https://img.shields.io/badge/已满-264312783-blue.svg)](https://jq.qq.com/?_wv=1027&k=EI9an8lJ) [![加入QQ群](https://img.shields.io/badge/已满-167385320-blue.svg)](https://jq.qq.com/?_wv=1027&k=SWCtLnMz) [![加入QQ群](https://img.shields.io/badge/已满-104748341-blue.svg)](https://jq.qq.com/?_wv=1027&k=96Dkdq0k) [![加入QQ群](https://img.shields.io/badge/已满-160110482-blue.svg)](https://jq.qq.com/?_wv=1027&k=0fsNiYZt) [![加入QQ群](https://img.shields.io/badge/已满-170801498-blue.svg)](https://jq.qq.com/?_wv=1027&k=7xw4xUG1) [![加入QQ群](https://img.shields.io/badge/已满-108482800-blue.svg)](https://jq.qq.com/?_wv=1027&k=eCx8eyoJ) [![加入QQ群](https://img.shields.io/badge/已满-101046199-blue.svg)](https://jq.qq.com/?_wv=1027&k=SpyH2875) [![加入QQ群](https://img.shields.io/badge/已满-136919097-blue.svg)](https://jq.qq.com/?_wv=1027&k=tKEt51dz) [![加入QQ群](https://img.shields.io/badge/已满-143961921-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=0vBbSb0ztbBgVtn3kJS-Q4HUNYwip89G&authKey=8irq5PhutrZmWIvsUsklBxhj57l%2F1nOZqjzigkXZVoZE451GG4JHPOqW7AW6cf0T&noverify=0&group_code=143961921) [![加入QQ群](https://img.shields.io/badge/已满-174951577-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZFAPAbp09S2ltvwrJzp7wGlbopsc0rwi&authKey=HB2cxpxP2yspk%2Bo3WKTBfktRCccVkU26cgi5B16u0KcAYrVu7sBaE7XSEqmMdFQp&noverify=0&group_code=174951577) [![加入QQ群](https://img.shields.io/badge/已满-161281055-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Fn2aF5IHpwsy8j6VlalNJK6qbwFLFHat&authKey=uyIT%2B97x2AXj3odyXpsSpVaPMC%2Bidw0LxG5MAtEqlrcBcWJUA%2FeS43rsF1Tg7IRJ&noverify=0&group_code=161281055) [![加入QQ群](https://img.shields.io/badge/已满-138988063-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=XIzkm_mV2xTsUtFxo63bmicYoDBA6Ifm&authKey=dDW%2F4qsmw3x9govoZY9w%2FoWAoC4wbHqGal%2BbqLzoS6VBarU8EBptIgPKN%2FviyC8j&noverify=0&group_code=138988063) [![加入QQ群](https://img.shields.io/badge/已满-151450850-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=DkugnCg68PevlycJSKSwjhFqfIgrWWwR&authKey=pR1Pa5lPIeGF%2FFtIk6d%2FGB5qFi0EdvyErtpQXULzo03zbhopBHLWcuqdpwY241R%2F&noverify=0&group_code=151450850) [![加入QQ群](https://img.shields.io/badge/已满-224622315-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=F58bgRa-Dp-rsQJThiJqIYv8t4-lWfXh&authKey=UmUs4CVG5OPA1whvsa4uSespOvyd8%2FAr9olEGaWAfdLmfKQk%2FVBp2YU3u2xXXt76&noverify=0&group_code=224622315) [![加入QQ群](https://img.shields.io/badge/已满-287842588-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Nxb2EQ5qozWa218Wbs7zgBnjLSNk_tVT&authKey=obBKXj6SBKgrFTJZx0AqQnIYbNOvBB2kmgwWvGhzxR67RoRr84%2Bus5OadzMcdJl5&noverify=0&group_code=287842588) [![加入QQ群](https://img.shields.io/badge/已满-187944233-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=numtK1M_I4eVd2Gvg8qtbuL8JgX42qNh&authKey=giV9XWMaFZTY%2FqPlmWbkB9g3fi0Ev5CwEtT9Tgei0oUlFFCQLDp4ozWRiVIzubIm&noverify=0&group_code=187944233) [![加入QQ群](https://img.shields.io/badge/已满-228578329-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=G6r5KGCaa3pqdbUSXNIgYloyb8e0_L0D&authKey=4w8tF1eGW7%2FedWn%2FHAypQksdrML%2BDHolQSx7094Agm7Luakj9EbfPnSTxSi2T1LQ&noverify=0&group_code=228578329) [![加入QQ群](https://img.shields.io/badge/已满-191164766-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=GsOo-OLz53J8y_9TPoO6XXSGNRTgbFxA&authKey=R7Uy%2Feq%2BZsoKNqHvRKhiXpypW7DAogoWapOawUGHokJSBIBIre2%2FoiAZeZBSLuBc&noverify=0&group_code=191164766) [![加入QQ群](https://img.shields.io/badge/已满-174569686-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=PmYavuzsOthVqfdAPbo4uAeIbu7Ttjgc&authKey=p52l8%2FXa4PS1JcEmS3VccKSwOPJUZ1ZfQ69MEKzbrooNUljRtlKjvsXf04bxNp3G&noverify=0&group_code=174569686) [![加入QQ群](https://img.shields.io/badge/127358632-blue.svg)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=M9y5NjAl44lAL_Vh2crmEehZU_PMU6KS&authKey=ZSDz8hEREWSaPuxQV3gEwqGIaGjfRNnkB4rJjf0IvXhrSUGSGwQFmBA%2Boe8HFxyl&noverify=0&group_code=127358632) 点击按钮入群。
+- 维护孩子档案
+- 为孩子报名课程
+- 查看课程报名状态
+- 查看学习记录与互动总结
+- 查看孩子的 AI 互动历史
+
+### 3. 教师端
+
+- 发布课后课程
+- 编辑课程信息
+- 查看与管理报名名单
+- 记录学生学习情况
+- 使用 AI 生成课程通知
+- 使用 AI 生成教学建议
+
+### 4. 管理员端
+
+- 查看平台统计看板
+- 统一管理课程、报名、学生档案
+- 查看作业问答记录
+- 查看 AI 调用日志
+- 进行平台演示数据管理
+
+## 项目结构
+
+```text
+bishe
+├─ ruoyi-admin           后端启动模块
+├─ ruoyi-framework       权限与框架配置
+├─ ruoyi-system          业务模块
+├─ ruoyi-common          通用模块
+├─ ruoyi-ui              前端 Vue 项目
+├─ sql                   数据库脚本
+└─ doc                   项目说明文档
+```
+
+## 本项目新增模块
+
+### 后端教育业务模块
+
+- `com.ruoyi.web.controller.edu`
+- `com.ruoyi.system.domain.edu`
+- `com.ruoyi.system.mapper.edu`
+- `com.ruoyi.system.service.edu`
+- `com.ruoyi.system.service.impl.edu`
+
+### 前端教育业务页面
+
+- `ruoyi-ui/src/views/edu/dashboard`
+- `ruoyi-ui/src/views/edu/course`
+- `ruoyi-ui/src/views/edu/student`
+- `ruoyi-ui/src/views/edu/enrollment`
+- `ruoyi-ui/src/views/edu/question`
+- `ruoyi-ui/src/views/edu/aiLog`
+
+### 首页演示流程
+
+登录后的首页已经改造成“毕业设计演示首页”，会自动展示：
+
+- 角色演示建议流程
+- 平台统计数据
+- 演示账号信息
+- 快速业务入口
+- 最近平台动态
+
+## 数据库脚本说明
+
+请按以下顺序执行数据库脚本：
+
+```sql
+sql/ry_20260321.sql
+sql/edu_after_school.sql
+sql/edu_demo_data.sql
+```
+
+### 脚本用途
+
+- `ry_20260321.sql`
+  初始化若依基础表结构与系统数据
+
+- `edu_after_school.sql`
+  初始化课后服务平台业务表、菜单、权限、角色
+
+- `edu_demo_data.sql`
+  初始化演示账号、课程、报名记录、作业问答、AI 日志
+
+## 演示账号
+
+导入演示数据后可直接使用以下账号，密码统一为：
+
+```text
+admin123
+```
+
+| 角色 | 账号 | 用途 |
+| --- | --- | --- |
+| 管理员 | `edu_admin` | 查看统计看板、课程管理、AI 日志 |
+| 教师 | `edu_teacher` | 发布课程、查看报名、生成 AI 通知 |
+| 家长 | `edu_parent` | 维护孩子档案、为孩子报名 |
+| 学生 | `edu_student` | 提交作业问题、查看 AI 解答 |
+
+## 运行环境
+
+### 推荐环境
+
+- JDK 17 及以上
+- MySQL 8.x
+- Redis
+- Node.js 16 及以上
+- Maven 3.8 及以上
+
+### 当前注意事项
+
+当前若依主分支为 Spring Boot 4.x，对应需要：
+
+```text
+JDK 17+
+```
+
+如果本机仍是 JDK 8，将无法正常编译运行。
+
+## 后端启动
+
+### 1. 修改数据库配置
+
+编辑文件：
+
+```text
+ruoyi-admin/src/main/resources/application-druid.yml
+```
+
+配置自己的 MySQL 账号密码。
+
+### 2. 修改 Redis 配置
+
+编辑文件：
+
+```text
+ruoyi-admin/src/main/resources/application.yml
+```
+
+配置 Redis 地址、端口和密码。
+
+### 3. 启动后端
+
+在项目根目录执行：
+
+```bash
+mvn clean install
+mvn -pl ruoyi-admin -am spring-boot:run
+```
+
+## 前端启动
+
+进入前端目录：
+
+```bash
+cd ruoyi-ui
+```
+
+安装依赖：
+
+```bash
+npm install
+```
+
+启动前端：
+
+```bash
+npm run dev
+```
+
+默认访问地址：
+
+```text
+http://localhost:80
+```
+
+## AI 配置说明
+
+配置文件位置：
+
+```text
+ruoyi-admin/src/main/resources/application.yml
+```
+
+已新增如下配置：
+
+```yml
+edu:
+  ai:
+    enabled: false
+    endpoint: https://api.openai.com/v1/chat/completions
+    apiKey:
+    model: gpt-4o-mini
+    timeoutSeconds: 30
+    maxPromptLength: 1200
+```
+
+### 使用说明
+
+- 默认 `enabled: false`，系统返回内置 Mock 结果，适合答辩演示
+- 填写真实 `apiKey` 并启用后，可调用真实大模型接口
+- 已增加敏感词限制和长度限制，用于保障响应安全可控
+
+## 推荐演示流程
+
+### 管理员演示
+
+1. 登录 `edu_admin`
+2. 查看首页统计看板
+3. 进入 AI 日志页面查看调用记录
+4. 查看课程、报名和问答数据
+
+### 教师演示
+
+1. 登录 `edu_teacher`
+2. 进入课程中心发布或编辑课程
+3. 点击 AI 通知/AI 建议生成教学内容
+4. 进入报名管理维护学习记录
+
+### 家长演示
+
+1. 登录 `edu_parent`
+2. 查看学生档案
+3. 到课程中心为孩子报名
+4. 查看报名记录与学习总结
+
+### 学生演示
+
+1. 登录 `edu_student`
+2. 查看开放课程
+3. 提交作业问题
+4. 查看 AI 返回的解题思路与建议
+
+## 项目亮点
+
+- 结合真实教育场景设计四类角色协同流程
+- 基于若依权限体系快速完成菜单、角色、权限控制
+- 集成大模型能力，提升系统智能化水平
+- 提供演示首页与演示数据，适合毕业设计答辩
+- 支持后续继续扩展通知公告、成绩分析、成长档案等模块
+
+## 文档补充
+
+详细补充说明可查看：
+
+```text
+doc/edu-after-school.md
+```
+
+## 开源说明
+
+本项目基于若依框架进行二次开发，原框架版权归原作者所有；本仓库中的教育业务模块、演示数据与说明文档为本课题扩展内容。
