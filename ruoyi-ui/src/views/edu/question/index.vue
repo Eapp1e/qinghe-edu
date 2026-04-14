@@ -1,13 +1,35 @@
 <template>
-  <div class="app-container">
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button v-hasPermi="['edu:question:add']" type="primary" plain size="mini" icon="el-icon-plus" @click="handleAdd">提交问题</el-button>
-      </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
-    </el-row>
+  <div class="app-container question-page">
+    <section class="hero-panel">
+      <div class="hero-copy">
+        <span class="hero-badge">Homework Q&A</span>
+        <h1>作业问答</h1>
+        <p>面向学生课后辅导场景，支持提交问题、查看 AI 解答，并在教师或管理员视角下统一追踪问答处理情况。</p>
+      </div>
+      <div class="hero-metrics">
+        <div class="metric-card">
+          <span>问题总数</span>
+          <strong>{{ total }}</strong>
+        </div>
+        <div class="metric-card">
+          <span>已解答</span>
+          <strong>{{ answeredCount }}</strong>
+        </div>
+      </div>
+    </section>
 
-    <el-table v-loading="loading" :data="questionList">
+    <section class="toolbar-panel">
+      <div class="toolbar-copy">
+        <strong>AI 课后辅导</strong>
+        <span>学生可提交问题，教师可重新生成更合适的 AI 回答。</span>
+      </div>
+      <div class="toolbar-actions">
+        <el-button v-hasPermi="['edu:question:add']" type="primary" plain size="mini" icon="el-icon-plus" @click="handleAdd">提交问题</el-button>
+        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+      </div>
+    </section>
+
+    <el-table v-loading="loading" :data="questionList" class="content-table">
       <el-table-column label="课程" prop="courseName" width="150" />
       <el-table-column label="学生" prop="studentName" width="120" />
       <el-table-column label="问题标题" prop="questionTitle" min-width="180" />
@@ -21,14 +43,14 @@
       <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button v-hasPermi="['edu:question:edit']" type="text" size="mini" @click="handleRegenerate(scope.row)">重新生成</el-button>
-          <el-button v-hasPermi="['edu:question:remove']" type="text" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-hasPermi="['edu:question:remove']" type="text" size="mini" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog title="提交作业问题" :visible.sync="open" width="680px">
+    <el-dialog title="提交作业问题" :visible.sync="open" width="700px">
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="课程ID">
           <el-input v-model="form.courseId" placeholder="可选，填写课程 ID" />
@@ -44,7 +66,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="submitForm">提交并生成AI解答</el-button>
+        <el-button type="primary" @click="submitForm">提交并生成 AI 解答</el-button>
         <el-button @click="open = false">取消</el-button>
       </div>
     </el-dialog>
@@ -69,6 +91,11 @@ export default {
         questionTitle: [{ required: true, message: '请输入问题标题', trigger: 'blur' }],
         questionContent: [{ required: true, message: '请输入问题内容', trigger: 'blur' }]
       }
+    }
+  },
+  computed: {
+    answeredCount() {
+      return this.questionList.filter(item => item.answerStatus === '1').length
     }
   },
   created() {
@@ -99,7 +126,7 @@ export default {
     },
     handleRegenerate(row) {
       regenerateQuestionAnswer(row.questionId).then(res => {
-        this.$alert(res.data, 'AI重新生成结果', { dangerouslyUseHTMLString: false })
+        this.$alert(res.data, 'AI 重新生成结果', { dangerouslyUseHTMLString: false })
         this.getList()
       })
     },
@@ -112,3 +139,121 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.question-page {
+  padding-top: 6px;
+}
+
+.hero-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 26px 28px;
+  border: 1px solid rgba(130, 112, 82, 0.12);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(198, 221, 240, 0.36), transparent 24%),
+    linear-gradient(135deg, #fff9f2 0%, #eef7f4 100%);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #dfeee7;
+  color: #3f6f63;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hero-copy h1 {
+  margin: 16px 0 12px;
+  color: #243a35;
+  font-size: 34px;
+}
+
+.hero-copy p {
+  margin: 0;
+  color: #66756e;
+  line-height: 1.9;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  min-width: 240px;
+}
+
+.metric-card {
+  padding: 18px;
+  border: 1px solid rgba(130, 112, 82, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 252, 247, 0.86);
+}
+
+.metric-card span {
+  color: #7b847f;
+  font-size: 13px;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 10px;
+  color: #243733;
+  font-size: 28px;
+}
+
+.toolbar-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border: 1px solid rgba(130, 112, 82, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 252, 247, 0.84);
+}
+
+.toolbar-copy strong {
+  display: block;
+  color: #2d4038;
+  font-size: 16px;
+}
+
+.toolbar-copy span {
+  display: block;
+  margin-top: 6px;
+  color: #748078;
+  font-size: 13px;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.content-table {
+  margin-bottom: 10px;
+}
+
+.danger-text {
+  color: #d25d50;
+}
+
+@media (max-width: 900px) {
+  .hero-panel {
+    flex-direction: column;
+  }
+
+  .hero-metrics {
+    min-width: 0;
+  }
+}
+</style>
