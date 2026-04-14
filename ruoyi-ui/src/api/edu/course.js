@@ -1,0 +1,68 @@
+import request from '@/utils/request'
+
+export function listCourse(query) {
+  return request({
+    url: '/edu/course/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function listMyCourse() {
+  return request({
+    url: '/edu/course/myList',
+    method: 'get'
+  })
+}
+
+export function getCourse(courseId) {
+  return request({
+    url: '/edu/course/' + courseId,
+    method: 'get'
+  })
+}
+
+export function addCourse(data) {
+  return request({
+    url: '/edu/course',
+    method: 'post',
+    data
+  })
+}
+
+export function updateCourse(data) {
+  return request({
+    url: '/edu/course',
+    method: 'put',
+    data
+  })
+}
+
+export function delCourse(courseId) {
+  return request({
+    url: '/edu/course/' + courseId,
+    method: 'delete'
+  })
+}
+
+export function enrollCourse(courseId, studentUserId) {
+  return request({
+    url: '/edu/course/enroll/' + courseId,
+    method: 'post',
+    params: { studentUserId }
+  })
+}
+
+export function generateCourseNotice(courseId) {
+  return request({
+    url: '/edu/course/notice/' + courseId,
+    method: 'post'
+  })
+}
+
+export function generateTeachingSuggestion(courseId) {
+  return request({
+    url: '/edu/course/suggestion/' + courseId,
+    method: 'post'
+  })
+}

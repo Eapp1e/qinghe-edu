@@ -145,3 +145,16 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+edu:
+  ai:
+    enabled: false
+    endpoint: https://api.openai.com/v1/chat/completions
+    apiKey:
+    model: gpt-4o-mini
+    timeoutSeconds: 30
+    maxPromptLength: 1200
+    bannedKeywords:
+      - 自杀
+      - 暴力制作
+      - 赌博
