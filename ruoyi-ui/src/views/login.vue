@@ -2,8 +2,16 @@
   <div class="login">
     <div class="ambient ambient-a"></div>
     <div class="ambient ambient-b"></div>
+    <div class="ambient ambient-c"></div>
+    <div class="ambient ambient-d"></div>
+    <div class="scene-grid"></div>
+    <div class="scene-wave wave-a"></div>
+    <div class="scene-wave wave-b"></div>
+    <div class="scene-ring ring-a"></div>
+    <div class="scene-ring ring-b"></div>
 
     <div class="login-shell">
+      <div class="shell-topline"></div>
       <section class="login-intro">
         <p class="eyebrow">After-school Service Platform</p>
         <h1>中小学智能课后服务平台</h1>
@@ -33,6 +41,13 @@
       </section>
 
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+        <div class="form-glow form-glow-a"></div>
+        <div class="form-glow form-glow-b"></div>
+        <div class="form-glow form-glow-c"></div>
+        <div class="form-grid"></div>
+        <div class="form-shine"></div>
+        <div class="form-orbit orbit-a"></div>
+        <div class="form-orbit orbit-b"></div>
         <div class="form-head">
           <span class="form-badge">身份认证</span>
           <h3>欢迎登录</h3>
@@ -80,7 +95,6 @@
 
         <div class="login-options">
           <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
-          <span class="login-tip">建议由平台管理员统一分配账号权限</span>
         </div>
 
         <el-form-item style="width: 100%">
@@ -208,15 +222,17 @@ export default {
   padding: 42px 24px 76px;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(208, 229, 176, 0.5), transparent 25%),
-    radial-gradient(circle at bottom right, rgba(255, 214, 153, 0.25), transparent 24%),
-    linear-gradient(135deg, #f7f1e6 0%, #f7f8f0 45%, #eef6ea 100%);
+    radial-gradient(circle at top left, rgba(132, 245, 190, 0.34), transparent 22%),
+    radial-gradient(circle at 82% 16%, rgba(255, 208, 96, 0.28), transparent 18%),
+    radial-gradient(circle at bottom right, rgba(112, 214, 255, 0.24), transparent 20%),
+    linear-gradient(135deg, #f4f6ef 0%, #eef5f4 44%, #e8f3ef 100%);
 }
 
 .ambient {
   position: absolute;
   border-radius: 50%;
   filter: blur(6px);
+  animation: ambientFloat 10s ease-in-out infinite;
 }
 
 .ambient-a {
@@ -224,7 +240,7 @@ export default {
   left: 4%;
   width: 240px;
   height: 240px;
-  background: rgba(191, 219, 149, 0.28);
+  background: rgba(106, 234, 178, 0.24);
 }
 
 .ambient-b {
@@ -232,7 +248,88 @@ export default {
   bottom: 8%;
   width: 260px;
   height: 260px;
-  background: rgba(244, 202, 138, 0.18);
+  background: rgba(255, 194, 78, 0.2);
+  animation-delay: -4s;
+}
+
+.ambient-c {
+  top: 38%;
+  right: 24%;
+  width: 180px;
+  height: 180px;
+  background: rgba(107, 198, 255, 0.16);
+  animation-delay: -2s;
+}
+
+.ambient-d {
+  left: 18%;
+  bottom: 16%;
+  width: 220px;
+  height: 220px;
+  background: rgba(143, 255, 196, 0.14);
+  animation-delay: -6s;
+}
+
+.scene-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(84, 168, 150, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(84, 168, 150, 0.06) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.42), transparent 88%);
+  pointer-events: none;
+}
+
+.scene-wave {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(10px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.wave-a {
+  left: -8%;
+  top: 22%;
+  width: 480px;
+  height: 160px;
+  background: linear-gradient(90deg, rgba(87, 236, 174, 0.22), rgba(255, 255, 255, 0));
+  transform: rotate(-18deg);
+}
+
+.wave-b {
+  right: -6%;
+  bottom: 18%;
+  width: 420px;
+  height: 150px;
+  background: linear-gradient(90deg, rgba(255, 196, 78, 0), rgba(255, 196, 78, 0.22));
+  transform: rotate(16deg);
+}
+
+.scene-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  pointer-events: none;
+  animation: orbitSpin 24s linear infinite;
+}
+
+.ring-a {
+  top: 10%;
+  left: 8%;
+  width: 220px;
+  height: 220px;
+  border-color: rgba(80, 226, 179, 0.18);
+}
+
+.ring-b {
+  right: 10%;
+  bottom: 10%;
+  width: 260px;
+  height: 260px;
+  border-color: rgba(88, 196, 255, 0.18);
+  animation-direction: reverse;
 }
 
 .login-shell {
@@ -243,52 +340,141 @@ export default {
   gap: 30px;
   width: min(1160px, 100%);
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(120, 220, 200, 0.42);
   border-radius: 32px;
-  background: rgba(255, 252, 246, 0.72);
-  box-shadow: 0 28px 60px rgba(138, 132, 112, 0.14);
-  backdrop-filter: blur(16px);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(214, 255, 244, 0.26), rgba(223, 242, 255, 0.22)),
+    rgba(246, 255, 252, 0.68);
+  box-shadow:
+    0 36px 92px rgba(42, 116, 122, 0.18),
+    0 10px 28px rgba(255, 255, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 2px 0 rgba(124, 229, 205, 0.24);
+  backdrop-filter: blur(22px) saturate(120%);
+}
+
+.login-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(76, 226, 174, 0.28), rgba(255, 194, 76, 0.22));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.login-shell::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border-radius: 24px;
+  border: 1px solid rgba(116, 213, 214, 0.26);
+  pointer-events: none;
+}
+
+.login-shell .shell-topline {
+  position: absolute;
+  top: 0;
+  left: 26px;
+  right: 26px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(93, 236, 178, 0.12), rgba(93, 236, 178, 0.42), rgba(255, 194, 76, 0.12));
+  filter: blur(0.2px);
+  pointer-events: none;
 }
 
 .login-intro {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 620px;
-  padding: 28px 18px 28px 12px;
+  padding: 30px 24px 30px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 30px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(206, 255, 239, 0.24), rgba(228, 244, 255, 0.18)),
+    rgba(247, 255, 252, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    0 26px 58px rgba(47, 117, 127, 0.12),
+    0 8px 20px rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+}
+
+.login-intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(80, 235, 191, 0.24), rgba(84, 194, 255, 0.16));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.login-intro::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.14), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 52%);
+  pointer-events: none;
 }
 
 .eyebrow {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   width: fit-content;
   margin: 0 0 18px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(119, 152, 86, 0.12);
-  color: #6d8b53;
+  background: linear-gradient(135deg, rgba(48, 236, 177, 0.26), rgba(188, 243, 255, 0.26));
+  color: #0d7961;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.46),
+    0 10px 20px rgba(47, 194, 168, 0.16);
 }
 
 .login-intro h1 {
+  position: relative;
+  z-index: 1;
   margin: 0;
-  color: #2f3d2f;
+  color: #15333b;
   font-size: 42px;
   line-height: 1.2;
+  text-shadow: 0 10px 28px rgba(33, 182, 200, 0.15);
 }
 
 .subtitle {
+  position: relative;
+  z-index: 1;
   max-width: 540px;
   margin: 22px 0 0;
-  color: #66725f;
+  color: #55707a;
   font-size: 16px;
   line-height: 1.9;
 }
 
 .feature-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
@@ -296,38 +482,175 @@ export default {
 }
 
 .feature-card {
+  position: relative;
   padding: 22px 20px;
-  border: 1px solid rgba(181, 196, 162, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.38);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 18px 32px rgba(121, 129, 100, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(214, 255, 243, 0.14), rgba(224, 244, 255, 0.1));
+  box-shadow:
+    0 18px 32px rgba(46, 119, 137, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.feature-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent 55%);
+  pointer-events: none;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    0 24px 38px rgba(43, 145, 149, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .feature-card strong {
+  position: relative;
+  z-index: 1;
   display: block;
   margin-bottom: 10px;
-  color: #314230;
+  color: #183844;
   font-size: 18px;
 }
 
 .feature-card span {
-  color: #71806d;
+  position: relative;
+  z-index: 1;
+  color: #5a7381;
   font-size: 14px;
   line-height: 1.8;
 }
 
 .login-form {
+  position: relative;
+  overflow: hidden;
   align-self: center;
   width: 100%;
   padding: 34px 32px 30px;
-  border: 1px solid rgba(214, 206, 187, 0.7);
-  border-radius: 28px;
-  background: rgba(255, 251, 245, 0.94);
-  box-shadow: 0 20px 38px rgba(109, 106, 83, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 30px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.84), rgba(221, 255, 246, 0.62) 44%, rgba(222, 240, 255, 0.58)),
+    rgba(248, 255, 252, 0.66);
+  box-shadow:
+    0 34px 90px rgba(25, 117, 135, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -16px 28px rgba(184, 238, 255, 0.14);
+  backdrop-filter: blur(28px) saturate(145%);
+}
+
+.login-form::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(44, 228, 170, 0.48), rgba(64, 181, 255, 0.42), rgba(255, 188, 69, 0.26));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.login-form > * {
+  position: relative;
+  z-index: 1;
+}
+
+.form-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(3px);
+  opacity: 0.8;
+  animation: glowPulse 8s ease-in-out infinite;
+}
+
+.form-glow-a {
+  top: -34px;
+  right: -18px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(63, 228, 181, 0.34), transparent 68%);
+}
+
+.form-glow-b {
+  bottom: 26px;
+  left: -40px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255, 183, 58, 0.22), transparent 70%);
+  animation-delay: -3s;
+}
+
+.form-glow-c {
+  top: 34%;
+  right: 8%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(100, 197, 255, 0.22), transparent 72%);
+  animation-delay: -5s;
+}
+
+.form-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(55, 178, 168, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(55, 178, 168, 0.05) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 72%);
+  pointer-events: none;
+}
+
+.form-shine {
+  position: absolute;
+  top: -20%;
+  left: -38%;
+  width: 48%;
+  height: 140%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.04));
+  transform: rotate(18deg);
+  opacity: 0.75;
+  animation: shineSweep 7.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.form-orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  pointer-events: none;
+}
+
+.orbit-a {
+  top: -70px;
+  right: -90px;
+  width: 220px;
+  height: 220px;
+  animation: orbitSpin 18s linear infinite;
+}
+
+.orbit-b {
+  bottom: -54px;
+  left: -58px;
+  width: 170px;
+  height: 170px;
+  border-color: rgba(89, 226, 179, 0.18);
+  animation: orbitSpinReverse 15s linear infinite;
 }
 
 .form-head {
   margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(53, 213, 181, 0.16);
 }
 
 .form-badge {
@@ -335,21 +658,27 @@ export default {
   align-items: center;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(243, 184, 116, 0.16);
-  color: #b46f22;
+  background: linear-gradient(135deg, rgba(255, 183, 60, 0.48), rgba(255, 232, 166, 0.68));
+  color: #9a4f00;
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 10px 20px rgba(255, 165, 36, 0.22);
 }
 
 .form-head h3 {
   margin: 18px 0 10px;
-  color: #2e3b2d;
-  font-size: 28px;
+  color: #163743;
+  font-size: 32px;
+  letter-spacing: 0.01em;
+  text-shadow: 0 6px 20px rgba(49, 184, 149, 0.14);
 }
 
 .form-head p {
   margin: 0;
-  color: #7c806f;
+  color: #5f7482;
   line-height: 1.7;
 }
 
@@ -360,75 +689,122 @@ export default {
 .role-selector {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .role-option {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  padding: 14px 16px;
-  border: 1px solid rgba(202, 197, 183, 0.75);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #55614d;
+  padding: 15px 16px 14px;
+  border: 1px solid rgba(141, 217, 220, 0.36);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(234, 250, 255, 0.92));
+  color: #345667;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease;
+  box-shadow:
+    0 12px 24px rgba(63, 139, 156, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  overflow: hidden;
+}
+
+.role-option::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), transparent 48%);
+  pointer-events: none;
+}
+
+.role-option::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border-radius: 50%;
+  background: rgba(102, 166, 194, 0.74);
+  box-shadow: 0 0 0 6px rgba(102, 166, 194, 0.1);
+  transition: background 0.22s ease, box-shadow 0.22s ease;
 }
 
 .role-option:hover {
-  border-color: rgba(133, 165, 102, 0.48);
-  box-shadow: 0 14px 24px rgba(123, 144, 99, 0.12);
-  transform: translateY(-1px);
+  border-color: rgba(84, 223, 176, 0.62);
+  box-shadow: 0 18px 32px rgba(67, 177, 145, 0.18);
+  transform: translateY(-4px) scale(1.015);
 }
 
 .role-option strong {
-  color: #304130;
+  color: #1f4254;
   font-size: 15px;
 }
 
 .role-option span {
-  color: #7a806e;
+  color: #648093;
   font-size: 12px;
   line-height: 1.6;
 }
 
 .role-option.active {
-  border-color: #86a965;
-  background: linear-gradient(180deg, rgba(241, 248, 233, 0.96), rgba(255, 255, 255, 0.96));
-  box-shadow: 0 16px 30px rgba(122, 152, 91, 0.16);
+  border-color: #2de6ba;
+  background:
+    radial-gradient(circle at top right, rgba(91, 255, 211, 0.56), transparent 58%),
+    linear-gradient(180deg, rgba(232, 255, 249, 0.99), rgba(237, 250, 255, 0.97));
+  box-shadow:
+    0 22px 38px rgba(41, 189, 170, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.role-option.active::before {
+  background: #20e7bd;
+  box-shadow:
+    0 0 0 6px rgba(32, 231, 189, 0.16),
+    0 0 18px rgba(32, 231, 189, 0.4);
 }
 
 .input-icon {
-  color: #a7af9d;
+  color: #74a1b8;
   font-size: 17px;
 }
 
 .login-options {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
   margin: 8px 0 24px;
-  color: #7d7b73;
+  color: #667f8b;
   font-size: 13px;
-}
-
-.login-tip {
-  color: #8c8a7b;
 }
 
 .login-btn {
   width: 100%;
-  height: 48px;
+  height: 54px;
   border: none;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #8cab6d 0%, #6f9253 100%);
-  box-shadow: 0 16px 28px rgba(112, 146, 82, 0.28);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, #1fdb98 0%, #10b981 48%, #0f9f9c 100%);
+  box-shadow:
+    0 20px 34px rgba(17, 167, 137, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
   font-size: 16px;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 28px 44px rgba(17, 167, 137, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  filter: saturate(108%);
 }
 
 .el-login-footer {
@@ -438,29 +814,33 @@ export default {
   left: 0;
   z-index: 1;
   text-align: center;
-  color: #8d8776;
+  color: #718492;
   font-size: 12px;
   letter-spacing: 0.03em;
 }
 
 ::v-deep .el-input__inner {
   height: 50px;
-  border: 1px solid rgba(204, 197, 183, 0.72);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #4a5449;
+  border: 1px solid rgba(144, 214, 221, 0.52);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(237, 249, 255, 0.94));
+  color: #355162;
   font-size: 15px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 ::v-deep .el-input__inner:focus {
-  border-color: #8cab6d;
+  border-color: #27dcbe;
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(140, 171, 109, 0.12);
+  box-shadow:
+    0 0 0 4px rgba(39, 220, 190, 0.14),
+    0 12px 22px rgba(39, 189, 195, 0.14);
 }
 
 ::v-deep .el-checkbox__label {
-  color: #767366;
+  color: #667988;
 }
 
 @media (max-width: 1100px) {
@@ -470,7 +850,7 @@ export default {
 
   .login-intro {
     min-height: auto;
-    padding-right: 0;
+    padding-right: 18px;
   }
 }
 
@@ -510,8 +890,65 @@ export default {
   }
 
   .login-options {
-    flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@keyframes ambientFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -12px, 0) scale(1.04);
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+  }
+}
+
+@keyframes shineSweep {
+  0% {
+    transform: translateX(0) rotate(18deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.72;
+  }
+  48% {
+    transform: translateX(250%) rotate(18deg);
+    opacity: 0.18;
+  }
+  100% {
+    transform: translateX(250%) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes orbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitSpinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
   }
 }
 </style>
