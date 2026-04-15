@@ -1,0 +1,131 @@
+package com.eapple.web.controller.system;
+
+import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.eapple.common.annotation.Log;
+import com.eapple.common.core.controller.BaseController;
+import com.eapple.common.core.domain.AjaxResult;
+import com.eapple.common.core.domain.entity.SysDictType;
+import com.eapple.common.core.page.TableDataInfo;
+import com.eapple.common.enums.BusinessType;
+import com.eapple.common.utils.poi.ExcelUtil;
+import com.eapple.system.service.ISysDictTypeService;
+
+/**
+ * 鏁版嵁瀛楀吀淇℃伅
+ * 
+ * @author Eapp1e
+ */
+@RestController
+@RequestMapping("/system/dict/type")
+public class SysDictTypeController extends BaseController
+{
+    @Autowired
+    private ISysDictTypeService dictTypeService;
+
+    @PreAuthorize("@ss.hasPermi('system:dict:list')")
+    @GetMapping("/list")
+    public TableDataInfo list(SysDictType dictType)
+    {
+        startPage();
+        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
+        return getDataTable(list);
+    }
+
+    @Log(title = "瀛楀吀绫诲瀷", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('system:dict:export')")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysDictType dictType)
+    {
+        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
+        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
+        util.exportExcel(response, list, "瀛楀吀绫诲瀷");
+    }
+
+    /**
+     * 鏌ヨ瀛楀吀绫诲瀷璇︾粏
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:query')")
+    @GetMapping(value = "/{dictId}")
+    public AjaxResult getInfo(@PathVariable Long dictId)
+    {
+        return success(dictTypeService.selectDictTypeById(dictId));
+    }
+
+    /**
+     * 鏂板瀛楀吀绫诲瀷
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:add')")
+    @Log(title = "瀛楀吀绫诲瀷", businessType = BusinessType.INSERT)
+    @PostMapping
+    public AjaxResult add(@Validated @RequestBody SysDictType dict)
+    {
+        if (!dictTypeService.checkDictTypeUnique(dict))
+        {
+            return error("鏂板瀛楀吀'" + dict.getDictName() + "'澶辫触锛屽瓧鍏哥被鍨嬪凡瀛樺湪");
+        }
+        dict.setCreateBy(getUsername());
+        return toAjax(dictTypeService.insertDictType(dict));
+    }
+
+    /**
+     * 淇敼瀛楀吀绫诲瀷
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:edit')")
+    @Log(title = "瀛楀吀绫诲瀷", businessType = BusinessType.UPDATE)
+    @PutMapping
+    public AjaxResult edit(@Validated @RequestBody SysDictType dict)
+    {
+        if (!dictTypeService.checkDictTypeUnique(dict))
+        {
+            return error("淇敼瀛楀吀'" + dict.getDictName() + "'澶辫触锛屽瓧鍏哥被鍨嬪凡瀛樺湪");
+        }
+        dict.setUpdateBy(getUsername());
+        return toAjax(dictTypeService.updateDictType(dict));
+    }
+
+    /**
+     * 鍒犻櫎瀛楀吀绫诲瀷
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @Log(title = "瀛楀吀绫诲瀷", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{dictIds}")
+    public AjaxResult remove(@PathVariable Long[] dictIds)
+    {
+        dictTypeService.deleteDictTypeByIds(dictIds);
+        return success();
+    }
+
+    /**
+     * 鍒锋柊瀛楀吀缂撳瓨
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @Log(title = "瀛楀吀绫诲瀷", businessType = BusinessType.CLEAN)
+    @DeleteMapping("/refreshCache")
+    public AjaxResult refreshCache()
+    {
+        dictTypeService.resetDictCache();
+        return success();
+    }
+
+    /**
+     * 鑾峰彇瀛楀吀閫夋嫨妗嗗垪琛?
+     */
+    @GetMapping("/optionselect")
+    public AjaxResult optionselect()
+    {
+        List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
+        return success(dictTypes);
+    }
+}

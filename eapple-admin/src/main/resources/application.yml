@@ -1,0 +1,160 @@
+# 椤圭洰鐩稿叧閰嶇疆
+ruoyi:
+  # 鍚嶇О
+  name: EduAfterSchool
+  # 鐗堟湰
+  version: 3.9.2
+  # 鐗堟潈骞翠唤
+  copyrightYear: 2026
+  # 鏂囦欢璺緞 绀轰緥锛?Windows閰嶇疆D:/ruoyi/uploadPath锛孡inux閰嶇疆 /home/ruoyi/uploadPath锛?
+  profile: D:/ruoyi/uploadPath
+  # 鑾峰彇ip鍦板潃寮€鍏?
+  addressEnabled: false
+  # 楠岃瘉鐮佺被鍨?math 鏁板瓧璁＄畻 char 瀛楃楠岃瘉
+  captchaType: math
+
+# 寮€鍙戠幆澧冮厤缃?
+server:
+  # 鏈嶅姟鍣ㄧ殑HTTP绔彛锛岄粯璁や负8080
+  port: 8080
+  servlet:
+    # 搴旂敤鐨勮闂矾寰?
+    context-path: /
+  tomcat:
+    # tomcat鐨刄RI缂栫爜
+    uri-encoding: UTF-8
+    # 杩炴帴鏁版弧鍚庣殑鎺掗槦鏁帮紝榛樿涓?00
+    accept-count: 1000
+    threads:
+      # tomcat鏈€澶х嚎绋嬫暟锛岄粯璁や负200
+      max: 800
+      # Tomcat鍚姩鍒濆鍖栫殑绾跨▼鏁帮紝榛樿鍊?0
+      min-spare: 100
+
+# 鏃ュ織閰嶇疆
+logging:
+  level:
+    com.eapple: debug
+    org.springframework: warn
+
+# 鐢ㄦ埛閰嶇疆
+user:
+  password:
+    # 瀵嗙爜鏈€澶ч敊璇鏁?
+    maxRetryCount: 5
+    # 瀵嗙爜閿佸畾鏃堕棿锛堥粯璁?0鍒嗛挓锛?
+    lockTime: 10
+
+# Spring閰嶇疆
+spring:
+  # 璧勬簮淇℃伅
+  messages:
+    # 鍥介檯鍖栬祫婧愭枃浠惰矾寰?
+    basename: i18n/messages
+  profiles:
+    active: druid
+  # 鏂囦欢涓婁紶
+  servlet:
+    multipart:
+      # 鍗曚釜鏂囦欢澶у皬
+      max-file-size: 10MB
+      # 璁剧疆鎬讳笂浼犵殑鏂囦欢澶у皬
+      max-request-size: 20MB
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  # 鏈嶅姟妯″潡
+  devtools:
+    restart:
+      # 鐑儴缃插紑鍏?
+      enabled: true
+  data:
+    # redis 閰嶇疆
+    redis:
+      # 鍦板潃
+      host: localhost
+      # 绔彛锛岄粯璁や负6379
+      port: 6379
+      # 鏁版嵁搴撶储寮?
+      database: 0
+      # 瀵嗙爜
+      password:
+      # 杩炴帴瓒呮椂鏃堕棿
+      timeout: 10s
+      lettuce:
+        pool:
+          # 杩炴帴姹犱腑鐨勬渶灏忕┖闂茶繛鎺?
+          min-idle: 0
+          # 杩炴帴姹犱腑鐨勬渶澶х┖闂茶繛鎺?
+          max-idle: 8
+          # 杩炴帴姹犵殑鏈€澶ф暟鎹簱杩炴帴鏁?
+          max-active: 8
+          # #杩炴帴姹犳渶澶ч樆濉炵瓑寰呮椂闂达紙浣跨敤璐熷€艰〃绀烘病鏈夐檺鍒讹級
+          max-wait: -1ms
+
+# token閰嶇疆
+token:
+  # 浠ょ墝鑷畾涔夋爣璇?
+  header: Authorization
+  # 浠ょ墝瀵嗛挜
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 浠ょ墝鏈夋晥鏈燂紙榛樿30鍒嗛挓锛?
+  expireTime: 30
+
+# MyBatis閰嶇疆
+mybatis:
+  # 鎼滅储鎸囧畾鍖呭埆鍚?
+  typeAliasesPackage: com.eapple.**.domain
+  # 閰嶇疆mapper鐨勬壂鎻忥紝鎵惧埌鎵€鏈夌殑mapper.xml鏄犲皠鏂囦欢
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 鍔犺浇鍏ㄥ眬鐨勯厤缃枃浠?
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+# PageHelper鍒嗛〉鎻掍欢
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+  params: count=countSql
+
+# Springdoc閰嶇疆
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+  group-configs:
+    - group: 'default'
+      display-name: '娴嬭瘯妯″潡'
+      paths-to-match: '/**'
+      packages-to-scan: com.eapple.web.controller.tool
+
+# 闃茬洍閾鹃厤缃?
+referer:
+  # 闃茬洍閾惧紑鍏?
+  enabled: false
+  # 鍏佽鐨勫煙鍚嶅垪琛?
+  allowed-domains: localhost,127.0.0.1
+
+# 闃叉XSS鏀诲嚮
+xss:
+  # 杩囨护寮€鍏?
+  enabled: true
+  # 鎺掗櫎閾炬帴锛堝涓敤閫楀彿鍒嗛殧锛?
+  excludes: /system/notice
+  # 鍖归厤閾炬帴
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+edu:
+  ai:
+    enabled: false
+    endpoint: https://api.openai.com/v1/chat/completions
+    apiKey:
+    model: gpt-4o-mini
+    timeoutSeconds: 30
+    maxPromptLength: 1200
+    bannedKeywords:
+      - 鑷潃
+      - 鏆村姏鍒朵綔
+      - 璧屽崥

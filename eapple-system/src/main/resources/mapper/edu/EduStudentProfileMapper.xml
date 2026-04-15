@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eapple.system.mapper.edu.EduStudentProfileMapper">
+
+    <resultMap id="EduProfileResult" type="EduStudentProfile">
+        <id property="profileId" column="profile_id"/>
+        <result property="studentUserId" column="student_user_id"/>
+        <result property="studentName" column="student_name"/>
+        <result property="parentUserId" column="parent_user_id"/>
+        <result property="parentName" column="parent_name"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="className" column="class_name"/>
+        <result property="gender" column="gender"/>
+        <result property="interestTags" column="interest_tags"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="profileSelect">
+        select profile_id, student_user_id, student_name, parent_user_id, parent_name, grade_name, class_name, gender,
+               interest_tags, status, create_by, create_time, update_by, update_time, remark
+        from edu_student_profile
+    </sql>
+
+    <sql id="profileWhere">
+        <where>
+            <if test="studentUserId != null">
+                and student_user_id = #{studentUserId}
+            </if>
+            <if test="parentUserId != null">
+                and parent_user_id = #{parentUserId}
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and student_name like concat('%', #{studentName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectProfileById" parameterType="Long" resultMap="EduProfileResult">
+        <include refid="profileSelect"/>
+        where profile_id = #{profileId}
+    </select>
+
+    <select id="selectProfileByStudentUserId" parameterType="Long" resultMap="EduProfileResult">
+        <include refid="profileSelect"/>
+        where student_user_id = #{studentUserId}
+    </select>
+
+    <select id="selectProfileList" parameterType="EduStudentProfile" resultMap="EduProfileResult">
+        <include refid="profileSelect"/>
+        <include refid="profileWhere"/>
+        order by profile_id desc
+    </select>
+
+    <insert id="insertProfile" parameterType="EduStudentProfile" useGeneratedKeys="true" keyProperty="profileId">
+        insert into edu_student_profile
+        (student_user_id, student_name, parent_user_id, parent_name, grade_name, class_name, gender, interest_tags, status, remark, create_by, create_time)
+        values
+        (#{studentUserId}, #{studentName}, #{parentUserId}, #{parentName}, #{gradeName}, #{className}, #{gender}, #{interestTags}, #{status}, #{remark}, #{createBy}, sysdate())
+    </insert>
+
+    <update id="updateProfile" parameterType="EduStudentProfile">
+        update edu_student_profile
+        <set>
+            <if test="studentName != null">student_name = #{studentName},</if>
+            <if test="parentUserId != null">parent_user_id = #{parentUserId},</if>
+            <if test="parentName != null">parent_name = #{parentName},</if>
+            <if test="gradeName != null">grade_name = #{gradeName},</if>
+            <if test="className != null">class_name = #{className},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="interestTags != null">interest_tags = #{interestTags},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where profile_id = #{profileId}
+    </update>
+
+    <delete id="deleteProfileByIds" parameterType="Long">
+        delete from edu_student_profile where profile_id in
+        <foreach collection="array" item="profileId" open="(" separator="," close=")">
+            #{profileId}
+        </foreach>
+    </delete>
+
+    <select id="countActiveStudents" parameterType="EduStudentProfile" resultType="Long">
+        select count(1) from edu_student_profile
+        <where>
+            status = '0'
+            <if test="studentUserId != null">
+                and student_user_id = #{studentUserId}
+            </if>
+            <if test="parentUserId != null">
+                and parent_user_id = #{parentUserId}
+            </if>
+        </where>
+    </select>
+</mapper>

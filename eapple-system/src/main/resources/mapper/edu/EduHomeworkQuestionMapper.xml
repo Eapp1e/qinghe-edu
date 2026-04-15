@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eapple.system.mapper.edu.EduHomeworkQuestionMapper">
+
+    <resultMap id="EduQuestionResult" type="EduHomeworkQuestion">
+        <id property="questionId" column="question_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="courseName" column="course_name"/>
+        <result property="studentUserId" column="student_user_id"/>
+        <result property="studentName" column="student_name"/>
+        <result property="parentUserId" column="parent_user_id"/>
+        <result property="teacherUserId" column="teacher_user_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="questionContent" column="question_content"/>
+        <result property="aiAnswer" column="ai_answer"/>
+        <result property="answerStatus" column="answer_status"/>
+        <result property="safetyFlag" column="safety_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="questionSelect">
+        select question_id, course_id, course_name, student_user_id, student_name, parent_user_id, teacher_user_id,
+               question_title, question_content, ai_answer, answer_status, safety_flag, create_by, create_time, update_by, update_time, remark
+        from edu_homework_question
+    </sql>
+
+    <sql id="questionWhere">
+        <where>
+            <if test="courseId != null">
+                and course_id = #{courseId}
+            </if>
+            <if test="teacherUserId != null">
+                and teacher_user_id = #{teacherUserId}
+            </if>
+            <if test="parentUserId != null">
+                and parent_user_id = #{parentUserId}
+            </if>
+            <if test="studentUserId != null">
+                and student_user_id = #{studentUserId}
+            </if>
+            <if test="questionTitle != null and questionTitle != ''">
+                and question_title like concat('%', #{questionTitle}, '%')
+            </if>
+            <if test="answerStatus != null and answerStatus != ''">
+                and answer_status = #{answerStatus}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectQuestionById" parameterType="Long" resultMap="EduQuestionResult">
+        <include refid="questionSelect"/>
+        where question_id = #{questionId}
+    </select>
+
+    <select id="selectQuestionList" parameterType="EduHomeworkQuestion" resultMap="EduQuestionResult">
+        <include refid="questionSelect"/>
+        <include refid="questionWhere"/>
+        order by question_id desc
+        <if test="params.limitTop != null">
+            limit #{params.limitTop}
+        </if>
+    </select>
+
+    <insert id="insertQuestion" parameterType="EduHomeworkQuestion" useGeneratedKeys="true" keyProperty="questionId">
+        insert into edu_homework_question
+        (course_id, course_name, student_user_id, student_name, parent_user_id, teacher_user_id,
+         question_title, question_content, ai_answer, answer_status, safety_flag, remark, create_by, create_time)
+        values
+        (#{courseId}, #{courseName}, #{studentUserId}, #{studentName}, #{parentUserId}, #{teacherUserId},
+         #{questionTitle}, #{questionContent}, #{aiAnswer}, #{answerStatus}, #{safetyFlag}, #{remark}, #{createBy}, sysdate())
+    </insert>
+
+    <update id="updateQuestionAnswer">
+        update edu_homework_question
+        set ai_answer = #{aiAnswer},
+            answer_status = #{answerStatus},
+            safety_flag = #{safetyFlag},
+            update_time = sysdate()
+        where question_id = #{questionId}
+    </update>
+
+    <delete id="deleteQuestionByIds" parameterType="Long">
+        delete from edu_homework_question where question_id in
+        <foreach collection="array" item="questionId" open="(" separator="," close=")">
+            #{questionId}
+        </foreach>
+    </delete>
+
+    <select id="countQuestions" parameterType="EduHomeworkQuestion" resultType="Long">
+        select count(1) from edu_homework_question
+        <include refid="questionWhere"/>
+    </select>
+</mapper>

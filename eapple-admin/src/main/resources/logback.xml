@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 鏃ュ織瀛樻斁璺緞 -->
+	<property name="log.path" value="D:/Progects/Codex/bishe/runtime/logs" />
+    <!-- 鏃ュ織杈撳嚭鏍煎紡 -->
+	<property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
+
+	<!-- 鎺у埗鍙拌緭鍑?-->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${log.pattern}</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 绯荤粺鏃ュ織杈撳嚭 -->
+	<appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log.path}/sys-info.log</file>
+        <!-- 寰幆鏀跨瓥锛氬熀浜庢椂闂村垱寤烘棩蹇楁枃浠?-->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 鏃ュ織鏂囦欢鍚嶆牸寮?-->
+			<fileNamePattern>${log.path}/sys-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- 鏃ュ織鏈€澶х殑鍘嗗彶 60澶?-->
+			<maxHistory>60</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${log.pattern}</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 杩囨护鐨勭骇鍒?-->
+            <level>INFO</level>
+            <!-- 鍖归厤鏃剁殑鎿嶄綔锛氭帴鏀讹紙璁板綍锛?-->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 涓嶅尮閰嶆椂鐨勬搷浣滐細鎷掔粷锛堜笉璁板綍锛?-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+	</appender>
+	
+	<appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log.path}/sys-error.log</file>
+        <!-- 寰幆鏀跨瓥锛氬熀浜庢椂闂村垱寤烘棩蹇楁枃浠?-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 鏃ュ織鏂囦欢鍚嶆牸寮?-->
+            <fileNamePattern>${log.path}/sys-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- 鏃ュ織鏈€澶х殑鍘嗗彶 60澶?-->
+			<maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 杩囨护鐨勭骇鍒?-->
+            <level>ERROR</level>
+			<!-- 鍖归厤鏃剁殑鎿嶄綔锛氭帴鏀讹紙璁板綍锛?-->
+            <onMatch>ACCEPT</onMatch>
+			<!-- 涓嶅尮閰嶆椂鐨勬搷浣滐細鎷掔粷锛堜笉璁板綍锛?-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+	
+	<!-- 鐢ㄦ埛璁块棶鏃ュ織杈撳嚭  -->
+    <appender name="sys-user" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.path}/sys-user.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 鎸夊ぉ鍥炴粴 daily -->
+            <fileNamePattern>${log.path}/sys-user.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 鏃ュ織鏈€澶х殑鍘嗗彶 60澶?-->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+	
+	<!-- 绯荤粺妯″潡鏃ュ織绾у埆鎺у埗  -->
+	<logger name="com.eapple" level="info" />
+	<!-- Spring鏃ュ織绾у埆鎺у埗  -->
+	<logger name="org.springframework" level="warn" />
+
+	<root level="info">
+		<appender-ref ref="console" />
+	</root>
+	
+	<!--绯荤粺鎿嶄綔鏃ュ織-->
+    <root level="info">
+        <appender-ref ref="file_info" />
+        <appender-ref ref="file_error" />
+    </root>
+	
+	<!--绯荤粺鐢ㄦ埛鎿嶄綔鏃ュ織-->
+    <logger name="sys-user" level="info">
+        <appender-ref ref="sys-user"/>
+    </logger>
+</configuration> 
