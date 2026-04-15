@@ -163,10 +163,11 @@ export default {
   align-items: center;
   padding: 7px 12px;
   border-radius: 999px;
-  background: #dfeee7;
-  color: #3f6f63;
+  background: linear-gradient(135deg, rgba(31, 228, 190, 0.22), rgba(198, 246, 255, 0.74));
+  color: #0b866f;
   font-size: 12px;
   font-weight: 700;
+  box-shadow: 0 10px 20px rgba(23, 188, 183, 0.12);
 }
 
 .hero-copy h1 {

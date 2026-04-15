@@ -206,10 +206,39 @@ export default {
 
 <style scoped>
 .edu-home {
+  position: relative;
   padding-top: 6px;
+  overflow: hidden;
+}
+
+.edu-home::before,
+.edu-home::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.edu-home::before {
+  top: -60px;
+  right: 4%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(49, 230, 187, 0.18), transparent 68%);
+}
+
+.edu-home::after {
+  left: -70px;
+  bottom: 10%;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(88, 186, 255, 0.15), transparent 70%);
 }
 
 .hero-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1.6fr 0.9fr;
   gap: 18px;
@@ -221,7 +250,15 @@ export default {
   grid-template-columns: 1.2fr 0.95fr;
   gap: 22px;
   min-height: 320px;
-  background: radial-gradient(circle at top right, rgba(214, 230, 182, 0.55), transparent 28%), linear-gradient(135deg, #fffaf1 0%, #f3f6eb 100%);
+  border: 1px solid rgba(97, 223, 207, 0.2);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(76, 240, 189, 0.24), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(95, 194, 255, 0.18), transparent 26%),
+    linear-gradient(135deg, rgba(253, 255, 255, 0.96) 0%, rgba(236, 255, 249, 0.96) 52%, rgba(238, 247, 255, 0.96) 100%);
+  box-shadow:
+    0 24px 44px rgba(34, 131, 145, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .hero-badge {
@@ -229,22 +266,24 @@ export default {
   align-items: center;
   padding: 7px 12px;
   border-radius: 999px;
-  background: #e4efd1;
-  color: #456b25;
+  background: linear-gradient(135deg, rgba(39, 228, 188, 0.2), rgba(197, 244, 255, 0.72));
+  color: #0a8a73;
   font-size: 12px;
   font-weight: 700;
+  box-shadow: 0 10px 22px rgba(27, 193, 182, 0.14);
 }
 
 .hero-copy h1 {
   margin: 18px 0 14px;
-  color: #243a24;
+  color: #163743;
   font-size: 40px;
   line-height: 1.15;
+  text-shadow: 0 10px 26px rgba(37, 184, 194, 0.12);
 }
 
 .hero-copy p {
   margin: 0;
-  color: #67736a;
+  color: #5f7684;
   line-height: 1.9;
   font-size: 15px;
 }
@@ -259,13 +298,19 @@ export default {
 .hero-panel {
   padding: 18px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(112, 220, 224, 0.22);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(229, 255, 248, 0.66)),
+    rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 20px 36px rgba(44, 135, 149, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .panel-title,
 .spotlight-title {
   margin-bottom: 14px;
-  color: #2f432f;
+  color: #1e4250;
   font-size: 18px;
   font-weight: 700;
 }
@@ -284,9 +329,10 @@ export default {
 .entry-item,
 .metric-card {
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(203, 216, 183, 0.45);
-  box-shadow: 0 16px 28px rgba(116, 128, 97, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(234, 251, 255, 0.82));
+  border: 1px solid rgba(120, 219, 222, 0.22);
+  box-shadow: 0 16px 28px rgba(44, 135, 149, 0.08);
 }
 
 .role-card,
@@ -300,7 +346,7 @@ export default {
 .service-item strong,
 .entry-item strong {
   display: block;
-  color: #2f412f;
+  color: #1c4150;
   margin-bottom: 8px;
 }
 
@@ -308,7 +354,7 @@ export default {
 .spotlight-item span,
 .entry-item span,
 .service-item p {
-  color: #6d7868;
+  color: #688090;
   line-height: 1.8;
   font-size: 14px;
   margin: 0;
@@ -318,10 +364,18 @@ export default {
 .entry-card,
 .service-card,
 .timeline-card {
-  background: linear-gradient(180deg, rgba(255, 251, 245, 0.95), rgba(246, 249, 240, 0.96));
+  border: 1px solid rgba(109, 220, 216, 0.18);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(238, 253, 255, 0.96));
+  box-shadow:
+    0 22px 40px rgba(41, 130, 141, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .metric-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
@@ -330,22 +384,34 @@ export default {
 
 .metric-card {
   padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.36), transparent 56%);
+  pointer-events: none;
 }
 
 .metric-card span {
   display: block;
-  color: #7a806e;
+  color: #6f8593;
   font-size: 13px;
 }
 
 .metric-card strong {
   display: block;
   margin-top: 10px;
-  color: #243924;
+  color: #163745;
   font-size: 30px;
 }
 
 .content-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr;
   gap: 18px;
@@ -359,12 +425,54 @@ export default {
   padding: 18px;
   text-align: left;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .entry-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 30px rgba(122, 142, 96, 0.14);
+  transform: translateY(-4px);
+  border-color: rgba(49, 224, 194, 0.34);
+  box-shadow: 0 18px 30px rgba(39, 173, 180, 0.16);
+}
+
+::v-deep .el-card {
+  overflow: hidden;
+}
+
+::v-deep .el-card__body {
+  position: relative;
+}
+
+::v-deep .el-card__header {
+  border-bottom: 1px solid rgba(104, 213, 214, 0.16);
+  color: #1f4252;
+  font-weight: 700;
+}
+
+::v-deep .el-timeline-item__timestamp {
+  color: #6f8492;
+}
+
+::v-deep .el-timeline-item__node {
+  background-color: #20dcb7;
+  box-shadow: 0 0 0 6px rgba(32, 220, 183, 0.1);
+}
+
+::v-deep .el-button--primary {
+  border: none;
+  background: linear-gradient(135deg, #14e0a9 0%, #0fc9c3 52%, #2898ff 100%);
+  box-shadow: 0 16px 30px rgba(25, 179, 180, 0.24);
+}
+
+::v-deep .el-button--primary:hover,
+::v-deep .el-button--primary:focus {
+  filter: saturate(108%);
+  box-shadow: 0 18px 34px rgba(25, 179, 180, 0.3);
+}
+
+::v-deep .el-button.is-plain {
+  border-color: rgba(52, 207, 196, 0.32);
+  color: #19806e;
+  background: rgba(238, 255, 251, 0.92);
 }
 
 @media (max-width: 1200px) {

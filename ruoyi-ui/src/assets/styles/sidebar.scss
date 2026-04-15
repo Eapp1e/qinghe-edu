@@ -43,7 +43,7 @@
 
     &.has-logo {
       .el-scrollbar {
-        height: calc(100% - 50px);
+        height: calc(100% - 52px);
       }
     }
 
@@ -106,11 +106,11 @@
     }
 
     &.theme-light {
-      border-right: 1px solid rgba(130, 112, 82, 0.12);
+      border-right: 1px solid rgba(95, 222, 214, 0.16);
       background:
-        radial-gradient(circle at top left, rgba(201, 223, 163, 0.3), transparent 28%),
-        linear-gradient(180deg, #f8f4ea 0%, #f5f1e6 100%);
-      box-shadow: 12px 0 30px rgba(67, 59, 47, 0.08);
+        radial-gradient(circle at top left, rgba(31, 228, 190, 0.08), transparent 28%),
+        linear-gradient(180deg, #f9fdfd 0%, #f4fbfc 100%);
+      box-shadow: 12px 0 30px rgba(39, 133, 146, 0.08);
 
       .el-menu-item,
       .el-submenu__title {

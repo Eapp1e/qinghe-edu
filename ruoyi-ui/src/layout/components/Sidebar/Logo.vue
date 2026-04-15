@@ -1,50 +1,23 @@
-<template>
-  <div
-    class="sidebar-logo-container"
-    :class="{ collapse: collapse }"
-    :style="{ backgroundColor: sideTheme === 'theme-dark' && navType !== 3 ? variables.menuBackground : variables.menuLightBackground }"
-  >
+﻿<template>
+  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <span
-          class="sidebar-title only-text"
-          :style="{ color: sideTheme === 'theme-dark' && navType !== 3 ? variables.logoTitleColor : variables.logoLightTitleColor }"
-        >
-          课
-        </span>
+        <span class="sidebar-title only-text">课</span>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <span
-          class="sidebar-title"
-          :style="{ color: sideTheme === 'theme-dark' && navType !== 3 ? variables.logoTitleColor : variables.logoLightTitleColor }"
-        >
-          课后服务平台
-        </span>
+        <span class="sidebar-title">课后服务平台</span>
       </router-link>
     </transition>
   </div>
 </template>
 
 <script>
-import variables from '@/assets/styles/variables.scss'
-
 export default {
   name: 'SidebarLogo',
   props: {
     collapse: {
       type: Boolean,
       required: true
-    }
-  },
-  computed: {
-    variables() {
-      return variables
-    },
-    sideTheme() {
-      return this.$store.state.settings.sideTheme
-    },
-    navType() {
-      return this.$store.state.settings.navType
     }
   }
 }
@@ -62,50 +35,63 @@ export default {
 
 .sidebar-logo-container {
   position: relative;
-  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
   padding: 0;
   overflow: hidden;
+  border-bottom: 1px solid rgba(95, 222, 214, 0.12);
+  background:
+    radial-gradient(circle at top left, rgba(31, 228, 190, 0.08), transparent 34%),
+    linear-gradient(180deg, #26352d 0%, #223028 100%);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.03);
 
   .sidebar-logo-link {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 50px;
+    height: 100%;
     margin: 0;
-    padding: 0 16px;
-    border-radius: 0;
-    background: linear-gradient(135deg, rgba(255, 250, 240, 0.08) 0%, rgba(145, 194, 110, 0.12) 100%);
+    padding: 0 14px;
+    background: transparent;
     overflow: hidden;
+    text-decoration: none;
   }
 
   .sidebar-title {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
     margin: 0;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
-    line-height: 16px;
-    letter-spacing: 0.2px;
+    line-height: 1;
+    letter-spacing: 0.02em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
+    color: #f5fbf8;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.16);
   }
 
   .sidebar-title.only-text {
-    font-size: 18px;
-    line-height: 18px;
+    font-size: 16px;
   }
 
   &.collapse {
-    padding: 0;
-
     .sidebar-logo-link {
-      width: 40px;
-      height: 40px;
-      margin: 5px auto;
+      width: 36px;
+      height: 36px;
+      margin: 8px auto;
       padding: 0;
       border-radius: 10px;
+      border: 1px solid rgba(95, 222, 214, 0.16);
+      background: linear-gradient(180deg, rgba(44, 60, 52, 0.96), rgba(35, 48, 41, 0.94));
     }
   }
 }
