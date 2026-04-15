@@ -1,5 +1,6 @@
 package com.ruoyi.framework.web.service;
 
+import java.util.List;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
@@ -60,7 +62,7 @@ public class SysLoginService
      * @param uuid 唯一标识
      * @return 结果
      */
-    public String login(String username, String password, String code, String uuid)
+    public String login(String username, String password, String code, String uuid, String loginRole)
     {
         // 验证码校验
         validateCaptcha(username, code, uuid);
@@ -92,11 +94,44 @@ public class SysLoginService
         {
             AuthenticationContextHolder.clearContext();
         }
-        AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+        validateLoginRole(loginUser, username, loginRole);
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         recordLoginInfo(loginUser.getUserId());
         // 生成token
         return tokenService.createToken(loginUser);
+    }
+
+    private void validateLoginRole(LoginUser loginUser, String username, String loginRole)
+    {
+        if (StringUtils.isEmpty(loginRole))
+        {
+            return;
+        }
+        List<SysRole> roles = loginUser.getUser().getRoles();
+        if (roles == null || roles.isEmpty())
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, "未分配可用角色"));
+            throw new ServiceException("当前账号未分配可用角色，请联系管理员");
+        }
+        boolean matched = roles.stream()
+                .map(SysRole::getRoleKey)
+                .filter(StringUtils::isNotEmpty)
+                .anyMatch(roleKey -> roleMatches(loginRole, roleKey));
+        if (!matched)
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, "登录角色与账号角色不匹配"));
+            throw new ServiceException("所选登录角色与当前账号不匹配，请重新选择");
+        }
+    }
+
+    private boolean roleMatches(String loginRole, String roleKey)
+    {
+        if (StringUtils.equals(loginRole, roleKey))
+        {
+            return true;
+        }
+        return StringUtils.equals("edu_admin", loginRole) && StringUtils.equals(Constants.SUPER_ADMIN, roleKey);
     }
 
     /**

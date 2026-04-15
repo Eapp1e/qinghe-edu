@@ -27,6 +27,8 @@ public class LoginBody
      */
     private String uuid;
 
+    private String loginRole;
+
     public String getUsername()
     {
         return username;
@@ -65,5 +67,15 @@ public class LoginBody
     public void setUuid(String uuid)
     {
         this.uuid = uuid;
+    }
+
+    public String getLoginRole()
+    {
+        return loginRole;
+    }
+
+    public void setLoginRole(String loginRole)
+    {
+        this.loginRole = loginRole;
     }
 }

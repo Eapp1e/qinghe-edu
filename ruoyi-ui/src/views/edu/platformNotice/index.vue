@@ -1,11 +1,11 @@
-<template>
+﻿<template>
   <div class="platform-page">
     <section class="page-hero">
       <div>
-        <p class="eyebrow">Admin Console</p>
+        <p class="eyebrow">Notice Center</p>
         <h1>平台通知中心</h1>
         <p class="summary">
-          统一发布课程开班、报名提醒、活动安排与家校通知，帮助管理员和教师用更清晰的方式组织课后服务信息流。
+          统一发布课程安排、报名提醒、家校通知和活动公告，帮助学校建立清晰、规范的课后服务信息流。
         </p>
       </div>
       <div class="hero-stats">
@@ -21,7 +21,7 @@
     </section>
 
     <section class="guide-panel">
-      <div class="guide-item" v-for="item in guideItems" :key="item.title">
+      <div v-for="item in guideItems" :key="item.title" class="guide-item">
         <strong>{{ item.title }}</strong>
         <span>{{ item.desc }}</span>
       </div>
@@ -30,39 +30,19 @@
     <section class="toolbar-card">
       <el-form ref="queryForm" :model="queryParams" inline size="small">
         <el-form-item label="通知标题">
-          <el-input
-            v-model="queryParams.noticeTitle"
-            placeholder="如：科学实验班开班通知"
-            clearable
-            @keyup.enter.native="getList"
-          />
+          <el-input v-model="queryParams.noticeTitle" placeholder="请输入通知标题" clearable @keyup.enter.native="getList" />
         </el-form-item>
         <el-form-item label="发布人">
-          <el-input
-            v-model="queryParams.createBy"
-            placeholder="支持按教师或管理员账号检索"
-            clearable
-            @keyup.enter.native="getList"
-          />
+          <el-input v-model="queryParams.createBy" placeholder="请输入发布人账号" clearable @keyup.enter.native="getList" />
         </el-form-item>
         <el-form-item label="通知类型">
           <el-select v-model="queryParams.noticeType" clearable placeholder="全部类型">
-            <el-option
-              v-for="dict in dict.type.sys_notice_type"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            />
+            <el-option v-for="dict in dict.type.sys_notice_type" :key="dict.value" :label="dict.label" :value="dict.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="发布状态">
           <el-select v-model="queryParams.status" clearable placeholder="全部状态">
-            <el-option
-              v-for="dict in dict.type.sys_notice_status"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            />
+            <el-option v-for="dict in dict.type.sys_notice_status" :key="dict.value" :label="dict.label" :value="dict.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -72,16 +52,14 @@
       </el-form>
 
       <div class="quick-actions">
-        <el-button type="primary" plain size="small" @click="handleAdd">发布平台通知</el-button>
+        <el-button type="primary" plain size="small" @click="handleAdd">新建通知</el-button>
       </div>
     </section>
 
     <el-table v-loading="loading" :data="noticeList" class="content-table">
       <el-table-column label="通知标题" min-width="240" show-overflow-tooltip>
         <template slot-scope="scope">
-          <el-link type="primary" :underline="false" @click="handlePreview(scope.row)">
-            {{ scope.row.noticeTitle }}
-          </el-link>
+          <el-link type="primary" :underline="false" @click="handlePreview(scope.row)">{{ scope.row.noticeTitle }}</el-link>
         </template>
       </el-table-column>
       <el-table-column label="通知类型" width="110" align="center">
@@ -131,21 +109,14 @@
           <el-col :span="12">
             <el-form-item label="通知类型" prop="noticeType">
               <el-select v-model="form.noticeType" placeholder="请选择通知类型">
-                <el-option
-                  v-for="dict in dict.type.sys_notice_type"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
+                <el-option v-for="dict in dict.type.sys_notice_type" :key="dict.value" :label="dict.label" :value="dict.value" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="发布状态" prop="status">
               <el-radio-group v-model="form.status">
-                <el-radio v-for="dict in dict.type.sys_notice_status" :key="dict.value" :label="dict.value">
-                  {{ dict.label }}
-                </el-radio>
+                <el-radio v-for="dict in dict.type.sys_notice_status" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -192,7 +163,7 @@
         </el-table-column>
       </el-table>
       <div v-if="!readLoading && !readUserList.length" class="empty-readers">
-        暂无阅读记录，适合答辩时演示通知发布后的联动效果。
+        暂无阅读记录，通知发布后将自动累计用户已读数据。
       </div>
     </el-dialog>
   </div>
@@ -217,9 +188,9 @@ export default {
       readLoading: false,
       readUserList: [],
       guideItems: [
-        { title: '课程通知', desc: '用于发布开班时间、地点调整、教师安排和上课提醒。' },
-        { title: '家校提醒', desc: '适合发送报名确认、材料准备、活动签到等课后服务消息。' },
-        { title: '答辩展示', desc: '切换不同角色后，可演示顶部通知、已读记录和管理发布流程。' }
+        { title: '课程通知', desc: '用于发布开课时间、教室调整、授课教师安排和上课提醒。' },
+        { title: '报名提醒', desc: '适用于发送报名确认、材料准备、活动签到等课后服务消息。' },
+        { title: '运营联动', desc: '切换不同角色后，可查看顶部通知、已读记录和管理发布流程。' }
       ],
       queryParams: {
         pageNum: 1,
@@ -273,7 +244,7 @@ export default {
     },
     handleAdd() {
       this.reset()
-      this.title = '发布平台通知'
+      this.title = '新建平台通知'
       this.open = true
     },
     handleUpdate(row) {
@@ -323,184 +294,166 @@ export default {
     },
     cancel() {
       this.open = false
-      this.reset()
     },
     noticeTypeLabel(value) {
-      return this.selectDictLabel(this.dict.type.sys_notice_type, value) || '未分类'
+      const match = (this.dict.type.sys_notice_type || []).find(item => item.value === value)
+      return match ? match.label : '-'
     },
     resolveRole(row) {
-      if (row.roleName) {
-        return row.roleName
-      }
-      if (row.roleKey) {
-        if (row.roleKey === 'edu_admin') return '平台管理员'
-        if (row.roleKey === 'edu_teacher') return '教师'
-        if (row.roleKey === 'edu_parent') return '家长'
-        if (row.roleKey === 'edu_student') return '学生'
-      }
-      return '平台用户'
+      const role = (row.roles || [])[0]
+      return role ? role.roleName : '-'
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .platform-page {
-  padding-bottom: 8px;
+  display: grid;
+  gap: 18px;
 }
 
 .page-hero {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 18px;
-  padding: 24px 26px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #fff7ee 0%, #fffdf7 56%, #edf6ff 100%);
-  border: 1px solid #f1dfc7;
+  gap: 18px;
+  padding: 24px 28px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #fff9ef 0%, #eff5e8 100%);
+  box-shadow: 0 20px 34px rgba(118, 126, 98, 0.08);
 }
 
 .eyebrow {
-  margin: 0 0 10px;
-  color: #b17322;
+  margin: 0 0 12px;
+  color: #73905f;
   font-size: 12px;
-  letter-spacing: 1.2px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .page-hero h1 {
-  margin: 0;
-  color: #654116;
-  font-size: 28px;
+  margin: 0 0 10px;
+  color: #293d29;
+  font-size: 32px;
 }
 
 .summary {
-  max-width: 700px;
-  margin: 12px 0 0;
-  color: #7b6650;
-  line-height: 1.8;
+  max-width: 720px;
+  margin: 0;
+  color: #6b7869;
+  line-height: 1.9;
 }
 
 .hero-stats {
   display: grid;
-  gap: 12px;
-  min-width: 180px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 260px;
 }
 
-.stat-card {
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 14px 24px rgba(95, 60, 18, 0.06);
+.stat-card,
+.guide-item,
+.toolbar-card,
+.content-table,
+.preview-panel {
+  border-radius: 22px;
+}
+
+.stat-card,
+.guide-item {
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(205, 216, 190, 0.45);
 }
 
 .stat-card span {
   display: block;
-  color: #8c6a44;
+  color: #788270;
   font-size: 13px;
 }
 
 .stat-card strong {
   display: block;
   margin-top: 8px;
-  color: #5f3c12;
-  font-size: 24px;
+  color: #2d402d;
+  font-size: 28px;
 }
 
 .guide-panel {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  margin-bottom: 18px;
-}
-
-.guide-item,
-.toolbar-card {
-  padding: 18px 20px;
-  border-radius: 18px;
-  background: #fff;
-  border: 1px solid #f1eadc;
-  box-shadow: 0 10px 24px rgba(95, 60, 18, 0.05);
 }
 
 .guide-item strong {
   display: block;
   margin-bottom: 8px;
-  color: #6d4715;
-  font-size: 15px;
+  color: #314431;
 }
 
 .guide-item span {
-  color: #7b6650;
-  line-height: 1.7;
+  color: #6d7868;
+  line-height: 1.8;
+  font-size: 14px;
 }
 
 .toolbar-card {
-  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 4px;
+  background: linear-gradient(180deg, rgba(255, 252, 246, 0.95), rgba(246, 249, 241, 0.95));
 }
 
 .quick-actions {
-  display: flex;
-  justify-content: flex-end;
+  padding-bottom: 14px;
 }
 
 .content-table {
-  padding: 8px;
-  border-radius: 18px;
-  background: #fff;
-  border: 1px solid #f2ebdf;
-  box-shadow: 0 10px 24px rgba(95, 60, 18, 0.05);
-}
-
-.danger-text {
-  color: #d84a4a;
-}
-
-.preview-panel {
-  min-height: 240px;
-}
-
-.preview-header {
-  padding-bottom: 16px;
-  border-bottom: 1px solid #efe7d9;
+  overflow: hidden;
 }
 
 .preview-header h2 {
-  margin: 0;
-  color: #5f3c12;
-  font-size: 24px;
+  margin: 0 0 10px;
+  color: #2b3d2b;
 }
 
 .preview-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-top: 12px;
-  color: #8a7254;
+  margin-bottom: 18px;
+  color: #788271;
   font-size: 13px;
 }
 
 .preview-content {
-  padding-top: 18px;
-  color: #5b4e3f;
-  line-height: 1.8;
+  color: #4d584d;
+  line-height: 1.9;
 }
 
 .empty-readers {
-  padding: 28px 0 8px;
-  color: #8c7657;
+  padding: 24px 8px 6px;
   text-align: center;
+  color: #7c8376;
 }
 
-@media (max-width: 960px) {
+.danger-text {
+  color: #dd5b4b;
+}
+
+@media (max-width: 992px) {
   .page-hero,
-  .guide-panel {
-    grid-template-columns: 1fr;
-    display: grid;
+  .toolbar-card {
+    flex-direction: column;
+    align-items: stretch;
   }
 
+  .guide-panel,
   .hero-stats {
-    min-width: 0;
+    grid-template-columns: 1fr;
   }
 }
 </style>

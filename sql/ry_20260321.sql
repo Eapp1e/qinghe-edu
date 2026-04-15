@@ -23,16 +23,16 @@ create table sys_dept (
 -- ----------------------------
 -- 初始化-部门表数据
 -- ----------------------------
-insert into sys_dept values(100,  0,   '0',          '若依科技',   0, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(101,  100, '0,100',      '深圳总公司', 1, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(102,  100, '0,100',      '长沙分公司', 2, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(103,  101, '0,100,101',  '研发部门',   1, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(104,  101, '0,100,101',  '市场部门',   2, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(105,  101, '0,100,101',  '测试部门',   3, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(106,  101, '0,100,101',  '财务部门',   4, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(107,  101, '0,100,101',  '运维部门',   5, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(108,  102, '0,100,102',  '市场部门',   1, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
-insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '若依', '15888888888', 'ry@qq.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(100,  0,   '0',          '课后服务平台主管中心',   0, '平台管理员', '15888888888', 'admin@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(101,  100, '0,100',      '第一校区', 1, '校区负责人', '15888888888', 'campus1@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(102,  100, '0,100',      '第二校区', 2, '校区负责人', '15888888888', 'campus2@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(103,  101, '0,100,101',  '教务管理组',   1, '教务主管', '15888888888', 'academic@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(104,  101, '0,100,101',  '课程运营组',   2, '运营主管', '15888888888', 'operation@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(105,  101, '0,100,101',  '质量督导组',   3, '督导主管', '15888888888', 'quality@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(106,  101, '0,100,101',  '综合事务组',   4, '事务主管', '15888888888', 'service@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(107,  101, '0,100,101',  '技术保障组',   5, '技术主管', '15888888888', 'tech@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(108,  102, '0,100,102',  '家校协同组',   1, '协同主管', '15888888888', 'home-school@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
+insert into sys_dept values(109,  102, '0,100,102',  '资源保障组',   2, '资源主管', '15888888888', 'resource@edu-platform.com', '0', '0', 'admin', sysdate(), '', null);
 
 
 -- ----------------------------
@@ -66,8 +66,8 @@ create table sys_user (
 -- ----------------------------
 -- 初始化-用户信息表数据
 -- ----------------------------
-insert into sys_user values(1,  103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '管理员');
-insert into sys_user values(2,  105, 'ry',    '若依', '00', 'ry@qq.com',  '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '测试员');
+insert into sys_user values(1,  103, 'admin', '平台管理员', '00', 'admin@edu-platform.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '系统管理员');
+insert into sys_user values(2,  105, 'ry',    '平台运维', '00', 'ops@edu-platform.com',  '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '平台运维账号');
 
 
 -- ----------------------------
@@ -162,7 +162,7 @@ create table sys_menu (
 insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null, '', '', 1, 0, 'M', '0', '0', '', 'system',   'admin', sysdate(), '', null, '系统管理目录');
 insert into sys_menu values('2', '系统监控', '0', '2', 'monitor',          null, '', '', 1, 0, 'M', '0', '0', '', 'monitor',  'admin', sysdate(), '', null, '系统监控目录');
 insert into sys_menu values('3', '系统工具', '0', '3', 'tool',             null, '', '', 1, 0, 'M', '0', '0', '', 'tool',     'admin', sysdate(), '', null, '系统工具目录');
-insert into sys_menu values('4', '若依官网', '0', '4', 'http://ruoyi.vip', null, '', '', 0, 0, 'M', '0', '0', '', 'guide',    'admin', sysdate(), '', null, '若依官网地址');
+insert into sys_menu values('4', '平台帮助', '0', '4', 'https://gitee.com/eapp1e/edu-after-school', null, '', '', 0, 0, 'M', '1', '0', '', 'guide',    'admin', sysdate(), '', null, '平台项目地址');
 -- 二级菜单
 insert into sys_menu values('100',  '用户管理', '1',   '1', 'user',       'system/user/index',        '', '', 1, 0, 'C', '0', '0', 'system:user:list',        'user',          'admin', sysdate(), '', null, '用户管理菜单');
 insert into sys_menu values('101',  '角色管理', '1',   '2', 'role',       'system/role/index',        '', '', 1, 0, 'C', '0', '0', 'system:role:list',        'peoples',       'admin', sysdate(), '', null, '角色管理菜单');
@@ -548,7 +548,7 @@ create table sys_config (
 insert into sys_config values(1, '主框架页-默认皮肤样式名称',     'sys.index.skinName',               'skin-blue',     'Y', 'admin', sysdate(), '', null, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow' );
 insert into sys_config values(2, '用户管理-账号初始密码',         'sys.user.initPassword',            '123456',        'Y', 'admin', sysdate(), '', null, '初始化密码 123456' );
 insert into sys_config values(3, '主框架页-侧边栏主题',           'sys.index.sideTheme',              'theme-dark',    'Y', 'admin', sysdate(), '', null, '深色主题theme-dark，浅色主题theme-light' );
-insert into sys_config values(4, '账号自助-验证码开关',           'sys.account.captchaEnabled',       'true',          'Y', 'admin', sysdate(), '', null, '是否开启验证码功能（true开启，false关闭）');
+insert into sys_config values(4, '账号自助-验证码开关',           'sys.account.captchaEnabled',       'false',         'Y', 'admin', sysdate(), '', null, '是否开启验证码功能（true开启，false关闭）');
 insert into sys_config values(5, '账号自助-是否开启用户注册功能', 'sys.account.registerUser',         'false',         'Y', 'admin', sysdate(), '', null, '是否开启注册用户功能（true开启，false关闭）');
 insert into sys_config values(6, '用户登录-黑名单列表',           'sys.login.blackIPList',            '',              'Y', 'admin', sysdate(), '', null, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）');
 insert into sys_config values(7, '用户管理-初始密码修改策略',     'sys.account.initPasswordModify',   '1',             'Y', 'admin', sysdate(), '', null, '0：初始密码修改策略关闭，没有任何提示，1：提醒用户，如果未修改初始密码，则在登录时就会提醒修改密码对话框');
@@ -641,9 +641,9 @@ create table sys_notice (
 -- ----------------------------
 -- 初始化-公告信息表数据
 -- ----------------------------
-insert into sys_notice values('1', '温馨提醒：2018-07-01 若依新版本发布啦', '2', '新版本内容', '0', 'admin', sysdate(), '', null, '管理员');
-insert into sys_notice values('2', '维护通知：2018-07-01 若依系统凌晨维护', '1', '维护内容',   '0', 'admin', sysdate(), '', null, '管理员');
-insert into sys_notice values('3', '若依开源框架介绍', '1', '<p><span style=\"color: rgb(230, 0, 0);\">项目介绍</span></p><p><font color=\"#333333\">RuoYi开源项目是为企业用户定制的后台脚手架框架，为企业打造的一站式解决方案，降低企业开发成本，提升开发效率。主要包括用户管理、角色管理、部门管理、菜单管理、参数管理、字典管理、</font><span style=\"color: rgb(51, 51, 51);\">岗位管理</span><span style=\"color: rgb(51, 51, 51);\">、定时任务</span><span style=\"color: rgb(51, 51, 51);\">、</span><span style=\"color: rgb(51, 51, 51);\">服务监控、登录日志、操作日志、代码生成等功能。其中，还支持多数据源、数据权限、国际化、Redis缓存、Docker部署、滑动验证码、第三方认证登录、分布式事务、</span><font color=\"#333333\">分布式文件存储</font><span style=\"color: rgb(51, 51, 51);\">、分库分表处理等技术特点。</span></p><p><img src=\"https://foruda.gitee.com/images/1773931848342439032/a4d22313_1815095.png\" style=\"width: 64px;\"><br></p><p><span style=\"color: rgb(230, 0, 0);\">官网及演示</span></p><p><span style=\"color: rgb(51, 51, 51);\">若依官网地址：&nbsp;</span><a href=\"http://ruoyi.vip\" target=\"_blank\">http://ruoyi.vip</a><a href=\"http://ruoyi.vip\" target=\"_blank\"></a></p><p><span style=\"color: rgb(51, 51, 51);\">若依文档地址：&nbsp;</span><a href=\"http://doc.ruoyi.vip\" target=\"_blank\">http://doc.ruoyi.vip</a><br></p><p><span style=\"color: rgb(51, 51, 51);\">演示地址【不分离版】：&nbsp;</span><a href=\"http://demo.ruoyi.vip\" target=\"_blank\">http://demo.ruoyi.vip</a></p><p><span style=\"color: rgb(51, 51, 51);\">演示地址【分离版本】：&nbsp;</span><a href=\"http://vue.ruoyi.vip\" target=\"_blank\">http://vue.ruoyi.vip</a></p><p><span style=\"color: rgb(51, 51, 51);\">演示地址【微服务版】：&nbsp;</span><a href=\"http://cloud.ruoyi.vip\" target=\"_blank\">http://cloud.ruoyi.vip</a></p><p><span style=\"color: rgb(51, 51, 51);\">演示地址【移动端版】：&nbsp;</span><a href=\"http://h5.ruoyi.vip\" target=\"_blank\">http://h5.ruoyi.vip</a></p><p><br style=\"color: rgb(48, 49, 51); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 12px;\"></p>', '0', 'admin', sysdate(), '', null, '管理员');
+insert into sys_notice values('1', '平台通知：课后服务课程报名已开放', '2', '<p>各年级课后服务课程已开放报名，请家长及时登录平台查看课程安排并完成报名。</p>', '0', 'admin', sysdate(), '', null, '管理员');
+insert into sys_notice values('2', '维护通知：平台将于今晚进行例行维护', '1', '<p>为保障课后服务平台稳定运行，系统将于今晚 22:00 至 23:00 进行例行维护。维护期间部分功能可能短时不可用，请提前做好安排。</p>', '0', 'admin', sysdate(), '', null, '管理员');
+insert into sys_notice values('3', '平台说明：智能课后服务一体化工作台', '1', '<p>中小学智能课后服务平台面向学校、教师、家长与学生提供统一的课后服务管理能力，覆盖课程发布、在线报名、学习跟踪、作业问答、平台通知与 AI 辅助服务。</p><p>平台支持管理员统一管理用户、课程、通知与 AI 调用日志，帮助学校提升课后服务效率与安全管理水平。</p>', '0', 'admin', sysdate(), '', null, '管理员');
 
 
 -- ----------------------------
