@@ -116,8 +116,93 @@
             <span v-else>正在登录...</span>
           </el-button>
         </el-form-item>
+
+        <div class="register-entry">
+          <span>还没有账号？</span>
+          <button type="button" class="register-link" @click="openRegister">立即注册</button>
+        </div>
       </el-form>
     </div>
+
+    <el-dialog
+      title="注册账号"
+      :visible.sync="registerDialogVisible"
+      width="480px"
+      custom-class="register-dialog"
+      append-to-body
+      @closed="resetRegisterForm"
+    >
+      <div class="register-dialog__intro">
+        <strong>创建新账号</strong>
+        <span>支持学生、家长和教师自助注册，注册成功后可直接返回登录。</span>
+      </div>
+
+      <el-form ref="registerForm" :model="registerForm" :rules="registerRules" label-position="top">
+        <el-form-item label="注册身份" prop="loginRole">
+          <div class="register-role-grid">
+            <button
+              v-for="item in registerRoleOptions"
+              :key="item.value"
+              type="button"
+              class="register-role"
+              :class="{ active: registerForm.loginRole === item.value }"
+              @click="selectRegisterRole(item.value)"
+            >
+              <strong>{{ item.label }}</strong>
+              <span>{{ item.desc }}</span>
+            </button>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="账号" prop="username">
+          <el-input v-model="registerForm.username" placeholder="请输入注册账号" />
+        </el-form-item>
+
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="registerForm.password"
+            :type="registerPasswordVisible ? 'text' : 'password'"
+            placeholder="请输入登录密码"
+          >
+            <span
+              slot="suffix"
+              class="password-toggle"
+              @click="registerPasswordVisible = !registerPasswordVisible"
+            >
+              <svg-icon :icon-class="registerPasswordVisible ? 'eye-open' : 'eye'" class="password-toggle-icon" />
+            </span>
+          </el-input>
+        </el-form-item>
+
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            v-model="registerForm.confirmPassword"
+            :type="registerConfirmVisible ? 'text' : 'password'"
+            placeholder="请再次输入密码"
+          >
+            <span
+              slot="suffix"
+              class="password-toggle"
+              @click="registerConfirmVisible = !registerConfirmVisible"
+            >
+              <svg-icon :icon-class="registerConfirmVisible ? 'eye-open' : 'eye'" class="password-toggle-icon" />
+            </span>
+          </el-input>
+        </el-form-item>
+      </el-form>
+
+      <div class="register-tip">
+        注册后将自动绑定所选身份，管理员账号仍需由平台统一创建。
+      </div>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="registerDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="registerLoading" @click="handleRegister">
+          <span v-if="!registerLoading">提交注册</span>
+          <span v-else>正在提交...</span>
+        </el-button>
+      </div>
+    </el-dialog>
 
     <div class="el-login-footer">
       <span>{{ footerContent }}</span>
@@ -128,11 +213,23 @@
 <script>
 import Cookies from 'js-cookie'
 import { encrypt, decrypt } from '@/utils/jsencrypt'
+import { register } from '@/api/login'
 import defaultSettings from '@/settings'
 
 export default {
   name: 'Login',
   data() {
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请再次输入密码'))
+        return
+      }
+      if (value !== this.registerForm.password) {
+        callback(new Error('两次输入的密码不一致'))
+        return
+      }
+      callback()
+    }
     return {
       title: process.env.VUE_APP_TITLE,
       footerContent: defaultSettings.footerContent,
@@ -150,14 +247,37 @@ export default {
         { value: 'edu_teacher', label: '教师登录', desc: '发布课程与处理教学事务' },
         { value: 'edu_admin', label: '管理员登录', desc: '管理平台用户、通知和统计数据' }
       ],
+      registerRoleOptions: [
+        { value: 'edu_student', label: '学生账号', desc: '适用于自主查看课程与作业问答' },
+        { value: 'edu_parent', label: '家长账号', desc: '适用于查看孩子档案和报名课程' },
+        { value: 'edu_teacher', label: '教师账号', desc: '适用于发布课程和生成教学建议' }
+      ],
       passwordVisible: false,
+      registerPasswordVisible: false,
+      registerConfirmVisible: false,
       loginRules: {
         loginRole: [{ required: true, trigger: 'change', message: '请选择登录角色' }],
         username: [{ required: true, trigger: 'blur', message: '请输入账号' }],
         password: [{ required: true, trigger: 'blur', message: '请输入密码' }]
       },
+      registerForm: {
+        username: '',
+        password: '',
+        confirmPassword: '',
+        loginRole: 'edu_student'
+      },
+      registerRules: {
+        loginRole: [{ required: true, trigger: 'change', message: '请选择注册身份' }],
+        username: [{ required: true, trigger: 'blur', message: '请输入注册账号' }],
+        password: [
+          { required: true, trigger: 'blur', message: '请输入登录密码' },
+          { min: 5, max: 20, trigger: 'blur', message: '密码长度必须在 5 到 20 个字符之间' }
+        ],
+        confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }]
+      },
       loading: false,
-      register: false,
+      registerDialogVisible: false,
+      registerLoading: false,
       redirect: undefined
     }
   },
@@ -192,6 +312,29 @@ export default {
         this.$refs.loginForm.clearValidate('loginRole')
       })
     },
+    openRegister() {
+      this.registerDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.registerForm && this.$refs.registerForm.clearValidate()
+      })
+    },
+    resetRegisterForm() {
+      this.registerPasswordVisible = false
+      this.registerConfirmVisible = false
+      this.registerLoading = false
+      this.registerForm = {
+        username: '',
+        password: '',
+        confirmPassword: '',
+        loginRole: 'edu_student'
+      }
+    },
+    selectRegisterRole(role) {
+      this.registerForm.loginRole = role
+      this.$nextTick(() => {
+        this.$refs.registerForm && this.$refs.registerForm.clearValidate('loginRole')
+      })
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (!valid) {
@@ -213,6 +356,29 @@ export default {
           this.$router.push({ path: this.redirect || '/' }).catch(() => {})
         }).catch(() => {
           this.loading = false
+        })
+      })
+    },
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
+        if (!valid) {
+          return
+        }
+        this.registerLoading = true
+        register({
+          username: this.registerForm.username,
+          password: this.registerForm.password,
+          loginRole: this.registerForm.loginRole
+        }).then(response => {
+          this.$message.success(response.msg || '注册成功，请返回登录')
+          this.loginForm.username = this.registerForm.username
+          this.loginForm.password = this.registerForm.password
+          this.loginForm.loginRole = this.registerForm.loginRole
+          this.registerDialogVisible = false
+        }).catch(() => {
+          this.registerLoading = false
+        }).finally(() => {
+          this.registerLoading = false
         })
       })
     }
@@ -849,6 +1015,114 @@ export default {
   filter: saturate(108%);
 }
 
+.register-entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  color: #5c7383;
+  font-size: 14px;
+}
+
+.register-link {
+  border: none;
+  padding: 0;
+  color: #0f9f9c;
+  font-size: 14px;
+  font-weight: 700;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.register-link:hover {
+  color: #18c6b0;
+  transform: translateY(-1px);
+}
+
+.register-dialog__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  color: #597182;
+}
+
+.register-dialog__intro strong {
+  color: #203646;
+  font-size: 18px;
+}
+
+.register-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.register-role {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  min-height: 92px;
+  padding: 14px 12px;
+  border: 1px solid rgba(78, 181, 177, 0.18);
+  border-radius: 18px;
+  background: rgba(244, 252, 252, 0.88);
+  color: #436273;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register-role strong {
+  color: #203646;
+  font-size: 14px;
+}
+
+.register-role span {
+  line-height: 1.5;
+  font-size: 12px;
+}
+
+.register-role:hover,
+.register-role.active {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 16px 28px rgba(24, 153, 144, 0.14);
+  transform: translateY(-2px);
+}
+
+.register-tip {
+  margin-top: 10px;
+  color: #718797;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+::v-deep .register-dialog {
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(248, 253, 252, 0.98), rgba(239, 247, 246, 0.96));
+  box-shadow: 0 28px 60px rgba(25, 71, 88, 0.22);
+}
+
+::v-deep .register-dialog .el-dialog__header {
+  padding: 22px 24px 12px;
+}
+
+::v-deep .register-dialog .el-dialog__title {
+  color: #1e3544;
+  font-weight: 700;
+}
+
+::v-deep .register-dialog .el-dialog__body {
+  padding: 0 24px 10px;
+}
+
+::v-deep .register-dialog .el-dialog__footer {
+  padding: 8px 24px 24px;
+}
+
 .el-login-footer {
   position: absolute;
   right: 0;
@@ -899,6 +1173,10 @@ export default {
 @media (max-width: 768px) {
   .login {
     padding: 18px 14px 60px;
+  }
+
+  .register-role-grid {
+    grid-template-columns: 1fr;
   }
 
   .login-shell {

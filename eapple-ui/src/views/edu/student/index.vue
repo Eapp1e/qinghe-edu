@@ -23,6 +23,17 @@
     </section>
 
     <section v-if="isOwnerView" class="owner-layout">
+      <div v-if="canSelfEdit" class="owner-toolbar">
+        <el-button
+          v-if="!studentList.length"
+          type="primary"
+          icon="el-icon-plus"
+          @click="handleOwnerAdd"
+        >
+          完善我的档案
+        </el-button>
+      </div>
+
       <div v-if="studentList.length" class="profile-grid">
         <article v-for="item in studentList" :key="item.profileId" class="profile-card">
           <div class="profile-head">
@@ -88,13 +99,16 @@
                 <h3>智能课程推荐</h3>
                 <p>结合学生档案、兴趣标签和课程热度，为当前学生推荐更合适的课后服务课程。</p>
               </div>
-              <el-button type="primary" icon="el-icon-magic-stick" @click="handleRecommend(item)">查看推荐</el-button>
+              <div class="recommend-actions">
+                <el-button v-if="canSelfEdit" plain icon="el-icon-edit" @click="handleOwnerEdit(item)">编辑档案</el-button>
+                <el-button type="primary" icon="el-icon-magic-stick" @click="handleRecommend(item)">查看推荐</el-button>
+              </div>
             </div>
           </div>
         </article>
       </div>
 
-      <el-empty v-else description="当前暂无可查看的学生档案" class="empty-panel" />
+      <el-empty v-else :description="ownerEmptyDescription" class="empty-panel" />
     </section>
 
     <template v-else>
@@ -209,12 +223,12 @@
     </template>
 
     <el-dialog :title="title" :visible.sync="open" width="700px">
-      <el-form ref="form" :model="form" :rules="rules" label-width="90px">
+      <el-form ref="form" :model="form" :rules="formRules" label-width="90px">
         <el-row :gutter="12">
-          <el-col :span="12"><el-form-item label="学生ID" prop="studentUserId"><el-input v-model="form.studentUserId" /></el-form-item></el-col>
+          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="学生ID" prop="studentUserId"><el-input v-model="form.studentUserId" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="学生姓名" prop="studentName"><el-input v-model="form.studentName" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="家长ID" prop="parentUserId"><el-input v-model="form.parentUserId" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="家长姓名"><el-input v-model="form.parentName" /></el-form-item></el-col>
+          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长ID" prop="parentUserId"><el-input v-model="form.parentUserId" /></el-form-item></el-col>
+          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长姓名"><el-input v-model="form.parentName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="年级"><el-input v-model="form.gradeName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" /></el-form-item></el-col>
           <el-col :span="12">
@@ -225,7 +239,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col v-if="!isStudentOwner" :span="12">
             <el-form-item label="状态">
               <el-radio-group v-model="form.status">
                 <el-radio label="0">正常</el-radio>
@@ -302,9 +316,7 @@ export default {
       },
       form: {},
       rules: {
-        studentUserId: [{ required: true, message: '请输入学生ID', trigger: 'blur' }],
-        studentName: [{ required: true, message: '请输入学生姓名', trigger: 'blur' }],
-        parentUserId: [{ required: true, message: '请输入家长ID', trigger: 'blur' }]
+        studentName: [{ required: true, message: '请输入学生姓名', trigger: 'blur' }]
       }
     }
   },
@@ -323,6 +335,28 @@ export default {
     },
     canManageProfile() {
       return this.$auth.hasRole('edu_teacher') || this.$auth.hasRole('admin')
+    },
+    canSelfEdit() {
+      return this.$auth.hasRole('edu_student')
+    },
+    isStudentOwner() {
+      return this.$auth.hasRole('edu_student')
+    },
+    ownerEmptyDescription() {
+      if (this.isStudentOwner) {
+        return '当前还没有个人档案，请先完善基础信息'
+      }
+      return '当前暂无可查看的学生档案'
+    },
+    formRules() {
+      const rules = {
+        studentName: [{ required: true, message: '请输入学生姓名', trigger: 'blur' }]
+      }
+      if (!this.isStudentOwner) {
+        rules.studentUserId = [{ required: true, message: '请输入学生ID', trigger: 'blur' }]
+        rules.parentUserId = [{ required: true, message: '请输入家长ID', trigger: 'blur' }]
+      }
+      return rules
     },
     pageTitle() {
       if (this.$auth.hasRole('edu_student')) {
@@ -384,14 +418,39 @@ export default {
       this.title = '新增学生档案'
       this.open = true
     },
+    handleOwnerAdd() {
+      this.form = {
+        status: '0',
+        gender: '男',
+        studentUserId: this.$store.getters.id,
+        studentName: this.$store.getters.nickName || this.$store.getters.name || '',
+        interestTags: ''
+      }
+      this.title = '完善我的档案'
+      this.open = true
+      this.$nextTick(() => {
+        this.$refs.form && this.$refs.form.clearValidate()
+      })
+    },
     handleUpdate(row) {
       this.form = { ...row }
       this.title = '编辑学生档案'
       this.open = true
     },
+    handleOwnerEdit(row) {
+      this.form = { ...row }
+      this.title = '修改我的档案'
+      this.open = true
+      this.$nextTick(() => {
+        this.$refs.form && this.$refs.form.clearValidate()
+      })
+    },
     submitForm() {
       this.$refs.form.validate(valid => {
         if (!valid) return
+        if (this.isStudentOwner) {
+          this.form.studentUserId = this.$store.getters.id
+        }
         const request = this.form.profileId ? updateStudent(this.form) : addStudent(this.form)
         request.then(() => {
           this.$modal.msgSuccess('保存成功')
@@ -537,6 +596,12 @@ export default {
   z-index: 1;
 }
 
+.owner-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
 .profile-grid {
   display: grid;
   gap: 18px;
@@ -659,6 +724,13 @@ export default {
   margin: 8px 0 0;
   color: #6c8794;
   line-height: 1.8;
+}
+
+.recommend-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .filter-panel {
@@ -855,6 +927,10 @@ export default {
   .recommend-section {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .recommend-actions {
+    justify-content: flex-start;
   }
 
   .filter-actions {

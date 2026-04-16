@@ -10,7 +10,7 @@ create table edu_student_profile (
   profile_id bigint(20) not null auto_increment comment '档案ID',
   student_user_id bigint(20) not null comment '学生用户ID',
   student_name varchar(64) not null comment '学生姓名',
-  parent_user_id bigint(20) not null comment '家长用户ID',
+  parent_user_id bigint(20) default null comment '家长用户ID',
   parent_name varchar(64) default '' comment '家长姓名',
   grade_name varchar(32) default '' comment '年级',
   class_name varchar(32) default '' comment '班级',

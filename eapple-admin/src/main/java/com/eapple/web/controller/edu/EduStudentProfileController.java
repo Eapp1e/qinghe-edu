@@ -49,7 +49,7 @@ public class EduStudentProfileController extends BaseController
         return success(profileService.selectProfileById(profileId));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:student:add')")
+    @PreAuthorize("@ss.hasPermi('edu:student:add') or @ss.hasRole('edu_student')")
     @Log(title = "学生档案", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody EduStudentProfile profile)
@@ -57,7 +57,7 @@ public class EduStudentProfileController extends BaseController
         return toAjax(profileService.insertProfile(profile));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:student:edit')")
+    @PreAuthorize("@ss.hasPermi('edu:student:edit') or @ss.hasRole('edu_student')")
     @Log(title = "学生档案", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody EduStudentProfile profile)

@@ -1,13 +1,15 @@
 package com.eapple.system.service.impl.edu;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.eapple.common.exception.ServiceException;
 import com.eapple.common.utils.SecurityUtils;
+import com.eapple.common.utils.StringUtils;
 import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.edu.IEduStudentProfileService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EduStudentProfileServiceImpl implements IEduStudentProfileService
@@ -54,6 +56,14 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public int insertProfile(EduStudentProfile profile)
     {
+        if (SecurityUtils.hasRole("edu_student"))
+        {
+            profile.setStudentUserId(SecurityUtils.getUserId());
+            if (StringUtils.isEmpty(profile.getStudentName()))
+            {
+                profile.setStudentName(SecurityUtils.getUsername());
+            }
+        }
         if (profileMapper.selectProfileByStudentUserId(profile.getStudentUserId()) != null)
         {
             throw new ServiceException("该学生档案已存在");
@@ -66,7 +76,15 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public int updateProfile(EduStudentProfile profile)
     {
-        ensureProfileEditable(profileMapper.selectProfileById(profile.getProfileId()));
+        EduStudentProfile currentProfile = profileMapper.selectProfileById(profile.getProfileId());
+        ensureProfileEditable(currentProfile);
+        if (SecurityUtils.hasRole("edu_student"))
+        {
+            profile.setStudentUserId(currentProfile.getStudentUserId());
+            profile.setParentUserId(currentProfile.getParentUserId());
+            profile.setParentName(currentProfile.getParentName());
+            profile.setStatus(currentProfile.getStatus());
+        }
         profile.setUpdateBy(SecurityUtils.getUsername());
         return profileMapper.updateProfile(profile);
     }
