@@ -1,47 +1,11 @@
 <template>
   <div class="app-container dashboard-page">
-    <section class="hero-grid">
-      <el-card shadow="never" class="hero-card">
-        <div class="hero-copy">
-          <span class="hero-badge">Platform Overview</span>
-          <h1>平台首页</h1>
-          <p>
-            平台围绕课后课程管理、报名协同、学习跟踪与 AI 辅助服务构建统一工作台，
-            为学校、教师、家长与学生提供高效、安全、可追踪的课后服务支持。
-          </p>
-          <div class="hero-actions">
-            <el-button type="primary" icon="el-icon-data-analysis" @click="scrollToCharts">查看统计图表</el-button>
-            <el-button plain icon="el-icon-reading" @click="goPage('/edu/course')">进入课程中心</el-button>
-          </div>
-        </div>
-        <div class="hero-panel">
-          <div class="panel-title">当前角色工作建议</div>
-          <div class="role-stack">
-            <div v-for="item in roleGuide" :key="item.title" class="role-card">
-              <strong>{{ item.title }}</strong>
-              <span>{{ item.description }}</span>
-            </div>
-          </div>
-        </div>
-      </el-card>
-
-      <el-card shadow="never" class="spotlight-card">
-        <div class="spotlight-title">核心能力</div>
-        <div class="spotlight-list">
-          <div class="spotlight-item">
-            <strong>课程与报名</strong>
-            <span>支持课程发布、家长报名、容量控制和上课信息统一管理。</span>
-          </div>
-          <div class="spotlight-item">
-            <strong>学习与问答</strong>
-            <span>面向学生提供作业问题提交、AI 解答和学习过程跟踪。</span>
-          </div>
-          <div class="spotlight-item">
-            <strong>运营与治理</strong>
-            <span>管理员可查看通知、统计报表、AI 日志与平台用户数据。</span>
-          </div>
-        </div>
-      </el-card>
+    <section class="hero-card">
+      <div>
+        <span class="hero-badge">Platform Overview</span>
+        <h1>平台首页</h1>
+        <p>集中查看课后服务平台的课程运行、报名情况、作业问答与整体活跃趋势。</p>
+      </div>
     </section>
 
     <section class="metric-grid">
@@ -60,40 +24,79 @@
         <div slot="header">平台业务结构</div>
         <div ref="structureChart" class="chart-box"></div>
       </el-card>
+      <el-card shadow="never" class="chart-card">
+        <div slot="header">热门选课排行</div>
+        <div ref="popularCourseChart" class="chart-box"></div>
+      </el-card>
       <el-card shadow="never" class="chart-card wide-card">
-        <div slot="header">近期活跃分布</div>
+        <div slot="header">近期活跃趋势</div>
         <div ref="activityChart" class="chart-box"></div>
       </el-card>
     </section>
 
     <section class="content-grid">
-      <el-card shadow="never" class="entry-card">
-        <div slot="header">业务入口</div>
-        <div class="entry-grid">
-          <button v-for="entry in quickEntries" :key="entry.path" type="button" class="entry-item" @click="goPage(entry.path)">
-            <strong>{{ entry.title }}</strong>
-            <span>{{ entry.desc }}</span>
-          </button>
-        </div>
-      </el-card>
+      <el-card shadow="never" class="insight-card">
+        <div slot="header">平台动态</div>
+        <div class="insight-layout">
+          <div class="info-panel timeline-panel">
+            <div class="panel-head">
+              <strong>近期动态</strong>
+              <span>聚合课程发布与学生提问等平台动态</span>
+            </div>
+            <div class="timeline-scroll">
+              <el-timeline>
+                <el-timeline-item v-for="item in timeline" :key="item.key" :timestamp="item.time">
+                  {{ item.text }}
+                </el-timeline-item>
+              </el-timeline>
+            </div>
+          </div>
 
-      <el-card shadow="never" class="service-card">
-        <div slot="header">服务覆盖</div>
-        <div class="service-list">
-          <div v-for="item in serviceScopes" :key="item.title" class="service-item">
-            <strong>{{ item.title }}</strong>
-            <p>{{ item.desc }}</p>
+          <div class="right-column">
+            <div class="info-panel schedule-panel">
+              <div class="panel-head">
+                <strong>近期课程安排</strong>
+                <span>快速查看最新课程与开课时间</span>
+              </div>
+              <div v-if="recentCourseCards.length" class="mini-list">
+                <div v-for="item in recentCourseCards" :key="item.key" class="mini-item">
+                  <div class="mini-main">
+                    <strong>{{ item.title }}</strong>
+                    <p>{{ item.desc }}</p>
+                  </div>
+                  <span>{{ item.meta }}</span>
+                </div>
+              </div>
+              <div v-else class="empty-state">暂无最新课程安排</div>
+            </div>
+
+            <div class="notice-grid">
+              <div class="info-panel compact-panel notice-panel">
+                <div class="panel-head">
+                  <strong>问答提醒</strong>
+                  <span>近期问答处理情况</span>
+                </div>
+                <div class="status-block">
+                  <strong>{{ questionSummary.pending }}</strong>
+                  <span>待关注问题</span>
+                  <p>{{ questionSummary.text }}</p>
+                </div>
+              </div>
+
+              <div class="info-panel compact-panel notice-panel">
+                <div class="panel-head">
+                  <strong>平台概览</strong>
+                  <span>当前平台整体运行情况</span>
+                </div>
+                <div class="status-block">
+                  <strong>{{ summaryBlock.total }}</strong>
+                  <span>本周重点关注</span>
+                  <p>{{ summaryBlock.text }}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </el-card>
-
-      <el-card shadow="never" class="timeline-card overview-timeline-card">
-        <div slot="header">近期平台动态</div>
-        <el-timeline>
-          <el-timeline-item v-for="item in timeline" :key="item.key" :timestamp="item.time">
-            {{ item.text }}
-          </el-timeline-item>
-        </el-timeline>
       </el-card>
     </section>
   </div>
@@ -110,102 +113,70 @@ export default {
   data() {
     return {
       dashboard: {
+        totalCourses: 0,
+        totalEnrollments: 0,
+        totalQuestions: 0,
+        totalAiCalls: 0,
+        activeStudents: 0,
+        activeTeachers: 0,
         recentCourses: [],
         recentQuestions: [],
-        recentAiLogs: []
+        recentAiLogs: [],
+        popularCourses: []
       },
-      charts: [],
-      quickEntries: [
-        { title: '课程中心', desc: '维护课程信息、查看课程安排与报名情况。', path: '/edu/course' },
-        { title: '学生档案', desc: '管理学生基础信息、兴趣方向与成长画像。', path: '/edu/student' },
-        { title: '报名记录', desc: '跟踪课程报名进度与学习过程记录。', path: '/edu/enrollment' },
-        { title: '作业问答', desc: '查看学生提问、AI 解答与辅导建议。', path: '/edu/question' },
-        { title: 'AI 日志', desc: '审查模型调用记录、响应状态与安全留痕。', path: '/edu/ai-log' },
-        { title: '通知中心', desc: '发布课程通知、报名提醒和家校消息。', path: '/edu/platform-notice' }
-      ],
-      serviceScopes: [
-        { title: '学生端', desc: '查看课程、参与报名、提交作业问题并获得 AI 辅助解答。' },
-        { title: '家长端', desc: '为孩子报名课程、查看学习记录和课后服务动态。' },
-        { title: '教师端', desc: '发布课程、管理名单、生成教学建议与通知内容。' },
-        { title: '管理端', desc: '统一管理用户、课程、通知、AI 日志及平台统计数据。' }
-      ]
+      charts: []
     }
   },
   computed: {
-    roles() {
-      return this.$store.getters.roles || []
-    },
-    currentRole() {
-      if (this.roles.includes('edu_teacher')) return 'teacher'
-      if (this.roles.includes('edu_parent')) return 'parent'
-      if (this.roles.includes('edu_student')) return 'student'
-      if (this.roles.includes('edu_admin') || this.roles.includes('admin')) return 'admin'
-      return 'visitor'
-    },
     cards() {
       return [
         { label: '课程总数', value: this.dashboard.totalCourses || 0 },
         { label: '报名总数', value: this.dashboard.totalEnrollments || 0 },
         { label: '提问总数', value: this.dashboard.totalQuestions || 0 },
-        { label: 'AI调用', value: this.dashboard.totalAiCalls || 0 },
+        { label: 'AI 调用', value: this.dashboard.totalAiCalls || 0 },
         { label: '活跃学生', value: this.dashboard.activeStudents || 0 },
         { label: '活跃教师', value: this.dashboard.activeTeachers || 0 }
       ]
     },
-    roleGuide() {
-      const guides = {
-        admin: [
-          { title: '查看平台看板', description: '了解课程开设、报名数量、问答情况与 AI 调用概览。' },
-          { title: '进入通知中心', description: '发布课后服务通知，跟踪消息已读状态和触达情况。' },
-          { title: '检查 AI 日志', description: '审查模型调用记录与内容生成状态，保障平台安全运行。' }
-        ],
-        teacher: [
-          { title: '维护课程信息', description: '新增课程、更新课表安排，并完善课程说明与教学建议。' },
-          { title: '查看报名记录', description: '掌握学生报名名单与学习跟踪信息，做好班级组织。' },
-          { title: '处理作业问答', description: '结合 AI 辅助结果，快速回应学生课后学习问题。' }
-        ],
-        parent: [
-          { title: '查看学生档案', description: '了解孩子的年级班级、兴趣方向和参与课程情况。' },
-          { title: '办理课程报名', description: '进入课程中心为孩子选择合适的课后服务课程。' },
-          { title: '跟踪学习记录', description: '查看报名进度、学习反馈和平台通知内容。' }
-        ],
-        student: [
-          { title: '浏览课程安排', description: '查看当前开放的课后课程与兴趣班信息。' },
-          { title: '提交作业问题', description: '把学习中遇到的问题提交给平台，获取 AI 辅助建议。' },
-          { title: '回顾学习过程', description: '查看自己的课程参与与问答记录，持续改进学习效果。' }
-        ],
-        visitor: [
-          { title: '进入课程中心', description: '从课程信息开始了解平台提供的课后服务内容。' },
-          { title: '查看统计图表', description: '通过数据面板掌握平台当前服务开展情况。' },
-          { title: '关注平台通知', description: '及时获取课程安排、活动提醒与服务公告。' }
-        ]
-      }
-      return guides[this.currentRole]
-    },
     timeline() {
       const items = []
-      ;(this.dashboard.recentCourses || []).slice(0, 2).forEach(item => {
+      ;(this.dashboard.recentCourses || []).slice(0, 3).forEach(item => {
         items.push({
-          key: 'course-' + item.courseId,
-          time: item.weekDay + ' ' + item.startTime,
-          text: `课程《${item.courseName}》已由 ${item.teacherName} 发布。`
+          key: `course-${item.courseId}`,
+          time: this.formatCourseTime(item),
+          text: `课程《${item.courseName}》已发布`
         })
       })
-      ;(this.dashboard.recentQuestions || []).slice(0, 2).forEach(item => {
+      ;(this.dashboard.recentQuestions || []).slice(0, 4).forEach(item => {
         items.push({
-          key: 'question-' + item.questionId,
-          time: parseTime(item.createTime),
-          text: `${item.studentName} 提交了问题《${item.questionTitle}》。`
+          key: `question-${item.questionId}`,
+          time: this.formatDisplayTime(item.createTime),
+          text: `收到问题《${item.questionTitle}》`
         })
       })
-      ;(this.dashboard.recentAiLogs || []).slice(0, 2).forEach(item => {
-        items.push({
-          key: 'ai-' + item.logId,
-          time: parseTime(item.createTime),
-          text: `AI 完成了一次 ${item.businessType} 业务处理，状态为 ${item.status}。`
-        })
-      })
-      return items.length ? items : [{ key: 'empty', time: '当前', text: '暂无最新平台动态。' }]
+      return items.length ? items : [{ key: 'empty', time: '当前', text: '暂无最新平台动态' }]
+    },
+    recentCourseCards() {
+      return (this.dashboard.recentCourses || []).slice(0, 3).map(item => ({
+        key: item.courseId,
+        title: item.courseName,
+        desc: `授课教师：${item.teacherName || '待安排'} · 容量 ${item.capacity || 0} 人`,
+        meta: this.formatCourseTime(item)
+      }))
+    },
+    questionSummary() {
+      const recentQuestions = this.dashboard.recentQuestions || []
+      const latest = recentQuestions[0]
+      return {
+        pending: recentQuestions.length,
+        text: latest ? `最新问题为《${latest.questionTitle}》，建议优先查看答疑质量与响应时效。` : '当前暂无新的学生提问，答疑服务运行平稳。'
+      }
+    },
+    summaryBlock() {
+      return {
+        total: this.dashboard.totalEnrollments || 0,
+        text: `当前共有 ${this.dashboard.totalCourses || 0} 门课程在运行，累计报名 ${this.dashboard.totalEnrollments || 0} 人次。`
+      }
     }
   },
   created() {
@@ -219,48 +190,74 @@ export default {
     this.disposeCharts()
   },
   methods: {
+    parseDate(value) {
+      if (!value) return null
+      if (value instanceof Date) return value
+      const normalized = typeof value === 'string' ? value.replace(/-/g, '/') : value
+      const date = new Date(normalized)
+      return Number.isNaN(date.getTime()) ? null : date
+    },
+    isCurrentWeek(value) {
+      const date = this.parseDate(value)
+      if (!date) return false
+      const now = new Date()
+      const currentDay = now.getDay() || 7
+      const startOfWeek = new Date(now)
+      startOfWeek.setHours(0, 0, 0, 0)
+      startOfWeek.setDate(now.getDate() - currentDay + 1)
+      const endOfWeek = new Date(startOfWeek)
+      endOfWeek.setDate(startOfWeek.getDate() + 7)
+      return date >= startOfWeek && date < endOfWeek
+    },
+    getWeekLabel(value) {
+      const date = this.parseDate(value)
+      if (!date) return ''
+      const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      return weekMap[date.getDay()]
+    },
+    formatDisplayTime(value, timeText = '') {
+      const date = this.parseDate(value)
+      if (!date) {
+        return timeText || '刚刚'
+      }
+      if (this.isCurrentWeek(date)) {
+        return `${this.getWeekLabel(date)}${timeText ? ' ' + timeText : ''}`.trim()
+      }
+      return `${parseTime(date, '{y}-{m}-{d}')}${timeText ? ' ' + timeText : ''}`.trim()
+    },
+    formatCourseTime(item) {
+      return this.formatDisplayTime(item.startDate || item.createTime, item.startTime || '')
+    },
+    formatCourseName(name) {
+      if (!name) return '未命名课程'
+      return name.length > 12 ? `${name.slice(0, 12)}...` : name
+    },
     getData() {
       getEduDashboard().then(res => {
-        this.dashboard = res.data || { recentCourses: [], recentQuestions: [], recentAiLogs: [] }
+        this.dashboard = Object.assign({}, this.dashboard, res.data || {})
         this.$nextTick(() => {
           this.renderCharts()
         })
-      }).catch(() => {
-        this.dashboard = { recentCourses: [], recentQuestions: [], recentAiLogs: [] }
       })
-    },
-    goPage(path) {
-      this.$router.push(path)
-    },
-    scrollToCharts() {
-      const target = this.$refs.chartSection
-      if (target && target.scrollIntoView) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
     },
     renderCharts() {
       this.disposeCharts()
       this.renderOverviewChart()
       this.renderStructureChart()
+      this.renderPopularCourseChart()
       this.renderActivityChart()
     },
     renderOverviewChart() {
       const chart = echarts.init(this.$refs.overviewChart, 'macarons')
       chart.setOption({
-        grid: { top: 40, left: 40, right: 20, bottom: 36 },
+        grid: { top: 36, left: 40, right: 20, bottom: 30 },
         tooltip: { trigger: 'axis' },
         xAxis: {
           type: 'category',
           axisTick: { show: false },
-          axisLine: { lineStyle: { color: '#c5e5ea' } },
-          axisLabel: { color: '#5b7582' },
-          data: ['课程', '报名', '问答', 'AI调用', '学生', '教师']
+          data: ['课程', '报名', '问答', '学生', '教师']
         },
-        yAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: 'rgba(114, 205, 212, 0.18)' } },
-          axisLabel: { color: '#6a8593' }
-        },
+        yAxis: { type: 'value' },
         series: [{
           type: 'bar',
           barWidth: 24,
@@ -268,7 +265,6 @@ export default {
             borderRadius: [10, 10, 0, 0],
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               { offset: 0, color: '#20e0b6' },
-              { offset: 0.55, color: '#16c8ca' },
               { offset: 1, color: '#3095ff' }
             ])
           },
@@ -276,7 +272,6 @@ export default {
             this.dashboard.totalCourses || 0,
             this.dashboard.totalEnrollments || 0,
             this.dashboard.totalQuestions || 0,
-            this.dashboard.totalAiCalls || 0,
             this.dashboard.activeStudents || 0,
             this.dashboard.activeTeachers || 0
           ]
@@ -288,82 +283,157 @@ export default {
       const chart = echarts.init(this.$refs.structureChart, 'macarons')
       chart.setOption({
         tooltip: { trigger: 'item' },
-        legend: {
-          bottom: 10,
-          icon: 'circle',
-          textStyle: { color: '#5f7987' }
-        },
+        legend: { bottom: 0 },
         series: [{
           type: 'pie',
-          radius: ['48%', '72%'],
-          center: ['50%', '44%'],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 12,
-            borderColor: '#fff',
-            borderWidth: 4
-          },
-          label: {
-            color: '#4f6877',
-            formatter: '{b}\n{c}'
-          },
+          radius: ['45%', '70%'],
+          itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 4 },
           data: [
-            { value: this.dashboard.totalCourses || 0, name: '课程', itemStyle: { color: '#20ddb6' } },
-            { value: this.dashboard.totalEnrollments || 0, name: '报名', itemStyle: { color: '#2f98ff' } },
-            { value: this.dashboard.totalQuestions || 0, name: '问答', itemStyle: { color: '#ffb74d' } },
-            { value: this.dashboard.totalAiCalls || 0, name: 'AI调用', itemStyle: { color: '#8a7dff' } }
+            { value: this.dashboard.totalCourses || 0, name: '课程' },
+            { value: this.dashboard.totalEnrollments || 0, name: '报名' },
+            { value: this.dashboard.totalQuestions || 0, name: '问答' }
           ]
         }]
+      })
+      this.charts.push(chart)
+    },
+    renderPopularCourseChart() {
+      const chart = echarts.init(this.$refs.popularCourseChart, 'macarons')
+      const popularCourses = (this.dashboard.popularCourses || [])
+        .slice()
+        .sort((a, b) => (b.enrollCount || 0) - (a.enrollCount || 0))
+        .slice(0, 5)
+      const rankLabels = popularCourses.length
+        ? popularCourses.map((item, index) => `TOP ${index + 1}`)
+        : ['TOP 1']
+      const courseNames = popularCourses.length
+        ? popularCourses.map(item => this.formatCourseName(item.courseName))
+        : ['暂无课程数据']
+      const values = popularCourses.length ? popularCourses.map(item => item.enrollCount || 0) : [0]
+      const maxValue = Math.max(...values, 1)
+
+      chart.setOption({
+        grid: { top: 18, left: 18, right: 88, bottom: 12, containLabel: true },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'none' },
+          formatter: params => {
+            const target = (params || []).find(item => item.seriesName === '报名人数')
+            if (!target || !popularCourses[target.dataIndex]) {
+              return '暂无课程数据'
+            }
+            const course = popularCourses[target.dataIndex]
+            return `${rankLabels[target.dataIndex]}<br/>${course.courseName}<br/>报名人数：${course.enrollCount || 0}`
+          }
+        },
+        xAxis: {
+          type: 'value',
+          max: maxValue,
+          splitLine: { show: false },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { show: false }
+        },
+        yAxis: [
+          {
+            type: 'category',
+            inverse: true,
+            axisTick: { show: false },
+            axisLine: { show: false },
+            axisLabel: {
+              color: '#5f7285',
+              fontSize: 12,
+              fontWeight: 700
+            },
+            data: rankLabels
+          },
+          {
+            type: 'category',
+            inverse: true,
+            axisTick: { show: false },
+            axisLine: { show: false },
+            axisLabel: {
+              color: '#22384a',
+              fontSize: 13,
+              margin: 28
+            },
+            data: courseNames
+          }
+        ],
+        series: [
+          {
+            type: 'bar',
+            yAxisIndex: 1,
+            silent: true,
+            barWidth: 16,
+            barGap: '-100%',
+            itemStyle: {
+              color: 'rgba(48, 149, 255, 0.12)',
+              borderRadius: 999
+            },
+            data: values.map(() => maxValue)
+          },
+          {
+            name: '报名人数',
+            type: 'bar',
+            yAxisIndex: 1,
+            barWidth: 16,
+            label: {
+              show: true,
+              position: 'insideRight',
+              distance: 8,
+              color: '#ffffff',
+              fontWeight: 700,
+              formatter: ({ value }) => `${value} 人`
+            },
+            itemStyle: {
+              borderRadius: 999,
+              color: params => {
+                const palette = [
+                  ['#23dfb7', '#2f95ff'],
+                  ['#48cfff', '#4c7cff'],
+                  ['#5ce5af', '#29c7a2'],
+                  ['#7ea7ff', '#5968ff'],
+                  ['#78d5ff', '#3db8ff']
+                ]
+                const colors = palette[params.dataIndex] || palette[palette.length - 1]
+                return new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                  { offset: 0, color: colors[0] },
+                  { offset: 1, color: colors[1] }
+                ])
+              }
+            },
+            data: values
+          }
+        ]
       })
       this.charts.push(chart)
     },
     renderActivityChart() {
       const recentCourseMap = {}
       ;(this.dashboard.recentCourses || []).forEach(item => {
-        const key = item.weekDay || '未排期'
+        const key = item.weekDay || '本周'
         recentCourseMap[key] = (recentCourseMap[key] || 0) + 1
-      })
-      const aiStatusMap = { success: 0, mock: 0, failed: 0 }
-      ;(this.dashboard.recentAiLogs || []).forEach(item => {
-        const key = item.status || 'success'
-        aiStatusMap[key] = (aiStatusMap[key] || 0) + 1
       })
       const questionMap = {}
       ;(this.dashboard.recentQuestions || []).forEach(item => {
         const key = parseTime(item.createTime, '{m}-{d}') || '近期'
         questionMap[key] = (questionMap[key] || 0) + 1
       })
-      const courseLabels = Object.keys(recentCourseMap)
-      const questionLabels = Object.keys(questionMap)
-      const labels = Array.from(new Set([...courseLabels, ...questionLabels]))
+      const labels = Array.from(new Set([...Object.keys(recentCourseMap), ...Object.keys(questionMap)]))
       const categoryLabels = labels.length ? labels : ['近期']
       const chart = echarts.init(this.$refs.activityChart, 'macarons')
       chart.setOption({
         tooltip: { trigger: 'axis' },
-        legend: {
-          top: 8,
-          textStyle: { color: '#5f7987' }
-        },
-        grid: { top: 46, left: 34, right: 24, bottom: 34 },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          axisLine: { lineStyle: { color: '#c5e5ea' } },
-          axisLabel: { color: '#5b7582' },
-          data: categoryLabels
-        },
-        yAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: 'rgba(114, 205, 212, 0.18)' } },
-          axisLabel: { color: '#6a8593' }
-        },
+        legend: { top: 8 },
+        grid: { top: 42, left: 34, right: 24, bottom: 30 },
+        xAxis: { type: 'category', boundaryGap: false, data: categoryLabels },
+        yAxis: { type: 'value' },
         series: [
           {
             name: '课程活跃',
             type: 'line',
             smooth: true,
-            symbolSize: 8,
-            itemStyle: { color: '#20ddb6' },
             areaStyle: { color: 'rgba(32, 221, 182, 0.12)' },
             data: categoryLabels.map(label => recentCourseMap[label] || 0)
           },
@@ -371,17 +441,8 @@ export default {
             name: '提问活跃',
             type: 'line',
             smooth: true,
-            symbolSize: 8,
-            itemStyle: { color: '#2f98ff' },
             areaStyle: { color: 'rgba(47, 152, 255, 0.12)' },
             data: categoryLabels.map(label => questionMap[label] || 0)
-          },
-          {
-            name: 'AI成功',
-            type: 'bar',
-            barWidth: 18,
-            itemStyle: { color: '#ffb74d', borderRadius: [8, 8, 0, 0] },
-            data: categoryLabels.map((label, index) => index === 0 ? (aiStatusMap.success || 0) : 0)
           }
         ]
       })
@@ -400,320 +461,313 @@ export default {
 
 <style scoped>
 .dashboard-page {
-  position: relative;
-  padding-top: 6px;
-  overflow: hidden;
-}
-
-.dashboard-page::before,
-.dashboard-page::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(8px);
-  pointer-events: none;
-}
-
-.dashboard-page::before {
-  top: -60px;
-  right: 4%;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(38, 232, 183, 0.18), transparent 68%);
-}
-
-.dashboard-page::after {
-  left: -70px;
-  bottom: 10%;
-  width: 240px;
-  height: 240px;
-  background: radial-gradient(circle, rgba(91, 187, 255, 0.14), transparent 70%);
-}
-
-.hero-grid,
-.content-grid,
-.chart-grid,
-.metric-grid {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-grid {
   display: grid;
-  grid-template-columns: 1.6fr 0.9fr;
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: 20px;
 }
 
 .hero-card {
-  display: grid;
-  grid-template-columns: 1.2fr 0.95fr;
-  gap: 22px;
-  min-height: 320px;
-  border: 1px solid rgba(97, 223, 207, 0.2);
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at top right, rgba(76, 240, 189, 0.24), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(95, 194, 255, 0.18), transparent 26%),
-    linear-gradient(135deg, rgba(253, 255, 255, 0.96) 0%, rgba(236, 255, 249, 0.96) 52%, rgba(238, 247, 255, 0.96) 100%);
-  box-shadow:
-    0 24px 44px rgba(34, 131, 145, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-}
-
-.hero-copy h1 {
-  margin: 18px 0 14px;
-  color: #163743;
-  font-size: 40px;
-  line-height: 1.15;
-  text-shadow: 0 10px 26px rgba(37, 184, 194, 0.12);
-}
-
-.hero-copy p {
-  margin: 0;
-  color: #5f7684;
-  line-height: 1.9;
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 32px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(21, 34, 46, 0.96), rgba(29, 73, 82, 0.9));
+  color: #fff;
 }
 
 .hero-badge {
   display: inline-flex;
-  align-items: center;
-  padding: 7px 12px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(39, 228, 188, 0.2), rgba(197, 244, 255, 0.72));
-  color: #0a8a73;
+  background: rgba(32, 224, 182, 0.14);
+  color: #8ff6dc;
   font-size: 12px;
-  font-weight: 700;
-  box-shadow: 0 10px 22px rgba(27, 193, 182, 0.14);
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
+.hero-card h1 {
+  margin: 14px 0 10px;
+  font-size: 34px;
 }
 
-.hero-panel {
-  padding: 18px;
-  border-radius: 24px;
-  border: 1px solid rgba(112, 220, 224, 0.22);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(229, 255, 248, 0.66)),
-    rgba(255, 255, 255, 0.7);
-  box-shadow:
-    0 20px 36px rgba(44, 135, 149, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.panel-title,
-.spotlight-title {
-  margin-bottom: 14px;
-  color: #1e4250;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.role-stack,
-.spotlight-list,
-.service-list,
-.entry-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.role-card,
-.spotlight-item,
-.service-item,
-.entry-item,
-.metric-card {
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(234, 251, 255, 0.82));
-  border: 1px solid rgba(120, 219, 222, 0.22);
-  box-shadow: 0 16px 28px rgba(44, 135, 149, 0.08);
-}
-
-.role-card,
-.spotlight-item,
-.service-item {
-  padding: 16px 18px;
-}
-
-.role-card strong,
-.spotlight-item strong,
-.service-item strong,
-.entry-item strong {
-  display: block;
-  color: #1c4150;
-  margin-bottom: 8px;
-}
-
-.role-card span,
-.spotlight-item span,
-.entry-item span,
-.service-item p {
-  color: #688090;
-  line-height: 1.8;
-  font-size: 14px;
+.hero-card p {
+  max-width: 720px;
   margin: 0;
-}
-
-.spotlight-card,
-.entry-card,
-.service-card,
-.timeline-card,
-.chart-card {
-  border: 1px solid rgba(109, 220, 216, 0.18);
-  border-radius: 26px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(238, 253, 255, 0.96));
-  box-shadow:
-    0 22px 40px rgba(41, 130, 141, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  color: rgba(232, 246, 246, 0.78);
+  line-height: 1.7;
 }
 
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
-  margin-bottom: 18px;
+}
+
+.metric-card,
+.chart-card,
+.insight-card {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 40px rgba(31, 107, 127, 0.08);
 }
 
 .metric-card {
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.metric-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.36), transparent 56%);
-  pointer-events: none;
+  padding: 20px 22px;
 }
 
 .metric-card span {
   display: block;
-  color: #6f8593;
+  color: #6d8591;
   font-size: 13px;
 }
 
 .metric-card strong {
   display: block;
-  margin-top: 10px;
-  color: #163745;
+  margin-top: 14px;
+  color: #203544;
   font-size: 30px;
+  font-weight: 700;
 }
 
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin-bottom: 18px;
 }
 
 .wide-card {
-  grid-column: span 2;
+  grid-column: span 3;
+}
+
+.chart-card ::v-deep .el-card__header,
+.insight-card ::v-deep .el-card__header {
+  padding: 18px 22px 0;
+  border-bottom: none;
+  color: #203544;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.chart-card ::v-deep .el-card__body,
+.insight-card ::v-deep .el-card__body {
+  padding: 18px 22px 22px;
 }
 
 .chart-box {
-  height: 330px;
+  height: 310px;
+}
+
+.wide-card .chart-box {
+  height: 300px;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
+}
+
+.insight-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
   gap: 18px;
 }
 
-.entry-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.info-panel {
+  border: 1px solid rgba(77, 171, 192, 0.16);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at bottom right, rgba(32, 224, 182, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(237, 251, 252, 0.96), rgba(246, 250, 253, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-.entry-item {
-  padding: 18px;
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+.timeline-panel {
+  padding: 24px 24px 12px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
 }
 
-.entry-item:hover {
-  transform: translateY(-4px);
-  border-color: rgba(49, 224, 194, 0.34);
-  box-shadow: 0 18px 30px rgba(39, 173, 180, 0.16);
+.timeline-scroll {
+  flex: 1;
+  padding-right: 8px;
+  overflow-y: auto;
 }
 
-.overview-timeline-card {
-  min-height: 100%;
+.timeline-scroll::-webkit-scrollbar {
+  width: 6px;
 }
 
-::v-deep .el-card {
-  overflow: hidden;
+.timeline-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(76, 149, 255, 0.25);
 }
 
-::v-deep .el-card__body {
-  position: relative;
+.panel-head {
+  margin-bottom: 18px;
 }
 
-::v-deep .el-card__header {
-  border-bottom: 1px solid rgba(104, 213, 214, 0.16);
-  color: #1f4252;
+.panel-head strong {
+  display: block;
+  color: #243b4a;
+  font-size: 18px;
   font-weight: 700;
 }
 
-::v-deep .el-timeline-item__timestamp {
-  color: #6f8492;
+.panel-head span {
+  display: block;
+  margin-top: 8px;
+  color: #7a919f;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-::v-deep .el-timeline-item__node {
-  background-color: #20dcb7;
-  box-shadow: 0 0 0 6px rgba(32, 220, 183, 0.1);
+.right-column {
+  display: grid;
+  gap: 18px;
 }
 
-::v-deep .el-button--primary {
-  border: none;
-  background: linear-gradient(135deg, #14e0a9 0%, #0fc9c3 52%, #2898ff 100%);
-  box-shadow: 0 16px 30px rgba(25, 179, 180, 0.24);
+.schedule-panel {
+  padding: 24px;
 }
 
-::v-deep .el-button--primary:hover,
-::v-deep .el-button--primary:focus {
-  filter: saturate(108%);
-  box-shadow: 0 18px 34px rgba(25, 179, 180, 0.3);
+.mini-list {
+  display: grid;
+  gap: 16px;
 }
 
-::v-deep .el-button.is-plain {
-  border-color: rgba(52, 207, 196, 0.32);
-  color: #19806e;
-  background: rgba(238, 255, 251, 0.92);
+.mini-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(77, 171, 192, 0.12);
 }
 
-@media (max-width: 1200px) {
+.mini-main strong {
+  display: block;
+  color: #203544;
+  font-size: 16px;
+}
+
+.mini-main p {
+  margin: 10px 0 0;
+  color: #6f8694;
+  line-height: 1.6;
+}
+
+.mini-item span {
+  flex-shrink: 0;
+  color: #3794e0;
+  font-weight: 700;
+}
+
+.notice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.compact-panel {
+  padding: 22px 22px 24px;
+}
+
+.status-block strong {
+  display: block;
+  color: #22384a;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.status-block span {
+  display: block;
+  margin-top: 10px;
+  color: #3b9fe7;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.status-block p {
+  margin: 16px 0 0;
+  color: #6f8694;
+  line-height: 1.8;
+}
+
+.empty-state {
+  padding: 32px 0 12px;
+  color: #7a919f;
+  text-align: center;
+}
+
+.timeline-panel ::v-deep .el-timeline {
+  padding-left: 10px;
+}
+
+.timeline-panel ::v-deep .el-timeline-item {
+  padding-bottom: 18px;
+}
+
+.timeline-panel ::v-deep .el-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-panel ::v-deep .el-timeline-item__node {
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 0 8px rgba(32, 224, 182, 0.12);
+}
+
+.timeline-panel ::v-deep .el-timeline-item__timestamp {
+  color: #6f8694;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.timeline-panel ::v-deep .el-timeline-item__content {
+  color: #243b4a;
+  line-height: 1.7;
+}
+
+@media (max-width: 1400px) {
   .metric-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .content-grid,
-  .hero-grid,
-  .hero-card,
   .chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wide-card {
+    grid-column: span 2;
+  }
+
+  .insight-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .metric-grid,
+  .chart-grid,
+  .notice-grid {
     grid-template-columns: 1fr;
   }
 
   .wide-card {
     grid-column: span 1;
   }
-}
 
-@media (max-width: 768px) {
-  .metric-grid,
-  .entry-grid {
-    grid-template-columns: 1fr;
+  .hero-card {
+    padding: 24px;
   }
 
-  .hero-copy h1 {
-    font-size: 30px;
+  .timeline-panel,
+  .schedule-panel,
+  .compact-panel {
+    padding: 20px;
   }
 }
 </style>
