@@ -10,8 +10,8 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import com.eapple.common.utils.poi.ExcelHandlerAdapter;
 
 /**
- * 鑷畾涔夊鍑篍xcel鏁版嵁娉ㄨВ
- * 
+ * 自定义 Excel 导入导出注解。
+ *
  * @author Eapp1e
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -19,152 +19,152 @@ import com.eapple.common.utils.poi.ExcelHandlerAdapter;
 public @interface Excel
 {
     /**
-     * 瀵煎嚭鏃跺湪excel涓帓搴?
+     * 导出时在 Excel 中的排序。
      */
-    public int sort() default Integer.MAX_VALUE;
+    int sort() default Integer.MAX_VALUE;
 
     /**
-     * 瀵煎嚭鍒癊xcel涓殑鍚嶅瓧.
+     * 导出到 Excel 中的列名。
      */
-    public String name() default "";
+    String name() default "";
 
     /**
-     * 鏃ユ湡鏍煎紡, 濡? yyyy-MM-dd
+     * 日期格式，例如 yyyy-MM-dd。
      */
-    public String dateFormat() default "";
+    String dateFormat() default "";
 
     /**
-     * 濡傛灉鏄瓧鍏哥被鍨嬶紝璇疯缃瓧鍏哥殑type鍊?(濡? sys_user_sex)
+     * 如果是字典类型，请设置字典的 type 值，例如 sys_user_sex。
      */
-    public String dictType() default "";
+    String dictType() default "";
 
     /**
-     * 璇诲彇鍐呭杞〃杈惧紡 (濡? 0=鐢?1=濂?2=鏈煡)
+     * 读取内容转换表达式，例如 0=男,1=女,2=未知。
      */
-    public String readConverterExp() default "";
+    String readConverterExp() default "";
 
     /**
-     * 鍒嗛殧绗︼紝璇诲彇瀛楃涓茬粍鍐呭
+     * 分隔符，用于读取字符串组内容。
      */
-    public String separator() default ",";
+    String separator() default ",";
 
     /**
-     * BigDecimal 绮惧害 榛樿:-1(榛樿涓嶅紑鍚疊igDecimal鏍煎紡鍖?
+     * BigDecimal 精度，默认 -1 表示不开启格式化。
      */
-    public int scale() default -1;
+    int scale() default -1;
 
     /**
-     * BigDecimal 鑸嶅叆瑙勫垯 榛樿:BigDecimal.ROUND_HALF_EVEN
+     * BigDecimal 舍入规则，默认 BigDecimal.ROUND_HALF_EVEN。
      */
     @SuppressWarnings("deprecation")
-    public int roundingMode() default BigDecimal.ROUND_HALF_EVEN;
+    int roundingMode() default BigDecimal.ROUND_HALF_EVEN;
 
     /**
-     * 瀵煎嚭鏃跺湪excel涓瘡涓垪鐨勯珮搴?
+     * 导出时单元格高度。
      */
-    public double height() default 14;
+    double height() default 14;
 
     /**
-     * 瀵煎嚭鏃跺湪excel涓瘡涓垪鐨勫搴?
+     * 导出时单元格宽度。
      */
-    public double width() default 16;
+    double width() default 16;
 
     /**
-     * 鏂囧瓧鍚庣紑,濡? 90 鍙樻垚90%
+     * 文本后缀，例如 90 会显示为 90%。
      */
-    public String suffix() default "";
+    String suffix() default "";
 
     /**
-     * 褰撳€间负绌烘椂,瀛楁鐨勯粯璁ゅ€?
+     * 默认值。
      */
-    public String defaultValue() default "";
+    String defaultValue() default "";
 
     /**
-     * 鎻愮ず淇℃伅
+     * 提示信息。
      */
-    public String prompt() default "";
+    String prompt() default "";
 
     /**
-     * 鏄惁鍏佽鍐呭鎹㈣ 
+     * 是否自动换行。
      */
-    public boolean wrapText() default false;
+    boolean wrapText() default false;
 
     /**
-     * 璁剧疆鍙兘閫夋嫨涓嶈兘杈撳叆鐨勫垪鍐呭.
+     * 下拉选项内容。
      */
-    public String[] combo() default {};
+    String[] combo() default {};
 
     /**
-     * 鏄惁浠庡瓧鍏歌鏁版嵁鍒癱ombo,榛樿涓嶈鍙?濡傝鍙栭渶瑕佽缃甦ictType娉ㄨВ.
+     * 是否从字典读取下拉选项，启用时需配置 dictType。
      */
-    public boolean comboReadDict() default false;
+    boolean comboReadDict() default false;
 
     /**
-     * 鏄惁闇€瑕佺旱鍚戝悎骞跺崟鍏冩牸,搴斿闇€姹?鍚湁list闆嗗悎鍗曞厓鏍?
+     * 是否需要纵向合并单元格。
      */
-    public boolean needMerge() default false;
+    boolean needMerge() default false;
 
     /**
-     * 鏄惁瀵煎嚭鏁版嵁,搴斿闇€姹?鏈夋椂鎴戜滑闇€瑕佸鍑轰竴浠芥ā鏉?杩欐槸鏍囬闇€瑕佷絾鍐呭闇€瑕佺敤鎴锋墜宸ュ～鍐?
+     * 是否导出该字段。
      */
-    public boolean isExport() default true;
+    boolean isExport() default true;
 
     /**
-     * 鍙︿竴涓被涓殑灞炴€у悕绉?鏀寔澶氱骇鑾峰彇,浠ュ皬鏁扮偣闅斿紑
+     * 另一个类中的目标属性名，支持多级获取，以小数点分隔。
      */
-    public String targetAttr() default "";
+    String targetAttr() default "";
 
     /**
-     * 鏄惁鑷姩缁熻鏁版嵁,鍦ㄦ渶鍚庤拷鍔犱竴琛岀粺璁℃暟鎹€诲拰
+     * 是否在导出末尾追加统计行。
      */
-    public boolean isStatistics() default false;
+    boolean isStatistics() default false;
 
     /**
-     * 瀵煎嚭绫诲瀷锛?鏁板瓧 1瀛楃涓?2鍥剧墖锛?
+     * 单元格类型。
      */
-    public ColumnType cellType() default ColumnType.STRING;
+    ColumnType cellType() default ColumnType.STRING;
 
     /**
-     * 瀵煎嚭鍒楀ご鑳屾櫙棰滆壊
+     * 表头背景色。
      */
-    public IndexedColors headerBackgroundColor() default IndexedColors.GREY_50_PERCENT;
+    IndexedColors headerBackgroundColor() default IndexedColors.GREY_50_PERCENT;
 
     /**
-     * 瀵煎嚭鍒楀ご瀛椾綋棰滆壊
+     * 表头字体颜色。
      */
-    public IndexedColors headerColor() default IndexedColors.WHITE;
+    IndexedColors headerColor() default IndexedColors.WHITE;
 
     /**
-     * 瀵煎嚭鍗曞厓鏍艰儗鏅鑹?
+     * 单元格背景色。
      */
-    public IndexedColors backgroundColor() default IndexedColors.WHITE;
+    IndexedColors backgroundColor() default IndexedColors.WHITE;
 
     /**
-     * 瀵煎嚭鍗曞厓鏍煎瓧浣撻鑹?
+     * 单元格字体颜色。
      */
-    public IndexedColors color() default IndexedColors.BLACK;
+    IndexedColors color() default IndexedColors.BLACK;
 
     /**
-     * 瀵煎嚭瀛楁瀵归綈鏂瑰紡
+     * 对齐方式。
      */
-    public HorizontalAlignment align() default HorizontalAlignment.CENTER;
+    HorizontalAlignment align() default HorizontalAlignment.CENTER;
 
     /**
-     * 鑷畾涔夋暟鎹鐞嗗櫒
+     * 自定义处理器。
      */
-    public Class<?> handler() default ExcelHandlerAdapter.class;
+    Class<?> handler() default ExcelHandlerAdapter.class;
 
     /**
-     * 鑷畾涔夋暟鎹鐞嗗櫒鍙傛暟
+     * 自定义处理器参数。
      */
-    public String[] args() default {};
+    String[] args() default {};
 
     /**
-     * 瀛楁绫诲瀷锛?锛氬鍑哄鍏ワ紱1锛氫粎瀵煎嚭锛?锛氫粎瀵煎叆锛?
+     * 字段类型：全部、仅导出、仅导入。
      */
     Type type() default Type.ALL;
 
-    public enum Type
+    enum Type
     {
         ALL(0), EXPORT(1), IMPORT(2);
         private final int value;
@@ -180,7 +180,7 @@ public @interface Excel
         }
     }
 
-    public enum ColumnType
+    enum ColumnType
     {
         NUMERIC(0), STRING(1), IMAGE(2), TEXT(3);
         private final int value;

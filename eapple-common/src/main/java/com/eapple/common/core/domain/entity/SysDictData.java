@@ -10,7 +10,7 @@ import com.eapple.common.constant.UserConstants;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 瀛楀吀鏁版嵁琛?sys_dict_data
+ * 字典数据表 sys_dict_data。
  * 
  * @author Eapp1e
  */
@@ -18,38 +18,38 @@ public class SysDictData extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 瀛楀吀缂栫爜 */
-    @Excel(name = "瀛楀吀缂栫爜", cellType = ColumnType.NUMERIC)
+    /** 字典编码 */
+    @Excel(name = "字典编码", cellType = ColumnType.NUMERIC)
     private Long dictCode;
 
-    /** 瀛楀吀鎺掑簭 */
-    @Excel(name = "瀛楀吀鎺掑簭", cellType = ColumnType.NUMERIC)
+    /** 字典排序 */
+    @Excel(name = "字典排序", cellType = ColumnType.NUMERIC)
     private Long dictSort;
 
-    /** 瀛楀吀鏍囩 */
-    @Excel(name = "瀛楀吀鏍囩")
+    /** 字典标签 */
+    @Excel(name = "字典标签")
     private String dictLabel;
 
-    /** 瀛楀吀閿€?*/
-    @Excel(name = "瀛楀吀閿€?)
+    /** 字典键值 */
+    @Excel(name = "字典键值")
     private String dictValue;
 
-    /** 瀛楀吀绫诲瀷 */
-    @Excel(name = "瀛楀吀绫诲瀷")
+    /** 字典类型 */
+    @Excel(name = "字典类型")
     private String dictType;
 
-    /** 鏍峰紡灞炴€э紙鍏朵粬鏍峰紡鎵╁睍锛?*/
+    /** 样式属性（其他样式扩展） */
     private String cssClass;
 
-    /** 琛ㄦ牸瀛楀吀鏍峰紡 */
+    /** 表格回显样式 */
     private String listClass;
 
-    /** 鏄惁榛樿锛圷鏄?N鍚︼級 */
-    @Excel(name = "鏄惁榛樿", readConverterExp = "Y=鏄?N=鍚?)
+    /** 是否默认（Y是 N否） */
+    @Excel(name = "是否默认")
     private String isDefault;
 
-    /** 鐘舵€侊紙0姝ｅ父 1鍋滅敤锛?*/
-    @Excel(name = "鐘舵€?, readConverterExp = "0=姝ｅ父,1=鍋滅敤")
+    /** 状态（0正常 1停用） */
+    @Excel(name = "状态")
     private String status;
 
     public Long getDictCode()
@@ -72,8 +72,8 @@ public class SysDictData extends BaseEntity
         this.dictSort = dictSort;
     }
 
-    @NotBlank(message = "瀛楀吀鏍囩涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "瀛楀吀鏍囩闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
+    @NotBlank(message = "字典标签不能为空")
+    @Size(min = 0, max = 100, message = "字典标签长度不能超过 100 个字符")
     public String getDictLabel()
     {
         return dictLabel;
@@ -84,8 +84,8 @@ public class SysDictData extends BaseEntity
         this.dictLabel = dictLabel;
     }
 
-    @NotBlank(message = "瀛楀吀閿€间笉鑳戒负绌?)
-    @Size(min = 0, max = 100, message = "瀛楀吀閿€奸暱搴︿笉鑳借秴杩?00涓瓧绗?)
+    @NotBlank(message = "字典键值不能为空")
+    @Size(min = 0, max = 100, message = "字典键值长度不能超过 100 个字符")
     public String getDictValue()
     {
         return dictValue;
@@ -96,8 +96,8 @@ public class SysDictData extends BaseEntity
         this.dictValue = dictValue;
     }
 
-    @NotBlank(message = "瀛楀吀绫诲瀷涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "瀛楀吀绫诲瀷闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
+    @NotBlank(message = "字典类型不能为空")
+    @Size(min = 0, max = 100, message = "字典类型长度不能超过 100 个字符")
     public String getDictType()
     {
         return dictType;
@@ -108,7 +108,7 @@ public class SysDictData extends BaseEntity
         this.dictType = dictType;
     }
 
-    @Size(min = 0, max = 100, message = "鏍峰紡灞炴€ч暱搴︿笉鑳借秴杩?00涓瓧绗?)
+    @Size(min = 0, max = 100, message = "样式属性长度不能超过 100 个字符")
     public String getCssClass()
     {
         return cssClass;
@@ -156,7 +156,7 @@ public class SysDictData extends BaseEntity
     
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("dictCode", getDictCode())
             .append("dictSort", getDictSort())
             .append("dictLabel", getDictLabel())

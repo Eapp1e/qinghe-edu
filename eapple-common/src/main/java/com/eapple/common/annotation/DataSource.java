@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 import com.eapple.common.enums.DataSourceType;
 
 /**
- * 鑷畾涔夊鏁版嵁婧愬垏鎹㈡敞瑙?
+ * 自定义多数据源切换注解。
  *
- * 浼樺厛绾э細鍏堟柟娉曪紝鍚庣被锛屽鏋滄柟娉曡鐩栦簡绫讳笂鐨勬暟鎹簮绫诲瀷锛屼互鏂规硶鐨勪负鍑嗭紝鍚﹀垯浠ョ被涓婄殑涓哄噯
+ * 优先级：先方法，后类。如果方法覆盖了类上的数据源类型，则以方法为准，否则以类上的为准。
  *
  * @author Eapp1e
  */
@@ -22,7 +22,7 @@ import com.eapple.common.enums.DataSourceType;
 public @interface DataSource
 {
     /**
-     * 鍒囨崲鏁版嵁婧愬悕绉?
+     * 切换的数据源类型。
      */
-    public DataSourceType value() default DataSourceType.MASTER;
+    DataSourceType value() default DataSourceType.MASTER;
 }

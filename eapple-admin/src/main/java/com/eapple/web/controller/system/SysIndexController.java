@@ -14,52 +14,44 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.system.service.ISysUserService;
 
 /**
- * 棣栭〉
+ * 首页控制器
  *
  * @author Eapp1e
  */
 @RestController
 public class SysIndexController
 {
-    /** 绯荤粺鍩虹閰嶇疆 */
     @Autowired
-    private PlatformConfig ruoyiConfig;
+    private PlatformConfig platformConfig;
 
     @Autowired
     private ISysUserService userService;
 
-    /**
-     * 璁块棶棣栭〉锛屾彁绀鸿
-     */
     @RequestMapping("/")
     public String index()
     {
-        return StringUtils.format("娆㈣繋浣跨敤{}鍚庡彴绠＄悊妗嗘灦锛屽綋鍓嶇増鏈細v{}锛岃閫氳繃鍓嶇鍦板潃璁块棶銆?, ruoyiConfig.getName(), ruoyiConfig.getVersion());
+        return StringUtils.format("欢迎使用{}后台管理框架，当前版本：v{}，请通过前端地址访问系统。", platformConfig.getName(), platformConfig.getVersion());
     }
 
-    /**
-     * 瑙ｉ攣灞忓箷
-     */
     @PostMapping("/unlockscreen")
     public AjaxResult unlockScreen(@RequestBody Map<String, String> body)
     {
         String password = body.get("password");
         if (StringUtils.isEmpty(password))
         {
-            return AjaxResult.error("瀵嗙爜涓嶈兘涓虹┖");
+            return AjaxResult.error("解锁密码不能为空");
         }
         String username = SecurityUtils.getUsername();
         SysUser user = userService.selectUserByUserName(username);
         if (user == null)
         {
-            return AjaxResult.error("鏈嶅姟鍣ㄨ秴鏃讹紝璇烽噸鏂扮櫥褰?);
+            return AjaxResult.error("当前用户不存在，请重新登录");
         }
         if (!SecurityUtils.matchesPassword(password, user.getPassword()))
         {
-            return AjaxResult.error("瀵嗙爜閿欒锛岃閲嶆柊杈撳叆");
+            return AjaxResult.error("解锁密码错误");
         }
 
-        return AjaxResult.success("瑙ｉ攣鎴愬姛");
+        return AjaxResult.success("解锁成功");
     }
 }
-

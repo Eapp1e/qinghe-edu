@@ -15,6 +15,14 @@ export function listMyCourse() {
   })
 }
 
+export function recommendCourse(studentUserId) {
+  return request({
+    url: '/edu/course/recommend',
+    method: 'get',
+    params: { studentUserId }
+  })
+}
+
 export function getCourse(courseId) {
   return request({
     url: '/edu/course/' + courseId,
@@ -48,6 +56,14 @@ export function delCourse(courseId) {
 export function enrollCourse(courseId, studentUserId) {
   return request({
     url: '/edu/course/enroll/' + courseId,
+    method: 'post',
+    params: { studentUserId }
+  })
+}
+
+export function cancelEnrollCourse(courseId, studentUserId) {
+  return request({
+    url: '/edu/course/cancelEnroll/' + courseId,
     method: 'post',
     params: { studentUserId }
   })

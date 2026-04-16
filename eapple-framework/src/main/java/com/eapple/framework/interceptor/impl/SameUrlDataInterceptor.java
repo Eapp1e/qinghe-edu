@@ -17,9 +17,9 @@ import com.eapple.common.utils.http.HttpHelper;
 import com.eapple.framework.interceptor.RepeatSubmitInterceptor;
 
 /**
- * 鍒ゆ柇璇锋眰url鍜屾暟鎹槸鍚﹀拰涓婁竴娆＄浉鍚岋紝
- * 濡傛灉鍜屼笂娆＄浉鍚岋紝鍒欐槸閲嶅鎻愪氦琛ㄥ崟銆?鏈夋晥鏃堕棿涓?0绉掑唴銆?
- * 
+ * 根据请求 URL 和请求数据判断是否重复提交。
+ * 如果两次请求的数据和地址一致，并且间隔时间小于设定值，则判定为重复提交。
+ *
  * @author Eapp1e
  */
 @Component
@@ -29,7 +29,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
 
     public final String REPEAT_TIME = "repeatTime";
 
-    // 浠ょ墝鑷畾涔夋爣璇?
+    // Token 请求头名称
     @Value("${token.header}")
     private String header;
 
@@ -47,7 +47,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
             nowParams = HttpHelper.getBodyString(repeatedlyRequest);
         }
 
-        // body鍙傛暟涓虹┖锛岃幏鍙朠arameter鐨勬暟鎹?
+        // 如果 body 参数为空，则尝试获取 parameter 参数
         if (StringUtils.isEmpty(nowParams))
         {
             nowParams = JSON.toJSONString(request.getParameterMap());
@@ -56,13 +56,13 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
         nowDataMap.put(REPEAT_PARAMS, nowParams);
         nowDataMap.put(REPEAT_TIME, System.currentTimeMillis());
 
-        // 璇锋眰鍦板潃锛堜綔涓哄瓨鏀綾ache鐨刱ey鍊硷級
+        // 请求地址作为缓存键的一部分
         String url = request.getRequestURI();
 
-        // 鍞竴鍊硷紙娌℃湁娑堟伅澶村垯浣跨敤璇锋眰鍦板潃锛?
+        // 使用 token 作为唯一标识，没有则为空字符串
         String submitKey = StringUtils.trimToEmpty(request.getHeader(header));
 
-        // 鍞竴鏍囪瘑锛堟寚瀹歬ey + url + 娑堟伅澶达級
+        // 组合缓存 key：前缀 + url + token
         String cacheRepeatKey = CacheConstants.REPEAT_SUBMIT_KEY + url + submitKey;
 
         Object sessionObj = redisCache.getCacheObject(cacheRepeatKey);
@@ -85,7 +85,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     }
 
     /**
-     * 鍒ゆ柇鍙傛暟鏄惁鐩稿悓
+     * 比较两次请求参数是否一致。
      */
     private boolean compareParams(Map<String, Object> nowMap, Map<String, Object> preMap)
     {
@@ -95,7 +95,7 @@ public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
     }
 
     /**
-     * 鍒ゆ柇涓ゆ闂撮殧鏃堕棿
+     * 比较两次请求时间间隔是否小于限制值。
      */
     private boolean compareTime(Map<String, Object> nowMap, Map<String, Object> preMap, int interval)
     {

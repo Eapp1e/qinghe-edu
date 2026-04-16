@@ -25,7 +25,7 @@ import com.eapple.system.mapper.SysUserRoleMapper;
 import com.eapple.system.service.ISysRoleService;
 
 /**
- * 瑙掕壊 涓氬姟灞傚鐞?
+ * 角色 业务层处理
  * 
  * @author Eapp1e
  */
@@ -45,10 +45,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     private SysRoleDeptMapper roleDeptMapper;
 
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ瑙掕壊鏁版嵁
+     * 根据条件分页查询角色数据
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 瑙掕壊鏁版嵁闆嗗悎淇℃伅
+     * @param role 角色信息
+     * @return 角色数据集合信息
      */
     @Override
     @DataScope(deptAlias = "d")
@@ -58,10 +58,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ瑙掕壊
+     * 根据用户ID查询角色
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 瑙掕壊鍒楄〃
+     * @param userId 用户ID
+     * @return 角色列表
      */
     @Override
     public List<SysRole> selectRolesByUserId(Long userId)
@@ -83,10 +83,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ鏉冮檺
+     * 根据用户ID查询权限
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 鏉冮檺鍒楄〃
+     * @param userId 用户ID
+     * @return 权限列表
      */
     @Override
     public Set<String> selectRolePermissionByUserId(Long userId)
@@ -104,9 +104,9 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏌ヨ鎵€鏈夎鑹?
+     * 查询所有角色
      * 
-     * @return 瑙掕壊鍒楄〃
+     * @return 角色列表
      */
     @Override
     public List<SysRole> selectRoleAll()
@@ -115,10 +115,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鑾峰彇瑙掕壊閫夋嫨妗嗗垪琛?
+     * 根据用户ID获取角色选择框列表
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 閫変腑瑙掕壊ID鍒楄〃
+     * @param userId 用户ID
+     * @return 选中角色ID列表
      */
     @Override
     public List<Long> selectRoleListByUserId(Long userId)
@@ -127,10 +127,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 閫氳繃瑙掕壊ID鏌ヨ瑙掕壊
+     * 通过角色ID查询角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 瑙掕壊瀵硅薄淇℃伅
+     * @param roleId 角色ID
+     * @return 角色对象信息
      */
     @Override
     public SysRole selectRoleById(Long roleId)
@@ -139,10 +139,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏍￠獙瑙掕壊鍚嶇О鏄惁鍞竴
+     * 校验角色名称是否唯一
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     @Override
     public boolean checkRoleNameUnique(SysRole role)
@@ -157,10 +157,10 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏍￠獙瑙掕壊鏉冮檺鏄惁鍞竴
+     * 校验角色权限是否唯一
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     @Override
     public boolean checkRoleKeyUnique(SysRole role)
@@ -175,23 +175,23 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏍￠獙瑙掕壊鏄惁鍏佽鎿嶄綔
+     * 校验角色是否允许操作
      * 
-     * @param role 瑙掕壊淇℃伅
+     * @param role 角色信息
      */
     @Override
     public void checkRoleAllowed(SysRole role)
     {
         if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin())
         {
-            throw new ServiceException("涓嶅厑璁告搷浣滆秴绾х鐞嗗憳瑙掕壊");
+            throw new ServiceException("不允许操作超级管理员角色");
         }
     }
 
     /**
-     * 鏍￠獙瑙掕壊鏄惁鏈夋暟鎹潈闄?
+     * 校验角色是否有数据权限
      * 
-     * @param roleIds 瑙掕壊id
+     * @param roleIds 角色id
      */
     @Override
     public void checkRoleDataScope(Long... roleIds)
@@ -205,17 +205,17 @@ public class SysRoleServiceImpl implements ISysRoleService
                 List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
                 if (StringUtils.isEmpty(roles))
                 {
-                    throw new ServiceException("娌℃湁鏉冮檺璁块棶瑙掕壊鏁版嵁锛?);
+                    throw new ServiceException("没有权限访问角色数据！");
                 }
             }
         }
     }
 
     /**
-     * 閫氳繃瑙掕壊ID鏌ヨ瑙掕壊浣跨敤鏁伴噺
+     * 通过角色ID查询角色使用数量
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleId 角色ID
+     * @return 结果
      */
     @Override
     public int countUserRoleByRoleId(Long roleId)
@@ -224,42 +224,42 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏂板淇濆瓨瑙掕壊淇℃伅
+     * 新增保存角色信息
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     @Override
     @Transactional
     public int insertRole(SysRole role)
     {
-        // 鏂板瑙掕壊淇℃伅
+        // 新增角色信息
         roleMapper.insertRole(role);
         return insertRoleMenu(role);
     }
 
     /**
-     * 淇敼淇濆瓨瑙掕壊淇℃伅
+     * 修改保存角色信息
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     @Override
     @Transactional
     public int updateRole(SysRole role)
     {
-        // 淇敼瑙掕壊淇℃伅
+        // 修改角色信息
         roleMapper.updateRole(role);
-        // 鍒犻櫎瑙掕壊涓庤彍鍗曞叧鑱?
+        // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId(role.getRoleId());
         return insertRoleMenu(role);
     }
 
     /**
-     * 淇敼瑙掕壊鐘舵€?
+     * 修改角色状态
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     @Override
     public int updateRoleStatus(SysRole role)
@@ -268,32 +268,32 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 淇敼鏁版嵁鏉冮檺淇℃伅
+     * 修改数据权限信息
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     @Override
     @Transactional
     public int authDataScope(SysRole role)
     {
-        // 淇敼瑙掕壊淇℃伅
+        // 修改角色信息
         roleMapper.updateRole(role);
-        // 鍒犻櫎瑙掕壊涓庨儴闂ㄥ叧鑱?
+        // 删除角色与部门关联
         roleDeptMapper.deleteRoleDeptByRoleId(role.getRoleId());
-        // 鏂板瑙掕壊鍜岄儴闂ㄤ俊鎭紙鏁版嵁鏉冮檺锛?
+        // 新增角色和部门信息（数据权限）
         return insertRoleDept(role);
     }
 
     /**
-     * 鏂板瑙掕壊鑿滃崟淇℃伅
+     * 新增角色菜单信息
      * 
-     * @param role 瑙掕壊瀵硅薄
+     * @param role 角色对象
      */
     public int insertRoleMenu(SysRole role)
     {
         int rows = 1;
-        // 鏂板鐢ㄦ埛涓庤鑹茬鐞?
+        // 新增用户与角色管理
         List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
         for (Long menuId : role.getMenuIds())
         {
@@ -310,14 +310,14 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鏂板瑙掕壊閮ㄩ棬淇℃伅(鏁版嵁鏉冮檺)
+     * 新增角色部门信息(数据权限)
      *
-     * @param role 瑙掕壊瀵硅薄
+     * @param role 角色对象
      */
     public int insertRoleDept(SysRole role)
     {
         int rows = 1;
-        // 鏂板瑙掕壊涓庨儴闂紙鏁版嵁鏉冮檺锛夌鐞?
+        // 新增角色与部门（数据权限）管理
         List<SysRoleDept> list = new ArrayList<SysRoleDept>();
         for (Long deptId : role.getDeptIds())
         {
@@ -334,27 +334,27 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 閫氳繃瑙掕壊ID鍒犻櫎瑙掕壊
+     * 通过角色ID删除角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleId 角色ID
+     * @return 结果
      */
     @Override
     @Transactional
     public int deleteRoleById(Long roleId)
     {
-        // 鍒犻櫎瑙掕壊涓庤彍鍗曞叧鑱?
+        // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId(roleId);
-        // 鍒犻櫎瑙掕壊涓庨儴闂ㄥ叧鑱?
+        // 删除角色与部门关联
         roleDeptMapper.deleteRoleDeptByRoleId(roleId);
         return roleMapper.deleteRoleById(roleId);
     }
 
     /**
-     * 鎵归噺鍒犻櫎瑙掕壊淇℃伅
+     * 批量删除角色信息
      * 
-     * @param roleIds 闇€瑕佸垹闄ょ殑瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleIds 需要删除的角色ID
+     * @return 结果
      */
     @Override
     @Transactional
@@ -367,21 +367,21 @@ public class SysRoleServiceImpl implements ISysRoleService
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0)
             {
-                throw new ServiceException(String.format("%1$s宸插垎閰?涓嶈兘鍒犻櫎", role.getRoleName()));
+                throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
             }
         }
-        // 鍒犻櫎瑙掕壊涓庤彍鍗曞叧鑱?
+        // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenu(roleIds);
-        // 鍒犻櫎瑙掕壊涓庨儴闂ㄥ叧鑱?
+        // 删除角色与部门关联
         roleDeptMapper.deleteRoleDept(roleIds);
         return roleMapper.deleteRoleByIds(roleIds);
     }
 
     /**
-     * 鍙栨秷鎺堟潈鐢ㄦ埛瑙掕壊
+     * 取消授权用户角色
      * 
-     * @param userRole 鐢ㄦ埛鍜岃鑹插叧鑱斾俊鎭?
-     * @return 缁撴灉
+     * @param userRole 用户和角色关联信息
+     * @return 结果
      */
     @Override
     public int deleteAuthUser(SysUserRole userRole)
@@ -390,11 +390,11 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鎵归噺鍙栨秷鎺堟潈鐢ㄦ埛瑙掕壊
+     * 批量取消授权用户角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @param userIds 闇€瑕佸彇娑堟巿鏉冪殑鐢ㄦ埛鏁版嵁ID
-     * @return 缁撴灉
+     * @param roleId 角色ID
+     * @param userIds 需要取消授权的用户数据ID
+     * @return 结果
      */
     @Override
     public int deleteAuthUsers(Long roleId, Long[] userIds)
@@ -403,16 +403,16 @@ public class SysRoleServiceImpl implements ISysRoleService
     }
 
     /**
-     * 鎵归噺閫夋嫨鎺堟潈鐢ㄦ埛瑙掕壊
+     * 批量选择授权用户角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @param userIds 闇€瑕佹巿鏉冪殑鐢ㄦ埛鏁版嵁ID
-     * @return 缁撴灉
+     * @param roleId 角色ID
+     * @param userIds 需要授权的用户数据ID
+     * @return 结果
      */
     @Override
     public int insertAuthUsers(Long roleId, Long[] userIds)
     {
-        // 鏂板鐢ㄦ埛涓庤鑹茬鐞?
+        // 新增用户与角色管理
         List<SysUserRole> list = new ArrayList<SysUserRole>();
         for (Long userId : userIds)
         {

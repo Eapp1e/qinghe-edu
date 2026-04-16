@@ -43,6 +43,13 @@ public class EduCourseController extends BaseController
         return success(courseService.selectMyCourseList());
     }
 
+    @PreAuthorize("@ss.hasPermi('edu:course:list')")
+    @GetMapping("/recommend")
+    public AjaxResult recommend(@RequestParam(required = false) Long studentUserId)
+    {
+        return success(courseService.recommendCoursesByStudent(studentUserId));
+    }
+
     @PreAuthorize("@ss.hasPermi('edu:course:query')")
     @GetMapping("/{courseId}")
     public AjaxResult getInfo(@PathVariable Long courseId)
@@ -50,7 +57,7 @@ public class EduCourseController extends BaseController
         return success(courseService.selectCourseById(courseId));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:course:add')")
+    @PreAuthorize("@ss.hasPermi('edu:course:add') or @ss.hasRole('edu_teacher')")
     @Log(title = "璇惧悗璇剧▼", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody EduCourse course)
@@ -58,7 +65,7 @@ public class EduCourseController extends BaseController
         return toAjax(courseService.insertCourse(course));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:course:edit')")
+    @PreAuthorize("@ss.hasPermi('edu:course:edit') or @ss.hasRole('edu_teacher')")
     @Log(title = "璇惧悗璇剧▼", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody EduCourse course)
@@ -81,14 +88,21 @@ public class EduCourseController extends BaseController
         return toAjax(courseService.enrollCourse(courseId, studentUserId));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:course:edit')")
+    @PreAuthorize("@ss.hasPermi('edu:course:enroll')")
+    @PostMapping("/cancelEnroll/{courseId}")
+    public AjaxResult cancelEnroll(@PathVariable Long courseId, @RequestParam(required = false) Long studentUserId)
+    {
+        return toAjax(courseService.cancelEnrollment(courseId, studentUserId));
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:course:edit') or @ss.hasRole('edu_teacher')")
     @PostMapping("/notice/{courseId}")
     public AjaxResult generateNotice(@PathVariable Long courseId)
     {
         return success(courseService.generateCourseNotice(courseId));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:course:edit')")
+    @PreAuthorize("@ss.hasPermi('edu:course:edit') or @ss.hasRole('edu_teacher')")
     @PostMapping("/suggestion/{courseId}")
     public AjaxResult generateSuggestion(@PathVariable Long courseId)
     {

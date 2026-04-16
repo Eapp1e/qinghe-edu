@@ -45,12 +45,12 @@ public class EduEnrollmentServiceImpl implements IEduEnrollmentService
         EduCourseEnrollment dbEnrollment = enrollmentMapper.selectEnrollmentById(enrollment.getEnrollmentId());
         if (dbEnrollment == null)
         {
-            throw new ServiceException("鎶ュ悕璁板綍涓嶅瓨鍦?);
+            throw new ServiceException("报名记录不存在");
         }
         if (!SecurityUtils.isAdmin() && SecurityUtils.hasRole("edu_teacher")
                 && !SecurityUtils.getUserId().equals(dbEnrollment.getTeacherUserId()))
         {
-            throw new ServiceException("鍙兘绠＄悊鏈汉璇剧▼鐨勬姤鍚嶈褰?);
+            throw new ServiceException("只能管理本人课程的报名记录");
         }
         enrollment.setUpdateBy(SecurityUtils.getUsername());
         return enrollmentMapper.updateEnrollment(enrollment);

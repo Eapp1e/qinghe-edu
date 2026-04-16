@@ -7,8 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 鏁版嵁鏉冮檺杩囨护娉ㄨВ
- * 
+ * 数据权限过滤注解。
+ *
  * @author Eapp1e
  */
 @Target(ElementType.METHOD)
@@ -17,27 +17,28 @@ import java.lang.annotation.Target;
 public @interface DataScope
 {
     /**
-     * 鐢ㄦ埛琛ㄧ殑鍒悕
+     * 用户表别名。
      */
-    public String userAlias() default "";
+    String userAlias() default "";
 
     /**
-     * 閮ㄩ棬琛ㄧ殑鍒悕
+     * 部门表别名。
      */
-    public String deptAlias() default "";
+    String deptAlias() default "";
 
     /**
-     * 鐢ㄦ埛瀛楁鍚?
+     * 用户字段名。
      */
-    public String userField() default "user_id";
+    String userField() default "user_id";
 
     /**
-     * 閮ㄩ棬瀛楁鍚?
+     * 部门字段名。
      */
-    public String deptField() default "dept_id";
+    String deptField() default "dept_id";
 
     /**
-     * 鏉冮檺瀛楃锛堢敤浜庡涓鑹插尮閰嶇鍚堣姹傜殑鏉冮檺锛夐粯璁ゆ牴鎹潈闄愭敞瑙ss鑾峰彇锛屽涓潈闄愮敤閫楀彿鍒嗛殧寮€鏉?
+     * 权限标识。
+     * 用于多个角色匹配满足要求的权限时进行过滤，默认从权限上下文中获取。
      */
-    public String permission() default "";
+    String permission() default "";
 }

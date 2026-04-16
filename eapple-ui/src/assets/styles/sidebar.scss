@@ -43,7 +43,7 @@
 
     &.has-logo {
       .el-scrollbar {
-        height: calc(100% - 52px);
+        height: calc(100% - 58px);
       }
     }
 
@@ -58,7 +58,8 @@
     }
 
     .svg-icon {
-      margin-right: 10px !important;
+      margin-right: 14px !important;
+      font-size: 17px;
     }
 
     .el-menu {
@@ -70,13 +71,31 @@
 
     .el-menu-item,
     .el-submenu__title {
-      height: 46px !important;
-      line-height: 46px !important;
-      margin: 4px 10px;
-      border-radius: 14px;
+      height: 52px !important;
+      line-height: 52px !important;
+      margin: 6px 12px;
+      padding-left: 18px !important;
+      padding-right: 16px !important;
+      border-radius: 0;
       overflow: hidden !important;
       white-space: nowrap !important;
       text-overflow: ellipsis !important;
+      transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+      font-size: 15px !important;
+      font-weight: 600;
+    }
+
+    .el-menu-item [class^="el-icon-"],
+    .el-submenu__title [class^="el-icon-"] {
+      margin-right: 14px;
+      font-size: 17px;
+      vertical-align: middle;
+    }
+
+    .el-menu-item span,
+    .el-submenu__title span {
+      font-size: 15px;
+      letter-spacing: 0.01em;
     }
 
     .submenu-title-noDropdown:hover,
@@ -86,9 +105,9 @@
 
     &.theme-dark {
       .el-menu-item.is-active {
-        background: linear-gradient(135deg, rgba(117, 165, 91, 0.26), rgba(188, 217, 145, 0.14)) !important;
+        background: linear-gradient(90deg, rgba(117, 165, 91, 0.26), rgba(188, 217, 145, 0.08)) !important;
         color: #fff !important;
-        box-shadow: inset 0 0 0 1px rgba(199, 224, 143, 0.2);
+        box-shadow: inset 4px 0 0 rgba(199, 224, 143, 0.95);
       }
 
       .el-submenu.is-active > .el-submenu__title {
@@ -119,7 +138,8 @@
 
       .el-menu-item.is-active {
         color: #29401a !important;
-        background: linear-gradient(135deg, rgba(193, 218, 151, 0.6), rgba(240, 225, 194, 0.56)) !important;
+        background: linear-gradient(90deg, rgba(193, 218, 151, 0.58), rgba(240, 225, 194, 0.18)) !important;
+        box-shadow: inset 4px 0 0 rgba(101, 153, 70, 0.95);
       }
 
       .nest-menu .el-submenu > .el-submenu__title,
@@ -150,7 +170,7 @@
           padding: 0 !important;
 
           .svg-icon {
-            margin-left: 20px;
+            margin-left: 18px;
           }
         }
       }
@@ -163,7 +183,7 @@
         padding: 0 !important;
 
         .svg-icon {
-          margin-left: 20px;
+          margin-left: 18px;
         }
       }
     }

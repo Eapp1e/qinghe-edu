@@ -11,62 +11,61 @@ import com.eapple.common.annotation.Excel.ColumnType;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 瑙掕壊琛?sys_role
- * 
+ * 角色对象，对应表 sys_role。
+ *
  * @author Eapp1e
  */
 public class SysRole extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 瑙掕壊ID */
-    @Excel(name = "瑙掕壊搴忓彿", cellType = ColumnType.NUMERIC)
+    /** 角色 ID */
+    @Excel(name = "角色序号", cellType = ColumnType.NUMERIC)
     private Long roleId;
 
-    /** 瑙掕壊鍚嶇О */
-    @Excel(name = "瑙掕壊鍚嶇О")
+    /** 角色名称 */
+    @Excel(name = "角色名称")
     private String roleName;
 
-    /** 瑙掕壊鏉冮檺 */
-    @Excel(name = "瑙掕壊鏉冮檺")
+    /** 角色权限 */
+    @Excel(name = "权限字符")
     private String roleKey;
 
-    /** 瑙掕壊鎺掑簭 */
-    @Excel(name = "瑙掕壊鎺掑簭")
+    /** 角色排序 */
+    @Excel(name = "显示顺序")
     private Integer roleSort;
 
-    /** 鏁版嵁鑼冨洿锛?锛氭墍鏈夋暟鎹潈闄愶紱2锛氳嚜瀹氫箟鏁版嵁鏉冮檺锛?锛氭湰閮ㄩ棬鏁版嵁鏉冮檺锛?锛氭湰閮ㄩ棬鍙婁互涓嬫暟鎹潈闄愶紱5锛氫粎鏈汉鏁版嵁鏉冮檺锛?*/
-    @Excel(name = "鏁版嵁鑼冨洿", readConverterExp = "1=鎵€鏈夋暟鎹潈闄?2=鑷畾涔夋暟鎹潈闄?3=鏈儴闂ㄦ暟鎹潈闄?4=鏈儴闂ㄥ強浠ヤ笅鏁版嵁鏉冮檺,5=浠呮湰浜烘暟鎹潈闄?)
+    /** 数据范围 */
+    @Excel(name = "数据范围")
     private String dataScope;
 
-    /** 鑿滃崟鏍戦€夋嫨椤规槸鍚﹀叧鑱旀樉绀猴紙 0锛氱埗瀛愪笉浜掔浉鍏宠仈鏄剧ず 1锛氱埗瀛愪簰鐩稿叧鑱旀樉绀猴級 */
+    /** 菜单树选择项是否关联显示 */
     private boolean menuCheckStrictly;
 
-    /** 閮ㄩ棬鏍戦€夋嫨椤规槸鍚﹀叧鑱旀樉绀猴紙0锛氱埗瀛愪笉浜掔浉鍏宠仈鏄剧ず 1锛氱埗瀛愪簰鐩稿叧鑱旀樉绀?锛?*/
+    /** 部门树选择项是否关联显示 */
     private boolean deptCheckStrictly;
 
-    /** 瑙掕壊鐘舵€侊紙0姝ｅ父 1鍋滅敤锛?*/
-    @Excel(name = "瑙掕壊鐘舵€?, readConverterExp = "0=姝ｅ父,1=鍋滅敤")
+    /** 角色状态（0 正常 1 停用） */
+    @Excel(name = "角色状态")
     private String status;
 
-    /** 鍒犻櫎鏍囧織锛?浠ｈ〃瀛樺湪 2浠ｈ〃鍒犻櫎锛?*/
+    /** 删除标志（0 存在 2 删除） */
     private String delFlag;
 
-    /** 鐢ㄦ埛鏄惁瀛樺湪姝よ鑹叉爣璇?榛樿涓嶅瓨鍦?*/
+    /** 用户是否存在此角色标识 */
     private boolean flag = false;
 
-    /** 鑿滃崟缁?*/
+    /** 菜单组 */
     private Long[] menuIds;
 
-    /** 閮ㄩ棬缁勶紙鏁版嵁鏉冮檺锛?*/
+    /** 部门组（数据权限） */
     private Long[] deptIds;
 
-    /** 瑙掕壊鑿滃崟鏉冮檺 */
+    /** 角色权限集合 */
     private Set<String> permissions;
 
     public SysRole()
     {
-
     }
 
     public SysRole(Long roleId)
@@ -94,8 +93,8 @@ public class SysRole extends BaseEntity
         return roleId != null && 1L == roleId;
     }
 
-    @NotBlank(message = "瑙掕壊鍚嶇О涓嶈兘涓虹┖")
-    @Size(min = 0, max = 30, message = "瑙掕壊鍚嶇О闀垮害涓嶈兘瓒呰繃30涓瓧绗?)
+    @NotBlank(message = "角色名称不能为空")
+    @Size(min = 0, max = 30, message = "角色名称长度不能超过 30 个字符")
     public String getRoleName()
     {
         return roleName;
@@ -106,8 +105,8 @@ public class SysRole extends BaseEntity
         this.roleName = roleName;
     }
 
-    @NotBlank(message = "鏉冮檺瀛楃涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "鏉冮檺瀛楃闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
+    @NotBlank(message = "权限字符不能为空")
+    @Size(min = 0, max = 100, message = "权限字符长度不能超过 100 个字符")
     public String getRoleKey()
     {
         return roleKey;
@@ -118,7 +117,7 @@ public class SysRole extends BaseEntity
         this.roleKey = roleKey;
     }
 
-    @NotNull(message = "鏄剧ず椤哄簭涓嶈兘涓虹┖")
+    @NotNull(message = "显示顺序不能为空")
     public Integer getRoleSort()
     {
         return roleSort;
@@ -221,7 +220,7 @@ public class SysRole extends BaseEntity
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("roleId", getRoleId())
             .append("roleName", getRoleName())
             .append("roleKey", getRoleKey())

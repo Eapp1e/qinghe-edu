@@ -19,7 +19,11 @@ public interface IEduCourseService
 
     int enrollCourse(Long courseId, Long studentUserId);
 
+    int cancelEnrollment(Long courseId, Long studentUserId);
+
     String generateCourseNotice(Long courseId);
 
     String generateTeachingSuggestion(Long courseId);
+
+    List<EduCourse> recommendCoursesByStudent(Long studentUserId);
 }

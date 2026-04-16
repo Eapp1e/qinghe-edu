@@ -3,7 +3,7 @@ package com.eapple.common.exception.file;
 import java.util.Arrays;
 
 /**
- * 鏂囦欢涓婁紶鏃犳晥鎵╁睍鍚嶅紓甯哥被
+ * 文件上传无效扩展名异常类
  * 
  * @author Eapp1e
  */
@@ -17,7 +17,7 @@ public class InvalidExtensionException extends FileUploadException
 
     public InvalidExtensionException(String[] allowedExtension, String extension, String filename)
     {
-        super("鏂囦欢[" + filename + "]鍚庣紑[" + extension + "]涓嶆纭紝璇蜂笂浼? + Arrays.toString(allowedExtension) + "鏍煎紡");
+        super("文件[" + filename + "]后缀[" + extension + "]不正确，请上传" + Arrays.toString(allowedExtension) + "格式");
         this.allowedExtension = allowedExtension;
         this.extension = extension;
         this.filename = filename;

@@ -1,62 +1,61 @@
-﻿# 鏁版嵁婧愰厤缃?
+# 数据源配置
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
         druid:
-            # 涓诲簱鏁版嵁婧?
+            # 主库数据源
             master:
-                url: jdbc:mysql://localhost:3306/edu_after_school?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+                url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
                 username: root
                 password: 123456
-            # 浠庡簱鏁版嵁婧?
+            # 从库数据源
             slave:
-                # 浠庢暟鎹簮寮€鍏?榛樿鍏抽棴
+                # 从数据源开关，默认关闭
                 enabled: false
-                url: 
-                username: 
-                password: 
-            # 鍒濆杩炴帴鏁?
+                url:
+                username:
+                password:
+            # 初始连接数
             initialSize: 5
-            # 鏈€灏忚繛鎺ユ睜鏁伴噺
+            # 最小连接池数量
             minIdle: 10
-            # 鏈€澶ц繛鎺ユ睜鏁伴噺
+            # 最大连接池数量
             maxActive: 20
-            # 閰嶇疆鑾峰彇杩炴帴绛夊緟瓒呮椂鐨勬椂闂?
+            # 获取连接等待超时时间
             maxWait: 60000
-            # 閰嶇疆杩炴帴瓒呮椂鏃堕棿
+            # 连接超时时间
             connectTimeout: 30000
-            # 閰嶇疆缃戠粶瓒呮椂鏃堕棿
+            # 网络超时时间
             socketTimeout: 60000
-            # 閰嶇疆闂撮殧澶氫箙鎵嶈繘琛屼竴娆℃娴嬶紝妫€娴嬮渶瑕佸叧闂殑绌洪棽杩炴帴锛屽崟浣嶆槸姣
+            # 检测空闲连接的时间间隔，单位毫秒
             timeBetweenEvictionRunsMillis: 60000
-            # 閰嶇疆涓€涓繛鎺ュ湪姹犱腑鏈€灏忕敓瀛樼殑鏃堕棿锛屽崟浣嶆槸姣
+            # 连接在池中的最小生存时间，单位毫秒
             minEvictableIdleTimeMillis: 300000
-            # 閰嶇疆涓€涓繛鎺ュ湪姹犱腑鏈€澶х敓瀛樼殑鏃堕棿锛屽崟浣嶆槸姣
+            # 连接在池中的最大生存时间，单位毫秒
             maxEvictableIdleTimeMillis: 900000
-            # 閰嶇疆妫€娴嬭繛鎺ユ槸鍚︽湁鏁?
+            # 检测连接是否有效
             validationQuery: SELECT 1 FROM DUAL
             testWhileIdle: true
             testOnBorrow: false
             testOnReturn: false
-            webStatFilter: 
+            webStatFilter:
                 enabled: true
             statViewServlet:
                 enabled: true
-                # 璁剧疆鐧藉悕鍗曪紝涓嶅～鍒欏厑璁告墍鏈夎闂?
+                # 允许访问的白名单，留空表示允许所有地址
                 allow:
                 url-pattern: /druid/*
-                # 鎺у埗鍙扮鐞嗙敤鎴峰悕鍜屽瘑鐮?
+                # 控制台登录账号密码
                 login-username: ruoyi
                 login-password: 123456
             filter:
                 stat:
                     enabled: true
-                    # 鎱QL璁板綍
+                    # 慢 SQL 记录
                     log-slow-sql: true
                     slow-sql-millis: 1000
                     merge-sql: true
                 wall:
                     config:
                         multi-statement-allow: true
-

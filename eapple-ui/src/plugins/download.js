@@ -45,7 +45,7 @@ export default {
   },
   zip(url, name) {
     var url = baseURL + url
-    downloadLoadingInstance = Loading.service({ text: "姝ｅ湪涓嬭浇鏁版嵁锛岃绋嶅€?, spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+    downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
     axios({
       method: 'get',
       url: url,
@@ -62,7 +62,7 @@ export default {
       downloadLoadingInstance.close()
     }).catch((r) => {
       console.error(r)
-      Message.error('涓嬭浇鏂囦欢鍑虹幇閿欒锛岃鑱旂郴绠＄悊鍛橈紒')
+      Message.error('下载文件出现错误，请联系管理员！')
       downloadLoadingInstance.close()
     })
   },
@@ -76,4 +76,3 @@ export default {
     Message.error(errMsg)
   }
 }
-

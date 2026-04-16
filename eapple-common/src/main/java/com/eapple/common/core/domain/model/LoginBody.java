@@ -1,29 +1,29 @@
 package com.eapple.common.core.domain.model;
 
 /**
- * 鐢ㄦ埛鐧诲綍瀵硅薄
+ * 登录请求对象。
  * 
  * @author Eapp1e
  */
 public class LoginBody
 {
     /**
-     * 鐢ㄦ埛鍚?
+     * 用户名。
      */
     private String username;
 
     /**
-     * 鐢ㄦ埛瀵嗙爜
+     * 用户密码。
      */
     private String password;
 
     /**
-     * 楠岃瘉鐮?
+     * 验证码。
      */
     private String code;
 
     /**
-     * 鍞竴鏍囪瘑
+     * 验证码唯一标识。
      */
     private String uuid;
 

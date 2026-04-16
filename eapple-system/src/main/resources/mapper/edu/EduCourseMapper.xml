@@ -22,6 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="description" column="description"/>
         <result property="aiNotice" column="ai_notice"/>
         <result property="aiSuggestion" column="ai_suggestion"/>
+        <result property="enrollCount" column="enroll_count"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
@@ -30,18 +31,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="enrolled" column="enrolled"/>
     </resultMap>
 
+    <sql id="baseCourseColumns">
+        select c.course_id, c.course_name, c.category, c.teacher_user_id, c.teacher_name, c.campus,
+               c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
+               c.current_capacity, c.status, c.description, c.ai_notice, c.ai_suggestion,
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               'N' as enrolled,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as enroll_count
+        from edu_course c
+    </sql>
+
     <sql id="courseColumns">
         select c.course_id, c.course_name, c.category, c.teacher_user_id, c.teacher_name, c.campus,
                c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
                c.current_capacity, c.status, c.description, c.ai_notice, c.ai_suggestion,
-               c.create_by, c.create_time, c.update_by, c.update_time, c.remark
-        <if test="params.currentUserId != null and params.currentRole == 'student'">
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as enroll_count
+        <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'student'">
             , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId}) then 'Y' else 'N' end as enrolled
         </if>
-        <if test="params.currentUserId != null and params.currentRole == 'parent'">
+        <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'parent'">
             , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId}) then 'Y' else 'N' end as enrolled
         </if>
-        <if test="params.currentUserId == null">
+        <if test="_parameter == null or _parameter.getClass().name == 'java.lang.Long' or params.currentUserId == null">
             , 'N' as enrolled
         </if>
         from edu_course c
@@ -61,17 +73,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">
                 and c.status = #{status}
             </if>
-            <if test="params.onlyMine != null and params.onlyMine and params.currentRole == 'student'">
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'student'">
                 and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId})
             </if>
-            <if test="params.onlyMine != null and params.onlyMine and params.currentRole == 'parent'">
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'parent'">
                 and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId})
             </if>
         </where>
     </sql>
 
     <select id="selectCourseById" parameterType="Long" resultMap="EduCourseResult">
-        <include refid="courseColumns"/>
+        <include refid="baseCourseColumns"/>
         where c.course_id = #{courseId}
     </select>
 
@@ -79,6 +91,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="courseColumns"/>
         <include refid="courseWhere"/>
         order by c.course_id desc
+        <if test="params.limitTop != null">
+            limit #{params.limitTop}
+        </if>
+    </select>
+
+    <select id="selectPopularCourses" parameterType="EduCourse" resultMap="EduCourseResult">
+        <include refid="courseColumns"/>
+        <include refid="courseWhere"/>
+        order by enroll_count desc, c.course_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>

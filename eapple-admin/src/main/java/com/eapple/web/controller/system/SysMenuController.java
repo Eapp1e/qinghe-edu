@@ -23,7 +23,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.system.service.ISysMenuService;
 
 /**
- * 鑿滃崟淇℃伅
+ * 菜单信息
  * 
  * @author Eapp1e
  */
@@ -35,7 +35,7 @@ public class SysMenuController extends BaseController
     private ISysMenuService menuService;
 
     /**
-     * 鑾峰彇鑿滃崟鍒楄〃
+     * 获取菜单列表
      */
     @PreAuthorize("@ss.hasPermi('system:menu:list')")
     @GetMapping("/list")
@@ -46,7 +46,7 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 鏍规嵁鑿滃崟缂栧彿鑾峰彇璇︾粏淇℃伅
+     * 根据菜单编号获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:menu:query')")
     @GetMapping(value = "/{menuId}")
@@ -56,7 +56,7 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 鑾峰彇鑿滃崟涓嬫媺鏍戝垪琛?
+     * 获取菜单下拉树列表
      */
     @GetMapping("/treeselect")
     public AjaxResult treeselect(SysMenu menu)
@@ -66,7 +66,7 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 鍔犺浇瀵瑰簲瑙掕壊鑿滃崟鍒楄〃鏍?
+     * 加载对应角色菜单列表树
      */
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
     public AjaxResult roleMenuTreeselect(@PathVariable("roleId") Long roleId)
@@ -79,62 +79,62 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 鏂板鑿滃崟
+     * 新增菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:add')")
-    @Log(title = "鑿滃崟绠＄悊", businessType = BusinessType.INSERT)
+    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysMenu menu)
     {
         if (!menuService.checkMenuNameUnique(menu))
         {
-            return error("鏂板鑿滃崟'" + menu.getMenuName() + "'澶辫触锛岃彍鍗曞悕绉板凡瀛樺湪");
+            return error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath()))
         {
-            return error("鏂板鑿滃崟'" + menu.getMenuName() + "'澶辫触锛屽湴鍧€蹇呴』浠ttp(s)://寮€澶?);
+            return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
         }
         else if (!menuService.checkRouteConfigUnique(menu))
         {
-            return error("鏂板鑿滃崟'" + menu.getMenuName() + "'澶辫触锛岃矾鐢卞悕绉版垨鍦板潃宸插瓨鍦?);
+            return error("新增菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
         }
         menu.setCreateBy(getUsername());
         return toAjax(menuService.insertMenu(menu));
     }
 
     /**
-     * 淇敼鑿滃崟
+     * 修改菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
-    @Log(title = "鑿滃崟绠＄悊", businessType = BusinessType.UPDATE)
+    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysMenu menu)
     {
         if (!menuService.checkMenuNameUnique(menu))
         {
-            return error("淇敼鑿滃崟'" + menu.getMenuName() + "'澶辫触锛岃彍鍗曞悕绉板凡瀛樺湪");
+            return error("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath()))
         {
-            return error("淇敼鑿滃崟'" + menu.getMenuName() + "'澶辫触锛屽湴鍧€蹇呴』浠ttp(s)://寮€澶?);
+            return error("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
         }
         else if (menu.getMenuId().equals(menu.getParentId()))
         {
-            return error("淇敼鑿滃崟'" + menu.getMenuName() + "'澶辫触锛屼笂绾ц彍鍗曚笉鑳介€夋嫨鑷繁");
+            return error("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
         }
         else if (!menuService.checkRouteConfigUnique(menu))
         {
-            return error("淇敼鑿滃崟'" + menu.getMenuName() + "'澶辫触锛岃矾鐢卞悕绉版垨鍦板潃宸插瓨鍦?);
+            return error("修改菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
         }
         menu.setUpdateBy(getUsername());
         return toAjax(menuService.updateMenu(menu));
     }
 
     /**
-     * 淇濆瓨鑿滃崟鎺掑簭
+     * 保存菜单排序
      */
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
-    @Log(title = "淇濆瓨鑿滃崟鎺掑簭", businessType = BusinessType.UPDATE)
+    @Log(title = "保存菜单排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
     public AjaxResult updateSort(@RequestBody Map<String, String> params)
     {
@@ -145,20 +145,20 @@ public class SysMenuController extends BaseController
     }
 
     /**
-     * 鍒犻櫎鑿滃崟
+     * 删除菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:remove')")
-    @Log(title = "鑿滃崟绠＄悊", businessType = BusinessType.DELETE)
+    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
     public AjaxResult remove(@PathVariable("menuId") Long menuId)
     {
         if (menuService.hasChildByMenuId(menuId))
         {
-            return warn("瀛樺湪瀛愯彍鍗?涓嶅厑璁稿垹闄?);
+            return warn("存在子菜单,不允许删除");
         }
         if (menuService.checkMenuExistRole(menuId))
         {
-            return warn("鑿滃崟宸插垎閰?涓嶅厑璁稿垹闄?);
+            return warn("菜单已分配,不允许删除");
         }
         return toAjax(menuService.deleteMenuById(menuId));
     }

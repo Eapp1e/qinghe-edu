@@ -24,7 +24,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.system.service.ISysDeptService;
 
 /**
- * 閮ㄩ棬淇℃伅
+ * 部门信息
  * 
  * @author Eapp1e
  */
@@ -36,7 +36,7 @@ public class SysDeptController extends BaseController
     private ISysDeptService deptService;
 
     /**
-     * 鑾峰彇閮ㄩ棬鍒楄〃
+     * 获取部门列表
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list")
@@ -47,7 +47,7 @@ public class SysDeptController extends BaseController
     }
 
     /**
-     * 鏌ヨ閮ㄩ棬鍒楄〃锛堟帓闄よ妭鐐癸級
+     * 查询部门列表（排除节点）
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list/exclude/{deptId}")
@@ -59,7 +59,7 @@ public class SysDeptController extends BaseController
     }
 
     /**
-     * 鏍规嵁閮ㄩ棬缂栧彿鑾峰彇璇︾粏淇℃伅
+     * 根据部门编号获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/{deptId}")
@@ -70,26 +70,26 @@ public class SysDeptController extends BaseController
     }
 
     /**
-     * 鏂板閮ㄩ棬
+     * 新增部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:add')")
-    @Log(title = "閮ㄩ棬绠＄悊", businessType = BusinessType.INSERT)
+    @Log(title = "部门管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysDept dept)
     {
         if (!deptService.checkDeptNameUnique(dept))
         {
-            return error("鏂板閮ㄩ棬'" + dept.getDeptName() + "'澶辫触锛岄儴闂ㄥ悕绉板凡瀛樺湪");
+            return error("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         }
         dept.setCreateBy(getUsername());
         return toAjax(deptService.insertDept(dept));
     }
 
     /**
-     * 淇敼閮ㄩ棬
+     * 修改部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
-    @Log(title = "閮ㄩ棬绠＄悊", businessType = BusinessType.UPDATE)
+    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysDept dept)
     {
@@ -97,25 +97,25 @@ public class SysDeptController extends BaseController
         deptService.checkDeptDataScope(deptId);
         if (!deptService.checkDeptNameUnique(dept))
         {
-            return error("淇敼閮ㄩ棬'" + dept.getDeptName() + "'澶辫触锛岄儴闂ㄥ悕绉板凡瀛樺湪");
+            return error("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         }
         else if (dept.getParentId().equals(deptId))
         {
-            return error("淇敼閮ㄩ棬'" + dept.getDeptName() + "'澶辫触锛屼笂绾ч儴闂ㄤ笉鑳芥槸鑷繁");
+            return error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         }
         else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0)
         {
-            return error("璇ラ儴闂ㄥ寘鍚湭鍋滅敤鐨勫瓙閮ㄩ棬锛?);
+            return error("该部门包含未停用的子部门！");
         }
         dept.setUpdateBy(getUsername());
         return toAjax(deptService.updateDept(dept));
     }
 
     /**
-     * 淇濆瓨閮ㄩ棬鎺掑簭
+     * 保存部门排序
      */
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
-    @Log(title = "淇濆瓨閮ㄩ棬鎺掑簭", businessType = BusinessType.UPDATE)
+    @Log(title = "保存部门排序", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
     public AjaxResult updateSort(@RequestBody Map<String, String> params)
     {
@@ -126,20 +126,20 @@ public class SysDeptController extends BaseController
     }
 
     /**
-     * 鍒犻櫎閮ㄩ棬
+     * 删除部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:remove')")
-    @Log(title = "閮ㄩ棬绠＄悊", businessType = BusinessType.DELETE)
+    @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
     public AjaxResult remove(@PathVariable Long deptId)
     {
         if (deptService.hasChildByDeptId(deptId))
         {
-            return warn("瀛樺湪涓嬬骇閮ㄩ棬,涓嶅厑璁稿垹闄?);
+            return warn("存在下级部门,不允许删除");
         }
         if (deptService.checkDeptExistUser(deptId))
         {
-            return warn("閮ㄩ棬瀛樺湪鐢ㄦ埛,涓嶅厑璁稿垹闄?);
+            return warn("部门存在用户,不允许删除");
         }
         deptService.checkDeptDataScope(deptId);
         return toAjax(deptService.deleteDeptById(deptId));

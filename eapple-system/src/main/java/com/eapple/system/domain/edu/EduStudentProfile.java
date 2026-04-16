@@ -11,27 +11,27 @@ public class EduStudentProfile extends BaseEntity
 
     private Long studentUserId;
 
-    @Excel(name = "瀛︾敓濮撳悕")
+    @Excel(name = "学生姓名")
     private String studentName;
 
     private Long parentUserId;
 
-    @Excel(name = "瀹堕暱濮撳悕")
+    @Excel(name = "家长姓名")
     private String parentName;
 
-    @Excel(name = "骞寸骇")
+    @Excel(name = "年级")
     private String gradeName;
 
-    @Excel(name = "鐝骇")
+    @Excel(name = "班级")
     private String className;
 
-    @Excel(name = "鎬у埆")
+    @Excel(name = "性别")
     private String gender;
 
-    @Excel(name = "鍏磋叮鏍囩")
+    @Excel(name = "兴趣标签")
     private String interestTags;
 
-    @Excel(name = "鐘舵€?)
+    @Excel(name = "状态")
     private String status;
 
     public Long getProfileId()

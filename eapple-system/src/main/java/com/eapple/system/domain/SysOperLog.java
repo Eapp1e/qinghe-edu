@@ -7,7 +7,7 @@ import com.eapple.common.annotation.Excel.ColumnType;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 鎿嶄綔鏃ュ織璁板綍琛?oper_log
+ * 操作日志记录表 oper_log
  * 
  * @author Eapp1e
  */
@@ -15,76 +15,76 @@ public class SysOperLog extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鏃ュ織涓婚敭 */
-    @Excel(name = "鎿嶄綔搴忓彿", cellType = ColumnType.NUMERIC)
+    /** 日志主键 */
+    @Excel(name = "操作序号", cellType = ColumnType.NUMERIC)
     private Long operId;
 
-    /** 鎿嶄綔妯″潡 */
-    @Excel(name = "鎿嶄綔妯″潡")
+    /** 操作模块 */
+    @Excel(name = "操作模块")
     private String title;
 
-    /** 涓氬姟绫诲瀷锛?鍏跺畠 1鏂板 2淇敼 3鍒犻櫎锛?*/
-    @Excel(name = "涓氬姟绫诲瀷", readConverterExp = "0=鍏跺畠,1=鏂板,2=淇敼,3=鍒犻櫎,4=鎺堟潈,5=瀵煎嚭,6=瀵煎叆,7=寮洪€€,8=鐢熸垚浠ｇ爜,9=娓呯┖鏁版嵁")
+    /** 业务类型（0其它 1新增 2修改 3删除） */
+    @Excel(name = "业务类型", readConverterExp = "0=其它,1=新增,2=修改,3=删除,4=授权,5=导出,6=导入,7=强退,8=生成代码,9=清空数据")
     private Integer businessType;
 
-    /** 涓氬姟绫诲瀷鏁扮粍 */
+    /** 业务类型数组 */
     private Integer[] businessTypes;
 
-    /** 璇锋眰鏂规硶 */
-    @Excel(name = "璇锋眰鏂规硶")
+    /** 请求方法 */
+    @Excel(name = "请求方法")
     private String method;
 
-    /** 璇锋眰鏂瑰紡 */
-    @Excel(name = "璇锋眰鏂瑰紡")
+    /** 请求方式 */
+    @Excel(name = "请求方式")
     private String requestMethod;
 
-    /** 鎿嶄綔绫诲埆锛?鍏跺畠 1鍚庡彴鐢ㄦ埛 2鎵嬫満绔敤鎴凤級 */
-    @Excel(name = "鎿嶄綔绫诲埆", readConverterExp = "0=鍏跺畠,1=鍚庡彴鐢ㄦ埛,2=鎵嬫満绔敤鎴?)
+    /** 操作类别（0其它 1后台用户 2手机端用户） */
+    @Excel(name = "操作类别", readConverterExp = "0=其它,1=后台用户,2=手机端用户")
     private Integer operatorType;
 
-    /** 鎿嶄綔浜哄憳 */
-    @Excel(name = "鎿嶄綔浜哄憳")
+    /** 操作人员 */
+    @Excel(name = "操作人员")
     private String operName;
 
-    /** 閮ㄩ棬鍚嶇О */
-    @Excel(name = "閮ㄩ棬鍚嶇О")
+    /** 部门名称 */
+    @Excel(name = "部门名称")
     private String deptName;
 
-    /** 璇锋眰url */
-    @Excel(name = "璇锋眰鍦板潃")
+    /** 请求url */
+    @Excel(name = "请求地址")
     private String operUrl;
 
-    /** 鎿嶄綔鍦板潃 */
-    @Excel(name = "鎿嶄綔鍦板潃")
+    /** 操作地址 */
+    @Excel(name = "操作地址")
     private String operIp;
 
-    /** 鎿嶄綔鍦扮偣 */
-    @Excel(name = "鎿嶄綔鍦扮偣")
+    /** 操作地点 */
+    @Excel(name = "操作地点")
     private String operLocation;
 
-    /** 璇锋眰鍙傛暟 */
-    @Excel(name = "璇锋眰鍙傛暟")
+    /** 请求参数 */
+    @Excel(name = "请求参数")
     private String operParam;
 
-    /** 杩斿洖鍙傛暟 */
-    @Excel(name = "杩斿洖鍙傛暟")
+    /** 返回参数 */
+    @Excel(name = "返回参数")
     private String jsonResult;
 
-    /** 鎿嶄綔鐘舵€侊紙0姝ｅ父 1寮傚父锛?*/
-    @Excel(name = "鐘舵€?, readConverterExp = "0=姝ｅ父,1=寮傚父")
+    /** 操作状态（0正常 1异常） */
+    @Excel(name = "状态", readConverterExp = "0=正常,1=异常")
     private Integer status;
 
-    /** 閿欒娑堟伅 */
-    @Excel(name = "閿欒娑堟伅")
+    /** 错误消息 */
+    @Excel(name = "错误消息")
     private String errorMsg;
 
-    /** 鎿嶄綔鏃堕棿 */
+    /** 操作时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "鎿嶄綔鏃堕棿", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "操作时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date operTime;
 
-    /** 娑堣€楁椂闂?*/
-    @Excel(name = "娑堣€楁椂闂?, suffix = "姣")
+    /** 消耗时间 */
+    @Excel(name = "消耗时间", suffix = "毫秒")
     private Long costTime;
 
     public Long getOperId()

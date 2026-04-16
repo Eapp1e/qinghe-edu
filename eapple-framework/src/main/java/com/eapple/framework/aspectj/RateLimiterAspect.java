@@ -20,7 +20,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.common.utils.ip.IpUtils;
 
 /**
- * 闄愭祦澶勭悊
+ * 限流处理
  *
  * @author Eapp1e
  */
@@ -59,9 +59,9 @@ public class RateLimiterAspect
             Long number = redisTemplate.execute(limitScript, keys, count, time);
             if (StringUtils.isNull(number) || number.intValue() > count)
             {
-                throw new ServiceException("璁块棶杩囦簬棰戠箒锛岃绋嶅€欏啀璇?);
+                throw new ServiceException("访问过于频繁，请稍候再试");
             }
-            log.info("闄愬埗璇锋眰'{}',褰撳墠璇锋眰'{}',缂撳瓨key'{}'", count, number.intValue(), combineKey);
+            log.info("限制请求'{}',当前请求'{}',缓存key'{}'", count, number.intValue(), combineKey);
         }
         catch (ServiceException e)
         {
@@ -69,7 +69,7 @@ public class RateLimiterAspect
         }
         catch (Exception e)
         {
-            throw new RuntimeException("鏈嶅姟鍣ㄩ檺娴佸紓甯革紝璇风◢鍊欏啀璇?);
+            throw new RuntimeException("服务器限流异常，请稍候再试");
         }
     }
 

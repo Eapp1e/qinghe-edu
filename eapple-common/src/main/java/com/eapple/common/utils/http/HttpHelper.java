@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 閫氱敤http宸ュ叿灏佽
+ * 通用 HTTP 工具封装
  * 
  * @author Eapp1e
  */
@@ -34,7 +34,7 @@ public class HttpHelper
         }
         catch (IOException e)
         {
-            LOGGER.warn("getBodyString鍑虹幇闂锛?);
+            LOGGER.warn("getBodyString出现问题");
         }
         finally
         {

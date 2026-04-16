@@ -18,5 +18,9 @@ public interface EduEnrollmentMapper
 
     int increaseCourseCapacity(Long courseId);
 
+    int decreaseCourseCapacity(Long courseId);
+
+    int deleteEnrollmentById(Long enrollmentId);
+
     Long countEnrollments(EduCourseEnrollment enrollment);
 }

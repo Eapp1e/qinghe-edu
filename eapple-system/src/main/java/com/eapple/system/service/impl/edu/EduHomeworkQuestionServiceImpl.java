@@ -60,7 +60,7 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
         EduStudentProfile profile = profileMapper.selectProfileByStudentUserId(studentUserId);
         if (profile == null)
         {
-            throw new ServiceException("璇峰厛缁存姢瀛︾敓妗ｆ");
+            throw new ServiceException("请先维护学生档案");
         }
         if (question.getCourseId() != null)
         {
@@ -79,7 +79,7 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
         question.setCreateBy(SecurityUtils.getUsername());
         int rows = questionMapper.insertQuestion(question);
         String answer = aiService.answerHomeworkQuestion(question.getQuestionId(),
-                "璇剧▼锛? + question.getCourseName() + "\n鏍囬锛? + question.getQuestionTitle() + "\n鍐呭锛? + question.getQuestionContent());
+                "课程：" + question.getCourseName() + "\n标题：" + question.getQuestionTitle() + "\n内容：" + question.getQuestionContent());
         questionMapper.updateQuestionAnswer(question.getQuestionId(), answer, "1", "normal");
         return rows;
     }
@@ -96,10 +96,10 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
         EduHomeworkQuestion question = questionMapper.selectQuestionById(questionId);
         if (question == null)
         {
-            throw new ServiceException("闂璁板綍涓嶅瓨鍦?);
+            throw new ServiceException("问题记录不存在");
         }
         String answer = aiService.answerHomeworkQuestion(questionId,
-                "璇剧▼锛? + question.getCourseName() + "\n鏍囬锛? + question.getQuestionTitle() + "\n鍐呭锛? + question.getQuestionContent());
+                "课程：" + question.getCourseName() + "\n标题：" + question.getQuestionTitle() + "\n内容：" + question.getQuestionContent());
         questionMapper.updateQuestionAnswer(questionId, answer, "1", "normal");
         return answer;
     }
@@ -114,12 +114,12 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
         {
             if (studentUserId == null)
             {
-                throw new ServiceException("瀹堕暱鎻愰棶鏃跺繀椤婚€夋嫨瀛╁瓙");
+                throw new ServiceException("家长提问时必须选择孩子");
             }
             EduStudentProfile profile = profileMapper.selectProfileByStudentUserId(studentUserId);
             if (profile == null || !SecurityUtils.getUserId().equals(profile.getParentUserId()))
             {
-                throw new ServiceException("鍙兘涓哄凡鍏宠仈鐨勫瀛愭彁闂?);
+                throw new ServiceException("只能为已关联的孩子提问");
             }
             return studentUserId;
         }

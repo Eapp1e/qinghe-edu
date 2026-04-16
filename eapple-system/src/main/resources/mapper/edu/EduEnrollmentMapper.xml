@@ -97,6 +97,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update edu_course set current_capacity = ifnull(current_capacity, 0) + 1 where course_id = #{courseId}
     </update>
 
+    <update id="decreaseCourseCapacity" parameterType="Long">
+        update edu_course
+        set current_capacity = case
+            when ifnull(current_capacity, 0) > 0 then current_capacity - 1
+            else 0
+        end
+        where course_id = #{courseId}
+    </update>
+
+    <delete id="deleteEnrollmentById" parameterType="Long">
+        delete from edu_course_enrollment where enrollment_id = #{enrollmentId}
+    </delete>
+
     <select id="countEnrollments" parameterType="EduCourseEnrollment" resultType="Long">
         select count(1) from edu_course_enrollment
         <include refid="enrollmentWhere"/>

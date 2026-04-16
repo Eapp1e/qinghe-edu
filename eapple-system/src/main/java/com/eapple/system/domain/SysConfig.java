@@ -9,7 +9,7 @@ import com.eapple.common.annotation.Excel.ColumnType;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 鍙傛暟閰嶇疆琛?sys_config
+ * 参数配置表 sys_config
  * 
  * @author Eapp1e
  */
@@ -17,24 +17,24 @@ public class SysConfig extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鍙傛暟涓婚敭 */
-    @Excel(name = "鍙傛暟涓婚敭", cellType = ColumnType.NUMERIC)
+    /** 参数主键 */
+    @Excel(name = "参数主键", cellType = ColumnType.NUMERIC)
     private Long configId;
 
-    /** 鍙傛暟鍚嶇О */
-    @Excel(name = "鍙傛暟鍚嶇О")
+    /** 参数名称 */
+    @Excel(name = "参数名称")
     private String configName;
 
-    /** 鍙傛暟閿悕 */
-    @Excel(name = "鍙傛暟閿悕")
+    /** 参数键名 */
+    @Excel(name = "参数键名")
     private String configKey;
 
-    /** 鍙傛暟閿€?*/
-    @Excel(name = "鍙傛暟閿€?)
+    /** 参数键值 */
+    @Excel(name = "参数键值")
     private String configValue;
 
-    /** 绯荤粺鍐呯疆锛圷鏄?N鍚︼級 */
-    @Excel(name = "绯荤粺鍐呯疆", readConverterExp = "Y=鏄?N=鍚?)
+    /** 系统内置（Y是 N否） */
+    @Excel(name = "系统内置", readConverterExp = "Y=是,N=否")
     private String configType;
 
     public Long getConfigId()
@@ -47,8 +47,8 @@ public class SysConfig extends BaseEntity
         this.configId = configId;
     }
 
-    @NotBlank(message = "鍙傛暟鍚嶇О涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "鍙傛暟鍚嶇О涓嶈兘瓒呰繃100涓瓧绗?)
+    @NotBlank(message = "参数名称不能为空")
+    @Size(min = 0, max = 100, message = "参数名称不能超过100个字符")
     public String getConfigName()
     {
         return configName;
@@ -59,8 +59,8 @@ public class SysConfig extends BaseEntity
         this.configName = configName;
     }
 
-    @NotBlank(message = "鍙傛暟閿悕闀垮害涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "鍙傛暟閿悕闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
+    @NotBlank(message = "参数键名长度不能为空")
+    @Size(min = 0, max = 100, message = "参数键名长度不能超过100个字符")
     public String getConfigKey()
     {
         return configKey;
@@ -71,8 +71,8 @@ public class SysConfig extends BaseEntity
         this.configKey = configKey;
     }
 
-    @NotBlank(message = "鍙傛暟閿€间笉鑳戒负绌?)
-    @Size(min = 0, max = 500, message = "鍙傛暟閿€奸暱搴︿笉鑳借秴杩?00涓瓧绗?)
+    @NotBlank(message = "参数键值不能为空")
+    @Size(min = 0, max = 500, message = "参数键值长度不能超过500个字符")
     public String getConfigValue()
     {
         return configValue;

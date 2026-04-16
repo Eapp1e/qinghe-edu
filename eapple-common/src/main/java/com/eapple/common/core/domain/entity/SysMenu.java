@@ -10,63 +10,63 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 鑿滃崟鏉冮檺琛?sys_menu
- * 
+ * 菜单权限对象，对应表 sys_menu。
+ *
  * @author Eapp1e
  */
 public class SysMenu extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鑿滃崟ID */
+    /** 菜单 ID */
     private Long menuId;
 
-    /** 鑿滃崟鍚嶇О */
+    /** 菜单名称 */
     private String menuName;
 
-    /** 鐖惰彍鍗曞悕绉?*/
+    /** 父菜单名称 */
     private String parentName;
 
-    /** 鐖惰彍鍗旾D */
+    /** 父菜单 ID */
     private Long parentId;
 
-    /** 鏄剧ず椤哄簭 */
+    /** 显示顺序 */
     private Integer orderNum;
 
-    /** 璺敱鍦板潃 */
+    /** 路由地址 */
     private String path;
 
-    /** 缁勪欢璺緞 */
+    /** 组件路径 */
     private String component;
 
-    /** 璺敱鍙傛暟 */
+    /** 路由参数 */
     private String query;
 
-    /** 璺敱鍚嶇О锛岄粯璁ゅ拰璺敱鍦板潃鐩稿悓鐨勯┘宄版牸寮忥紙娉ㄦ剰锛氬洜涓簐ue3鐗堟湰鐨剅outer浼氬垹闄ゅ悕绉扮浉鍚岃矾鐢憋紝涓洪伩鍏嶅悕瀛楃殑鍐茬獊锛岀壒娈婃儏鍐靛彲浠ヨ嚜瀹氫箟锛?*/
+    /** 路由名称 */
     private String routeName;
 
-    /** 鏄惁涓哄閾撅紙0鏄?1鍚︼級 */
+    /** 是否为外链（0 是 1 否） */
     private String isFrame;
 
-    /** 鏄惁缂撳瓨锛?缂撳瓨 1涓嶇紦瀛橈級 */
+    /** 是否缓存（0 缓存 1 不缓存） */
     private String isCache;
 
-    /** 绫诲瀷锛圡鐩綍 C鑿滃崟 F鎸夐挳锛?*/
+    /** 菜单类型（M 目录 C 菜单 F 按钮） */
     private String menuType;
 
-    /** 鏄剧ず鐘舵€侊紙0鏄剧ず 1闅愯棌锛?*/
+    /** 菜单状态（0 显示 1 隐藏） */
     private String visible;
 
-    /** 鑿滃崟鐘舵€侊紙0姝ｅ父 1鍋滅敤锛?*/
+    /** 菜单状态（0 正常 1 停用） */
     private String status;
 
-    /** 鏉冮檺瀛楃涓?*/
+    /** 权限标识 */
     private String perms;
 
-    /** 鑿滃崟鍥炬爣 */
+    /** 菜单图标 */
     private String icon;
 
-    /** 瀛愯彍鍗?*/
+    /** 子菜单 */
     private List<SysMenu> children = new ArrayList<SysMenu>();
 
     public Long getMenuId()
@@ -79,8 +79,8 @@ public class SysMenu extends BaseEntity
         this.menuId = menuId;
     }
 
-    @NotBlank(message = "鑿滃崟鍚嶇О涓嶈兘涓虹┖")
-    @Size(min = 0, max = 50, message = "鑿滃崟鍚嶇О闀垮害涓嶈兘瓒呰繃50涓瓧绗?)
+    @NotBlank(message = "菜单名称不能为空")
+    @Size(min = 0, max = 50, message = "菜单名称长度不能超过 50 个字符")
     public String getMenuName()
     {
         return menuName;
@@ -111,7 +111,7 @@ public class SysMenu extends BaseEntity
         this.parentId = parentId;
     }
 
-    @NotNull(message = "鏄剧ず椤哄簭涓嶈兘涓虹┖")
+    @NotNull(message = "显示顺序不能为空")
     public Integer getOrderNum()
     {
         return orderNum;
@@ -122,7 +122,7 @@ public class SysMenu extends BaseEntity
         this.orderNum = orderNum;
     }
 
-    @Size(min = 0, max = 200, message = "璺敱鍦板潃涓嶈兘瓒呰繃200涓瓧绗?)
+    @Size(min = 0, max = 200, message = "路由地址长度不能超过 200 个字符")
     public String getPath()
     {
         return path;
@@ -133,7 +133,7 @@ public class SysMenu extends BaseEntity
         this.path = path;
     }
 
-    @Size(min = 0, max = 200, message = "缁勪欢璺緞涓嶈兘瓒呰繃255涓瓧绗?)
+    @Size(min = 0, max = 200, message = "组件路径长度不能超过 200 个字符")
     public String getComponent()
     {
         return component;
@@ -184,7 +184,7 @@ public class SysMenu extends BaseEntity
         this.isCache = isCache;
     }
 
-    @NotBlank(message = "鑿滃崟绫诲瀷涓嶈兘涓虹┖")
+    @NotBlank(message = "菜单类型不能为空")
     public String getMenuType()
     {
         return menuType;
@@ -215,7 +215,7 @@ public class SysMenu extends BaseEntity
         this.status = status;
     }
 
-    @Size(min = 0, max = 100, message = "鏉冮檺鏍囪瘑闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
+    @Size(min = 0, max = 100, message = "权限标识长度不能超过 100 个字符")
     public String getPerms()
     {
         return perms;
@@ -248,7 +248,7 @@ public class SysMenu extends BaseEntity
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("menuId", getMenuId())
             .append("menuName", getMenuName())
             .append("parentId", getParentId())
@@ -258,10 +258,10 @@ public class SysMenu extends BaseEntity
             .append("query", getQuery())
             .append("routeName", getRouteName())
             .append("isFrame", getIsFrame())
-            .append("IsCache", getIsCache())
+            .append("isCache", getIsCache())
             .append("menuType", getMenuType())
             .append("visible", getVisible())
-            .append("status ", getStatus())
+            .append("status", getStatus())
             .append("perms", getPerms())
             .append("icon", getIcon())
             .append("createBy", getCreateBy())

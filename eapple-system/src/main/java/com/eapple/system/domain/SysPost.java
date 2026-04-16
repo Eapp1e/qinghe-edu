@@ -10,7 +10,7 @@ import com.eapple.common.annotation.Excel.ColumnType;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 宀椾綅琛?sys_post
+ * 岗位表 sys_post
  * 
  * @author Eapp1e
  */
@@ -18,27 +18,27 @@ public class SysPost extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 宀椾綅搴忓彿 */
-    @Excel(name = "宀椾綅搴忓彿", cellType = ColumnType.NUMERIC)
+    /** 岗位序号 */
+    @Excel(name = "岗位序号", cellType = ColumnType.NUMERIC)
     private Long postId;
 
-    /** 宀椾綅缂栫爜 */
-    @Excel(name = "宀椾綅缂栫爜")
+    /** 岗位编码 */
+    @Excel(name = "岗位编码")
     private String postCode;
 
-    /** 宀椾綅鍚嶇О */
-    @Excel(name = "宀椾綅鍚嶇О")
+    /** 岗位名称 */
+    @Excel(name = "岗位名称")
     private String postName;
 
-    /** 宀椾綅鎺掑簭 */
-    @Excel(name = "宀椾綅鎺掑簭")
+    /** 岗位排序 */
+    @Excel(name = "岗位排序")
     private Integer postSort;
 
-    /** 鐘舵€侊紙0姝ｅ父 1鍋滅敤锛?*/
-    @Excel(name = "鐘舵€?, readConverterExp = "0=姝ｅ父,1=鍋滅敤")
+    /** 状态（0正常 1停用） */
+    @Excel(name = "状态", readConverterExp = "0=正常,1=停用")
     private String status;
 
-    /** 鐢ㄦ埛鏄惁瀛樺湪姝ゅ矖浣嶆爣璇?榛樿涓嶅瓨鍦?*/
+    /** 用户是否存在此岗位标识 默认不存在 */
     private boolean flag = false;
 
     public Long getPostId()
@@ -51,8 +51,8 @@ public class SysPost extends BaseEntity
         this.postId = postId;
     }
 
-    @NotBlank(message = "宀椾綅缂栫爜涓嶈兘涓虹┖")
-    @Size(min = 0, max = 64, message = "宀椾綅缂栫爜闀垮害涓嶈兘瓒呰繃64涓瓧绗?)
+    @NotBlank(message = "岗位编码不能为空")
+    @Size(min = 0, max = 64, message = "岗位编码长度不能超过64个字符")
     public String getPostCode()
     {
         return postCode;
@@ -63,8 +63,8 @@ public class SysPost extends BaseEntity
         this.postCode = postCode;
     }
 
-    @NotBlank(message = "宀椾綅鍚嶇О涓嶈兘涓虹┖")
-    @Size(min = 0, max = 50, message = "宀椾綅鍚嶇О闀垮害涓嶈兘瓒呰繃50涓瓧绗?)
+    @NotBlank(message = "岗位名称不能为空")
+    @Size(min = 0, max = 50, message = "岗位名称长度不能超过50个字符")
     public String getPostName()
     {
         return postName;
@@ -75,7 +75,7 @@ public class SysPost extends BaseEntity
         this.postName = postName;
     }
 
-    @NotNull(message = "鏄剧ず椤哄簭涓嶈兘涓虹┖")
+    @NotNull(message = "显示顺序不能为空")
     public Integer getPostSort()
     {
         return postSort;

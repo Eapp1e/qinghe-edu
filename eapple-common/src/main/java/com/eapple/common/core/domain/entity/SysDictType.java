@@ -10,7 +10,7 @@ import com.eapple.common.annotation.Excel.ColumnType;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 瀛楀吀绫诲瀷琛?sys_dict_type
+ * 字典类型表 sys_dict_type。
  * 
  * @author Eapp1e
  */
@@ -18,20 +18,20 @@ public class SysDictType extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 瀛楀吀涓婚敭 */
-    @Excel(name = "瀛楀吀涓婚敭", cellType = ColumnType.NUMERIC)
+    /** 字典主键 */
+    @Excel(name = "字典主键", cellType = ColumnType.NUMERIC)
     private Long dictId;
 
-    /** 瀛楀吀鍚嶇О */
-    @Excel(name = "瀛楀吀鍚嶇О")
+    /** 字典名称 */
+    @Excel(name = "字典名称")
     private String dictName;
 
-    /** 瀛楀吀绫诲瀷 */
-    @Excel(name = "瀛楀吀绫诲瀷")
+    /** 字典类型 */
+    @Excel(name = "字典类型")
     private String dictType;
 
-    /** 鐘舵€侊紙0姝ｅ父 1鍋滅敤锛?*/
-    @Excel(name = "鐘舵€?, readConverterExp = "0=姝ｅ父,1=鍋滅敤")
+    /** 状态（0正常 1停用） */
+    @Excel(name = "状态")
     private String status;
 
     public Long getDictId()
@@ -44,8 +44,8 @@ public class SysDictType extends BaseEntity
         this.dictId = dictId;
     }
 
-    @NotBlank(message = "瀛楀吀鍚嶇О涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "瀛楀吀绫诲瀷鍚嶇О闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
+    @NotBlank(message = "字典名称不能为空")
+    @Size(min = 0, max = 100, message = "字典名称长度不能超过 100 个字符")
     public String getDictName()
     {
         return dictName;
@@ -56,9 +56,9 @@ public class SysDictType extends BaseEntity
         this.dictName = dictName;
     }
 
-    @NotBlank(message = "瀛楀吀绫诲瀷涓嶈兘涓虹┖")
-    @Size(min = 0, max = 100, message = "瀛楀吀绫诲瀷绫诲瀷闀垮害涓嶈兘瓒呰繃100涓瓧绗?)
-    @Pattern(regexp = "^[a-z][a-z0-9_]*$", message = "瀛楀吀绫诲瀷蹇呴』浠ュ瓧姣嶅紑澶达紝涓斿彧鑳戒负锛堝皬鍐欏瓧姣嶏紝鏁板瓧锛屼笅婊戠嚎锛?)
+    @NotBlank(message = "字典类型不能为空")
+    @Size(min = 0, max = 100, message = "字典类型长度不能超过 100 个字符")
+    @Pattern(regexp = "^[a-z][a-z0-9_]*$", message = "字典类型必须以小写字母开头，且只能包含小写字母、数字和下划线")
     public String getDictType()
     {
         return dictType;
@@ -81,7 +81,7 @@ public class SysDictType extends BaseEntity
     
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("dictId", getDictId())
             .append("dictName", getDictName())
             .append("dictType", getDictType())

@@ -11,31 +11,31 @@ public class EduCourseEnrollment extends BaseEntity
 
     private Long courseId;
 
-    @Excel(name = "璇剧▼鍚嶇О")
+    @Excel(name = "课程名称")
     private String courseName;
 
     private Long studentUserId;
 
-    @Excel(name = "瀛︾敓")
+    @Excel(name = "学生")
     private String studentName;
 
     private Long parentUserId;
 
-    @Excel(name = "瀹堕暱")
+    @Excel(name = "家长")
     private String parentName;
 
     private Long teacherUserId;
 
-    @Excel(name = "鏁欏笀")
+    @Excel(name = "教师")
     private String teacherName;
 
-    @Excel(name = "鎶ュ悕鐘舵€?)
+    @Excel(name = "报名状态")
     private String status;
 
-    @Excel(name = "鎶ュ悕鏉ユ簮")
+    @Excel(name = "报名来源")
     private String signupSource;
 
-    @Excel(name = "瀛︿範璁板綍")
+    @Excel(name = "学习记录")
     private String learningRecord;
 
     private String interactionSummary;

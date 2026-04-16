@@ -4,39 +4,39 @@ import com.eapple.common.core.text.Convert;
 import com.eapple.common.utils.ServletUtils;
 
 /**
- * 琛ㄦ牸鏁版嵁澶勭悊
+ * 表格分页数据处理工具。
  * 
  * @author Eapp1e
  */
 public class TableSupport
 {
     /**
-     * 褰撳墠璁板綍璧峰绱㈠紩
+     * 当前记录起始索引。
      */
     public static final String PAGE_NUM = "pageNum";
 
     /**
-     * 姣忛〉鏄剧ず璁板綍鏁?
+     * 每页显示记录数。
      */
     public static final String PAGE_SIZE = "pageSize";
 
     /**
-     * 鎺掑簭鍒?
+     * 排序列。
      */
     public static final String ORDER_BY_COLUMN = "orderByColumn";
 
     /**
-     * 鎺掑簭鐨勬柟鍚?"desc" 鎴栬€?"asc".
+     * 排序方向，"desc" 或者 "asc"。
      */
     public static final String IS_ASC = "isAsc";
 
     /**
-     * 鍒嗛〉鍙傛暟鍚堢悊鍖?
+     * 是否启用合理化分页。
      */
     public static final String REASONABLE = "reasonable";
 
     /**
-     * 灏佽鍒嗛〉瀵硅薄
+     * 构建分页请求对象。
      */
     public static PageDomain getPageDomain()
     {

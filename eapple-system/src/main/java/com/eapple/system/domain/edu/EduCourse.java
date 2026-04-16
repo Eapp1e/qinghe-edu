@@ -11,27 +11,27 @@ public class EduCourse extends BaseEntity
 
     private Long courseId;
 
-    @Excel(name = "璇剧▼鍚嶇О")
+    @Excel(name = "课程名称")
     private String courseName;
 
-    @Excel(name = "璇剧▼鍒嗙被")
+    @Excel(name = "课程分类")
     private String category;
 
     private Long teacherUserId;
 
-    @Excel(name = "鏁欏笀")
+    @Excel(name = "教师")
     private String teacherName;
 
-    @Excel(name = "鏍″尯")
+    @Excel(name = "校区")
     private String campus;
 
-    @Excel(name = "涓婅鏄熸湡")
+    @Excel(name = "上课星期")
     private String weekDay;
 
-    @Excel(name = "寮€濮嬫椂闂?)
+    @Excel(name = "开始时间")
     private String startTime;
 
-    @Excel(name = "缁撴潫鏃堕棿")
+    @Excel(name = "结束时间")
     private String endTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -40,12 +40,12 @@ public class EduCourse extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
-    @Excel(name = "鏈€澶у閲?)
+    @Excel(name = "最大容量")
     private Integer maxCapacity;
 
     private Integer currentCapacity;
 
-    @Excel(name = "鐘舵€?)
+    @Excel(name = "状态")
     private String status;
 
     private String description;
@@ -57,6 +57,10 @@ public class EduCourse extends BaseEntity
     private Long enrollCount;
 
     private String enrolled;
+
+    private Integer recommendationScore;
+
+    private String recommendationReason;
 
     public Long getCourseId()
     {
@@ -246,5 +250,25 @@ public class EduCourse extends BaseEntity
     public void setEnrolled(String enrolled)
     {
         this.enrolled = enrolled;
+    }
+
+    public Integer getRecommendationScore()
+    {
+        return recommendationScore;
+    }
+
+    public void setRecommendationScore(Integer recommendationScore)
+    {
+        this.recommendationScore = recommendationScore;
+    }
+
+    public String getRecommendationReason()
+    {
+        return recommendationReason;
+    }
+
+    public void setRecommendationReason(String recommendationReason)
+    {
+        this.recommendationReason = recommendationReason;
     }
 }

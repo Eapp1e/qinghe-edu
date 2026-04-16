@@ -23,7 +23,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.system.domain.SysCache;
 
 /**
- * 缂撳瓨鐩戞帶
+ * 缓存监控
  * 
  * @author Eapp1e
  */
@@ -36,13 +36,13 @@ public class CacheController
 
     private final static List<SysCache> caches = new ArrayList<SysCache>();
     {
-        caches.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "鐢ㄦ埛淇℃伅"));
-        caches.add(new SysCache(CacheConstants.SYS_CONFIG_KEY, "閰嶇疆淇℃伅"));
-        caches.add(new SysCache(CacheConstants.SYS_DICT_KEY, "鏁版嵁瀛楀吀"));
-        caches.add(new SysCache(CacheConstants.CAPTCHA_CODE_KEY, "楠岃瘉鐮?));
-        caches.add(new SysCache(CacheConstants.REPEAT_SUBMIT_KEY, "闃查噸鎻愪氦"));
-        caches.add(new SysCache(CacheConstants.RATE_LIMIT_KEY, "闄愭祦澶勭悊"));
-        caches.add(new SysCache(CacheConstants.PWD_ERR_CNT_KEY, "瀵嗙爜閿欒娆℃暟"));
+        caches.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
+        caches.add(new SysCache(CacheConstants.SYS_CONFIG_KEY, "配置信息"));
+        caches.add(new SysCache(CacheConstants.SYS_DICT_KEY, "数据字典"));
+        caches.add(new SysCache(CacheConstants.CAPTCHA_CODE_KEY, "验证码"));
+        caches.add(new SysCache(CacheConstants.REPEAT_SUBMIT_KEY, "防重提交"));
+        caches.add(new SysCache(CacheConstants.RATE_LIMIT_KEY, "限流处理"));
+        caches.add(new SysCache(CacheConstants.PWD_ERR_CNT_KEY, "密码错误次数"));
     }
 
     @SuppressWarnings("deprecation")

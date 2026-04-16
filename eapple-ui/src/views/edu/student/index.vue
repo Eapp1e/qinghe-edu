@@ -3,49 +3,212 @@
     <section class="hero-panel">
       <div class="hero-copy">
         <span class="hero-badge">Student Profile</span>
-        <h1>学生档案</h1>
-        <p>统一维护学生基础信息、家长关联关系、年级班级与兴趣标签，支撑课后课程报名、成长记录与个性化服务推荐。</p>
+        <h1>{{ pageTitle }}</h1>
+        <p>{{ pageDescription }}</p>
       </div>
-      <div class="hero-stats">
+      <div v-if="!isOwnerView" class="hero-stats">
         <div class="stat-card">
           <span>档案总数</span>
           <strong>{{ total }}</strong>
         </div>
         <div class="stat-card">
-          <span>正常档案</span>
+          <span>正常在册</span>
           <strong>{{ activeCount }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>关联家长</span>
+          <strong>{{ thirdStat }}</strong>
         </div>
       </div>
     </section>
 
-    <section class="toolbar-panel">
-      <el-row :gutter="10" class="mb8 toolbar-row">
-        <el-col :span="1.5">
-          <el-button v-hasPermi="['edu:student:add']" type="primary" plain size="mini" icon="el-icon-plus" @click="handleAdd">新增档案</el-button>
-        </el-col>
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
-      </el-row>
+    <section v-if="isOwnerView" class="owner-layout">
+      <div v-if="studentList.length" class="profile-grid">
+        <article v-for="item in studentList" :key="item.profileId" class="profile-card">
+          <div class="profile-head">
+            <div>
+              <span class="profile-badge">{{ $auth.hasRole('edu_student') ? '我的档案' : '孩子档案' }}</span>
+              <h2>{{ item.studentName }}</h2>
+              <p>{{ item.gradeName || '未设置年级' }} · {{ item.className || '未设置班级' }}</p>
+            </div>
+            <el-tag :type="item.status === '0' ? 'success' : 'info'" size="mini">
+              {{ item.status === '0' ? '正常' : '停用' }}
+            </el-tag>
+          </div>
+
+          <div class="profile-body">
+            <div class="profile-section">
+              <h3>基础信息</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span>学生姓名</span>
+                  <strong>{{ item.studentName || '未填写' }}</strong>
+                </div>
+                <div class="info-item">
+                  <span>性别</span>
+                  <strong>{{ item.gender || '未填写' }}</strong>
+                </div>
+                <div class="info-item">
+                  <span>年级</span>
+                  <strong>{{ item.gradeName || '未填写' }}</strong>
+                </div>
+                <div class="info-item">
+                  <span>班级</span>
+                  <strong>{{ item.className || '未填写' }}</strong>
+                </div>
+                <div class="info-item">
+                  <span>家长姓名</span>
+                  <strong>{{ item.parentName || '未关联' }}</strong>
+                </div>
+                <div class="info-item">
+                  <span>关联家长 ID</span>
+                  <strong>{{ item.parentUserId || '未关联' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <h3>兴趣画像</h3>
+              <div class="tag-panel">
+                <el-tag
+                  v-for="tag in splitTags(item.interestTags)"
+                  :key="tag"
+                  size="small"
+                  effect="plain"
+                  class="interest-tag"
+                >
+                  {{ tag }}
+                </el-tag>
+                <span v-if="!splitTags(item.interestTags).length" class="empty-text">暂未填写兴趣标签</span>
+              </div>
+            </div>
+
+            <div class="profile-section recommend-section">
+              <div>
+                <h3>智能课程推荐</h3>
+                <p>结合学生档案、兴趣标签和课程热度，为当前学生推荐更合适的课后服务课程。</p>
+              </div>
+              <el-button type="primary" icon="el-icon-magic-stick" @click="handleRecommend(item)">查看推荐</el-button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <el-empty v-else description="当前暂无可查看的学生档案" class="empty-panel" />
     </section>
 
-    <el-table v-loading="loading" :data="studentList" class="content-table">
-      <el-table-column label="学生ID" prop="studentUserId" width="100" />
-      <el-table-column label="学生姓名" prop="studentName" width="120" />
-      <el-table-column label="家长ID" prop="parentUserId" width="100" />
-      <el-table-column label="家长姓名" prop="parentName" width="120" />
-      <el-table-column label="年级" prop="gradeName" width="120" />
-      <el-table-column label="班级" prop="className" width="120" />
-      <el-table-column label="兴趣标签" prop="interestTags" min-width="180" />
-      <el-table-column label="操作" width="150">
-        <template slot-scope="scope">
-          <el-button v-hasPermi="['edu:student:edit']" type="text" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button v-hasPermi="['edu:student:remove']" type="text" size="mini" @click="handleDelete(scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <template v-else>
+      <section v-show="showSearch" class="filter-panel">
+        <div class="panel-title">
+          <div>
+            <strong>档案筛选</strong>
+            <span>支持按学生、家长、年级、班级和状态快速检索学生档案。</span>
+          </div>
+        </div>
+        <el-form ref="queryForm" :model="queryParams" label-width="72px" class="filter-form" size="small" inline>
+          <el-form-item label="学生姓名" prop="studentName">
+            <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="handleQuery" />
+          </el-form-item>
+          <el-form-item label="家长姓名" prop="parentName">
+            <el-input v-model="queryParams.parentName" placeholder="请输入家长姓名" clearable @keyup.enter.native="handleQuery" />
+          </el-form-item>
+          <el-form-item label="年级" prop="gradeName">
+            <el-input v-model="queryParams.gradeName" placeholder="请输入年级" clearable @keyup.enter.native="handleQuery" />
+          </el-form-item>
+          <el-form-item label="班级" prop="className">
+            <el-input v-model="queryParams.className" placeholder="请输入班级" clearable @keyup.enter.native="handleQuery" />
+          </el-form-item>
+          <el-form-item label="状态" prop="status">
+            <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
+              <el-option label="正常" value="0" />
+              <el-option label="停用" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item class="filter-actions">
+            <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery">查询</el-button>
+            <el-button size="small" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+            <el-button
+              v-if="canManageProfile"
+              v-hasPermi="['edu:student:add']"
+              type="success"
+              size="small"
+              icon="el-icon-plus"
+              @click="handleAdd"
+            >
+              新增档案
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </section>
 
-    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+      <section class="content-layout">
+        <el-card shadow="never" class="list-panel">
+          <div slot="header" class="panel-header">
+            <div>
+              <strong>档案列表</strong>
+              <span>集中查看学生基础信息、家长关联、班级归属和兴趣标签。</span>
+            </div>
+            <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+          </div>
 
-    <el-dialog :title="title" :visible.sync="open" width="660px">
+          <el-table v-loading="loading" :data="studentList" class="content-table">
+            <el-table-column label="学生姓名" min-width="150">
+              <template slot-scope="scope">
+                <div class="name-cell">
+                  <strong>{{ scope.row.studentName }}</strong>
+                  <span>ID {{ scope.row.studentUserId }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="家长信息" min-width="150">
+              <template slot-scope="scope">
+                <div class="name-cell">
+                  <strong>{{ scope.row.parentName || '未关联' }}</strong>
+                  <span>{{ scope.row.parentUserId ? '家长ID ' + scope.row.parentUserId : '待补充' }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="年级班级" min-width="130">
+              <template slot-scope="scope">
+                <div class="meta-stack">
+                  <span>{{ scope.row.gradeName || '未设置年级' }}</span>
+                  <span>{{ scope.row.className || '未设置班级' }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="兴趣标签" min-width="220" prop="interestTags" show-overflow-tooltip />
+            <el-table-column label="状态" width="100">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.status === '0' ? 'success' : 'info'" size="mini">
+                  {{ scope.row.status === '0' ? '正常' : '停用' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="课程推荐" width="120">
+              <template slot-scope="scope">
+                <el-button type="text" size="mini" @click.stop="handleRecommend(scope.row)">智能推荐</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column v-if="canManageProfile" label="操作" width="150" fixed="right">
+              <template slot-scope="scope">
+                <el-button v-hasPermi="['edu:student:edit']" type="text" size="mini" @click.stop="handleUpdate(scope.row)">编辑</el-button>
+                <el-button v-hasPermi="['edu:student:remove']" type="text" size="mini" @click.stop="handleDelete(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize"
+            @pagination="getList"
+          />
+        </el-card>
+      </section>
+    </template>
+
+    <el-dialog :title="title" :visible.sync="open" width="700px">
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="学生ID" prop="studentUserId"><el-input v-model="form.studentUserId" /></el-form-item></el-col>
@@ -54,9 +217,23 @@
           <el-col :span="12"><el-form-item label="家长姓名"><el-input v-model="form.parentName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="年级"><el-input v-model="form.gradeName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="性别"><el-select v-model="form.gender"><el-option label="男" value="男" /><el-option label="女" value="女" /></el-select></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="状态"><el-radio-group v-model="form.status"><el-radio label="0">正常</el-radio><el-radio label="1">停用</el-radio></el-radio-group></el-form-item></el-col>
-          <el-col :span="24"><el-form-item label="兴趣标签"><el-input v-model="form.interestTags" /></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="性别">
+              <el-select v-model="form.gender" placeholder="请选择性别">
+                <el-option label="男" value="男" />
+                <el-option label="女" value="女" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态">
+              <el-radio-group v-model="form.status">
+                <el-radio label="0">正常</el-radio>
+                <el-radio label="1">停用</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24"><el-form-item label="兴趣标签"><el-input v-model="form.interestTags" placeholder="例如：编程, 绘画, 篮球" /></el-form-item></el-col>
         </el-row>
       </el-form>
       <div slot="footer">
@@ -64,11 +241,41 @@
         <el-button @click="open = false">取消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="recommendTitle" :visible.sync="recommendOpen" width="820px">
+      <div v-loading="recommendLoading" class="recommend-dialog">
+        <div v-if="recommendList.length" class="recommend-grid">
+          <div v-for="item in recommendList" :key="item.courseId" class="recommend-card">
+            <div class="recommend-head">
+              <div>
+                <strong>{{ item.courseName }}</strong>
+                <span>{{ item.category || '综合课程' }}</span>
+              </div>
+              <el-tag type="success" size="mini">匹配度 {{ item.recommendationScore || 0 }}</el-tag>
+            </div>
+            <p class="recommend-meta">授课教师：{{ item.teacherName || '待安排' }} · {{ item.weekDay || '' }} {{ item.startTime || '' }}</p>
+            <p class="recommend-desc">{{ item.description || '暂无课程简介' }}</p>
+            <div class="recommend-reason">
+              <span>AI 推荐理由</span>
+              <p>{{ item.recommendationReason || '该课程与学生当前档案较为匹配，建议优先关注。' }}</p>
+            </div>
+          </div>
+        </div>
+        <div v-else class="recommend-empty">
+          <i class="el-icon-magic-stick" />
+          <p>当前暂无可推荐课程，请先完善兴趣标签或新增更多课程。</p>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button @click="recommendOpen = false">关闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { addStudent, delStudent, listStudent, updateStudent } from '@/api/edu/student'
+import { recommendCourse } from '@/api/edu/course'
 
 export default {
   name: 'EduStudent',
@@ -78,9 +285,21 @@ export default {
       showSearch: true,
       total: 0,
       open: false,
+      recommendOpen: false,
+      recommendLoading: false,
       title: '',
+      recommendTitle: '智能推荐课程',
       studentList: [],
-      queryParams: { pageNum: 1, pageSize: 10 },
+      recommendList: [],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        studentName: '',
+        parentName: '',
+        gradeName: '',
+        className: '',
+        status: ''
+      },
       form: {},
       rules: {
         studentUserId: [{ required: true, message: '请输入学生ID', trigger: 'blur' }],
@@ -90,24 +309,78 @@ export default {
     }
   },
   computed: {
+    isOwnerView() {
+      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+    },
     activeCount() {
       return this.studentList.filter(item => item.status === '0').length
+    },
+    thirdStat() {
+      if (this.isOwnerView) {
+        return this.studentList.reduce((count, item) => count + this.splitTags(item.interestTags).length, 0)
+      }
+      return new Set(this.studentList.map(item => item.parentUserId).filter(Boolean)).size
+    },
+    canManageProfile() {
+      return this.$auth.hasRole('edu_teacher') || this.$auth.hasRole('admin')
+    },
+    pageTitle() {
+      if (this.$auth.hasRole('edu_student')) {
+        return '我的档案'
+      }
+      if (this.$auth.hasRole('edu_parent')) {
+        return '孩子档案'
+      }
+      return '学生档案'
+    },
+    pageDescription() {
+      if (this.$auth.hasRole('edu_student')) {
+        return '集中查看自己的基础信息、班级归属、兴趣标签和智能课程推荐结果。'
+      }
+      if (this.$auth.hasRole('edu_parent')) {
+        return '集中查看孩子的基础档案、班级信息、兴趣标签和智能推荐课程。'
+      }
+      return '教师端和管理员端可查看全部学生档案，并维护学生基础信息、家长关联关系、年级班级与兴趣标签。'
     }
   },
   created() {
     this.getList()
   },
   methods: {
+    splitTags(tags) {
+      if (!tags) {
+        return []
+      }
+      return tags.split(/[，,、\s]+/).map(item => item.trim()).filter(Boolean)
+    },
     getList() {
       this.loading = true
       listStudent(this.queryParams).then(res => {
-        this.studentList = res.rows
-        this.total = res.total
+        this.studentList = res.rows || []
+        this.total = res.total || 0
+        this.loading = false
+      }).catch(() => {
         this.loading = false
       })
     },
+    handleQuery() {
+      this.queryParams.pageNum = 1
+      this.getList()
+    },
+    resetQuery() {
+      this.queryParams = {
+        pageNum: 1,
+        pageSize: 10,
+        studentName: '',
+        parentName: '',
+        gradeName: '',
+        className: '',
+        status: ''
+      }
+      this.getList()
+    },
     handleAdd() {
-      this.form = { status: '0' }
+      this.form = { status: '0', gender: '男' }
       this.title = '新增学生档案'
       this.open = true
     },
@@ -128,9 +401,20 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$modal.confirm(`确认删除该档案“${row.studentName}”吗？`).then(() => delStudent(row.profileId)).then(() => {
+      this.$modal.confirm(`确认删除档案“${row.studentName}”吗？`).then(() => delStudent(row.profileId)).then(() => {
         this.$modal.msgSuccess('删除成功')
         this.getList()
+      })
+    },
+    handleRecommend(row) {
+      this.recommendTitle = `${row.studentName} 的课程推荐`
+      this.recommendOpen = true
+      this.recommendLoading = true
+      recommendCourse(row.studentUserId).then(res => {
+        this.recommendList = res.data || []
+        this.recommendLoading = false
+      }).catch(() => {
+        this.recommendLoading = false
       })
     }
   }
@@ -177,15 +461,15 @@ export default {
   gap: 18px;
   margin-bottom: 18px;
   padding: 28px;
-  border: 1px solid rgba(95, 222, 214, 0.2);
+  border: 1px solid rgba(103, 224, 214, 0.18);
   border-radius: 26px;
   background:
-    radial-gradient(circle at top right, rgba(67, 239, 189, 0.24), transparent 26%),
-    radial-gradient(circle at bottom left, rgba(91, 188, 255, 0.18), transparent 24%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(234, 255, 249, 0.96) 56%, rgba(237, 247, 255, 0.96) 100%);
+    radial-gradient(circle at top right, rgba(63, 229, 190, 0.2), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(72, 153, 255, 0.16), transparent 24%),
+    linear-gradient(135deg, rgba(21, 34, 46, 0.96), rgba(29, 73, 82, 0.92));
   box-shadow:
-    0 24px 44px rgba(39, 133, 146, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 24px 44px rgba(15, 35, 46, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-copy {
@@ -197,78 +481,312 @@ export default {
   align-items: center;
   padding: 7px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(31, 228, 190, 0.22), rgba(198, 246, 255, 0.74));
-  color: #0b866f;
+  background: rgba(32, 224, 182, 0.14);
+  color: #8ff6dc;
   font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 10px 20px rgba(23, 188, 183, 0.12);
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 20px rgba(12, 34, 40, 0.2);
 }
 
 .hero-copy h1 {
   margin: 16px 0 12px;
-  color: #163643;
+  color: #ffffff;
   font-size: 34px;
-  text-shadow: 0 10px 22px rgba(33, 188, 196, 0.12);
 }
 
 .hero-copy p {
   margin: 0;
-  color: #617786;
+  color: rgba(232, 246, 246, 0.78);
   line-height: 1.9;
 }
 
 .hero-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  min-width: 250px;
+  min-width: 360px;
 }
 
 .stat-card {
   padding: 18px;
-  border: 1px solid rgba(112, 214, 220, 0.2);
+  border: 1px solid rgba(129, 224, 224, 0.14);
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(233, 250, 255, 0.82));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
   box-shadow:
-    0 16px 28px rgba(39, 131, 146, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    0 16px 28px rgba(11, 32, 40, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .stat-card span {
-  color: #6f8794;
+  color: rgba(222, 240, 243, 0.72);
   font-size: 13px;
 }
 
 .stat-card strong {
   display: block;
   margin-top: 10px;
-  color: #163948;
+  color: #ffffff;
   font-size: 28px;
 }
 
-.toolbar-panel {
+.owner-layout,
+.filter-panel,
+.list-panel {
   position: relative;
   z-index: 1;
-  margin-bottom: 16px;
-  padding: 18px 20px 10px;
-  border: 1px solid rgba(103, 216, 219, 0.18);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
-  box-shadow:
-    0 20px 34px rgba(41, 130, 141, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
-.toolbar-row {
+.profile-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.profile-card,
+.filter-panel,
+.list-panel {
+  border-radius: 24px;
+  border: 1px solid rgba(103, 216, 219, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
+  box-shadow: 0 20px 34px rgba(41, 130, 141, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.profile-card {
+  padding: 24px;
+}
+
+.profile-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(86, 190, 207, 0.14);
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: rgba(21, 203, 167, 0.12);
+  color: #159e90;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-head h2 {
+  margin: 14px 0 8px;
+  color: #163746;
+  font-size: 28px;
+}
+
+.profile-head p {
+  margin: 0;
+  color: #6b8794;
+}
+
+.profile-body {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.profile-section {
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(92, 192, 212, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 251, 255, 0.86));
+}
+
+.profile-section h3 {
+  margin: 0 0 14px;
+  color: #173848;
+  font-size: 18px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.info-item {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(247, 252, 255, 0.9);
+  border: 1px solid rgba(122, 206, 216, 0.14);
+}
+
+.info-item span {
+  display: block;
+  color: #6f8894;
+  font-size: 12px;
+}
+
+.info-item strong {
+  display: block;
+  margin-top: 8px;
+  color: #163949;
+  font-size: 16px;
+}
+
+.tag-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.interest-tag {
+  border-color: rgba(27, 202, 168, 0.18);
+  color: #117f7f;
+  background: rgba(22, 205, 171, 0.08);
+}
+
+.empty-text {
+  color: #7c939e;
+  font-size: 13px;
+}
+
+.recommend-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 18px;
+}
+
+.recommend-section p {
+  margin: 8px 0 0;
+  color: #6c8794;
+  line-height: 1.8;
+}
+
+.filter-panel {
+  margin-bottom: 16px;
+  padding: 20px 22px 6px;
+}
+
+.panel-title,
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel-title strong,
+.panel-header strong {
+  display: block;
+  color: #18394a;
+  font-size: 18px;
+}
+
+.panel-title span,
+.panel-header span {
+  display: block;
+  margin-top: 4px;
+  color: #6e8794;
+  font-size: 13px;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.filter-actions {
+  margin-left: auto;
+}
+
+.content-layout {
+  display: block;
 }
 
 .content-table {
-  position: relative;
-  z-index: 1;
   margin-bottom: 10px;
+}
+
+.recommend-dialog {
+  min-height: 240px;
+}
+
+.recommend-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.recommend-card {
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(86, 190, 207, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 250, 252, 0.92));
+}
+
+.recommend-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recommend-head strong {
+  display: block;
+  color: #173542;
+  font-size: 18px;
+}
+
+.recommend-head span {
+  display: block;
+  margin-top: 6px;
+  color: #6f8792;
+  font-size: 12px;
+}
+
+.recommend-meta,
+.recommend-desc,
+.recommend-reason p {
+  margin: 12px 0 0;
+  color: #5f7885;
+  line-height: 1.7;
+}
+
+.recommend-reason {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(76, 171, 190, 0.12);
+}
+
+.recommend-reason span {
+  color: #1f998c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.recommend-empty,
+.empty-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+}
+
+.name-cell,
+.meta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name-cell strong,
+.meta-stack span:first-child {
+  color: #1b3947;
+}
+
+.name-cell span,
+.meta-stack span:last-child {
+  color: #738b97;
+  font-size: 12px;
 }
 
 ::v-deep .el-button--primary {
@@ -277,22 +795,14 @@ export default {
   box-shadow: 0 16px 30px rgba(20, 175, 183, 0.22);
 }
 
-::v-deep .el-button--primary:hover,
-::v-deep .el-button--primary:focus {
-  filter: saturate(108%);
-  box-shadow: 0 18px 34px rgba(20, 175, 183, 0.28);
-}
-
-::v-deep .el-button--primary.is-plain {
-  border: 1px solid rgba(49, 212, 198, 0.34);
-  color: #147f71;
-  background: rgba(236, 255, 251, 0.9);
-  box-shadow: none;
+::v-deep .el-button--success {
+  border: none;
+  background: linear-gradient(135deg, #2ad7b8 0%, #2ea0ff 100%);
 }
 
 ::v-deep .el-table {
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 22px;
   border: 1px solid rgba(106, 216, 218, 0.18);
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 22px 38px rgba(41, 130, 141, 0.08);
@@ -303,12 +813,8 @@ export default {
   color: #34505f;
 }
 
-::v-deep .el-table tr {
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.7);
+  background: rgba(230, 255, 249, 0.72);
 }
 
 ::v-deep .el-input__inner,
@@ -317,19 +823,6 @@ export default {
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
-}
-
-::v-deep .el-input__inner:focus {
-  border-color: #25ddbf;
-  box-shadow:
-    0 0 0 4px rgba(37, 221, 191, 0.12),
-    0 12px 22px rgba(39, 182, 194, 0.12);
-}
-
-::v-deep .el-form-item__label {
-  color: #456270;
-  font-weight: 600;
 }
 
 ::v-deep .el-dialog {
@@ -339,28 +832,33 @@ export default {
   box-shadow: 0 30px 60px rgba(25, 112, 133, 0.22);
 }
 
-::v-deep .el-dialog__header {
-  border-bottom: 1px solid rgba(111, 217, 217, 0.16);
-}
-
-::v-deep .el-dialog__title {
-  color: #18394a;
-  font-weight: 700;
-}
-
-::v-deep .el-pagination .btn-next,
-::v-deep .el-pagination .btn-prev,
-::v-deep .el-pagination .el-pager li {
-  border-radius: 12px;
-}
-
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .hero-panel {
     flex-direction: column;
   }
 
   .hero-stats {
     min-width: 0;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-stats,
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recommend-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-actions {
+    margin-left: 0;
   }
 }
 </style>

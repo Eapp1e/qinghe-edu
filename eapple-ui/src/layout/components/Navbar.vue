@@ -8,7 +8,7 @@
 
     <div class="right-menu">
       <router-link to="/user/profile" class="action-link">个人中心</router-link>
-      <button type="button" class="action-link logout-link" @click="logout">退出登录</button>
+      <button type="button" class="action-link logout-link" @click="logout">退出</button>
     </div>
   </div>
 </template>
@@ -56,13 +56,17 @@ export default {
   box-sizing: border-box;
   height: 52px;
   margin: 0;
-  padding: 0 12px;
+  padding: 0 14px;
   overflow: hidden;
-  border-bottom: 1px solid rgba(95, 222, 214, 0.16);
+  border-bottom: 1px solid rgba(129, 224, 224, 0.16);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: none;
-  backdrop-filter: blur(6px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 10px 24px rgba(15, 35, 46, 0.06);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
 
   .topmenu-container {
     position: absolute;
@@ -90,33 +94,45 @@ export default {
       height: 34px;
       margin-left: 8px;
       padding: 0 14px;
-      border: 1px solid rgba(120, 219, 222, 0.22);
+      border: 1px solid rgba(140, 226, 227, 0.2);
       border-radius: 12px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 253, 255, 0.9));
-      color: #2b6275;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12));
+      color: #204f60;
       font-size: 13px;
       font-weight: 600;
       text-decoration: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 8px 18px rgba(15, 35, 46, 0.05);
       transition: all 0.25s ease;
 
       &:hover {
-        border-color: rgba(31, 228, 190, 0.34);
-        color: #11846f;
-        box-shadow: 0 12px 22px rgba(39, 133, 146, 0.1);
+        border-color: rgba(31, 228, 190, 0.3);
+        color: #0f8570;
+        background: linear-gradient(180deg, rgba(216, 252, 246, 0.26), rgba(180, 239, 236, 0.14));
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.22),
+          0 12px 22px rgba(39, 133, 146, 0.08);
       }
     }
 
     .logout-link {
       cursor: pointer;
       outline: none;
-      background: linear-gradient(135deg, #12e0a9 0%, #10c7c4 52%, #2a98ff 100%);
+      background: linear-gradient(135deg, rgba(18, 224, 169, 0.92) 0%, rgba(16, 199, 196, 0.86) 52%, rgba(42, 152, 255, 0.88) 100%);
       color: #fff;
       border: none;
-      box-shadow: 0 10px 20px rgba(20, 175, 183, 0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 10px 20px rgba(20, 175, 183, 0.16);
 
       &:hover {
         color: #fff;
-        filter: saturate(108%);
+        background: linear-gradient(135deg, rgba(20, 214, 170, 0.96) 0%, rgba(17, 191, 191, 0.9) 52%, rgba(39, 141, 240, 0.92) 100%);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.22),
+          0 12px 22px rgba(20, 175, 183, 0.2);
+        filter: none;
       }
     }
   }

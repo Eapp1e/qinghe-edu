@@ -38,7 +38,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 52px;
+  height: 58px;
   padding: 0;
   overflow: hidden;
   border-bottom: 1px solid rgba(95, 222, 214, 0.12);
@@ -68,6 +68,7 @@ export default {
     height: 100%;
     margin: 0;
     font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0.02em;
@@ -80,7 +81,7 @@ export default {
   }
 
   .sidebar-title.only-text {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   &.collapse {

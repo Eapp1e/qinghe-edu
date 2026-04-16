@@ -19,7 +19,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.framework.security.context.PermissionContextHolder;
 
 /**
- * 鏁版嵁杩囨护澶勭悊
+ * 数据权限过滤处理。
  *
  * @author Eapp1e
  */
@@ -28,7 +28,7 @@ import com.eapple.framework.security.context.PermissionContextHolder;
 public class DataScopeAspect
 {
     /**
-     * 鏁版嵁鏉冮檺杩囨护鍏抽敭瀛?
+     * 数据权限过滤关键字。
      */
     public static final String DATA_SCOPE = "dataScope";
 
@@ -41,12 +41,12 @@ public class DataScopeAspect
 
     protected void handleDataScope(final JoinPoint joinPoint, DataScope controllerDataScope)
     {
-        // 鑾峰彇褰撳墠鐨勭敤鎴?
+        // 获取当前登录用户
         LoginUser loginUser = SecurityUtils.getLoginUser();
         if (StringUtils.isNotNull(loginUser))
         {
             SysUser currentUser = loginUser.getUser();
-            // 濡傛灉鏄秴绾х鐞嗗憳锛屽垯涓嶈繃婊ゆ暟鎹?
+            // 超级管理员不过滤数据权限
             if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin())
             {
                 String permission = StringUtils.defaultIfEmpty(controllerDataScope.permission(), PermissionContextHolder.getContext());
@@ -56,13 +56,13 @@ public class DataScopeAspect
     }
 
     /**
-     * 鏁版嵁鑼冨洿杩囨护
+     * 数据范围过滤。
      *
-     * @param joinPoint 鍒囩偣
-     * @param user 鐢ㄦ埛
-     * @param deptAlias 閮ㄩ棬鍒悕
-     * @param userAlias 鐢ㄦ埛鍒悕
-     * @param permission 鏉冮檺瀛楃
+     * @param joinPoint 切点
+     * @param user 当前用户
+     * @param deptAlias 部门表别名
+     * @param userAlias 用户表别名
+     * @param permission 权限标识
      */
     public static void dataScopeFilter(JoinPoint joinPoint, SysUser user, String userAlias, String deptAlias, String userField, String deptField, String permission)
     {
@@ -97,7 +97,7 @@ public class DataScopeAspect
             {
                 if (scopeCustomIds.size() > 1)
                 {
-                    // 澶氫釜鑷畾鏁版嵁鏉冮檺浣跨敤in鏌ヨ锛岄伩鍏嶅娆℃嫾鎺ャ€?
+                    // 多个自定义数据权限使用 in 查询，避免多次拼接。
                     sqlString.append(StringUtils.format(" OR {}.{} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id in ({}) ) ", deptAlias, deptField, String.join(",", scopeCustomIds)));
                 }
                 else
@@ -121,14 +121,14 @@ public class DataScopeAspect
                 }
                 else
                 {
-                    // 鏁版嵁鏉冮檺涓轰粎鏈汉涓旀病鏈塽serAlias鍒悕涓嶆煡璇换浣曟暟鎹?
+                    // 仅本人权限且没有用户别名时，设置为空结果条件。
                     sqlString.append(StringUtils.format(" OR {}.{} = 0 ", deptAlias, deptField));
                 }
             }
             conditions.add(dataScope);
         }
 
-        // 瑙掕壊閮戒笉鍖呭惈浼犻€掕繃鏉ョ殑鏉冮檺瀛楃锛岃繖涓椂鍊檚qlString涔熶細涓虹┖锛屾墍浠ヨ闄愬埗涓€涓?涓嶆煡璇换浣曟暟鎹?
+        // 如果所有角色都未命中权限条件，则限制为查不到任何数据。
         if (StringUtils.isEmpty(conditions))
         {
             sqlString.append(StringUtils.format(" OR {}.{} = 0 ", deptAlias, deptField));
@@ -146,7 +146,7 @@ public class DataScopeAspect
     }
 
     /**
-     * 鎷兼帴鏉冮檺sql鍓嶅厛娓呯┖params.dataScope鍙傛暟闃叉娉ㄥ叆
+     * 清空已有的数据权限 SQL，避免重复拼接。
      */
     private void clearDataScope(final JoinPoint joinPoint)
     {

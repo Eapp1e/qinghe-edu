@@ -173,15 +173,15 @@ export default {
   gap: 18px;
   margin-bottom: 18px;
   padding: 28px;
-  border: 1px solid rgba(94, 222, 213, 0.2);
+  border: 1px solid rgba(103, 224, 214, 0.18);
   border-radius: 26px;
   background:
-    radial-gradient(circle at top right, rgba(67, 239, 189, 0.24), transparent 26%),
-    radial-gradient(circle at bottom left, rgba(91, 188, 255, 0.18), transparent 24%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(234, 255, 249, 0.96) 56%, rgba(237, 247, 255, 0.96) 100%);
+    radial-gradient(circle at top right, rgba(63, 229, 190, 0.2), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(72, 153, 255, 0.16), transparent 24%),
+    linear-gradient(135deg, rgba(21, 34, 46, 0.96), rgba(29, 73, 82, 0.92));
   box-shadow:
-    0 24px 44px rgba(39, 133, 146, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 24px 44px rgba(15, 35, 46, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-copy {
@@ -193,23 +193,23 @@ export default {
   align-items: center;
   padding: 7px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(31, 228, 190, 0.22), rgba(198, 246, 255, 0.74));
-  color: #0b866f;
+  background: rgba(32, 224, 182, 0.14);
+  color: #8ff6dc;
   font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 10px 20px rgba(23, 188, 183, 0.12);
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 20px rgba(12, 34, 40, 0.2);
 }
 
 .hero-copy h1 {
   margin: 16px 0 12px;
-  color: #163643;
+  color: #ffffff;
   font-size: 34px;
-  text-shadow: 0 10px 22px rgba(33, 188, 196, 0.12);
 }
 
 .hero-copy p {
   margin: 0;
-  color: #617786;
+  color: rgba(232, 246, 246, 0.78);
   line-height: 1.9;
 }
 
@@ -222,23 +222,23 @@ export default {
 
 .stat-card {
   padding: 18px;
-  border: 1px solid rgba(112, 214, 220, 0.2);
+  border: 1px solid rgba(129, 224, 224, 0.14);
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(233, 250, 255, 0.82));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
   box-shadow:
-    0 16px 28px rgba(39, 131, 146, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    0 16px 28px rgba(11, 32, 40, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .stat-card span {
-  color: #6f8794;
+  color: rgba(222, 240, 243, 0.72);
   font-size: 13px;
 }
 
 .stat-card strong {
   display: block;
   margin-top: 10px;
-  color: #163948;
+  color: #ffffff;
   font-size: 28px;
 }
 

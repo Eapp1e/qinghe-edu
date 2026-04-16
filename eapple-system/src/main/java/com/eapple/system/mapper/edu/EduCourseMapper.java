@@ -10,6 +10,8 @@ public interface EduCourseMapper
 
     List<EduCourse> selectCourseList(EduCourse course);
 
+    List<EduCourse> selectPopularCourses(EduCourse course);
+
     int insertCourse(EduCourse course);
 
     int updateCourse(EduCourse course);

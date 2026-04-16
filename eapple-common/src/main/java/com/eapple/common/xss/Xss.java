@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 鑷畾涔墄ss鏍￠獙娉ㄨВ
+ * 自定义 XSS 校验注解
  * 
  * @author Eapp1e
  */
@@ -17,9 +17,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = { XssValidator.class })
 public @interface Xss
 {
-    String message()
-
-    default "涓嶅厑璁镐换浣曡剼鏈繍琛?;
+    String message() default "不允许任何脚本运行";
 
     Class<?>[] groups() default {};
 

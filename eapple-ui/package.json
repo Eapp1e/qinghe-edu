@@ -1,7 +1,7 @@
 {
     "name":  "eapple-after-school-platform-ui",
     "version":  "1.0.0",
-    "description":  "?????????????",
+    "description":  "中小学智能课后服务平台前端",
     "author":  "Eapp1e",
     "license":  "MIT",
     "scripts":  {

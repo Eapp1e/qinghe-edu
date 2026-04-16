@@ -12,7 +12,7 @@ import com.eapple.common.core.domain.AjaxResult;
 import com.eapple.common.utils.ServletUtils;
 
 /**
- * 闃叉閲嶅鎻愪氦鎷︽埅鍣?
+ * 防止重复提交拦截器抽象类。
  *
  * @author Eapp1e
  */
@@ -45,12 +45,12 @@ public abstract class RepeatSubmitInterceptor implements HandlerInterceptor
     }
 
     /**
-     * 楠岃瘉鏄惁閲嶅鎻愪氦鐢卞瓙绫诲疄鐜板叿浣撶殑闃查噸澶嶆彁浜ょ殑瑙勫垯
+     * 判断当前请求是否属于重复提交。
      *
-     * @param request 璇锋眰淇℃伅
-     * @param annotation 闃查噸澶嶆敞瑙ｅ弬鏁?
-     * @return 缁撴灉
-     * @throws Exception
+     * @param request 请求信息
+     * @param annotation 重复提交注解
+     * @return true 表示重复提交
+     * @throws Exception 异常信息
      */
-    public abstract boolean isRepeatSubmit(HttpServletRequest request, RepeatSubmit annotation);
+    public abstract boolean isRepeatSubmit(HttpServletRequest request, RepeatSubmit annotation) throws Exception;
 }

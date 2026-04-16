@@ -84,12 +84,19 @@
         <el-form-item prop="password">
           <el-input
             v-model="loginForm.password"
-            type="password"
+            :type="passwordVisible ? 'text' : 'password'"
             auto-complete="off"
             placeholder="请输入密码"
             @keyup.enter.native="handleLogin"
           >
             <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+            <span
+              slot="suffix"
+              class="password-toggle"
+              @click="passwordVisible = !passwordVisible"
+            >
+              <svg-icon :icon-class="passwordVisible ? 'eye-open' : 'eye'" class="password-toggle-icon" />
+            </span>
           </el-input>
         </el-form-item>
 
@@ -143,6 +150,7 @@ export default {
         { value: 'edu_teacher', label: '教师登录', desc: '发布课程与处理教学事务' },
         { value: 'edu_admin', label: '管理员登录', desc: '管理平台用户、通知和统计数据' }
       ],
+      passwordVisible: false,
       loginRules: {
         loginRole: [{ required: true, trigger: 'change', message: '请选择登录角色' }],
         username: [{ required: true, trigger: 'blur', message: '请输入账号' }],
@@ -771,6 +779,40 @@ export default {
 .input-icon {
   color: #74a1b8;
   font-size: 17px;
+}
+
+.password-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: #4e7389 !important;
+  cursor: pointer;
+  opacity: 1;
+  user-select: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: #18c6b0;
+  transform: scale(1.05);
+}
+
+.password-toggle-icon {
+  font-size: 18px;
+}
+
+::v-deep .el-input__suffix {
+  display: flex;
+  align-items: center;
+  right: 12px;
+}
+
+::v-deep .el-input__suffix-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .login-options {

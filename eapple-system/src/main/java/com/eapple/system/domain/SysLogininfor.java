@@ -7,7 +7,7 @@ import com.eapple.common.annotation.Excel.ColumnType;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 绯荤粺璁块棶璁板綍琛?sys_logininfor
+ * 系统访问记录表 sys_logininfor
  * 
  * @author Eapp1e
  */
@@ -16,40 +16,40 @@ public class SysLogininfor extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** ID */
-    @Excel(name = "搴忓彿", cellType = ColumnType.NUMERIC)
+    @Excel(name = "序号", cellType = ColumnType.NUMERIC)
     private Long infoId;
 
-    /** 鐢ㄦ埛璐﹀彿 */
-    @Excel(name = "鐢ㄦ埛璐﹀彿")
+    /** 用户账号 */
+    @Excel(name = "用户账号")
     private String userName;
 
-    /** 鐧诲綍鐘舵€?0鎴愬姛 1澶辫触 */
-    @Excel(name = "鐧诲綍鐘舵€?, readConverterExp = "0=鎴愬姛,1=澶辫触")
+    /** 登录状态 0成功 1失败 */
+    @Excel(name = "登录状态", readConverterExp = "0=成功,1=失败")
     private String status;
 
-    /** 鐧诲綍IP鍦板潃 */
-    @Excel(name = "鐧诲綍鍦板潃")
+    /** 登录IP地址 */
+    @Excel(name = "登录地址")
     private String ipaddr;
 
-    /** 鐧诲綍鍦扮偣 */
-    @Excel(name = "鐧诲綍鍦扮偣")
+    /** 登录地点 */
+    @Excel(name = "登录地点")
     private String loginLocation;
 
-    /** 娴忚鍣ㄧ被鍨?*/
-    @Excel(name = "娴忚鍣?)
+    /** 浏览器类型 */
+    @Excel(name = "浏览器")
     private String browser;
 
-    /** 鎿嶄綔绯荤粺 */
-    @Excel(name = "鎿嶄綔绯荤粺")
+    /** 操作系统 */
+    @Excel(name = "操作系统")
     private String os;
 
-    /** 鎻愮ず娑堟伅 */
-    @Excel(name = "鎻愮ず娑堟伅")
+    /** 提示消息 */
+    @Excel(name = "提示消息")
     private String msg;
 
-    /** 璁块棶鏃堕棿 */
+    /** 访问时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "璁块棶鏃堕棿", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date loginTime;
 
     public Long getInfoId()

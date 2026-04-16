@@ -39,6 +39,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="studentName != null and studentName != ''">
                 and student_name like concat('%', #{studentName}, '%')
             </if>
+            <if test="parentName != null and parentName != ''">
+                and parent_name like concat('%', #{parentName}, '%')
+            </if>
+            <if test="gradeName != null and gradeName != ''">
+                and grade_name like concat('%', #{gradeName}, '%')
+            </if>
+            <if test="className != null and className != ''">
+                and class_name like concat('%', #{className}, '%')
+            </if>
             <if test="status != null and status != ''">
                 and status = #{status}
             </if>

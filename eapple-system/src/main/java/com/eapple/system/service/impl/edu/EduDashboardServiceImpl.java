@@ -85,9 +85,11 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         vo.setActiveTeachers(courseMapper.countActiveTeachers());
 
         List<EduCourse> recentCourses = courseMapper.selectCourseList(courseQuery);
+        List<EduCourse> popularCourses = courseMapper.selectPopularCourses(courseQuery);
         List<EduHomeworkQuestion> recentQuestions = questionMapper.selectQuestionList(questionQuery);
         List<EduAiLog> recentAiLogs = aiLogMapper.selectAiLogList(logQuery);
         vo.setRecentCourses(recentCourses);
+        vo.setPopularCourses(popularCourses);
         vo.setRecentQuestions(recentQuestions);
         vo.setRecentAiLogs(recentAiLogs);
         return vo;

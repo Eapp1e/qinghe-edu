@@ -32,7 +32,7 @@ import com.eapple.system.service.ISysRoleService;
 import com.eapple.system.service.ISysUserService;
 
 /**
- * 瑙掕壊淇℃伅
+ * 角色信息
  * 
  * @author Eapp1e
  */
@@ -64,18 +64,18 @@ public class SysRoleController extends BaseController
         return getDataTable(list);
     }
 
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.EXPORT)
+    @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:role:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysRole role)
     {
         List<SysRole> list = roleService.selectRoleList(role);
         ExcelUtil<SysRole> util = new ExcelUtil<SysRole>(SysRole.class);
-        util.exportExcel(response, list, "瑙掕壊鏁版嵁");
+        util.exportExcel(response, list, "角色数据");
     }
 
     /**
-     * 鏍规嵁瑙掕壊缂栧彿鑾峰彇璇︾粏淇℃伅
+     * 根据角色编号获取详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/{roleId}")
@@ -86,20 +86,20 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鏂板瑙掕壊
+     * 新增角色
      */
     @PreAuthorize("@ss.hasPermi('system:role:add')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.INSERT)
+    @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysRole role)
     {
         if (!roleService.checkRoleNameUnique(role))
         {
-            return error("鏂板瑙掕壊'" + role.getRoleName() + "'澶辫触锛岃鑹插悕绉板凡瀛樺湪");
+            return error("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
         }
         else if (!roleService.checkRoleKeyUnique(role))
         {
-            return error("鏂板瑙掕壊'" + role.getRoleName() + "'澶辫触锛岃鑹叉潈闄愬凡瀛樺湪");
+            return error("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
         role.setCreateBy(getUsername());
         return toAjax(roleService.insertRole(role));
@@ -107,10 +107,10 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 淇敼淇濆瓨瑙掕壊
+     * 修改保存角色
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.UPDATE)
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysRole role)
     {
@@ -118,17 +118,17 @@ public class SysRoleController extends BaseController
         roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role))
         {
-            return error("淇敼瑙掕壊'" + role.getRoleName() + "'澶辫触锛岃鑹插悕绉板凡瀛樺湪");
+            return error("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
         }
         else if (!roleService.checkRoleKeyUnique(role))
         {
-            return error("淇敼瑙掕壊'" + role.getRoleName() + "'澶辫触锛岃鑹叉潈闄愬凡瀛樺湪");
+            return error("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
         }
         role.setUpdateBy(getUsername());
         
         if (roleService.updateRole(role) > 0)
         {
-            // 鏇存柊缂撳瓨鐢ㄦ埛鏉冮檺
+            // 更新缓存用户权限
             LoginUser loginUser = getLoginUser();
             if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
             {
@@ -138,14 +138,14 @@ public class SysRoleController extends BaseController
             }
             return success();
         }
-        return error("淇敼瑙掕壊'" + role.getRoleName() + "'澶辫触锛岃鑱旂郴绠＄悊鍛?);
+        return error("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
     }
 
     /**
-     * 淇敼淇濆瓨鏁版嵁鏉冮檺
+     * 修改保存数据权限
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.UPDATE)
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/dataScope")
     public AjaxResult dataScope(@RequestBody SysRole role)
     {
@@ -155,10 +155,10 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鐘舵€佷慨鏀?
+     * 状态修改
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.UPDATE)
+    @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult changeStatus(@RequestBody SysRole role)
     {
@@ -169,10 +169,10 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鍒犻櫎瑙掕壊
+     * 删除角色
      */
     @PreAuthorize("@ss.hasPermi('system:role:remove')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.DELETE)
+    @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
     public AjaxResult remove(@PathVariable Long[] roleIds)
     {
@@ -180,7 +180,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鑾峰彇瑙掕壊閫夋嫨妗嗗垪琛?
+     * 获取角色选择框列表
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping("/optionselect")
@@ -190,7 +190,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鏌ヨ宸插垎閰嶇敤鎴疯鑹插垪琛?
+     * 查询已分配用户角色列表
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/allocatedList")
@@ -202,7 +202,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鏌ヨ鏈垎閰嶇敤鎴疯鑹插垪琛?
+     * 查询未分配用户角色列表
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/authUser/unallocatedList")
@@ -214,10 +214,10 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鍙栨秷鎺堟潈鐢ㄦ埛
+     * 取消授权用户
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.GRANT)
+    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
     public AjaxResult cancelAuthUser(@RequestBody SysUserRole userRole)
     {
@@ -225,10 +225,10 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鎵归噺鍙栨秷鎺堟潈鐢ㄦ埛
+     * 批量取消授权用户
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.GRANT)
+    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
     public AjaxResult cancelAuthUserAll(Long roleId, Long[] userIds)
     {
@@ -236,10 +236,10 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鎵归噺閫夋嫨鐢ㄦ埛鎺堟潈
+     * 批量选择用户授权
      */
     @PreAuthorize("@ss.hasPermi('system:role:edit')")
-    @Log(title = "瑙掕壊绠＄悊", businessType = BusinessType.GRANT)
+    @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
     public AjaxResult selectAuthUserAll(Long roleId, Long[] userIds)
     {
@@ -248,7 +248,7 @@ public class SysRoleController extends BaseController
     }
 
     /**
-     * 鑾峰彇瀵瑰簲瑙掕壊閮ㄩ棬鏍戝垪琛?
+     * 获取对应角色部门树列表
      */
     @PreAuthorize("@ss.hasPermi('system:role:query')")
     @GetMapping(value = "/deptTree/{roleId}")

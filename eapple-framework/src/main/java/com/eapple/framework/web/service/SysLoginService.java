@@ -31,7 +31,7 @@ import com.eapple.system.service.ISysConfigService;
 import com.eapple.system.service.ISysUserService;
 
 /**
- * 鐧诲綍鏍￠獙鏂规硶
+ * 登录校验方法
  * 
  * @author Eapp1e
  */
@@ -54,27 +54,27 @@ public class SysLoginService
     private ISysConfigService configService;
 
     /**
-     * 鐧诲綍楠岃瘉
+     * 登录验证
      * 
-     * @param username 鐢ㄦ埛鍚?
-     * @param password 瀵嗙爜
-     * @param code 楠岃瘉鐮?
-     * @param uuid 鍞竴鏍囪瘑
-     * @return 缁撴灉
+     * @param username 用户名
+     * @param password 密码
+     * @param code 验证码
+     * @param uuid 唯一标识
+     * @return 结果
      */
     public String login(String username, String password, String code, String uuid, String loginRole)
     {
-        // 楠岃瘉鐮佹牎楠?
+        // 验证码校验
         validateCaptcha(username, code, uuid);
-        // 鐧诲綍鍓嶇疆鏍￠獙
+        // 登录前置校验
         loginPreCheck(username, password);
-        // 鐢ㄦ埛楠岃瘉
+        // 用户验证
         Authentication authentication = null;
         try
         {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             AuthenticationContextHolder.setContext(authenticationToken);
-            // 璇ユ柟娉曚細鍘昏皟鐢║serDetailsServiceImpl.loadUserByUsername
+            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate(authenticationToken);
         }
         catch (Exception e)
@@ -98,7 +98,7 @@ public class SysLoginService
         validateLoginRole(loginUser, username, loginRole);
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         recordLoginInfo(loginUser.getUserId());
-        // 鐢熸垚token
+        // 生成token
         return tokenService.createToken(loginUser);
     }
 
@@ -111,8 +111,8 @@ public class SysLoginService
         List<SysRole> roles = loginUser.getUser().getRoles();
         if (roles == null || roles.isEmpty())
         {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, "鏈垎閰嶅彲鐢ㄨ鑹?));
-            throw new ServiceException("褰撳墠璐﹀彿鏈垎閰嶅彲鐢ㄨ鑹诧紝璇疯仈绯荤鐞嗗憳");
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, "未分配可用角色"));
+            throw new ServiceException("当前账号未分配可用角色，请联系管理员");
         }
         boolean matched = roles.stream()
                 .map(SysRole::getRoleKey)
@@ -120,8 +120,8 @@ public class SysLoginService
                 .anyMatch(roleKey -> roleMatches(loginRole, roleKey));
         if (!matched)
         {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, "鐧诲綍瑙掕壊涓庤处鍙疯鑹蹭笉鍖归厤"));
-            throw new ServiceException("鎵€閫夌櫥褰曡鑹蹭笌褰撳墠璐﹀彿涓嶅尮閰嶏紝璇烽噸鏂伴€夋嫨");
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, "登录角色与账号角色不匹配"));
+            throw new ServiceException("所选登录角色与当前账号不匹配，请重新选择");
         }
     }
 
@@ -135,12 +135,12 @@ public class SysLoginService
     }
 
     /**
-     * 鏍￠獙楠岃瘉鐮?
+     * 校验验证码
      * 
-     * @param username 鐢ㄦ埛鍚?
-     * @param code 楠岃瘉鐮?
-     * @param uuid 鍞竴鏍囪瘑
-     * @return 缁撴灉
+     * @param username 用户名
+     * @param code 验证码
+     * @param uuid 唯一标识
+     * @return 结果
      */
     public void validateCaptcha(String username, String code, String uuid)
     {
@@ -164,33 +164,33 @@ public class SysLoginService
     }
 
     /**
-     * 鐧诲綍鍓嶇疆鏍￠獙
-     * @param username 鐢ㄦ埛鍚?
-     * @param password 鐢ㄦ埛瀵嗙爜
+     * 登录前置校验
+     * @param username 用户名
+     * @param password 用户密码
      */
     public void loginPreCheck(String username, String password)
     {
-        // 鐢ㄦ埛鍚嶆垨瀵嗙爜涓虹┖ 閿欒
+        // 用户名或密码为空 错误
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password))
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("not.null")));
             throw new UserNotExistsException();
         }
-        // 瀵嗙爜濡傛灉涓嶅湪鎸囧畾鑼冨洿鍐?閿欒
+        // 密码如果不在指定范围内 错误
         if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH)
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
             throw new UserPasswordNotMatchException();
         }
-        // 鐢ㄦ埛鍚嶄笉鍦ㄦ寚瀹氳寖鍥村唴 閿欒
+        // 用户名不在指定范围内 错误
         if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH)
         {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
             throw new UserPasswordNotMatchException();
         }
-        // IP榛戝悕鍗曟牎楠?
+        // IP黑名单校验
         String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
         if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr()))
         {
@@ -200,9 +200,9 @@ public class SysLoginService
     }
 
     /**
-     * 璁板綍鐧诲綍淇℃伅
+     * 记录登录信息
      *
-     * @param userId 鐢ㄦ埛ID
+     * @param userId 用户ID
      */
     public void recordLoginInfo(Long userId)
     {

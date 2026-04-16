@@ -27,5 +27,5 @@ public @interface RepeatSubmit
     /**
      * 鎻愮ず娑堟伅
      */
-    public String message() default "涓嶅厑璁搁噸澶嶆彁浜わ紝璇风◢鍊欏啀璇?;
+    public String message() default "??????";
 }

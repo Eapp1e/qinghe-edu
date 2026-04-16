@@ -8,30 +8,30 @@ import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
 
 let downloadLoadingInstance
-// 鏄惁鏄剧ず閲嶆柊鐧诲綍
+// 是否显示重新登录
 export let isRelogin = { show: false }
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
-// 鍒涘缓axios瀹炰緥
+// 创建axios实例
 const service = axios.create({
-  // axios涓姹傞厤缃湁baseURL閫夐」锛岃〃绀鸿姹俇RL鍏叡閮ㄥ垎
+  // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: process.env.VUE_APP_BASE_API,
-  // 瓒呮椂
+  // 超时
   timeout: 10000
 })
 
-// request鎷︽埅鍣?
+// request拦截器
 service.interceptors.request.use(config => {
-  // 鏄惁闇€瑕佽缃?token
+  // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
-  // 鏄惁闇€瑕侀槻姝㈡暟鎹噸澶嶆彁浜?
+  // 是否需要防止数据重复提交
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
-  // 闂撮殧鏃堕棿(ms)锛屽皬浜庢鏃堕棿瑙嗕负閲嶅鎻愪氦
+  // 间隔时间(ms)，小于此时间视为重复提交
   const interval = (config.headers || {}).interval || 1000
   if (getToken() && !isToken) {
-    config.headers['Authorization'] = 'Bearer ' + getToken() // 璁╂瘡涓姹傛惡甯﹁嚜瀹氫箟token 璇锋牴鎹疄闄呮儏鍐佃嚜琛屼慨鏀?
+    config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
-  // get璇锋眰鏄犲皠params鍙傛暟
+  // get请求映射params参数
   if (config.method === 'get' && config.params) {
     let url = config.url + '?' + tansParams(config.params)
     url = url.slice(0, -1)
@@ -44,21 +44,21 @@ service.interceptors.request.use(config => {
       data: typeof config.data === 'object' ? JSON.stringify(config.data) : config.data,
       time: new Date().getTime()
     }
-    const requestSize = Object.keys(JSON.stringify(requestObj)).length // 璇锋眰鏁版嵁澶у皬
-    const limitSize = 5 * 1024 * 1024 // 闄愬埗瀛樻斁鏁版嵁5M
+    const requestSize = Object.keys(JSON.stringify(requestObj)).length // 请求数据大小
+    const limitSize = 5 * 1024 * 1024 // 限制存放数据5M
     if (requestSize >= limitSize) {
-      console.warn(`[${config.url}]: ` + '璇锋眰鏁版嵁澶у皬瓒呭嚭鍏佽鐨?M闄愬埗锛屾棤娉曡繘琛岄槻閲嶅鎻愪氦楠岃瘉銆?)
+      console.warn(`[${config.url}]: ` + '请求数据大小超出允许的5M限制，无法进行防重复提交验证。')
       return config
     }
     const sessionObj = cache.session.getJSON('sessionObj')
     if (sessionObj === undefined || sessionObj === null || sessionObj === '') {
       cache.session.setJSON('sessionObj', requestObj)
     } else {
-      const s_url = sessionObj.url                  // 璇锋眰鍦板潃
-      const s_data = sessionObj.data                // 璇锋眰鏁版嵁
-      const s_time = sessionObj.time                // 璇锋眰鏃堕棿
+      const s_url = sessionObj.url                  // 请求地址
+      const s_data = sessionObj.data                // 请求数据
+      const s_time = sessionObj.time                // 请求时间
       if (s_data === requestObj.data && requestObj.time - s_time < interval && s_url === requestObj.url) {
-        const message = '鏁版嵁姝ｅ湪澶勭悊锛岃鍕块噸澶嶆彁浜?
+        const message = '数据正在处理，请勿重复提交'
         console.warn(`[${s_url}]: ` + message)
         return Promise.reject(new Error(message))
       } else {
@@ -72,20 +72,20 @@ service.interceptors.request.use(config => {
     Promise.reject(error)
 })
 
-// 鍝嶅簲鎷︽埅鍣?
+// 响应拦截器
 service.interceptors.response.use(res => {
-    // 鏈缃姸鎬佺爜鍒欓粯璁ゆ垚鍔熺姸鎬?
+    // 未设置状态码则默认成功状态
     const code = res.data.code || 200
-    // 鑾峰彇閿欒淇℃伅
+    // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
-    // 浜岃繘鍒舵暟鎹垯鐩存帴杩斿洖
+    // 二进制数据则直接返回
     if (res.request.responseType ===  'blob' || res.request.responseType ===  'arraybuffer') {
       return res.data
     }
     if (code === 401) {
       if (!isRelogin.show) {
         isRelogin.show = true
-        MessageBox.confirm('鐧诲綍鐘舵€佸凡杩囨湡锛屾偍鍙互缁х画鐣欏湪璇ラ〉闈紝鎴栬€呴噸鏂扮櫥褰?, '绯荤粺鎻愮ず', { confirmButtonText: '閲嶆柊鐧诲綍', cancelButtonText: '鍙栨秷', type: 'warning' }).then(() => {
+        MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' }).then(() => {
           isRelogin.show = false
           store.dispatch('LogOut').then(() => {
             location.href = '/index'
@@ -94,7 +94,7 @@ service.interceptors.response.use(res => {
         isRelogin.show = false
       })
     }
-      return Promise.reject('鏃犳晥鐨勪細璇濓紝鎴栬€呬細璇濆凡杩囨湡锛岃閲嶆柊鐧诲綍銆?)
+      return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
       Message({ message: msg, type: 'error' })
       return Promise.reject(new Error(msg))
@@ -112,20 +112,20 @@ service.interceptors.response.use(res => {
     console.log('err' + error)
     let { message } = error
     if (message == "Network Error") {
-      message = "鍚庣鎺ュ彛杩炴帴寮傚父"
+      message = "后端接口连接异常"
     } else if (message.includes("timeout")) {
-      message = "绯荤粺鎺ュ彛璇锋眰瓒呮椂"
+      message = "系统接口请求超时"
     } else if (message.includes("Request failed with status code")) {
-      message = "绯荤粺鎺ュ彛" + message.slice(-3) + "寮傚父"
+      message = "系统接口" + message.slice(-3) + "异常"
     }
     Message({ message: message, type: 'error', duration: 5 * 1000 })
     return Promise.reject(error)
   }
 )
 
-// 閫氱敤涓嬭浇鏂规硶
+// 通用下载方法
 export function download(url, params, filename, config) {
-  downloadLoadingInstance = Loading.service({ text: "姝ｅ湪涓嬭浇鏁版嵁锛岃绋嶅€?, spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
+  downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
   return service.post(url, params, {
     transformRequest: [(params) => { return tansParams(params) }],
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -145,7 +145,7 @@ export function download(url, params, filename, config) {
     downloadLoadingInstance.close()
   }).catch((r) => {
     console.error(r)
-    Message.error('涓嬭浇鏂囦欢鍑虹幇閿欒锛岃鑱旂郴绠＄悊鍛橈紒')
+    Message.error('下载文件出现错误，请联系管理员！')
     downloadLoadingInstance.close()
   })
 }

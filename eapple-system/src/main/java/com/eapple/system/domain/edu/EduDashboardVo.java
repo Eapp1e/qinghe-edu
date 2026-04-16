@@ -11,6 +11,7 @@ public class EduDashboardVo
     private Long activeStudents;
     private Long activeTeachers;
     private List<EduCourse> recentCourses;
+    private List<EduCourse> popularCourses;
     private List<EduHomeworkQuestion> recentQuestions;
     private List<EduAiLog> recentAiLogs;
 
@@ -82,6 +83,16 @@ public class EduDashboardVo
     public void setRecentCourses(List<EduCourse> recentCourses)
     {
         this.recentCourses = recentCourses;
+    }
+
+    public List<EduCourse> getPopularCourses()
+    {
+        return popularCourses;
+    }
+
+    public void setPopularCourses(List<EduCourse> popularCourses)
+    {
+        this.popularCourses = popularCourses;
     }
 
     public List<EduHomeworkQuestion> getRecentQuestions()

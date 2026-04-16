@@ -50,7 +50,7 @@ public class EduStudentProfileController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('edu:student:add')")
-    @Log(title = "瀛︾敓妗ｆ", businessType = BusinessType.INSERT)
+    @Log(title = "学生档案", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody EduStudentProfile profile)
     {
@@ -58,7 +58,7 @@ public class EduStudentProfileController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('edu:student:edit')")
-    @Log(title = "瀛︾敓妗ｆ", businessType = BusinessType.UPDATE)
+    @Log(title = "学生档案", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody EduStudentProfile profile)
     {

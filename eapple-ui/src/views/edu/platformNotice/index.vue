@@ -348,15 +348,15 @@ export default {
   justify-content: space-between;
   gap: 18px;
   padding: 28px;
-  border: 1px solid rgba(95, 222, 214, 0.2);
+  border: 1px solid rgba(103, 224, 214, 0.18);
   border-radius: 26px;
   background:
-    radial-gradient(circle at top right, rgba(67, 239, 189, 0.24), transparent 26%),
-    radial-gradient(circle at bottom left, rgba(91, 188, 255, 0.18), transparent 24%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(234, 255, 249, 0.96) 56%, rgba(237, 247, 255, 0.96) 100%);
+    radial-gradient(circle at top right, rgba(63, 229, 190, 0.2), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(72, 153, 255, 0.16), transparent 24%),
+    linear-gradient(135deg, rgba(21, 34, 46, 0.96), rgba(29, 73, 82, 0.92));
   box-shadow:
-    0 24px 44px rgba(39, 133, 146, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 24px 44px rgba(15, 35, 46, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-badge {
@@ -365,26 +365,25 @@ export default {
   margin: 0 0 12px;
   padding: 7px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(31, 228, 190, 0.22), rgba(198, 246, 255, 0.74));
-  color: #0b866f;
+  background: rgba(32, 224, 182, 0.14);
+  color: #8ff6dc;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: none;
-  box-shadow: 0 10px 20px rgba(23, 188, 183, 0.12);
+  box-shadow: 0 10px 20px rgba(12, 34, 40, 0.2);
 }
 
 .page-hero h1 {
   margin: 0 0 10px;
-  color: #163643;
+  color: #ffffff;
   font-size: 32px;
-  text-shadow: 0 10px 22px rgba(33, 188, 196, 0.12);
 }
 
 .summary {
   max-width: 720px;
   margin: 0;
-  color: #617786;
+  color: rgba(232, 246, 246, 0.78);
   line-height: 1.9;
 }
 
@@ -406,22 +405,22 @@ export default {
 .stat-card,
 .guide-item {
   padding: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(234, 251, 255, 0.82));
-  border: 1px solid rgba(120, 219, 222, 0.22);
-  box-shadow: 0 16px 28px rgba(44, 135, 149, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(129, 224, 224, 0.14);
+  box-shadow: 0 16px 28px rgba(11, 32, 40, 0.16);
   min-height: 118px;
 }
 
 .stat-card span {
   display: block;
-  color: #6f8794;
+  color: rgba(222, 240, 243, 0.72);
   font-size: 13px;
 }
 
 .stat-card strong {
   display: block;
   margin-top: 8px;
-  color: #163948;
+  color: #ffffff;
   font-size: 28px;
 }
 

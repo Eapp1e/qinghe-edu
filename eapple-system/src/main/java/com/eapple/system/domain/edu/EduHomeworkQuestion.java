@@ -11,31 +11,31 @@ public class EduHomeworkQuestion extends BaseEntity
 
     private Long courseId;
 
-    @Excel(name = "璇剧▼鍚嶇О")
+    @Excel(name = "课程名称")
     private String courseName;
 
     private Long studentUserId;
 
-    @Excel(name = "瀛︾敓")
+    @Excel(name = "学生")
     private String studentName;
 
     private Long parentUserId;
 
     private Long teacherUserId;
 
-    @Excel(name = "闂鏍囬")
+    @Excel(name = "问题标题")
     private String questionTitle;
 
-    @Excel(name = "闂鍐呭")
+    @Excel(name = "问题内容")
     private String questionContent;
 
-    @Excel(name = "AI瑙ｇ瓟")
+    @Excel(name = "AI解答")
     private String aiAnswer;
 
-    @Excel(name = "绛旂枒鐘舵€?)
+    @Excel(name = "答疑状态")
     private String answerStatus;
 
-    @Excel(name = "瀹夊叏鏍囪")
+    @Excel(name = "安全标记")
     private String safetyFlag;
 
     public Long getQuestionId()

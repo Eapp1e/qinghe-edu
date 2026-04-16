@@ -25,7 +25,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
 /**
- * druid 閰嶇疆澶氭暟鎹簮
+ * Druid 数据源配置。
  * 
  * @author Eapp1e
  */
@@ -60,11 +60,11 @@ public class DruidConfig
     }
     
     /**
-     * 璁剧疆鏁版嵁婧?
+     * 动态设置数据源。
      * 
-     * @param targetDataSources 澶囬€夋暟鎹簮闆嗗悎
-     * @param sourceName 鏁版嵁婧愬悕绉?
-     * @param beanName bean鍚嶇О
+     * @param targetDataSources 当前目标数据源集合
+     * @param sourceName 数据源名称
+     * @param beanName bean 名称
      */
     public void setDataSource(Map<Object, Object> targetDataSources, String sourceName, String beanName)
     {
@@ -79,20 +79,20 @@ public class DruidConfig
     }
 
     /**
-     * 鍘婚櫎鐩戞帶椤甸潰搴曢儴鐨勫箍鍛?
+     * 去除监控页底部广告与版权信息。
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Bean
     @ConditionalOnProperty(name = "spring.datasource.druid.statViewServlet.enabled", havingValue = "true")
     public FilterRegistrationBean removeDruidFilterRegistrationBean(DruidStatProperties properties)
     {
-        // 鑾峰彇web鐩戞帶椤甸潰鐨勫弬鏁?
+        // 获取 StatViewServlet 的配置信息
         DruidStatProperties.StatViewServlet config = properties.getStatViewServlet();
-        // 鎻愬彇common.js鐨勯厤缃矾寰?
+        // 获取 common.js 文件访问路径
         String pattern = config.getUrlPattern() != null ? config.getUrlPattern() : "/druid/*";
         String commonJsPattern = pattern.replaceAll("\\*", "js/common.js");
         final String filePath = "support/http/resources/js/common.js";
-        // 鍒涘缓filter杩涜杩囨护
+        // 创建并注册过滤器
         Filter filter = new Filter()
         {
             @Override
@@ -104,11 +104,11 @@ public class DruidConfig
                     throws IOException, ServletException
             {
                 chain.doFilter(request, response);
-                // 閲嶇疆缂撳啿鍖猴紝鍝嶅簲澶翠笉浼氳閲嶇疆
+                // 重置缓冲区，后续将替换 common.js 内容
                 response.resetBuffer();
-                // 鑾峰彇common.js
+                // 读取 common.js
                 String text = Utils.readFromResource(filePath);
-                // 姝ｅ垯鏇挎崲banner, 闄ゅ幓搴曢儴鐨勫箍鍛婁俊鎭?
+                // 去除 banner 和底部版权信息
                 text = text.replaceAll("<a.*?banner\"></a><br/>", "");
                 text = text.replaceAll("powered.*?shrek.wang</a>", "");
                 response.getWriter().write(text);

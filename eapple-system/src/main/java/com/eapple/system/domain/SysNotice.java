@@ -9,7 +9,7 @@ import com.eapple.common.core.domain.BaseEntity;
 import com.eapple.common.xss.Xss;
 
 /**
- * 閫氱煡鍏憡琛?sys_notice
+ * 通知公告表 sys_notice
  * 
  * @author Eapp1e
  */
@@ -17,22 +17,22 @@ public class SysNotice extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鍏憡ID */
+    /** 公告ID */
     private Long noticeId;
 
-    /** 鍏憡鏍囬 */
+    /** 公告标题 */
     private String noticeTitle;
 
-    /** 鍏憡绫诲瀷锛?閫氱煡 2鍏憡锛?*/
+    /** 公告类型（1通知 2公告） */
     private String noticeType;
 
-    /** 鍏憡鍐呭 */
+    /** 公告内容 */
     private String noticeContent;
 
-    /** 鍏憡鐘舵€侊紙0姝ｅ父 1鍏抽棴锛?*/
+    /** 公告状态（0正常 1关闭） */
     private String status;
 
-    /** 鏄惁宸茶 */
+    /** 是否已读 */
     @JsonProperty("isRead")
     private boolean isRead;
 
@@ -51,9 +51,9 @@ public class SysNotice extends BaseEntity
         this.noticeTitle = noticeTitle;
     }
 
-    @Xss(message = "鍏憡鏍囬涓嶈兘鍖呭惈鑴氭湰瀛楃")
-    @NotBlank(message = "鍏憡鏍囬涓嶈兘涓虹┖")
-    @Size(min = 0, max = 50, message = "鍏憡鏍囬涓嶈兘瓒呰繃50涓瓧绗?)
+    @Xss(message = "公告标题不能包含脚本字符")
+    @NotBlank(message = "公告标题不能为空")
+    @Size(min = 0, max = 50, message = "公告标题不能超过50个字符")
     public String getNoticeTitle()
     {
         return noticeTitle;

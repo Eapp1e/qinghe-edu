@@ -11,48 +11,48 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.eapple.common.core.domain.BaseEntity;
 
 /**
- * 閮ㄩ棬琛?sys_dept
- * 
+ * 部门对象，对应表 sys_dept。
+ *
  * @author Eapp1e
  */
 public class SysDept extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 閮ㄩ棬ID */
+    /** 部门 ID */
     private Long deptId;
 
-    /** 鐖堕儴闂↖D */
+    /** 父部门 ID */
     private Long parentId;
 
-    /** 绁栫骇鍒楄〃 */
+    /** 祖级列表 */
     private String ancestors;
 
-    /** 閮ㄩ棬鍚嶇О */
+    /** 部门名称 */
     private String deptName;
 
-    /** 鏄剧ず椤哄簭 */
+    /** 显示顺序 */
     private Integer orderNum;
 
-    /** 璐熻矗浜?*/
+    /** 负责人 */
     private String leader;
 
-    /** 鑱旂郴鐢佃瘽 */
+    /** 联系电话 */
     private String phone;
 
-    /** 閭 */
+    /** 邮箱 */
     private String email;
 
-    /** 閮ㄩ棬鐘舵€?0姝ｅ父,1鍋滅敤 */
+    /** 部门状态（0 正常 1 停用） */
     private String status;
 
-    /** 鍒犻櫎鏍囧織锛?浠ｈ〃瀛樺湪 2浠ｈ〃鍒犻櫎锛?*/
+    /** 删除标志（0 存在 2 删除） */
     private String delFlag;
 
-    /** 鐖堕儴闂ㄥ悕绉?*/
+    /** 父部门名称 */
     private String parentName;
-    
-    /** 瀛愰儴闂?*/
+
+    /** 子部门 */
     private List<SysDept> children = new ArrayList<SysDept>();
 
     public Long getDeptId()
@@ -85,8 +85,8 @@ public class SysDept extends BaseEntity
         this.ancestors = ancestors;
     }
 
-    @NotBlank(message = "閮ㄩ棬鍚嶇О涓嶈兘涓虹┖")
-    @Size(min = 0, max = 30, message = "閮ㄩ棬鍚嶇О闀垮害涓嶈兘瓒呰繃30涓瓧绗?)
+    @NotBlank(message = "部门名称不能为空")
+    @Size(min = 0, max = 30, message = "部门名称长度不能超过 30 个字符")
     public String getDeptName()
     {
         return deptName;
@@ -97,7 +97,7 @@ public class SysDept extends BaseEntity
         this.deptName = deptName;
     }
 
-    @NotNull(message = "鏄剧ず椤哄簭涓嶈兘涓虹┖")
+    @NotNull(message = "显示顺序不能为空")
     public Integer getOrderNum()
     {
         return orderNum;
@@ -118,7 +118,7 @@ public class SysDept extends BaseEntity
         this.leader = leader;
     }
 
-    @Size(min = 0, max = 11, message = "鑱旂郴鐢佃瘽闀垮害涓嶈兘瓒呰繃11涓瓧绗?)
+    @Size(min = 0, max = 11, message = "联系电话长度不能超过 11 个字符")
     public String getPhone()
     {
         return phone;
@@ -129,8 +129,8 @@ public class SysDept extends BaseEntity
         this.phone = phone;
     }
 
-    @Email(message = "閭鏍煎紡涓嶆纭?)
-    @Size(min = 0, max = 50, message = "閭闀垮害涓嶈兘瓒呰繃50涓瓧绗?)
+    @Email(message = "邮箱格式不正确")
+    @Size(min = 0, max = 50, message = "邮箱长度不能超过 50 个字符")
     public String getEmail()
     {
         return email;
@@ -183,7 +183,7 @@ public class SysDept extends BaseEntity
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("deptId", getDeptId())
             .append("parentId", getParentId())
             .append("ancestors", getAncestors())

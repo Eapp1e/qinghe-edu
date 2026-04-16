@@ -27,7 +27,7 @@ import com.eapple.framework.web.service.TokenService;
 import com.eapple.system.service.ISysUserService;
 
 /**
- * 涓汉淇℃伅 涓氬姟澶勭悊
+ * 个人信息控制器
  * 
  * @author Eapp1e
  */
@@ -41,9 +41,6 @@ public class SysProfileController extends BaseController
     @Autowired
     private TokenService tokenService;
 
-    /**
-     * 涓汉淇℃伅
-     */
     @GetMapping
     public AjaxResult profile()
     {
@@ -55,10 +52,7 @@ public class SysProfileController extends BaseController
         return ajax;
     }
 
-    /**
-     * 淇敼鐢ㄦ埛
-     */
-    @Log(title = "涓汉淇℃伅", businessType = BusinessType.UPDATE)
+    @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult updateProfile(@RequestBody SysUser user)
     {
@@ -70,25 +64,21 @@ public class SysProfileController extends BaseController
         currentUser.setSex(user.getSex());
         if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(currentUser))
         {
-            return error("淇敼鐢ㄦ埛'" + loginUser.getUsername() + "'澶辫触锛屾墜鏈哄彿鐮佸凡瀛樺湪");
+            return error("修改用户'" + loginUser.getUsername() + "'失败，手机号码已存在");
         }
         if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(currentUser))
         {
-            return error("淇敼鐢ㄦ埛'" + loginUser.getUsername() + "'澶辫触锛岄偖绠辫处鍙峰凡瀛樺湪");
+            return error("修改用户'" + loginUser.getUsername() + "'失败，邮箱账号已存在");
         }
         if (userService.updateUserProfile(currentUser) > 0)
         {
-            // 鏇存柊缂撳瓨鐢ㄦ埛淇℃伅
             tokenService.setLoginUser(loginUser);
             return success();
         }
-        return error("淇敼涓汉淇℃伅寮傚父锛岃鑱旂郴绠＄悊鍛?);
+        return error("修改个人信息异常，请联系管理员");
     }
 
-    /**
-     * 閲嶇疆瀵嗙爜
-     */
-    @Log(title = "涓汉淇℃伅", businessType = BusinessType.UPDATE)
+    @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public AjaxResult updatePwd(@RequestBody Map<String, String> params)
     {
@@ -100,28 +90,24 @@ public class SysProfileController extends BaseController
         String password = user.getPassword();
         if (!SecurityUtils.matchesPassword(oldPassword, password))
         {
-            return error("淇敼瀵嗙爜澶辫触锛屾棫瀵嗙爜閿欒");
+            return error("修改密码失败，旧密码错误");
         }
         if (SecurityUtils.matchesPassword(newPassword, password))
         {
-            return error("鏂板瘑鐮佷笉鑳戒笌鏃у瘑鐮佺浉鍚?);
+            return error("新密码不能与旧密码相同");
         }
         newPassword = SecurityUtils.encryptPassword(newPassword);
         if (userService.resetUserPwd(userId, newPassword) > 0)
         {
-            // 鏇存柊缂撳瓨鐢ㄦ埛瀵嗙爜&瀵嗙爜鏈€鍚庢洿鏂版椂闂?
             loginUser.getUser().setPwdUpdateDate(DateUtils.getNowDate());
             loginUser.getUser().setPassword(newPassword);
             tokenService.setLoginUser(loginUser);
             return success();
         }
-        return error("淇敼瀵嗙爜寮傚父锛岃鑱旂郴绠＄悊鍛?);
+        return error("修改密码异常，请联系管理员");
     }
 
-    /**
-     * 澶村儚涓婁紶
-     */
-    @Log(title = "鐢ㄦ埛澶村儚", businessType = BusinessType.UPDATE)
+    @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")
     public AjaxResult avatar(@RequestParam("avatarfile") MultipartFile file) throws Exception
     {
@@ -138,13 +124,11 @@ public class SysProfileController extends BaseController
                 }
                 AjaxResult ajax = AjaxResult.success();
                 ajax.put("imgUrl", avatar);
-                // 鏇存柊缂撳瓨鐢ㄦ埛澶村儚
                 loginUser.getUser().setAvatar(avatar);
                 tokenService.setLoginUser(loginUser);
                 return ajax;
             }
         }
-        return error("涓婁紶鍥剧墖寮傚父锛岃鑱旂郴绠＄悊鍛?);
+        return error("上传图片异常，请联系管理员");
     }
 }
-

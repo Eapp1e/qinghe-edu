@@ -32,7 +32,9 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public EduStudentProfile selectProfileById(Long profileId)
     {
-        return profileMapper.selectProfileById(profileId);
+        EduStudentProfile profile = profileMapper.selectProfileById(profileId);
+        ensureProfileAccessible(profile);
+        return profile;
     }
 
     @Override
@@ -54,8 +56,9 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     {
         if (profileMapper.selectProfileByStudentUserId(profile.getStudentUserId()) != null)
         {
-            throw new ServiceException("璇ュ鐢熸。妗堝凡瀛樺湪");
+            throw new ServiceException("该学生档案已存在");
         }
+        ensureProfileEditable(profile);
         profile.setCreateBy(SecurityUtils.getUsername());
         return profileMapper.insertProfile(profile);
     }
@@ -63,6 +66,7 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public int updateProfile(EduStudentProfile profile)
     {
+        ensureProfileEditable(profileMapper.selectProfileById(profile.getProfileId()));
         profile.setUpdateBy(SecurityUtils.getUsername());
         return profileMapper.updateProfile(profile);
     }
@@ -70,6 +74,35 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public int deleteProfileByIds(Long[] profileIds)
     {
+        for (Long profileId : profileIds)
+        {
+            ensureProfileEditable(profileMapper.selectProfileById(profileId));
+        }
         return profileMapper.deleteProfileByIds(profileIds);
+    }
+
+    private void ensureProfileAccessible(EduStudentProfile profile)
+    {
+        if (profile == null)
+        {
+            throw new ServiceException("学生档案不存在");
+        }
+        if (SecurityUtils.hasRole("edu_student") && !SecurityUtils.getUserId().equals(profile.getStudentUserId()))
+        {
+            throw new ServiceException("只能查看自己的学生档案");
+        }
+        if (SecurityUtils.hasRole("edu_parent") && !SecurityUtils.getUserId().equals(profile.getParentUserId()))
+        {
+            throw new ServiceException("只能查看自己关联孩子的学生档案");
+        }
+    }
+
+    private void ensureProfileEditable(EduStudentProfile profile)
+    {
+        if (SecurityUtils.hasRole("edu_teacher") || SecurityUtils.isAdmin())
+        {
+            return;
+        }
+        ensureProfileAccessible(profile);
     }
 }

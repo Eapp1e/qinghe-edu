@@ -12,25 +12,25 @@ public class EduAiLog extends BaseEntity
     private Long bizId;
     private Long userId;
 
-    @Excel(name = "鐢ㄦ埛")
+    @Excel(name = "用户")
     private String userName;
 
-    @Excel(name = "瑙掕壊")
+    @Excel(name = "角色")
     private String roleType;
 
-    @Excel(name = "鎻愮ず璇?)
+    @Excel(name = "提示词")
     private String promptContent;
 
-    @Excel(name = "杩斿洖鍐呭")
+    @Excel(name = "返回内容")
     private String responseContent;
 
-    @Excel(name = "妯″瀷")
+    @Excel(name = "模型")
     private String modelName;
 
-    @Excel(name = "鐘舵€?)
+    @Excel(name = "状态")
     private String status;
 
-    @Excel(name = "椋庨櫓鏍囪")
+    @Excel(name = "风险标记")
     private String riskFlag;
 
     private String errorMessage;

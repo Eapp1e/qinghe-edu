@@ -22,7 +22,7 @@ import com.eapple.system.mapper.SysRoleMapper;
 import com.eapple.system.service.ISysDeptService;
 
 /**
- * 閮ㄩ棬绠＄悊 鏈嶅姟瀹炵幇
+ * 部门管理 服务实现
  * 
  * @author Eapp1e
  */
@@ -36,10 +36,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     private SysRoleMapper roleMapper;
 
     /**
-     * 鏌ヨ閮ㄩ棬绠＄悊鏁版嵁
+     * 查询部门管理数据
      * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 閮ㄩ棬淇℃伅闆嗗悎
+     * @param dept 部门信息
+     * @return 部门信息集合
      */
     @Override
     @DataScope(deptAlias = "d")
@@ -49,10 +49,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏌ヨ閮ㄩ棬鏍戠粨鏋勪俊鎭?
+     * 查询部门树结构信息
      * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 閮ㄩ棬鏍戜俊鎭泦鍚?
+     * @param dept 部门信息
+     * @return 部门树信息集合
      */
     @Override
     public List<TreeSelect> selectDeptTreeList(SysDept dept)
@@ -62,10 +62,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏋勫缓鍓嶇鎵€闇€瑕佹爲缁撴瀯
+     * 构建前端所需要树结构
      * 
-     * @param depts 閮ㄩ棬鍒楄〃
-     * @return 鏍戠粨鏋勫垪琛?
+     * @param depts 部门列表
+     * @return 树结构列表
      */
     @Override
     public List<SysDept> buildDeptTree(List<SysDept> depts)
@@ -74,7 +74,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         List<Long> tempList = depts.stream().map(SysDept::getDeptId).collect(Collectors.toList());
         for (SysDept dept : depts)
         {
-            // 濡傛灉鏄《绾ц妭鐐? 閬嶅巻璇ョ埗鑺傜偣鐨勬墍鏈夊瓙鑺傜偣
+            // 如果是顶级节点, 遍历该父节点的所有子节点
             if (!tempList.contains(dept.getParentId()))
             {
                 recursionFn(depts, dept);
@@ -89,10 +89,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏋勫缓鍓嶇鎵€闇€瑕佷笅鎷夋爲缁撴瀯
+     * 构建前端所需要下拉树结构
      * 
-     * @param depts 閮ㄩ棬鍒楄〃
-     * @return 涓嬫媺鏍戠粨鏋勫垪琛?
+     * @param depts 部门列表
+     * @return 下拉树结构列表
      */
     @Override
     public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts)
@@ -102,10 +102,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏍规嵁瑙掕壊ID鏌ヨ閮ㄩ棬鏍戜俊鎭?
+     * 根据角色ID查询部门树信息
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 閫変腑閮ㄩ棬鍒楄〃
+     * @param roleId 角色ID
+     * @return 选中部门列表
      */
     @Override
     public List<Long> selectDeptListByRoleId(Long roleId)
@@ -115,10 +115,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏍规嵁閮ㄩ棬ID鏌ヨ淇℃伅
+     * 根据部门ID查询信息
      * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 閮ㄩ棬淇℃伅
+     * @param deptId 部门ID
+     * @return 部门信息
      */
     @Override
     public SysDept selectDeptById(Long deptId)
@@ -127,10 +127,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏍规嵁ID鏌ヨ鎵€鏈夊瓙閮ㄩ棬锛堟甯哥姸鎬侊級
+     * 根据ID查询所有子部门（正常状态）
      * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 瀛愰儴闂ㄦ暟
+     * @param deptId 部门ID
+     * @return 子部门数
      */
     @Override
     public int selectNormalChildrenDeptById(Long deptId)
@@ -139,10 +139,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏄惁瀛樺湪瀛愯妭鐐?
+     * 是否存在子节点
      * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉
+     * @param deptId 部门ID
+     * @return 结果
      */
     @Override
     public boolean hasChildByDeptId(Long deptId)
@@ -152,10 +152,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏌ヨ閮ㄩ棬鏄惁瀛樺湪鐢ㄦ埛
+     * 查询部门是否存在用户
      * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉 true 瀛樺湪 false 涓嶅瓨鍦?
+     * @param deptId 部门ID
+     * @return 结果 true 存在 false 不存在
      */
     @Override
     public boolean checkDeptExistUser(Long deptId)
@@ -165,10 +165,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏍￠獙閮ㄩ棬鍚嶇О鏄惁鍞竴
+     * 校验部门名称是否唯一
      * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 缁撴灉
+     * @param dept 部门信息
+     * @return 结果
      */
     @Override
     public boolean checkDeptNameUnique(SysDept dept)
@@ -183,9 +183,9 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鏍￠獙閮ㄩ棬鏄惁鏈夋暟鎹潈闄?
+     * 校验部门是否有数据权限
      * 
-     * @param deptId 閮ㄩ棬id
+     * @param deptId 部门id
      */
     @Override
     public void checkDeptDataScope(Long deptId)
@@ -197,35 +197,35 @@ public class SysDeptServiceImpl implements ISysDeptService
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
             if (StringUtils.isEmpty(depts))
             {
-                throw new ServiceException("娌℃湁鏉冮檺璁块棶閮ㄩ棬鏁版嵁锛?);
+                throw new ServiceException("没有权限访问部门数据！");
             }
         }
     }
 
     /**
-     * 鏂板淇濆瓨閮ㄩ棬淇℃伅
+     * 新增保存部门信息
      * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 缁撴灉
+     * @param dept 部门信息
+     * @return 结果
      */
     @Override
     public int insertDept(SysDept dept)
     {
         SysDept info = deptMapper.selectDeptById(dept.getParentId());
-        // 濡傛灉鐖惰妭鐐逛笉涓烘甯哥姸鎬?鍒欎笉鍏佽鏂板瀛愯妭鐐?
+        // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus()))
         {
-            throw new ServiceException("閮ㄩ棬鍋滅敤锛屼笉鍏佽鏂板");
+            throw new ServiceException("部门停用，不允许新增");
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         return deptMapper.insertDept(dept);
     }
 
     /**
-     * 淇敼淇濆瓨閮ㄩ棬淇℃伅
+     * 修改保存部门信息
      * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 缁撴灉
+     * @param dept 部门信息
+     * @return 结果
      */
     @Override
     public int updateDept(SysDept dept)
@@ -243,16 +243,16 @@ public class SysDeptServiceImpl implements ISysDeptService
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
                 && !StringUtils.equals("0", dept.getAncestors()))
         {
-            // 濡傛灉璇ラ儴闂ㄦ槸鍚敤鐘舵€侊紝鍒欏惎鐢ㄨ閮ㄩ棬鐨勬墍鏈変笂绾ч儴闂?
+            // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
         }
         return result;
     }
 
     /**
-     * 淇敼璇ラ儴闂ㄧ殑鐖剁骇閮ㄩ棬鐘舵€?
+     * 修改该部门的父级部门状态
      * 
-     * @param dept 褰撳墠閮ㄩ棬
+     * @param dept 当前部门
      */
     private void updateParentDeptStatusNormal(SysDept dept)
     {
@@ -262,11 +262,11 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 淇敼瀛愬厓绱犲叧绯?
+     * 修改子元素关系
      * 
-     * @param deptId 琚慨鏀圭殑閮ㄩ棬ID
-     * @param newAncestors 鏂扮殑鐖禝D闆嗗悎
-     * @param oldAncestors 鏃х殑鐖禝D闆嗗悎
+     * @param deptId 被修改的部门ID
+     * @param newAncestors 新的父ID集合
+     * @param oldAncestors 旧的父ID集合
      */
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors)
     {
@@ -282,10 +282,10 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 淇濆瓨閮ㄩ棬鎺掑簭
+     * 保存部门排序
      *
-     * @param deptIds 閮ㄩ棬ID鏁扮粍
-     * @param orderNums 鎺掑簭鏁扮粍
+     * @param deptIds 部门ID数组
+     * @param orderNums 排序数组
      */
     @Override
     @Transactional
@@ -303,15 +303,15 @@ public class SysDeptServiceImpl implements ISysDeptService
         }
         catch (Exception e)
         {
-            throw new ServiceException("淇濆瓨鎺掑簭寮傚父锛岃鑱旂郴绠＄悊鍛?);
+            throw new ServiceException("保存排序异常，请联系管理员");
         }
     }
 
     /**
-     * 鍒犻櫎閮ㄩ棬绠＄悊淇℃伅
+     * 删除部门管理信息
      * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉
+     * @param deptId 部门ID
+     * @return 结果
      */
     @Override
     public int deleteDeptById(Long deptId)
@@ -320,11 +320,11 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 閫掑綊鍒楄〃
+     * 递归列表
      */
     private void recursionFn(List<SysDept> list, SysDept t)
     {
-        // 寰楀埌瀛愯妭鐐瑰垪琛?
+        // 得到子节点列表
         List<SysDept> childList = getChildList(list, t);
         t.setChildren(childList);
         for (SysDept tChild : childList)
@@ -337,7 +337,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 寰楀埌瀛愯妭鐐瑰垪琛?
+     * 得到子节点列表
      */
     private List<SysDept> getChildList(List<SysDept> list, SysDept t)
     {
@@ -355,7 +355,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     }
 
     /**
-     * 鍒ゆ柇鏄惁鏈夊瓙鑺傜偣
+     * 判断是否有子节点
      */
     private boolean hasChild(List<SysDept> list, SysDept t)
     {

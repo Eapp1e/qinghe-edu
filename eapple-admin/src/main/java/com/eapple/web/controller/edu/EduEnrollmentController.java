@@ -33,7 +33,7 @@ public class EduEnrollmentController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('edu:enrollment:edit')")
-    @Log(title = "璇剧▼鎶ュ悕", businessType = BusinessType.UPDATE)
+    @Log(title = "课程报名", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody EduCourseEnrollment enrollment)
     {

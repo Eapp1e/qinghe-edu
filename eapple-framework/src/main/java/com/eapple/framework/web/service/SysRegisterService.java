@@ -20,7 +20,7 @@ import com.eapple.system.service.ISysConfigService;
 import com.eapple.system.service.ISysUserService;
 
 /**
- * 娉ㄥ唽鏍￠獙鏂规硶
+ * 注册校验方法
  * 
  * @author Eapp1e
  */
@@ -37,7 +37,7 @@ public class SysRegisterService
     private RedisCache redisCache;
 
     /**
-     * 娉ㄥ唽
+     * 注册
      */
     public String register(RegisterBody registerBody)
     {
@@ -45,7 +45,7 @@ public class SysRegisterService
         SysUser sysUser = new SysUser();
         sysUser.setUserName(username);
 
-        // 楠岃瘉鐮佸紑鍏?
+        // 验证码开关
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         if (captchaEnabled)
         {
@@ -54,25 +54,25 @@ public class SysRegisterService
 
         if (StringUtils.isEmpty(username))
         {
-            msg = "鐢ㄦ埛鍚嶄笉鑳戒负绌?;
+            msg = "用户名不能为空";
         }
         else if (StringUtils.isEmpty(password))
         {
-            msg = "鐢ㄦ埛瀵嗙爜涓嶈兘涓虹┖";
+            msg = "用户密码不能为空";
         }
         else if (username.length() < UserConstants.USERNAME_MIN_LENGTH
                 || username.length() > UserConstants.USERNAME_MAX_LENGTH)
         {
-            msg = "璐︽埛闀垮害蹇呴』鍦?鍒?0涓瓧绗︿箣闂?;
+            msg = "账户长度必须在2到20个字符之间";
         }
         else if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH)
         {
-            msg = "瀵嗙爜闀垮害蹇呴』鍦?鍒?0涓瓧绗︿箣闂?;
+            msg = "密码长度必须在5到20个字符之间";
         }
         else if (!userService.checkUserNameUnique(sysUser))
         {
-            msg = "淇濆瓨鐢ㄦ埛'" + username + "'澶辫触锛屾敞鍐岃处鍙峰凡瀛樺湪";
+            msg = "保存用户'" + username + "'失败，注册账号已存在";
         }
         else
         {
@@ -82,7 +82,7 @@ public class SysRegisterService
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag)
             {
-                msg = "娉ㄥ唽澶辫触,璇疯仈绯荤郴缁熺鐞嗕汉鍛?;
+                msg = "注册失败,请联系系统管理人员";
             }
             else
             {
@@ -93,12 +93,12 @@ public class SysRegisterService
     }
 
     /**
-     * 鏍￠獙楠岃瘉鐮?
+     * 校验验证码
      * 
-     * @param username 鐢ㄦ埛鍚?
-     * @param code 楠岃瘉鐮?
-     * @param uuid 鍞竴鏍囪瘑
-     * @return 缁撴灉
+     * @param username 用户名
+     * @param code 验证码
+     * @param uuid 唯一标识
+     * @return 结果
      */
     public void validateCaptcha(String username, String code, String uuid)
     {

@@ -8,8 +8,8 @@ import com.google.code.kaptcha.util.Config;
 import static com.google.code.kaptcha.Constants.*;
 
 /**
- * 楠岃瘉鐮侀厤缃?
- * 
+ * 验证码配置。
+ *
  * @author Eapp1e
  */
 @Configuration
@@ -20,23 +20,22 @@ public class CaptchaConfig
     {
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
-        // 鏄惁鏈夎竟妗?榛樿涓簍rue 鎴戜滑鍙互鑷繁璁剧疆yes锛宯o
+        // 是否有边框，默认使用 yes
         properties.setProperty(KAPTCHA_BORDER, "yes");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹂鑹?榛樿涓篊olor.BLACK
+        // 验证码文本颜色
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_COLOR, "black");
-        // 楠岃瘉鐮佸浘鐗囧搴?榛樿涓?00
+        // 图片宽度
         properties.setProperty(KAPTCHA_IMAGE_WIDTH, "160");
-        // 楠岃瘉鐮佸浘鐗囬珮搴?榛樿涓?0
+        // 图片高度
         properties.setProperty(KAPTCHA_IMAGE_HEIGHT, "60");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹀ぇ灏?榛樿涓?0
+        // 字体大小
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_SIZE, "38");
-        // KAPTCHA_SESSION_KEY
         properties.setProperty(KAPTCHA_SESSION_CONFIG_KEY, "kaptchaCode");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹂暱搴?榛樿涓?
+        // 字符长度
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_LENGTH, "4");
-        // 楠岃瘉鐮佹枃鏈瓧浣撴牱寮?榛樿涓簄ew Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)
+        // 字体名称
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "Arial,Courier");
-        // 鍥剧墖鏍峰紡 姘寸汗com.google.code.kaptcha.impl.WaterRipple 楸肩溂com.google.code.kaptcha.impl.FishEyeGimpy 闃村奖com.google.code.kaptcha.impl.ShadowGimpy
+        // 干扰实现类
         properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);
@@ -48,33 +47,32 @@ public class CaptchaConfig
     {
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
-        // 鏄惁鏈夎竟妗?榛樿涓簍rue 鎴戜滑鍙互鑷繁璁剧疆yes锛宯o
+        // 是否有边框
         properties.setProperty(KAPTCHA_BORDER, "yes");
-        // 杈规棰滆壊 榛樿涓篊olor.BLACK
+        // 边框颜色
         properties.setProperty(KAPTCHA_BORDER_COLOR, "105,179,90");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹂鑹?榛樿涓篊olor.BLACK
+        // 文本颜色
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_COLOR, "blue");
-        // 楠岃瘉鐮佸浘鐗囧搴?榛樿涓?00
+        // 图片宽度
         properties.setProperty(KAPTCHA_IMAGE_WIDTH, "160");
-        // 楠岃瘉鐮佸浘鐗囬珮搴?榛樿涓?0
+        // 图片高度
         properties.setProperty(KAPTCHA_IMAGE_HEIGHT, "60");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹀ぇ灏?榛樿涓?0
+        // 字体大小
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_SIZE, "35");
-        // KAPTCHA_SESSION_KEY
         properties.setProperty(KAPTCHA_SESSION_CONFIG_KEY, "kaptchaCodeMath");
-        // 楠岃瘉鐮佹枃鏈敓鎴愬櫒
+        // 数学表达式生成器
         properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, "com.eapple.framework.config.KaptchaTextCreator");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹂棿璺?榛樿涓?
+        // 字符间距
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_SPACE, "3");
-        // 楠岃瘉鐮佹枃鏈瓧绗﹂暱搴?榛樿涓?
+        // 字符长度
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_LENGTH, "6");
-        // 楠岃瘉鐮佹枃鏈瓧浣撴牱寮?榛樿涓簄ew Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)
+        // 字体名称
         properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "Arial,Courier");
-        // 楠岃瘉鐮佸櫔鐐归鑹?榛樿涓篊olor.BLACK
+        // 噪点颜色
         properties.setProperty(KAPTCHA_NOISE_COLOR, "white");
-        // 骞叉壈瀹炵幇绫?
+        // 不使用额外噪点
         properties.setProperty(KAPTCHA_NOISE_IMPL, "com.google.code.kaptcha.impl.NoNoise");
-        // 鍥剧墖鏍峰紡 姘寸汗com.google.code.kaptcha.impl.WaterRipple 楸肩溂com.google.code.kaptcha.impl.FishEyeGimpy 闃村奖com.google.code.kaptcha.impl.ShadowGimpy
+        // 干扰实现类
         properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);
