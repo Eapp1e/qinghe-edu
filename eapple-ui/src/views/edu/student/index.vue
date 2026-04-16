@@ -271,7 +271,10 @@
             <p class="recommend-desc">{{ item.description || '暂无课程简介' }}</p>
             <div class="recommend-reason">
               <span>AI 推荐理由</span>
-              <p>{{ item.recommendationReason || '该课程与学生当前档案较为匹配，建议优先关注。' }}</p>
+              <div
+                class="ai-rich-content"
+                v-html="renderAiHtml(item.recommendationReason || '该课程与学生当前档案较为匹配，建议优先关注。')"
+              />
             </div>
           </div>
         </div>
@@ -290,6 +293,7 @@
 <script>
 import { addStudent, delStudent, listStudent, updateStudent } from '@/api/edu/student'
 import { recommendCourse } from '@/api/edu/course'
+import { renderAiContentHtml } from '@/utils/aiContent'
 
 export default {
   name: 'EduStudent',
@@ -386,6 +390,9 @@ export default {
         return []
       }
       return tags.split(/[，,、\s]+/).map(item => item.trim()).filter(Boolean)
+    },
+    renderAiHtml(content) {
+      return renderAiContentHtml(content)
     },
     getList() {
       this.loading = true
@@ -833,6 +840,45 @@ export default {
   color: #1f998c;
   font-size: 12px;
   font-weight: 700;
+}
+
+.ai-rich-content {
+  margin-top: 12px;
+  color: #46606f;
+  line-height: 1.8;
+}
+
+.ai-rich-content :deep(h2),
+.ai-rich-content :deep(h3),
+.ai-rich-content :deep(h4) {
+  margin: 16px 0 10px;
+  color: #173848;
+  font-weight: 700;
+}
+
+.ai-rich-content :deep(p) {
+  margin: 0 0 10px;
+}
+
+.ai-rich-content :deep(ul),
+.ai-rich-content :deep(ol) {
+  margin: 8px 0 10px 18px;
+  padding: 0;
+}
+
+.ai-rich-content :deep(li) {
+  margin-bottom: 6px;
+}
+
+.ai-rich-content :deep(strong) {
+  color: #183949;
+}
+
+.ai-rich-content :deep(code) {
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(25, 197, 174, 0.08);
+  color: #117b7f;
 }
 
 .recommend-empty,

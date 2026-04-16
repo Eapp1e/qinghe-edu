@@ -136,7 +136,7 @@
           <span class="biz-type-tag">{{ responseDialogBusinessType }}</span>
           <el-tag size="small" :type="responseDialogStatusType">{{ responseDialogStatus }}</el-tag>
         </div>
-        <div class="response-detail-body">{{ responseDialogContent }}</div>
+        <div class="response-detail-body ai-rich-content" v-html="responseDialogHtml"></div>
       </div>
       <div slot="footer">
         <el-button @click="responseDialogOpen = false">关闭</el-button>
@@ -148,6 +148,7 @@
 <script>
 import { listAiModels, getCurrentAiModel, updateCurrentAiModel } from '@/api/edu/ai'
 import { listAiLog, listMyAiLog } from '@/api/edu/aiLog'
+import { renderAiContentHtml, stripAiMarkdown } from '@/utils/aiContent'
 
 export default {
   name: 'EduAiCenter',
@@ -163,7 +164,8 @@ export default {
       responseDialogBusinessType: '',
       responseDialogStatus: '',
       responseDialogStatusType: 'info',
-      responseDialogContent: ''
+      responseDialogContent: '',
+      responseDialogHtml: ''
     }
   },
   computed: {
@@ -338,20 +340,7 @@ export default {
       return map[type] || type || '未分类'
     },
     sanitizeResponseContent(content) {
-      if (!content) {
-        return ''
-      }
-      return content
-        .replace(/\r\n/g, '\n')
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/__(.*?)__/g, '$1')
-        .replace(/`([^`]+)`/g, '$1')
-        .replace(/^#{1,6}\s*/gm, '')
-        .replace(/^\s*[-*]\s+/gm, '• ')
-        .replace(/^\s*\d+\.\s+/gm, '')
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim()
+      return stripAiMarkdown(content)
     },
     getResponsePreview(responseContent, errorMessage) {
       const content = this.sanitizeResponseContent(responseContent || errorMessage)
@@ -370,6 +359,7 @@ export default {
       this.responseDialogStatus = this.formatStatus(row.status)
       this.responseDialogStatusType = this.statusTagType(row.status)
       this.responseDialogContent = content || '暂无可展示内容'
+      this.responseDialogHtml = renderAiContentHtml(content || '暂无可展示内容')
       this.responseDialogOpen = true
     }
   }
@@ -553,7 +543,39 @@ export default {
   background: linear-gradient(180deg, rgba(251, 255, 255, 0.96), rgba(241, 250, 255, 0.9));
   color: #314c5d;
   line-height: 1.9;
-  white-space: pre-line;
+}
+
+.ai-rich-content :deep(h2),
+.ai-rich-content :deep(h3),
+.ai-rich-content :deep(h4) {
+  margin: 16px 0 10px;
+  color: #173848;
+  font-weight: 700;
+}
+
+.ai-rich-content :deep(p) {
+  margin: 0 0 10px;
+}
+
+.ai-rich-content :deep(ul),
+.ai-rich-content :deep(ol) {
+  margin: 8px 0 10px 18px;
+  padding: 0;
+}
+
+.ai-rich-content :deep(li) {
+  margin-bottom: 6px;
+}
+
+.ai-rich-content :deep(strong) {
+  color: #183949;
+}
+
+.ai-rich-content :deep(code) {
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(25, 197, 174, 0.08);
+  color: #117b7f;
 }
 
 .overview-grid {
