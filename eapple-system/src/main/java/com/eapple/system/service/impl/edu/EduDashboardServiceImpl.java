@@ -3,7 +3,6 @@ package com.eapple.system.service.impl.edu;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.eapple.common.utils.SecurityUtils;
 import com.eapple.system.domain.edu.EduAiLog;
 import com.eapple.system.domain.edu.EduCourse;
 import com.eapple.system.domain.edu.EduCourseEnrollment;
@@ -45,33 +44,6 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         EduHomeworkQuestion questionQuery = new EduHomeworkQuestion();
         EduAiLog logQuery = new EduAiLog();
         EduStudentProfile profileQuery = new EduStudentProfile();
-
-        if (SecurityUtils.hasRole("edu_teacher"))
-        {
-            courseQuery.setTeacherUserId(SecurityUtils.getUserId());
-            enrollmentQuery.setTeacherUserId(SecurityUtils.getUserId());
-            questionQuery.setTeacherUserId(SecurityUtils.getUserId());
-        }
-        else if (SecurityUtils.hasRole("edu_parent"))
-        {
-            courseQuery.getParams().put("currentUserId", SecurityUtils.getUserId());
-            courseQuery.getParams().put("currentRole", "parent");
-            courseQuery.getParams().put("onlyMine", true);
-            enrollmentQuery.setParentUserId(SecurityUtils.getUserId());
-            questionQuery.setParentUserId(SecurityUtils.getUserId());
-            logQuery.setUserId(SecurityUtils.getUserId());
-            profileQuery.setParentUserId(SecurityUtils.getUserId());
-        }
-        else if (SecurityUtils.hasRole("edu_student"))
-        {
-            courseQuery.getParams().put("currentUserId", SecurityUtils.getUserId());
-            courseQuery.getParams().put("currentRole", "student");
-            courseQuery.getParams().put("onlyMine", true);
-            enrollmentQuery.setStudentUserId(SecurityUtils.getUserId());
-            questionQuery.setStudentUserId(SecurityUtils.getUserId());
-            logQuery.setUserId(SecurityUtils.getUserId());
-            profileQuery.setStudentUserId(SecurityUtils.getUserId());
-        }
 
         courseQuery.getParams().put("limitTop", 5);
         questionQuery.getParams().put("limitTop", 5);

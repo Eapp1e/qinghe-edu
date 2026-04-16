@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="app-container student-page">
     <section class="hero-panel">
       <div class="hero-copy">
@@ -229,6 +229,12 @@
           <el-col :span="12"><el-form-item label="学生姓名" prop="studentName"><el-input v-model="form.studentName" /></el-form-item></el-col>
           <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长ID" prop="parentUserId"><el-input v-model="form.parentUserId" /></el-form-item></el-col>
           <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长姓名"><el-input v-model="form.parentName" /></el-form-item></el-col>
+          <el-col v-if="isStudentOwner" :span="24">
+            <el-form-item label="家长账号" prop="parentAccount">
+              <el-input v-model="form.parentAccount" placeholder="请输入家长登录账号进行绑定" />
+              <div class="field-tip">填写家长登录账号后即可完成绑定，留空则保持当前绑定关系不变。</div>
+            </el-form-item>
+          </el-col>
           <el-col :span="12"><el-form-item label="年级"><el-input v-model="form.gradeName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" /></el-form-item></el-col>
           <el-col :span="12">
@@ -431,7 +437,8 @@ export default {
         gender: '男',
         studentUserId: this.$store.getters.id,
         studentName: this.$store.getters.nickName || this.$store.getters.name || '',
-        interestTags: ''
+        interestTags: '',
+        parentAccount: ''
       }
       this.title = '完善我的档案'
       this.open = true
@@ -445,7 +452,7 @@ export default {
       this.open = true
     },
     handleOwnerEdit(row) {
-      this.form = { ...row }
+      this.form = { ...row, parentAccount: '' }
       this.title = '修改我的档案'
       this.open = true
       this.$nextTick(() => {
@@ -457,6 +464,10 @@ export default {
         if (!valid) return
         if (this.isStudentOwner) {
           this.form.studentUserId = this.$store.getters.id
+          if (!this.form.profileId && !this.form.parentAccount) {
+            this.$modal.msgError('首次完善档案时，请先填写家长账号完成绑定')
+            return
+          }
         }
         const request = this.form.profileId ? updateStudent(this.form) : addStudent(this.form)
         request.then(() => {
@@ -509,6 +520,13 @@ export default {
   width: 220px;
   height: 220px;
   background: radial-gradient(circle, rgba(32, 231, 188, 0.18), transparent 68%);
+}
+
+.field-tip {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #7a8a9d;
 }
 
 .student-page::after {
@@ -718,6 +736,13 @@ export default {
 .empty-text {
   color: #7c939e;
   font-size: 13px;
+}
+
+.field-tip {
+  margin-top: 6px;
+  color: #7b929d;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .recommend-section {

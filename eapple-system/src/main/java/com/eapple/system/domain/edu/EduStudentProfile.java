@@ -19,6 +19,8 @@ public class EduStudentProfile extends BaseEntity
     @Excel(name = "家长姓名")
     private String parentName;
 
+    private String parentAccount;
+
     @Excel(name = "年级")
     private String gradeName;
 
@@ -82,6 +84,16 @@ public class EduStudentProfile extends BaseEntity
     public void setParentName(String parentName)
     {
         this.parentName = parentName;
+    }
+
+    public String getParentAccount()
+    {
+        return parentAccount;
+    }
+
+    public void setParentAccount(String parentAccount)
+    {
+        this.parentAccount = parentAccount;
     }
 
     public String getGradeName()

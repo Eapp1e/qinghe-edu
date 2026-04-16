@@ -30,8 +30,10 @@ public class EduAiLogController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('edu:ai:list')")
     @GetMapping("/myList")
-    public AjaxResult myList()
+    public TableDataInfo myList(EduAiLog log)
     {
-        return success(aiLogService.selectCurrentUserLogs());
+        startPage();
+        List<EduAiLog> list = aiLogService.selectCurrentUserLogs(log);
+        return getDataTable(list);
     }
 }

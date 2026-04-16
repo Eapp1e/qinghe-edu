@@ -7,7 +7,7 @@ public interface IEduAiLogService
 {
     List<EduAiLog> selectAiLogList(EduAiLog log);
 
-    List<EduAiLog> selectCurrentUserLogs();
+    List<EduAiLog> selectCurrentUserLogs(EduAiLog log);
 
     int insertAiLog(EduAiLog log);
 }

@@ -128,6 +128,14 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <pagination
+        v-show="total > 0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getLogList"
+      />
     </section>
 
     <el-dialog :title="responseDialogTitle" :visible.sync="responseDialogOpen" width="720px" append-to-body>
@@ -157,6 +165,10 @@ export default {
       loading: false,
       total: 0,
       aiLogList: [],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 6
+      },
       aiModelOptions: [],
       currentAiModel: '',
       responseDialogOpen: false,
@@ -289,17 +301,11 @@ export default {
     getLogList() {
       this.loading = true
       const request = this.isAdminView
-        ? listAiLog({ pageNum: 1, pageSize: 8 })
-        : listMyAiLog()
+        ? listAiLog(this.queryParams)
+        : listMyAiLog(this.queryParams)
       request.then(res => {
-        if (this.isAdminView) {
-          this.aiLogList = res.rows || []
-          this.total = res.total || 0
-          return
-        }
-        const list = res.data || []
-        this.aiLogList = list.slice(0, 8)
-        this.total = list.length
+        this.aiLogList = res.rows || []
+        this.total = res.total || 0
       }).finally(() => {
         this.loading = false
       })

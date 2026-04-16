@@ -8,9 +8,10 @@ export function listAiLog(query) {
   })
 }
 
-export function listMyAiLog() {
+export function listMyAiLog(query) {
   return request({
     url: '/edu/aiLog/myList',
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }

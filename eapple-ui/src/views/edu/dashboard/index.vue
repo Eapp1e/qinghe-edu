@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="app-container dashboard-page">
     <section class="hero-card">
       <div>
@@ -46,7 +46,10 @@
             <div class="timeline-scroll">
               <el-timeline>
                 <el-timeline-item v-for="item in timeline" :key="item.key" :timestamp="item.time">
-                  {{ item.text }}
+                  <div class="timeline-card">
+                    <strong>{{ item.text }}</strong>
+                    <span>{{ item.time }}</span>
+                  </div>
                 </el-timeline-item>
               </el-timeline>
             </div>
@@ -68,32 +71,6 @@
                 </div>
               </div>
               <div v-else class="empty-state">暂无最新课程安排</div>
-            </div>
-
-            <div class="notice-grid">
-              <div class="info-panel compact-panel notice-panel">
-                <div class="panel-head">
-                  <strong>问答提醒</strong>
-                  <span>近期问答处理情况</span>
-                </div>
-                <div class="status-block">
-                  <strong>{{ questionSummary.pending }}</strong>
-                  <span>待关注问题</span>
-                  <p>{{ questionSummary.text }}</p>
-                </div>
-              </div>
-
-              <div class="info-panel compact-panel notice-panel">
-                <div class="panel-head">
-                  <strong>平台概览</strong>
-                  <span>当前平台整体运行情况</span>
-                </div>
-                <div class="status-block">
-                  <strong>{{ summaryBlock.total }}</strong>
-                  <span>本周重点关注</span>
-                  <p>{{ summaryBlock.text }}</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -160,23 +137,9 @@ export default {
       return (this.dashboard.recentCourses || []).slice(0, 3).map(item => ({
         key: item.courseId,
         title: item.courseName,
-        desc: `授课教师：${item.teacherName || '待安排'} · 容量 ${item.capacity || 0} 人`,
+        desc: `授课教师：${item.teacherName || '待安排'} · 容量 ${item.maxCapacity || item.capacity || 0} 人`,
         meta: this.formatCourseTime(item)
       }))
-    },
-    questionSummary() {
-      const recentQuestions = this.dashboard.recentQuestions || []
-      const latest = recentQuestions[0]
-      return {
-        pending: recentQuestions.length,
-        text: latest ? `最新问题为《${latest.questionTitle}》，建议优先查看答疑质量与响应时效。` : '当前暂无新的学生提问，答疑服务运行平稳。'
-      }
-    },
-    summaryBlock() {
-      return {
-        total: this.dashboard.totalEnrollments || 0,
-        text: `当前共有 ${this.dashboard.totalCourses || 0} 门课程在运行，累计报名 ${this.dashboard.totalEnrollments || 0} 人次。`
-      }
     }
   },
   created() {
@@ -313,7 +276,7 @@ export default {
       const maxValue = Math.max(...values, 1)
 
       chart.setOption({
-        grid: { top: 18, left: 18, right: 88, bottom: 12, containLabel: true },
+        grid: { top: 28, left: 20, right: 132, bottom: 28, containLabel: true },
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'none' },
@@ -330,6 +293,7 @@ export default {
           type: 'value',
           max: maxValue,
           splitLine: { show: false },
+          splitArea: { show: false },
           axisLine: { show: false },
           axisTick: { show: false },
           axisLabel: { show: false }
@@ -343,7 +307,8 @@ export default {
             axisLabel: {
               color: '#5f7285',
               fontSize: 12,
-              fontWeight: 700
+              fontWeight: 700,
+              margin: 20
             },
             data: rankLabels
           },
@@ -355,7 +320,9 @@ export default {
             axisLabel: {
               color: '#22384a',
               fontSize: 13,
-              margin: 28
+              margin: 40,
+              width: 132,
+              overflow: 'truncate'
             },
             data: courseNames
           }
@@ -367,6 +334,7 @@ export default {
             silent: true,
             barWidth: 16,
             barGap: '-100%',
+            z: 1,
             itemStyle: {
               color: 'rgba(48, 149, 255, 0.12)',
               borderRadius: 999
@@ -384,8 +352,9 @@ export default {
               distance: 8,
               color: '#ffffff',
               fontWeight: 700,
-              formatter: ({ value }) => `${value} 人`
+              formatter: ({ value }) => (value > 0 ? `${value} 人` : '')
             },
+            z: 3,
             itemStyle: {
               borderRadius: 999,
               color: params => {
@@ -410,24 +379,48 @@ export default {
       this.charts.push(chart)
     },
     renderActivityChart() {
+      const today = new Date()
+      today.setHours(23, 59, 59, 999)
+      const windowStart = new Date(today)
+      windowStart.setHours(0, 0, 0, 0)
+      windowStart.setDate(windowStart.getDate() - 6)
       const recentCourseMap = {}
       ;(this.dashboard.recentCourses || []).forEach(item => {
-        const key = item.weekDay || '本周'
+        const date = this.parseDate(item.startDate || item.createTime)
+        if (!date) return
+        if (date > today || date < windowStart) return
+        const key = parseTime(date, '{y}-{m}-{d}')
         recentCourseMap[key] = (recentCourseMap[key] || 0) + 1
       })
       const questionMap = {}
       ;(this.dashboard.recentQuestions || []).forEach(item => {
-        const key = parseTime(item.createTime, '{m}-{d}') || '近期'
+        const date = this.parseDate(item.createTime)
+        if (!date) return
+        if (date > today || date < windowStart) return
+        const key = parseTime(date, '{y}-{m}-{d}')
         questionMap[key] = (questionMap[key] || 0) + 1
       })
-      const labels = Array.from(new Set([...Object.keys(recentCourseMap), ...Object.keys(questionMap)]))
-      const categoryLabels = labels.length ? labels : ['近期']
+      const categoryKeys = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(windowStart)
+        date.setDate(windowStart.getDate() + index)
+        return parseTime(date, '{y}-{m}-{d}')
+      })
+      const categoryLabels = categoryKeys.map(label => this.formatDisplayTime(label))
       const chart = echarts.init(this.$refs.activityChart, 'macarons')
       chart.setOption({
         tooltip: { trigger: 'axis' },
         legend: { top: 8 },
         grid: { top: 42, left: 34, right: 24, bottom: 30 },
-        xAxis: { type: 'category', boundaryGap: false, data: categoryLabels },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: categoryLabels,
+          axisLabel: {
+            interval: 0,
+            hideOverlap: true,
+            color: '#5f7285'
+          }
+        },
         yAxis: { type: 'value' },
         series: [
           {
@@ -435,14 +428,14 @@ export default {
             type: 'line',
             smooth: true,
             areaStyle: { color: 'rgba(32, 221, 182, 0.12)' },
-            data: categoryLabels.map(label => recentCourseMap[label] || 0)
+            data: categoryKeys.map(label => recentCourseMap[label] || 0)
           },
           {
             name: '提问活跃',
             type: 'line',
             smooth: true,
             areaStyle: { color: 'rgba(47, 152, 255, 0.12)' },
-            data: categoryLabels.map(label => questionMap[label] || 0)
+            data: categoryKeys.map(label => questionMap[label] || 0)
           }
         ]
       })
@@ -556,7 +549,7 @@ export default {
 }
 
 .chart-box {
-  height: 310px;
+  height: 326px;
 }
 
 .wide-card .chart-box {
@@ -574,16 +567,19 @@ export default {
 }
 
 .info-panel {
-  border: 1px solid rgba(77, 171, 192, 0.16);
+  border: 1px solid rgba(61, 136, 160, 0.34);
   border-radius: 24px;
   background:
     radial-gradient(circle at bottom right, rgba(32, 224, 182, 0.08), transparent 28%),
     linear-gradient(180deg, rgba(237, 251, 252, 0.96), rgba(246, 250, 253, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 18px 36px rgba(31, 107, 127, 0.08);
 }
 
 .timeline-panel {
-  padding: 24px 24px 12px;
+  padding: 24px 24px 18px;
   min-height: 520px;
   display: flex;
   flex-direction: column;
@@ -605,14 +601,17 @@ export default {
 }
 
 .panel-head {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(61, 136, 160, 0.24);
 }
 
 .panel-head strong {
   display: block;
   color: #243b4a;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .panel-head span {
@@ -620,7 +619,7 @@ export default {
   margin-top: 8px;
   color: #7a919f;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .right-column {
@@ -630,70 +629,48 @@ export default {
 
 .schedule-panel {
   padding: 24px;
+  min-height: 520px;
 }
 
 .mini-list {
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 
 .mini-item {
   display: flex;
   justify-content: space-between;
   gap: 18px;
+  align-items: flex-start;
   padding: 18px 20px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(77, 171, 192, 0.12);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 255, 0.96));
+  border: 1px solid rgba(61, 136, 160, 0.26);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 10px 24px rgba(34, 93, 108, 0.06);
 }
 
 .mini-main strong {
   display: block;
   color: #203544;
   font-size: 16px;
+  line-height: 1.45;
 }
 
 .mini-main p {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: #6f8694;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.7;
 }
 
 .mini-item span {
   flex-shrink: 0;
   color: #3794e0;
+  font-size: 14px;
   font-weight: 700;
-}
-
-.notice-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.compact-panel {
-  padding: 22px 22px 24px;
-}
-
-.status-block strong {
-  display: block;
-  color: #22384a;
-  font-size: 48px;
-  line-height: 1;
-}
-
-.status-block span {
-  display: block;
-  margin-top: 10px;
-  color: #3b9fe7;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.status-block p {
-  margin: 16px 0 0;
-  color: #6f8694;
-  line-height: 1.8;
+  line-height: 1.5;
 }
 
 .empty-state {
@@ -703,11 +680,11 @@ export default {
 }
 
 .timeline-panel ::v-deep .el-timeline {
-  padding-left: 10px;
+  padding-left: 12px;
 }
 
 .timeline-panel ::v-deep .el-timeline-item {
-  padding-bottom: 18px;
+  padding-bottom: 14px;
 }
 
 .timeline-panel ::v-deep .el-timeline-item:last-child {
@@ -717,18 +694,44 @@ export default {
 .timeline-panel ::v-deep .el-timeline-item__node {
   width: 14px;
   height: 14px;
-  box-shadow: 0 0 0 8px rgba(32, 224, 182, 0.12);
+  background: linear-gradient(180deg, #20d9b7, #57a6ff);
+  border: 2px solid #f4fbfb;
+  box-shadow: 0 0 0 7px rgba(32, 224, 182, 0.16);
 }
 
 .timeline-panel ::v-deep .el-timeline-item__timestamp {
-  color: #6f8694;
-  font-size: 13px;
-  margin-bottom: 4px;
+  display: none;
 }
 
 .timeline-panel ::v-deep .el-timeline-item__content {
   color: #243b4a;
   line-height: 1.7;
+}
+
+.timeline-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 254, 0.96));
+  border: 1px solid rgba(61, 136, 160, 0.26);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
+    0 10px 22px rgba(34, 93, 108, 0.05);
+}
+
+.timeline-card strong {
+  display: block;
+  color: #243b4a;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.timeline-card span {
+  display: block;
+  margin-top: 8px;
+  color: #6f8694;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 @media (max-width: 1400px) {
@@ -747,12 +750,15 @@ export default {
   .insight-layout {
     grid-template-columns: 1fr;
   }
+
+  .schedule-panel {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 900px) {
   .metric-grid,
-  .chart-grid,
-  .notice-grid {
+  .chart-grid {
     grid-template-columns: 1fr;
   }
 
@@ -765,9 +771,16 @@ export default {
   }
 
   .timeline-panel,
-  .schedule-panel,
-  .compact-panel {
+  .schedule-panel {
     padding: 20px;
+  }
+
+  .mini-item {
+    flex-direction: column;
+  }
+
+  .mini-item span {
+    margin-top: 4px;
   }
 }
 </style>

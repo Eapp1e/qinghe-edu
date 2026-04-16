@@ -21,9 +21,12 @@ public class EduAiLogServiceImpl implements IEduAiLogService
     }
 
     @Override
-    public List<EduAiLog> selectCurrentUserLogs()
+    public List<EduAiLog> selectCurrentUserLogs(EduAiLog log)
     {
-        EduAiLog log = new EduAiLog();
+        if (log == null)
+        {
+            log = new EduAiLog();
+        }
         log.setUserId(SecurityUtils.getUserId());
         return aiLogMapper.selectAiLogList(log);
     }
