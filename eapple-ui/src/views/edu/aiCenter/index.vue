@@ -98,17 +98,50 @@
       </div>
 
       <el-table v-loading="loading" :data="aiLogList" class="content-table">
-        <el-table-column label="业务类型" prop="businessType" min-width="150" />
+        <el-table-column label="业务类型" min-width="150">
+          <template slot-scope="scope">
+            <div class="biz-type-cell">
+              <span class="biz-type-tag">{{ formatBusinessType(scope.row.businessType) }}</span>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="模型" prop="modelName" min-width="180" show-overflow-tooltip />
         <el-table-column label="状态" width="100">
           <template slot-scope="scope">
-            <el-tag size="small" :type="statusTagType(scope.row.status)">{{ scope.row.status }}</el-tag>
+            <el-tag size="small" :type="statusTagType(scope.row.status)">{{ formatStatus(scope.row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column v-if="showRoleColumn" label="角色" prop="roleType" width="100" />
-        <el-table-column label="返回内容" prop="responseContent" min-width="260" show-overflow-tooltip />
+        <el-table-column label="返回内容" min-width="320">
+          <template slot-scope="scope">
+            <div class="response-card">
+              <p class="response-preview">{{ getResponsePreview(scope.row.responseContent, scope.row.errorMessage) }}</p>
+              <el-button
+                v-if="hasResponseDetail(scope.row.responseContent, scope.row.errorMessage)"
+                type="text"
+                size="mini"
+                @click="showResponseDetail(scope.row)"
+              >
+                查看完整内容
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
     </section>
+
+    <el-dialog :title="responseDialogTitle" :visible.sync="responseDialogOpen" width="720px" append-to-body>
+      <div class="response-detail-panel">
+        <div class="response-detail-meta">
+          <span class="biz-type-tag">{{ responseDialogBusinessType }}</span>
+          <el-tag size="small" :type="responseDialogStatusType">{{ responseDialogStatus }}</el-tag>
+        </div>
+        <div class="response-detail-body">{{ responseDialogContent }}</div>
+      </div>
+      <div slot="footer">
+        <el-button @click="responseDialogOpen = false">关闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -124,7 +157,13 @@ export default {
       total: 0,
       aiLogList: [],
       aiModelOptions: [],
-      currentAiModel: ''
+      currentAiModel: '',
+      responseDialogOpen: false,
+      responseDialogTitle: 'AI 返回内容',
+      responseDialogBusinessType: '',
+      responseDialogStatus: '',
+      responseDialogStatusType: 'info',
+      responseDialogContent: ''
     }
   },
   computed: {
@@ -277,6 +316,61 @@ export default {
       if (status === 'mock') return 'warning'
       if (status === 'failed') return 'danger'
       return 'info'
+    },
+    formatStatus(status) {
+      const map = {
+        success: '成功',
+        failed: '失败',
+        mock: '模拟'
+      }
+      return map[status] || '未知'
+    },
+    formatBusinessType(type) {
+      const map = {
+        course_notice: '课程通知生成',
+        teaching_suggestion: '教学建议生成',
+        homework_answer: '作业问答',
+        course_recommendation: '课程推荐',
+        learning_guidance: '学习辅导',
+        parent_support: '家长陪学',
+        ai_chat: '智能对话'
+      }
+      return map[type] || type || '未分类'
+    },
+    sanitizeResponseContent(content) {
+      if (!content) {
+        return ''
+      }
+      return content
+        .replace(/\r\n/g, '\n')
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/__(.*?)__/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/^#{1,6}\s*/gm, '')
+        .replace(/^\s*[-*]\s+/gm, '• ')
+        .replace(/^\s*\d+\.\s+/gm, '')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+    },
+    getResponsePreview(responseContent, errorMessage) {
+      const content = this.sanitizeResponseContent(responseContent || errorMessage)
+      if (!content) {
+        return '暂无可展示内容'
+      }
+      return content.length > 90 ? `${content.slice(0, 90)}...` : content
+    },
+    hasResponseDetail(responseContent, errorMessage) {
+      return !!this.sanitizeResponseContent(responseContent || errorMessage)
+    },
+    showResponseDetail(row) {
+      const content = this.sanitizeResponseContent(row.responseContent || row.errorMessage)
+      this.responseDialogTitle = `${this.formatBusinessType(row.businessType)}详情`
+      this.responseDialogBusinessType = this.formatBusinessType(row.businessType)
+      this.responseDialogStatus = this.formatStatus(row.status)
+      this.responseDialogStatusType = this.statusTagType(row.status)
+      this.responseDialogContent = content || '暂无可展示内容'
+      this.responseDialogOpen = true
     }
   }
 }
@@ -399,6 +493,67 @@ export default {
   margin-top: 10px;
   color: #ffffff;
   font-size: 26px;
+}
+
+.biz-type-cell {
+  display: flex;
+  align-items: center;
+}
+
+.biz-type-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid rgba(35, 196, 178, 0.18);
+  border-radius: 999px;
+  background: rgba(20, 210, 177, 0.1);
+  color: #0d8f88;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.response-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid rgba(109, 210, 219, 0.16);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(251, 255, 255, 0.96), rgba(242, 251, 255, 0.88));
+}
+
+.response-preview {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #355163;
+  line-height: 1.8;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.response-detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.response-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.response-detail-body {
+  padding: 18px 20px;
+  border: 1px solid rgba(108, 208, 219, 0.16);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(251, 255, 255, 0.96), rgba(241, 250, 255, 0.9));
+  color: #314c5d;
+  line-height: 1.9;
+  white-space: pre-line;
 }
 
 .overview-grid {
