@@ -378,6 +378,50 @@ public class EduCourseServiceImpl implements IEduCourseService
                 + "\n课程名称：" + course.getCourseName()
                 + "\n课程分类：" + StringUtils.defaultString(course.getCategory(), "未分类")
                 + "\n课程简介：" + StringUtils.defaultString(course.getDescription(), "暂无简介");
-        return aiService.generateCourseRecommendation(profile.getStudentUserId(), prompt);
+        String aiReason = aiService.generateCourseRecommendation(profile.getStudentUserId(), prompt);
+        return sanitizeRecommendationReason(aiReason, profile);
+    }
+
+    private String sanitizeRecommendationReason(String aiReason, EduStudentProfile profile)
+    {
+        String cleaned = StringUtils.defaultString(aiReason)
+                .replace("\r", "")
+                .replace("```markdown", "")
+                .replace("```", "")
+                .replace("**", "")
+                .replace("user", "")
+                .replace("assistant", "")
+                .replace("system", "")
+                .replaceAll("[A-Za-z]{3,}", "")
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        String[] fragments = cleaned.split("[。！？!?\n]");
+        for (String fragment : fragments)
+        {
+            String candidate = fragment == null ? "" : fragment.trim();
+            if (candidate.length() >= 6)
+            {
+                return ensureSentence(candidate);
+            }
+        }
+
+        String interests = StringUtils.defaultString(profile.getInterestTags(), "当前兴趣");
+        String firstInterest = interests.split("[，,、\\s]+")[0];
+        return ensureSentence("课程内容与" + firstInterest + "方向较匹配，建议优先关注");
+    }
+
+    private String ensureSentence(String text)
+    {
+        String sentence = StringUtils.defaultString(text).trim();
+        if (StringUtils.isEmpty(sentence))
+        {
+            return "课程内容与学生兴趣较匹配，建议优先关注。";
+        }
+        if (!sentence.endsWith("。"))
+        {
+            sentence = sentence + "。";
+        }
+        return sentence;
     }
 }
