@@ -201,6 +201,10 @@ update sys_menu set parent_id = 0, order_num = 8, path = 'edu/platform-notice', 
 insert ignore into sys_role_menu(role_id, menu_id) values (102, 3008);
 insert ignore into sys_role_menu(role_id, menu_id) values (103, 3008);
 insert ignore into sys_role_menu(role_id, menu_id) values (104, 3008);
+insert ignore into sys_role_menu(role_id, menu_id) values (102, 3003);
+insert ignore into sys_role_menu(role_id, menu_id) values (102, 3020);
+insert ignore into sys_role_menu(role_id, menu_id) values (103, 3003);
+insert ignore into sys_role_menu(role_id, menu_id) values (103, 3020);
 update sys_menu set icon = 'chart', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3001;
 update sys_menu set icon = 'education', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3002;
 update sys_menu set icon = 'user', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3003;

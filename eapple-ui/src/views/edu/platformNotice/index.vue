@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { addNotice, delNotice, getNotice, listNotice, listNoticeReadUsers, updateNotice } from '@/api/system/notice'
+import { addNotice, delNotice, getNotice, listNotice, listNoticeReadUsers, markNoticeRead, updateNotice } from '@/api/system/notice'
 
 export default {
   name: 'EduPlatformNoticePage',
@@ -262,6 +262,7 @@ export default {
       })
     },
     handlePreview(row) {
+      markNoticeRead(row.noticeId).catch(() => {})
       getNotice(row.noticeId).then(response => {
         this.previewData = response.data || {}
         this.previewOpen = true
@@ -306,8 +307,7 @@ export default {
       return match ? match.label : '-'
     },
     resolveRole(row) {
-      const role = (row.roles || [])[0]
-      return role ? role.roleName : '-'
+      return row.roleName || row.roleNames || '-'
     }
   }
 }

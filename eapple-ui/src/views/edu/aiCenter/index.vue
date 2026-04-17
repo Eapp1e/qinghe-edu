@@ -12,10 +12,6 @@
           <strong>{{ currentModelDisplay }}</strong>
         </div>
         <div class="stat-card">
-          <span>{{ pageConfig.secondaryStatLabel }}</span>
-          <strong>{{ pageConfig.secondaryStatValue }}</strong>
-        </div>
-        <div class="stat-card">
           <span>最近调用</span>
           <strong>{{ summaryTotal }}</strong>
         </div>
@@ -78,7 +74,16 @@
         <span class="card-badge">Feature Map</span>
         <h3>{{ pageConfig.featureTitle }}</h3>
         <ul class="feature-list">
-          <li v-for="item in pageConfig.features" :key="item">{{ item }}</li>
+          <li
+            v-for="item in pageConfig.features"
+            :key="item.label || item"
+            :class="{ clickable: !!item.path }"
+            @click="handleFeatureClick(item)"
+          >
+            <span class="feature-dot" />
+            <span class="feature-label">{{ item.label || item }}</span>
+            <i v-if="item.path" class="el-icon-arrow-right" />
+          </li>
         </ul>
       </div>
     </section>
@@ -152,7 +157,7 @@
 <script>
 import { listAiModels, getCurrentAiModel, updateCurrentAiModel } from '@/api/edu/ai'
 import { listAiLog, listMyAiLog, getAiLogSummary, getMyAiLogSummary } from '@/api/edu/aiLog'
-import { renderAiContentHtml, stripAiMarkdown } from '@/utils/aiContent'
+import { renderAiContentHtml, sanitizeAiDisplayContent } from '@/utils/aiContent'
 
 export default {
   name: 'EduAiCenter',
@@ -215,13 +220,16 @@ export default {
         return {
           title: 'AI中心',
           description: '统一管理平台中的 AI 模型、生成能力与调用记录，重点掌握平台整体使用情况、模型稳定性与风险状态。',
-          secondaryStatLabel: '模型数量',
-          secondaryStatValue: this.aiModelOptions.length,
           modelTip: '平台内的 AI 能力会优先使用当前账号在这里选中的模型，管理员可用它做测试与巡检。',
           snapshotTitle: '平台运行概览',
           snapshotTip: '适合查看平台整体 AI 使用质量、失败率与模型稳定性，再决定后续优化方向。',
           featureTitle: '平台重点能力',
-          features: ['课程通知生成', '教学建议生成', '作业问答辅助', '课程推荐理由生成'],
+          features: [
+            { label: '课程通知生成', path: '/edu/platform-notice' },
+            { label: '教学建议生成', path: '/edu/course' },
+            { label: '作业问答辅助', path: '/edu/question' },
+            { label: '课程推荐理由生成', path: '/edu/student' }
+          ],
           logTitle: '平台最近 AI 调用',
           logDescription: '展示平台最近的 AI 调用记录，便于核查返回质量与整体使用情况。'
         }
@@ -230,13 +238,16 @@ export default {
         return {
           title: '教学AI中心',
           description: '围绕课程通知、教学建议与课堂辅助统一配置 AI，帮助教师更高效地完成课后服务教学工作。',
-          secondaryStatLabel: '常用能力',
-          secondaryStatValue: 3,
           modelTip: '课程中心里的 AI 通知和 AI 建议都会优先使用这里选中的模型。',
           snapshotTitle: '教学生成概览',
           snapshotTip: '如果 AI 生成超时，建议优先切换到更轻量模型，再重新生成课程通知或教学建议。',
           featureTitle: '教学辅助能力',
-          features: ['课程通知生成', '教学建议生成', '作业答疑辅助', '教学表达优化'],
+          features: [
+            { label: '课程通知生成', path: '/edu/course' },
+            { label: '教学建议生成', path: '/edu/course' },
+            { label: '作业答疑辅助', path: '/edu/question' },
+            { label: '教学表达优化', path: '/edu/course' }
+          ],
           logTitle: '我的最近 AI 调用',
           logDescription: '展示当前教师账号最近的 AI 调用记录，便于回看通知与教学建议生成结果。'
         }
@@ -245,13 +256,14 @@ export default {
         return {
           title: '陪学AI中心',
           description: '为家长提供更合适的 AI 模型选择，支持查看陪学问答与课程推荐相关的 AI 使用记录。',
-          secondaryStatLabel: '陪学场景',
-          secondaryStatValue: 3,
           modelTip: '家长侧的 AI 互动、课程推荐理由等内容会优先使用这里选中的模型。',
           snapshotTitle: '陪学使用概览',
           snapshotTip: '推荐优先选择响应更快、表达更稳定的模型，方便日常陪学与课程参考。',
           featureTitle: '家长常用能力',
-          features: ['陪学问答支持', '孩子课程推荐', '学习记录理解', '家校沟通参考'],
+          features: [
+            { label: '陪学问答支持', path: '/edu/question' },
+            { label: '孩子课程推荐', path: '/edu/student' }
+          ],
           logTitle: '我的最近 AI 互动',
           logDescription: '展示当前家长账号最近的 AI 调用记录，便于回看陪学问题和推荐内容。'
         }
@@ -259,13 +271,16 @@ export default {
       return {
         title: '学习AI中心',
         description: '为学生提供更适合学习场景的 AI 助手配置，帮助完成作业问答、课程理解与课后学习支持。',
-        secondaryStatLabel: '学习场景',
-        secondaryStatValue: 3,
         modelTip: '作业问答、课程推荐等学习场景会优先使用这里选中的模型。',
         snapshotTitle: '学习助手概览',
         snapshotTip: '建议优先选择更简洁、响应更快的模型，方便日常提问和课后学习。',
         featureTitle: '学习辅助能力',
-        features: ['作业问题解答', '课程推荐理由', '学习思路提示', '课后知识理解'],
+        features: [
+          { label: '作业问题解答', path: '/edu/question' },
+          { label: '课程推荐理由', path: '/edu/student' },
+          { label: '学习思路提示', path: '/edu/question' },
+          { label: '课后知识理解', path: '/edu/course' }
+        ],
         logTitle: '我的最近 AI 使用',
         logDescription: '展示当前学生账号最近的 AI 调用记录，便于回看作业问答与学习辅助内容。'
       }
@@ -336,6 +351,12 @@ export default {
         this.refreshData()
       })
     },
+    handleFeatureClick(item) {
+      if (!item || !item.path || this.$route.path === item.path) {
+        return
+      }
+      this.$router.push(item.path)
+    },
     statusTagType(status) {
       if (status === 'success') return 'success'
       if (status === 'mock') return 'warning'
@@ -363,7 +384,7 @@ export default {
       return map[type] || type || '未分类'
     },
     sanitizeResponseContent(content) {
-      return stripAiMarkdown(content)
+      return sanitizeAiDisplayContent(content)
     },
     getResponsePreview(responseContent, errorMessage) {
       const content = this.sanitizeResponseContent(responseContent || errorMessage)
@@ -476,9 +497,9 @@ export default {
 
 .hero-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  min-width: 420px;
+  min-width: 280px;
 }
 
 .stat-card,
@@ -528,8 +549,9 @@ export default {
 
 .response-card {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   padding: 12px 14px;
   border: 1px solid rgba(109, 210, 219, 0.16);
   border-radius: 16px;
@@ -538,6 +560,7 @@ export default {
 
 .response-preview {
   display: -webkit-box;
+  flex: 1;
   margin: 0;
   overflow: hidden;
   color: #355163;
@@ -545,6 +568,13 @@ export default {
   white-space: pre-line;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+.response-card :deep(.el-button) {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0;
+  white-space: nowrap;
 }
 
 .response-detail-panel {
@@ -716,9 +746,55 @@ export default {
 
 .feature-list {
   margin: 18px 0 0;
-  padding-left: 18px;
+  padding-left: 0;
   display: grid;
   gap: 12px;
+  list-style: none;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(112, 214, 223, 0.18);
+  border-radius: 16px;
+  background: rgba(247, 253, 255, 0.9);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.feature-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #12d8b0 0%, #2a98ff 100%);
+  box-shadow: 0 0 0 3px rgba(18, 216, 176, 0.14);
+}
+
+.feature-label {
+  flex: 1;
+}
+
+.feature-list li i {
+  color: #7aa2b5;
+  font-size: 14px;
+}
+
+.feature-list li.clickable {
+  cursor: pointer;
+}
+
+.feature-list li.clickable:hover {
+  transform: translateY(-1px);
+  border-color: rgba(48, 208, 190, 0.34);
+  box-shadow: 0 14px 26px rgba(33, 145, 155, 0.1);
+}
+
+.feature-list li.clickable:hover i,
+.feature-list li.clickable:hover span {
+  color: #17707a;
 }
 
 .log-panel {
@@ -783,6 +859,17 @@ export default {
 
   .mini-stats {
     grid-template-columns: 1fr;
+  }
+
+  .response-card {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .response-card :deep(.el-button) {
+    margin-left: 0;
+    align-self: flex-end;
   }
 }
 </style>

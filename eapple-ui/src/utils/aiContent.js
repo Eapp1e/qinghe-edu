@@ -43,8 +43,43 @@ export function stripAiMarkdown(content) {
     .trim()
 }
 
+export function sanitizeAiDisplayContent(content) {
+  const normalized = stripAiMarkdown(content)
+  if (!normalized) {
+    return ''
+  }
+
+  const punctuationPattern = /[\u4e00-\u9fa5，。！？；：、】【》、]/
+  const trailingAsciiPattern = /\s+(?:[A-Za-z]{2,12}|[A-Za-z]{2,12}\s+[A-Za-z]{2,12}|[A-Za-z]{2,12}\s+[A-Za-z]{2,12}\s+[A-Za-z]{2,12})$/
+
+  const cleanedLines = normalized
+    .replace(/\uFFFD/g, '')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && !/^[A-Za-z][A-Za-z0-9_\s-]{0,20}$/.test(line))
+    .map((line) => {
+      let cleaned = line
+        .replace(/\s+[A-Za-z]{2,12}\s+[�]\s+[A-Za-z]{2,12}$/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim()
+
+      if (punctuationPattern.test(cleaned)) {
+        cleaned = cleaned.replace(trailingAsciiPattern, '')
+      }
+
+      if (/^[A-Za-z]{2,12}(?:\s+[A-Za-z]{2,12}){0,2}$/.test(cleaned)) {
+        cleaned = ''
+      }
+
+      return cleaned.trim()
+    })
+    .filter(Boolean)
+
+  return cleanedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+}
+
 export function renderAiContentHtml(content) {
-  const normalized = normalizeAiMarkdown(content)
+  const normalized = sanitizeAiDisplayContent(content)
   if (!normalized) {
     return '<p>暂无可展示内容</p>'
   }

@@ -38,7 +38,7 @@
         <article v-for="item in studentList" :key="item.profileId" class="profile-card">
           <div class="profile-head">
             <div>
-              <span class="profile-badge">{{ $auth.hasRole('edu_student') ? '我的档案' : '孩子档案' }}</span>
+              <span class="profile-badge">{{ $auth.hasRole('edu_student') ? '我的档案' : '学生档案' }}</span>
               <h2>{{ item.studentName }}</h2>
               <p>{{ item.gradeName || '未设置年级' }} · {{ item.className || '未设置班级' }}</p>
             </div>
@@ -344,7 +344,7 @@ export default {
       return new Set(this.studentList.map(item => item.parentUserId).filter(Boolean)).size
     },
     canManageProfile() {
-      return this.$auth.hasRole('edu_teacher') || this.$auth.hasRole('admin')
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin')
     },
     canSelfEdit() {
       return this.$auth.hasRole('edu_student')
@@ -373,7 +373,7 @@ export default {
         return '我的档案'
       }
       if (this.$auth.hasRole('edu_parent')) {
-        return '孩子档案'
+        return '学生档案'
       }
       return '学生档案'
     },
@@ -382,7 +382,7 @@ export default {
         return '集中查看自己的基础信息、班级归属、兴趣标签和智能课程推荐结果。'
       }
       if (this.$auth.hasRole('edu_parent')) {
-        return '集中查看孩子的基础档案、班级信息、兴趣标签和智能推荐课程。'
+        return '集中查看关联学生的基础档案、班级信息、兴趣标签和智能推荐课程。'
       }
       return '教师端和管理员端可查看全部学生档案，并维护学生基础信息、家长关联关系、年级班级与兴趣标签。'
     }

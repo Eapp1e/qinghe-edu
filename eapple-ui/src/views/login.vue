@@ -34,8 +34,8 @@
             <span>教师可借助 AI 生成课程通知、教学建议和作业答疑内容，提高工作效率。</span>
           </div>
           <div class="feature-card">
-            <strong>安全运营</strong>
-            <span>管理员统一查看用户、通知、统计报表与 AI 调用日志，确保平台运行可控。</span>
+            <strong>平台协同</strong>
+            <span>管理员统一管理用户、通知、统计报表与 AI 服务，保障课后服务高效联动。</span>
           </div>
         </div>
       </section>
