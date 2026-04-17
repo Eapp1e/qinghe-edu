@@ -276,7 +276,7 @@ export default {
       const maxValue = Math.max(...values, 1)
 
       chart.setOption({
-        grid: { top: 28, left: 20, right: 132, bottom: 28, containLabel: true },
+        grid: { top: 28, left: 18, right: 138, bottom: 28, containLabel: true },
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'none' },
@@ -291,7 +291,7 @@ export default {
         },
         xAxis: {
           type: 'value',
-          max: maxValue,
+          max: Math.max(Math.ceil(maxValue * 1.08), 3),
           splitLine: { show: false },
           splitArea: { show: false },
           axisLine: { show: false },
@@ -320,8 +320,8 @@ export default {
             axisLabel: {
               color: '#22384a',
               fontSize: 13,
-              margin: 40,
-              width: 132,
+              margin: 54,
+              width: 126,
               overflow: 'truncate'
             },
             data: courseNames
@@ -332,7 +332,7 @@ export default {
             type: 'bar',
             yAxisIndex: 1,
             silent: true,
-            barWidth: 16,
+            barWidth: 18,
             barGap: '-100%',
             z: 1,
             itemStyle: {
@@ -345,12 +345,12 @@ export default {
             name: '报名人数',
             type: 'bar',
             yAxisIndex: 1,
-            barWidth: 16,
+            barWidth: 18,
             label: {
               show: true,
-              position: 'insideRight',
-              distance: 8,
-              color: '#ffffff',
+              position: 'right',
+              distance: 12,
+              color: '#3b5568',
               fontWeight: 700,
               formatter: ({ value }) => (value > 0 ? `${value} 人` : '')
             },

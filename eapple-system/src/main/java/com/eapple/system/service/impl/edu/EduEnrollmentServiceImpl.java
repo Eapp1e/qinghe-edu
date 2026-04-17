@@ -52,6 +52,11 @@ public class EduEnrollmentServiceImpl implements IEduEnrollmentService
         {
             throw new ServiceException("只能管理本人课程的报名记录");
         }
+        if (!SecurityUtils.isAdmin() && SecurityUtils.hasRole("edu_parent")
+                && !SecurityUtils.getUserId().equals(dbEnrollment.getParentUserId()))
+        {
+            throw new ServiceException("只能维护当前家长关联学生的报名记录");
+        }
         enrollment.setUpdateBy(SecurityUtils.getUsername());
         return enrollmentMapper.updateEnrollment(enrollment);
     }

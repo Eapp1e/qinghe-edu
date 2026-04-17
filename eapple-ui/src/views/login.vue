@@ -65,7 +65,6 @@
               @click="selectRole(item.value)"
             >
               <strong>{{ item.label }}</strong>
-              <span>{{ item.desc }}</span>
             </button>
           </div>
         </el-form-item>
@@ -267,10 +266,10 @@ export default {
         uuid: ''
       },
       roleOptions: [
-        { value: 'edu_student', label: '学生登录', desc: '查看课程与提交作业问题' },
-        { value: 'edu_parent', label: '家长登录', desc: '报名课程与查看学习记录' },
-        { value: 'edu_teacher', label: '教师登录', desc: '发布课程与处理教学事务' },
-        { value: 'edu_admin', label: '管理员登录', desc: '管理平台用户、通知和统计数据' }
+        { value: 'edu_student', label: '学生' },
+        { value: 'edu_parent', label: '家长' },
+        { value: 'edu_teacher', label: '教师' },
+        { value: 'edu_admin', label: '管理员' }
       ],
       registerRoleOptions: [
         { value: 'edu_student', label: '学生账号', desc: '适用于自主查看课程与作业问答' },
@@ -888,22 +887,22 @@ export default {
 .role-selector {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .role-option {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 15px 16px 14px;
+  align-items: center;
+  justify-content: center;
+  min-height: 92px;
+  padding: 12px 16px;
   border: 1px solid rgba(141, 217, 220, 0.36);
-  border-radius: 20px;
+  border-radius: 18px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(234, 250, 255, 0.92));
   color: #345667;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
   transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease;
   box-shadow:
@@ -922,11 +921,11 @@ export default {
 
 .role-option::before {
   content: '';
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   border-radius: 50%;
   background: rgba(102, 166, 194, 0.74);
   box-shadow: 0 0 0 6px rgba(102, 166, 194, 0.1);
@@ -942,12 +941,8 @@ export default {
 .role-option strong {
   color: #1f4254;
   font-size: 15px;
-}
-
-.role-option span {
-  color: #648093;
-  font-size: 12px;
-  line-height: 1.6;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .role-option.active {

@@ -487,11 +487,13 @@ export default {
       this.recommendTitle = `${row.studentName} 的课程推荐`
       this.recommendOpen = true
       this.recommendLoading = true
+      this.recommendList = []
       recommendCourse(row.studentUserId).then(res => {
         this.recommendList = res.data || []
         this.recommendLoading = false
       }).catch(() => {
         this.recommendLoading = false
+        this.$modal.msgError('智能推荐生成时间较长，请稍后重试；若 AI 中心已有记录，可等待片刻后再次打开。')
       })
     }
   }

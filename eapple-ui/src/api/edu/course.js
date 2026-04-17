@@ -19,7 +19,8 @@ export function recommendCourse(studentUserId) {
   return request({
     url: '/edu/course/recommend',
     method: 'get',
-    params: { studentUserId }
+    params: { studentUserId },
+    timeout: 120000
   })
 }
 

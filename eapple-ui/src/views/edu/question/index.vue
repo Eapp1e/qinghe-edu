@@ -42,6 +42,7 @@
       </el-table-column>
       <el-table-column label="操作" width="180">
         <template slot-scope="scope">
+          <el-button type="text" size="mini" @click="handleViewAnswer(scope.row)">查看解答</el-button>
           <el-button v-hasPermi="['edu:question:edit']" type="text" size="mini" @click="handleRegenerate(scope.row)">重新生成</el-button>
           <el-button v-hasPermi="['edu:question:remove']" type="text" size="mini" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
         </template>
@@ -70,11 +71,34 @@
         <el-button @click="open = false">取消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="answerDialogTitle" :visible.sync="answerOpen" width="760px">
+      <div class="answer-panel">
+        <div class="answer-head">
+          <strong>{{ currentQuestion.questionTitle || '作业解答详情' }}</strong>
+          <el-tag :type="currentQuestion.answerStatus === '1' ? 'success' : 'warning'" size="mini">
+            {{ currentQuestion.answerStatus === '1' ? '已解答' : '待解答' }}
+          </el-tag>
+        </div>
+        <div class="answer-block">
+          <span>问题内容</span>
+          <p>{{ currentQuestion.questionContent || '暂无问题内容' }}</p>
+        </div>
+        <div class="answer-block answer-result">
+          <span>AI 解答</span>
+          <div class="answer-rich" v-html="renderAnswerHtml(currentQuestion.aiAnswer || '当前暂无解答内容，请稍后再查看。')" />
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button @click="answerOpen = false">关闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { addQuestion, delQuestion, listQuestion, regenerateQuestionAnswer } from '@/api/edu/question'
+import { renderAiContentHtml } from '@/utils/aiContent'
 
 export default {
   name: 'EduQuestion',
@@ -84,7 +108,9 @@ export default {
       showSearch: true,
       total: 0,
       open: false,
+      answerOpen: false,
       questionList: [],
+      currentQuestion: {},
       queryParams: { pageNum: 1, pageSize: 10 },
       form: {},
       rules: {
@@ -96,6 +122,9 @@ export default {
   computed: {
     answeredCount() {
       return this.questionList.filter(item => item.answerStatus === '1').length
+    },
+    answerDialogTitle() {
+      return this.currentQuestion.studentName ? `${this.currentQuestion.studentName} 的作业解答` : '作业解答详情'
     }
   },
   created() {
@@ -114,6 +143,9 @@ export default {
       this.form = {}
       this.open = true
     },
+    renderAnswerHtml(content) {
+      return renderAiContentHtml(content)
+    },
     submitForm() {
       this.$refs.form.validate(valid => {
         if (!valid) return
@@ -123,6 +155,10 @@ export default {
           this.getList()
         })
       })
+    },
+    handleViewAnswer(row) {
+      this.currentQuestion = { ...row }
+      this.answerOpen = true
     },
     handleRegenerate(row) {
       regenerateQuestionAnswer(row.questionId).then(res => {
@@ -254,6 +290,74 @@ export default {
 
 .danger-text {
   color: #d25d50;
+}
+
+.answer-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.answer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(103, 216, 219, 0.18);
+}
+
+.answer-head strong {
+  color: #203544;
+  font-size: 18px;
+}
+
+.answer-block {
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(106, 216, 218, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 251, 255, 0.92));
+}
+
+.answer-block span {
+  display: block;
+  margin-bottom: 10px;
+  color: #1f998c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.answer-block p {
+  margin: 0;
+  color: #566b79;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.answer-rich {
+  color: #46606f;
+  line-height: 1.8;
+}
+
+.answer-rich :deep(h2),
+.answer-rich :deep(h3),
+.answer-rich :deep(h4) {
+  margin: 14px 0 10px;
+  color: #173848;
+  font-weight: 700;
+}
+
+.answer-rich :deep(p) {
+  margin: 0 0 10px;
+}
+
+.answer-rich :deep(ul),
+.answer-rich :deep(ol) {
+  margin: 8px 0 10px 18px;
+  padding: 0;
+}
+
+.answer-rich :deep(li) {
+  margin-bottom: 6px;
 }
 
 @media (max-width: 900px) {

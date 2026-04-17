@@ -20,13 +20,6 @@
       </div>
     </section>
 
-    <section class="guide-panel">
-      <div v-for="item in guideItems" :key="item.title" class="guide-item">
-        <strong>{{ item.title }}</strong>
-        <span>{{ item.desc }}</span>
-      </div>
-    </section>
-
     <section class="toolbar-card">
       <el-form ref="queryForm" :model="queryParams" inline size="small">
         <el-form-item label="通知标题">
@@ -51,7 +44,7 @@
         </el-form-item>
       </el-form>
 
-      <div class="quick-actions">
+      <div v-if="canCreateNotice" class="quick-actions">
         <el-button type="primary" plain size="small" @click="handleAdd">新建通知</el-button>
       </div>
     </section>
@@ -82,10 +75,10 @@
       </el-table-column>
       <el-table-column label="操作" width="280" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" @click="handlePreview(scope.row)">预览</el-button>
-          <el-button size="mini" type="text" @click="handleReadUsers(scope.row)">已读情况</el-button>
-          <el-button size="mini" type="text" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="text" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button size="mini" type="text" @click="handlePreview(scope.row)">{{ previewActionText }}</el-button>
+          <el-button v-if="canViewReadUsers" size="mini" type="text" @click="handleReadUsers(scope.row)">已读情况</el-button>
+          <el-button v-if="canEditNotice" size="mini" type="text" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-if="canDeleteNotice" size="mini" type="text" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -187,11 +180,6 @@ export default {
       readOpen: false,
       readLoading: false,
       readUserList: [],
-      guideItems: [
-        { title: '课程通知', desc: '用于发布开课时间、教室调整、授课教师安排和上课提醒。' },
-        { title: '报名提醒', desc: '适用于发送报名确认、材料准备、活动签到等课后服务消息。' },
-        { title: '运营联动', desc: '切换不同角色后，可查看顶部通知、已读记录和管理发布流程。' }
-      ],
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -211,6 +199,24 @@ export default {
   computed: {
     publishedCount() {
       return this.noticeList.filter(item => item.status === '0').length
+    },
+    previewActionText() {
+      if (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')) {
+        return '查看'
+      }
+      return '预览'
+    },
+    canViewReadUsers() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher')
+    },
+    canEditNotice() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher')
+    },
+    canCreateNotice() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher')
+    },
+    canDeleteNotice() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher')
     }
   },
   created() {
@@ -424,26 +430,6 @@ export default {
   font-size: 28px;
 }
 
-.guide-panel {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.guide-item strong {
-  display: block;
-  margin-bottom: 8px;
-  color: #1c4150;
-}
-
-.guide-item span {
-  color: #688090;
-  line-height: 1.8;
-  font-size: 14px;
-}
-
 .toolbar-card {
   position: relative;
   z-index: 1;
@@ -597,7 +583,6 @@ export default {
     align-items: stretch;
   }
 
-  .guide-panel,
   .hero-stats {
     grid-template-columns: 1fr;
   }

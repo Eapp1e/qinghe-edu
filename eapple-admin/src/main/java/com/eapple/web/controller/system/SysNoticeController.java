@@ -62,7 +62,7 @@ public class SysNoticeController extends BaseController
     /**
      * 鏂板閫氱煡鍏憡
      */
-    @PreAuthorize("@ss.hasPermi('system:notice:add')")
+    @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
     @Log(title = "閫氱煡鍏憡", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysNotice notice)
@@ -74,7 +74,7 @@ public class SysNoticeController extends BaseController
     /**
      * 淇敼閫氱煡鍏憡
      */
-    @PreAuthorize("@ss.hasPermi('system:notice:edit')")
+    @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
     @Log(title = "閫氱煡鍏憡", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysNotice notice)
@@ -126,7 +126,7 @@ public class SysNoticeController extends BaseController
     /**
      * 宸茶鐢ㄦ埛鍒楄〃鏁版嵁
      */
-    @PreAuthorize("@ss.hasPermi('system:notice:list')")
+    @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
     @GetMapping("/readUsers/list")
     @ResponseBody
     public TableDataInfo readUsersList(Long noticeId, String searchValue)
@@ -139,7 +139,7 @@ public class SysNoticeController extends BaseController
     /**
      * 鍒犻櫎閫氱煡鍏憡
      */
-    @PreAuthorize("@ss.hasPermi('system:notice:remove')")
+    @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
     @Log(title = "閫氱煡鍏憡", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
     public AjaxResult remove(@PathVariable Long[] noticeIds)

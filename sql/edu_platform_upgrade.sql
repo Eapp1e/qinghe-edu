@@ -197,6 +197,10 @@ update sys_menu set parent_id = 0, order_num = 5, path = 'edu/question', route_n
 update sys_menu set menu_name = 'AI中心', parent_id = 0, order_num = 6, path = 'edu/ai-center', component = 'edu/aiCenter/index', route_name = 'EduAiCenter', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3006;
 update sys_menu set parent_id = 0, order_num = 7, path = 'edu/platform-user', route_name = 'EduPlatformUser', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3007;
 update sys_menu set parent_id = 0, order_num = 8, path = 'edu/platform-notice', route_name = 'EduPlatformNotice', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3008;
+
+insert ignore into sys_role_menu(role_id, menu_id) values (102, 3008);
+insert ignore into sys_role_menu(role_id, menu_id) values (103, 3008);
+insert ignore into sys_role_menu(role_id, menu_id) values (104, 3008);
 update sys_menu set icon = 'chart', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3001;
 update sys_menu set icon = 'education', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3002;
 update sys_menu set icon = 'user', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3003;

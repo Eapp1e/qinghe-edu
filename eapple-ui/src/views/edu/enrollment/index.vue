@@ -49,16 +49,16 @@
         </template>
       </el-table-column>
       <el-table-column label="学习记录" prop="learningRecord" min-width="220" show-overflow-tooltip />
-      <el-table-column label="操作" width="120">
+      <el-table-column v-if="showActionColumn" label="操作" width="140">
         <template slot-scope="scope">
-          <el-button v-hasPermi="['edu:enrollment:edit']" size="mini" type="text" @click="handleUpdate(scope.row)">维护</el-button>
+          <el-button v-if="canEditEnrollment" size="mini" type="text" @click="handleUpdate(scope.row)">{{ actionButtonText }}</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog title="维护学习记录" :visible.sync="open" width="620px">
+    <el-dialog :title="dialogTitle" :visible.sync="open" width="620px">
       <el-form :model="form" label-width="90px">
         <el-form-item label="状态">
           <el-radio-group v-model="form.status">
@@ -100,6 +100,21 @@ export default {
   computed: {
     finishedCount() {
       return this.enrollmentList.filter(item => item.status === '1').length
+    },
+    showActionColumn() {
+      return !this.$auth.hasRole('edu_student')
+    },
+    actionButtonText() {
+      if (this.$auth.hasRole('edu_parent')) {
+        return '填写学习记录'
+      }
+      return '维护'
+    },
+    canEditEnrollment() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher') || this.$auth.hasRole('edu_parent')
+    },
+    dialogTitle() {
+      return this.$auth.hasRole('edu_parent') ? '填写学习记录' : '维护学习记录'
     }
   },
   created() {
