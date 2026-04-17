@@ -110,6 +110,13 @@ select * from (
   select 101, 3006 union all
   select 101, 3007 union all
   select 101, 3008 union all
+  select 101, 1000 union all
+  select 101, 1001 union all
+  select 101, 1002 union all
+  select 101, 1003 union all
+  select 101, 1006 union all
+  select 101, 101 union all
+  select 101, 1007 union all
   select 101, 3010 union all
   select 101, 3011 union all
   select 101, 3012 union all

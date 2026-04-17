@@ -15,3 +15,19 @@ export function listMyAiLog(query) {
     params: query
   })
 }
+
+export function getAiLogSummary(query) {
+  return request({
+    url: '/edu/aiLog/summary',
+    method: 'get',
+    params: query
+  })
+}
+
+export function getMyAiLogSummary(query) {
+  return request({
+    url: '/edu/aiLog/mySummary',
+    method: 'get',
+    params: query
+  })
+}

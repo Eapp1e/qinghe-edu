@@ -1,6 +1,7 @@
 package com.eapple.web.controller.edu;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,5 +36,21 @@ public class EduAiLogController extends BaseController
         startPage();
         List<EduAiLog> list = aiLogService.selectCurrentUserLogs(log);
         return getDataTable(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:ai:list')")
+    @GetMapping("/summary")
+    public AjaxResult summary(EduAiLog log)
+    {
+        Map<String, Long> summary = aiLogService.getAiLogSummary(log);
+        return AjaxResult.success(summary);
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:ai:list')")
+    @GetMapping("/mySummary")
+    public AjaxResult mySummary(EduAiLog log)
+    {
+        Map<String, Long> summary = aiLogService.getCurrentUserAiLogSummary(log);
+        return AjaxResult.success(summary);
     }
 }

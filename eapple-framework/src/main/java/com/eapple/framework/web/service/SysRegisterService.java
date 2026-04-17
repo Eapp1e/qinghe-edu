@@ -1,5 +1,6 @@
 package com.eapple.framework.web.service;
 
+import java.util.regex.Pattern;
 import com.eapple.common.constant.CacheConstants;
 import com.eapple.common.constant.Constants;
 import com.eapple.common.constant.UserConstants;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SysRegisterService
 {
+    private static final Pattern REGISTER_USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
+
     @Autowired
     private ISysUserService userService;
 
@@ -72,6 +75,10 @@ public class SysRegisterService
         {
             msg = "账户长度必须在2到20个字符之间";
         }
+        else if (!REGISTER_USERNAME_PATTERN.matcher(username).matches())
+        {
+            msg = "注册账号只能由字母和数字组成";
+        }
         else if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
                 || password.length() > UserConstants.PASSWORD_MAX_LENGTH)
         {
@@ -88,7 +95,7 @@ public class SysRegisterService
             {
                 return "请选择有效的注册身份";
             }
-            sysUser.setNickName(username);
+            sysUser.setNickName("待完善资料");
             sysUser.setPwdUpdateDate(DateUtils.getNowDate());
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
             boolean regFlag = userService.registerUser(sysUser);

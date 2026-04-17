@@ -133,12 +133,14 @@
       @closed="resetRegisterForm"
     >
       <div class="register-dialog__intro">
-        <strong>创建新账号</strong>
-        <span>支持学生、家长和教师自助注册，注册成功后可直接返回登录。</span>
+        <span>支持学生、家长和教师自助注册，账号仅支持字母和数字，真实姓名请在对应档案中完善。</span>
       </div>
 
-      <el-form ref="registerForm" :model="registerForm" :rules="registerRules" label-position="top">
-        <el-form-item label="注册身份" prop="loginRole">
+      <el-form ref="registerForm" :model="registerForm" :rules="registerRules" label-position="top" :hide-required-asterisk="true">
+        <el-form-item prop="loginRole">
+          <template slot="label">
+            <span class="required-label"><i>*</i> 注册身份</span>
+          </template>
           <div class="register-role-grid">
             <button
               v-for="item in registerRoleOptions"
@@ -149,16 +151,21 @@
               @click="selectRegisterRole(item.value)"
             >
               <strong>{{ item.label }}</strong>
-              <span>{{ item.desc }}</span>
             </button>
           </div>
         </el-form-item>
 
-        <el-form-item label="账号" prop="username">
-          <el-input v-model="registerForm.username" placeholder="请输入注册账号" />
+        <el-form-item prop="username">
+          <template slot="label">
+            <span class="required-label"><i>*</i> 账号</span>
+          </template>
+          <el-input v-model.trim="registerForm.username" placeholder="请输入字母或数字账号" maxlength="20" />
         </el-form-item>
 
-        <el-form-item label="密码" prop="password">
+        <el-form-item prop="password">
+          <template slot="label">
+            <span class="required-label"><i>*</i> 密码</span>
+          </template>
           <el-input
             v-model="registerForm.password"
             :type="registerPasswordVisible ? 'text' : 'password'"
@@ -174,7 +181,10 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item label="确认密码" prop="confirmPassword">
+        <el-form-item prop="confirmPassword">
+          <template slot="label">
+            <span class="required-label"><i>*</i> 确认密码</span>
+          </template>
           <el-input
             v-model="registerForm.confirmPassword"
             :type="registerConfirmVisible ? 'text' : 'password'"
@@ -192,7 +202,7 @@
       </el-form>
 
       <div class="register-tip">
-        注册后将自动绑定所选身份，管理员账号仍需由平台统一创建。
+        注册后将自动绑定所选身份，真实姓名请到学生档案或对应资料页完善，管理员账号仍需由平台统一创建。
       </div>
 
       <div slot="footer" class="dialog-footer">
@@ -219,6 +229,21 @@ import defaultSettings from '@/settings'
 export default {
   name: 'Login',
   data() {
+    const validateRegisterUsername = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入注册账号'))
+        return
+      }
+      if (!/^[A-Za-z0-9]+$/.test(value)) {
+        callback(new Error('账号只能由字母和数字组成'))
+        return
+      }
+      if (value.length < 2 || value.length > 20) {
+        callback(new Error('账号长度必须在 2 到 20 个字符之间'))
+        return
+      }
+      callback()
+    }
     const validateConfirmPassword = (rule, value, callback) => {
       if (!value) {
         callback(new Error('请再次输入密码'))
@@ -268,7 +293,7 @@ export default {
       },
       registerRules: {
         loginRole: [{ required: true, trigger: 'change', message: '请选择注册身份' }],
-        username: [{ required: true, trigger: 'blur', message: '请输入注册账号' }],
+        username: [{ validator: validateRegisterUsername, trigger: 'blur' }],
         password: [
           { required: true, trigger: 'blur', message: '请输入登录密码' },
           { min: 5, max: 20, trigger: 'blur', message: '密码长度必须在 5 到 20 个字符之间' }
@@ -1045,13 +1070,32 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   color: #597182;
+  padding: 14px 16px;
+  border: 1px solid rgba(118, 210, 214, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(247, 253, 252, 0.96), rgba(239, 248, 247, 0.92));
 }
 
 .register-dialog__intro strong {
   color: #203646;
   font-size: 18px;
+}
+
+.required-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #334c5c;
+  font-weight: 700;
+}
+
+.required-label i {
+  color: #f05a54;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 1;
 }
 
 .register-role-grid {
@@ -1063,33 +1107,37 @@ export default {
 .register-role {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
-  min-height: 92px;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
   padding: 14px 12px;
   border: 1px solid rgba(78, 181, 177, 0.18);
   border-radius: 18px;
   background: rgba(244, 252, 252, 0.88);
   color: #436273;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  position: relative;
 }
 
 .register-role strong {
   color: #203646;
-  font-size: 14px;
-}
-
-.register-role span {
-  line-height: 1.5;
-  font-size: 12px;
+  font-size: 15px;
+  text-align: center;
 }
 
 .register-role:hover,
 .register-role.active {
-  border-color: rgba(16, 185, 129, 0.5);
-  box-shadow: 0 16px 28px rgba(24, 153, 144, 0.14);
+  border-color: rgba(16, 185, 129, 0.86);
+  background: linear-gradient(135deg, rgba(25, 214, 177, 0.18), rgba(84, 193, 255, 0.2));
+  box-shadow:
+    0 18px 32px rgba(24, 153, 144, 0.18),
+    0 0 0 3px rgba(16, 185, 129, 0.12);
   transform: translateY(-2px);
+}
+
+.register-role.active strong {
+  color: #0f5f63;
 }
 
 .register-tip {

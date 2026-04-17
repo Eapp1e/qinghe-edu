@@ -54,7 +54,11 @@
 
     <el-table v-loading="loading" :data="userList" class="content-table">
       <el-table-column label="账号" prop="userName" min-width="140" />
-      <el-table-column label="姓名" prop="nickName" min-width="120" />
+      <el-table-column label="姓名" min-width="120">
+        <template slot-scope="scope">
+          {{ resolveDisplayName(scope.row) }}
+        </template>
+      </el-table-column>
       <el-table-column label="角色类型" min-width="120">
         <template slot-scope="scope">
           <el-tag size="small" :type="roleTagType(resolveRoleLabel(scope.row))">
@@ -63,11 +67,6 @@
         </template>
       </el-table-column>
       <el-table-column label="联系方式" prop="phonenumber" min-width="130" />
-      <el-table-column label="所属部门" min-width="130">
-        <template slot-scope="scope">
-          {{ scope.row.dept && scope.row.dept.deptName ? scope.row.dept.deptName : '-' }}
-        </template>
-      </el-table-column>
       <el-table-column label="状态" width="100" align="center">
         <template slot-scope="scope">
           <el-switch
@@ -160,6 +159,7 @@
 <script>
 import { addUser, changeUserStatus, delUser, getUser, listUser, resetUserPwd, updateUser } from '@/api/system/user'
 import { listRole } from '@/api/system/role'
+import { listStudent } from '@/api/edu/student'
 
 export default {
   name: 'EduPlatformUserPage',
@@ -169,6 +169,7 @@ export default {
       open: false,
       total: 0,
       userList: [],
+      studentProfiles: [],
       allRoles: [],
       dialogTitle: '新增平台用户',
       queryParams: {
@@ -215,21 +216,38 @@ export default {
     }
   },
   created() {
-    this.getRoleOptions()
-    this.getList()
+    Promise.all([this.getRoleOptions(), this.getStudentProfiles()]).finally(() => {
+      this.getList()
+    })
   },
   methods: {
     getRoleOptions() {
-      listRole({ pageNum: 1, pageSize: 100 }).then(res => {
+      return listRole({ pageNum: 1, pageSize: 100 }).then(res => {
         this.allRoles = res.rows || []
+      })
+    },
+    getStudentProfiles() {
+      return listStudent({ pageNum: 1, pageSize: 500 }).then(res => {
+        this.studentProfiles = res.rows || []
       })
     },
     getList() {
       this.loading = true
-      listUser(this.queryParams).then(res => {
+      const requestParams = {
+        ...this.queryParams,
+        pageNum: 1,
+        pageSize: 500
+      }
+      listUser(requestParams).then(async res => {
         const rows = res.rows || []
-        this.userList = rows.filter(item => !item.userName || item.userName === 'admin' || item.userName.startsWith('edu_'))
-        this.total = this.userList.length
+        const filteredRows = rows
+          .filter(item => this.isEduPlatformUser(item))
+          .sort((a, b) => (a.userId || 0) - (b.userId || 0))
+        this.total = filteredRows.length
+        const start = (this.queryParams.pageNum - 1) * this.queryParams.pageSize
+        const end = start + this.queryParams.pageSize
+        const pageRows = filteredRows.slice(start, end)
+        this.userList = await this.enrichUserRoles(pageRows)
       }).finally(() => {
         this.loading = false
       })
@@ -258,11 +276,77 @@ export default {
       }
     },
     resolveRoleLabel(row) {
-      if (row.userName === 'admin' || row.userName === 'edu_admin') return '平台管理员'
-      if (row.userName === 'edu_teacher') return '教师'
-      if (row.userName === 'edu_parent') return '家长'
-      if (row.userName === 'edu_student') return '学生'
-      return '平台用户'
+      const roleKeys = this.extractRoleKeys(row)
+      const remark = row.remark || ''
+      const hasStudentProfile = this.studentProfiles.some(item => Number(item.studentUserId) === Number(row.userId))
+      const hasParentProfile = this.studentProfiles.some(item => Number(item.parentUserId) === Number(row.userId))
+
+      if (row.userName === 'admin' || roleKeys.includes('admin') || roleKeys.includes('edu_admin') || remark.includes('管理员')) {
+        return '平台管理员'
+      }
+      if (roleKeys.includes('edu_teacher') || (row.userName && row.userName.startsWith('edu_teacher')) || remark.includes('教师')) {
+        return '教师'
+      }
+      if (roleKeys.includes('edu_parent') || (row.userName && row.userName.startsWith('edu_parent')) || hasParentProfile || remark.includes('家长')) {
+        return '家长'
+      }
+      if (roleKeys.includes('edu_student') || (row.userName && row.userName.startsWith('edu_student')) || hasStudentProfile || remark.includes('学生')) {
+        return '学生'
+      }
+      return '学生'
+    },
+    resolveDisplayName(row) {
+      const roleKeys = this.extractRoleKeys(row)
+      const profile = this.studentProfiles.find(item => Number(item.studentUserId) === Number(row.userId))
+      if (profile && profile.studentName) {
+        return profile.studentName
+      }
+      if (roleKeys.includes('edu_parent')) {
+        const parentProfile = this.studentProfiles.find(item => Number(item.parentUserId) === Number(row.userId) && item.parentName)
+        if (parentProfile && parentProfile.parentName) {
+          return parentProfile.parentName
+        }
+      }
+      return row.nickName || row.userName || '--'
+    },
+    isEduPlatformUser(row) {
+      if (!row) return false
+      if (['ry', 'xiaozhi'].includes(row.userName)) return false
+      if (row.userName === 'admin') return true
+      const roleKeys = this.extractRoleKeys(row)
+      if (roleKeys.some(key => ['admin', 'edu_admin', 'edu_teacher', 'edu_parent', 'edu_student'].includes(key))) {
+        return true
+      }
+      if (Number(row.userId) >= 110) {
+        return true
+      }
+      if (Number(row.deptId) === 103) {
+        return true
+      }
+      if (row.userName && /^edu_/.test(row.userName)) {
+        return true
+      }
+      return false
+    },
+    extractRoleKeys(row) {
+      const roles = Array.isArray(row.roles) ? row.roles : []
+      return roles.map(item => item.roleKey).filter(Boolean)
+    },
+    async enrichUserRoles(rows) {
+      const results = await Promise.all(rows.map(async item => {
+        try {
+          const res = await getUser(item.userId)
+          const roleIds = res.roleIds || []
+          const roles = this.allRoles.filter(role => roleIds.includes(role.roleId))
+          return {
+            ...item,
+            roles
+          }
+        } catch (error) {
+          return item
+        }
+      }))
+      return results
     },
     roleTagType(label) {
       if (label.includes('管理员')) return 'danger'

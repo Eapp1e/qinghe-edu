@@ -17,7 +17,7 @@
         </div>
         <div class="stat-card">
           <span>最近调用</span>
-          <strong>{{ total }}</strong>
+          <strong>{{ summaryTotal }}</strong>
         </div>
       </div>
     </section>
@@ -61,7 +61,7 @@
       <div class="overview-card compact-card">
         <span class="card-badge">Usage Snapshot</span>
         <h3>{{ pageConfig.snapshotTitle }}</h3>
-        <div class="mini-stats">
+        <div class="mini-stats mini-stats-dual">
           <div>
             <strong>{{ successCount }}</strong>
             <span>成功调用</span>
@@ -69,10 +69,6 @@
           <div>
             <strong>{{ failedCount }}</strong>
             <span>失败调用</span>
-          </div>
-          <div>
-            <strong>{{ mockCount }}</strong>
-            <span>模拟调用</span>
           </div>
         </div>
         <p class="compact-copy">{{ pageConfig.snapshotTip }}</p>
@@ -94,7 +90,7 @@
           <h3>{{ pageConfig.logTitle }}</h3>
           <p>{{ pageConfig.logDescription }}</p>
         </div>
-        <el-button size="mini" icon="el-icon-refresh" @click="getLogList">刷新</el-button>
+        <el-button size="mini" icon="el-icon-refresh" @click="refreshData">刷新</el-button>
       </div>
 
       <el-table v-loading="loading" :data="aiLogList" class="content-table">
@@ -155,7 +151,7 @@
 
 <script>
 import { listAiModels, getCurrentAiModel, updateCurrentAiModel } from '@/api/edu/ai'
-import { listAiLog, listMyAiLog } from '@/api/edu/aiLog'
+import { listAiLog, listMyAiLog, getAiLogSummary, getMyAiLogSummary } from '@/api/edu/aiLog'
 import { renderAiContentHtml, stripAiMarkdown } from '@/utils/aiContent'
 
 export default {
@@ -165,6 +161,11 @@ export default {
       loading: false,
       total: 0,
       aiLogList: [],
+      summaryData: {
+        total: 0,
+        success: 0,
+        failed: 0
+      },
       queryParams: {
         pageNum: 1,
         pageSize: 6
@@ -197,14 +198,14 @@ export default {
       const current = this.aiModelOptions.find(item => item.modelName === this.currentAiModel)
       return current ? current.displayName : (this.currentAiModel || '未设置')
     },
+    summaryTotal() {
+      return this.summaryData.total || 0
+    },
     successCount() {
-      return this.aiLogList.filter(item => item.status === 'success').length
+      return this.summaryData.success || 0
     },
     failedCount() {
-      return this.aiLogList.filter(item => item.status === 'failed').length
-    },
-    mockCount() {
-      return this.aiLogList.filter(item => item.status === 'mock').length
+      return this.summaryData.failed || 0
     },
     showRoleColumn() {
       return this.isAdminView
@@ -272,7 +273,7 @@ export default {
   },
   created() {
     this.getAiModelConfig()
-    this.getLogList()
+    this.refreshData()
   },
   methods: {
     getModelCacheKey() {
@@ -310,13 +311,29 @@ export default {
         this.loading = false
       })
     },
+    getLogSummary() {
+      const request = this.isAdminView
+        ? getAiLogSummary()
+        : getMyAiLogSummary()
+      request.then(res => {
+        this.summaryData = {
+          total: (res.data && res.data.total) || 0,
+          success: (res.data && res.data.success) || 0,
+          failed: (res.data && res.data.failed) || 0
+        }
+      })
+    },
+    refreshData() {
+      this.getLogList()
+      this.getLogSummary()
+    },
     handleModelChange(modelName) {
       updateCurrentAiModel(modelName).then(() => {
         this.currentAiModel = modelName
         this.saveLocalModel(modelName)
         const current = this.aiModelOptions.find(item => item.modelName === modelName)
         this.$modal.msgSuccess(`已切换到 ${current ? current.displayName : modelName}`)
-        this.getLogList()
+        this.refreshData()
       })
     },
     statusTagType(status) {
@@ -680,6 +697,10 @@ export default {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin: 18px 0 16px;
+}
+
+.mini-stats-dual {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .mini-stats strong {
