@@ -277,9 +277,7 @@ export default {
         featureTitle: '学习辅助能力',
         features: [
           { label: '作业问题解答', path: '/edu/question' },
-          { label: '课程推荐理由', path: '/edu/student' },
-          { label: '学习思路提示', path: '/edu/question' },
-          { label: '课后知识理解', path: '/edu/course' }
+          { label: '课程推荐理由', path: '/edu/student' }
         ],
         logTitle: '我的最近 AI 使用',
         logDescription: '展示当前学生账号最近的 AI 调用记录，便于回看作业问答与学习辅助内容。'

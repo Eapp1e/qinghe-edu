@@ -26,13 +26,21 @@ const state = {
   cachedViews: [],
   iframeViews: []
 }
+function resolveViewTitle(view) {
+  const defaultTitle = (view.meta && view.meta.title) || 'no-name'
+  const roles = store.getters.roles || []
+  if (defaultTitle === '\u62a5\u540d\u8bb0\u5f55' && (roles.includes('edu_student') || roles.includes('edu_parent'))) {
+    return '\u5b66\u4e60\u8bb0\u5f55'
+  }
+  return defaultTitle
+}
 
 const mutations = {
   ADD_IFRAME_VIEW: (state, view) => {
     if (state.iframeViews.some(v => v.path === view.path)) return
     state.iframeViews.push(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: resolveViewTitle(view)
       })
     )
   },
@@ -40,7 +48,7 @@ const mutations = {
     if (state.visitedViews.some(v => v.path === view.path)) return
     state.visitedViews.push(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: resolveViewTitle(view)
       })
     )
     saveVisitedViews(state.visitedViews)
@@ -49,7 +57,7 @@ const mutations = {
     if (state.visitedViews.some(v => v.path === view.path)) return
     state.visitedViews.unshift(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: resolveViewTitle(view)
       })
     )
   },
@@ -105,7 +113,7 @@ const mutations = {
   UPDATE_VISITED_VIEW: (state, view) => {
     for (let v of state.visitedViews) {
       if (v.path === view.path) {
-        v = Object.assign(v, view)
+        v = Object.assign(v, view, { title: resolveViewTitle(view) })
         break
       }
     }
@@ -258,7 +266,7 @@ const actions = {
       resolve([...state.visitedViews])
     })
   },
-  // 恢复持久化的 tags
+  // 鎭㈠鎸佷箙鍖栫殑 tags
   loadPersistedViews({ commit }) {
     const views = loadVisitedViews()
     views.forEach(view => {

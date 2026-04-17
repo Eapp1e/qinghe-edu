@@ -1,18 +1,18 @@
-﻿<template>
+<template>
   <div class="app-container enrollment-page">
     <section class="hero-panel">
       <div class="hero-copy">
-        <span class="hero-badge">Enrollment Tracker</span>
-        <h1>报名记录</h1>
-        <p>集中查看学生报名状态、课程归属、教师安排与学习记录，帮助教师、家长和管理员快速跟踪课后服务参与情况。</p>
+        <span class="hero-badge">{{ pageBadge }}</span>
+        <h1>{{ pageTitle }}</h1>
+        <p>{{ pageDescription }}</p>
       </div>
       <div class="hero-stats">
         <div class="stat-card">
-          <span>报名总数</span>
+          <span>&#25253;&#21517;&#24635;&#25968;</span>
           <strong>{{ total }}</strong>
         </div>
         <div class="stat-card">
-          <span>已完成</span>
+          <span>&#24050;&#23436;&#25104;</span>
           <strong>{{ finishedCount }}</strong>
         </div>
       </div>
@@ -20,18 +20,18 @@
 
     <section class="toolbar-panel">
       <el-form :inline="true" :model="queryParams" size="small" v-show="showSearch" class="query-form">
-        <el-form-item label="学生姓名">
-          <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="getList" />
+        <el-form-item :label="'\u5b66\u751f\u59d3\u540d'">
+          <el-input v-model="queryParams.studentName" :placeholder="'\u8bf7\u8f93\u5165\u5b66\u751f\u59d3\u540d'" clearable @keyup.enter.native="getList" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryParams.status" clearable placeholder="请选择状态">
-            <el-option label="已报名" value="0" />
-            <el-option label="已完成" value="1" />
+        <el-form-item :label="'\u72b6\u6001'">
+          <el-select v-model="queryParams.status" clearable :placeholder="'\u8bf7\u9009\u62e9\u72b6\u6001'">
+            <el-option :label="'\u5df2\u62a5\u540d'" value="0" />
+            <el-option :label="'\u5df2\u5b8c\u6210'" value="1" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="mini" icon="el-icon-search" @click="getList">搜索</el-button>
-          <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-search" @click="getList">&#25628;&#32034;</el-button>
+          <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">&#37325;&#32622;</el-button>
         </el-form-item>
       </el-form>
 
@@ -39,17 +39,17 @@
     </section>
 
     <el-table v-loading="loading" :data="enrollmentList" class="content-table">
-      <el-table-column label="课程" prop="courseName" min-width="150" />
-      <el-table-column label="学生" prop="studentName" width="120" />
-      <el-table-column label="家长" prop="parentName" width="120" />
-      <el-table-column label="教师" prop="teacherName" width="120" />
-      <el-table-column label="状态" width="100">
+      <el-table-column :label="'\u8bfe\u7a0b'" prop="courseName" min-width="150" />
+      <el-table-column :label="'\u5b66\u751f'" prop="studentName" width="120" />
+      <el-table-column :label="'\u5bb6\u957f'" prop="parentName" width="120" />
+      <el-table-column :label="'\u6559\u5e08'" prop="teacherName" width="120" />
+      <el-table-column :label="'\u72b6\u6001'" width="100">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status === '1' ? 'success' : 'warning'">{{ scope.row.status === '1' ? '已完成' : '已报名' }}</el-tag>
+          <el-tag :type="scope.row.status === '1' ? 'success' : 'warning'">{{ scope.row.status === '1' ? '\u5df2\u5b8c\u6210' : '\u5df2\u62a5\u540d' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="学习记录" prop="learningRecord" min-width="220" show-overflow-tooltip />
-      <el-table-column v-if="showActionColumn" label="操作" width="140">
+      <el-table-column :label="'\u5b66\u4e60\u8bb0\u5f55'" prop="learningRecord" min-width="220" show-overflow-tooltip />
+      <el-table-column v-if="showActionColumn" :label="'\u64cd\u4f5c'" width="140">
         <template slot-scope="scope">
           <el-button v-if="canEditEnrollment" size="mini" type="text" @click="handleUpdate(scope.row)">{{ actionButtonText }}</el-button>
         </template>
@@ -60,22 +60,22 @@
 
     <el-dialog :title="dialogTitle" :visible.sync="open" width="620px">
       <el-form :model="form" label-width="90px">
-        <el-form-item label="状态">
+        <el-form-item :label="'\u72b6\u6001'">
           <el-radio-group v-model="form.status">
-            <el-radio label="0">已报名</el-radio>
-            <el-radio label="1">已完成</el-radio>
+            <el-radio label="0">{{ '\u5df2\u62a5\u540d' }}</el-radio>
+            <el-radio label="1">{{ '\u5df2\u5b8c\u6210' }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="学习记录">
+        <el-form-item :label="'\u5b66\u4e60\u8bb0\u5f55'">
           <el-input v-model="form.learningRecord" type="textarea" :rows="4" />
         </el-form-item>
-        <el-form-item label="互动总结">
+        <el-form-item :label="'\u4e92\u52a8\u603b\u7ed3'">
           <el-input v-model="form.interactionSummary" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="submitForm">确定</el-button>
-        <el-button @click="open = false">取消</el-button>
+        <el-button type="primary" @click="submitForm">&#30830;&#23450;</el-button>
+        <el-button @click="open = false">&#21462;&#28040;</el-button>
       </div>
     </el-dialog>
   </div>
@@ -98,6 +98,21 @@ export default {
     }
   },
   computed: {
+    isStudentOrParent() {
+      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+    },
+    pageTitle() {
+      return this.isStudentOrParent ? '\u5b66\u4e60\u8bb0\u5f55' : '\u62a5\u540d\u8bb0\u5f55'
+    },
+    pageBadge() {
+      return this.isStudentOrParent ? 'Learning Record' : 'Enrollment Tracker'
+    },
+    pageDescription() {
+      if (this.isStudentOrParent) {
+        return '\u96c6\u4e2d\u67e5\u770b\u8bfe\u7a0b\u53c2\u4e0e\u72b6\u6001\u3001\u5b66\u4e60\u8bb0\u5f55\u4e0e\u6210\u957f\u53cd\u9988\uff0c\u5e2e\u52a9\u5b66\u751f\u548c\u5bb6\u957f\u66f4\u6e05\u6670\u5730\u4e86\u89e3\u8bfe\u540e\u670d\u52a1\u5b66\u4e60\u8fdb\u5c55\u3002'
+      }
+      return '\u96c6\u4e2d\u67e5\u770b\u5b66\u751f\u62a5\u540d\u72b6\u6001\u3001\u8bfe\u7a0b\u5f52\u5c5e\u3001\u6559\u5e08\u5b89\u6392\u4e0e\u5b66\u4e60\u8bb0\u5f55\uff0c\u5e2e\u52a9\u6559\u5e08\u3001\u5bb6\u957f\u548c\u7ba1\u7406\u5458\u5feb\u901f\u8ddf\u8e2a\u8bfe\u540e\u670d\u52a1\u53c2\u4e0e\u60c5\u51b5\u3002'
+    },
     finishedCount() {
       return this.enrollmentList.filter(item => item.status === '1').length
     },
@@ -106,15 +121,15 @@ export default {
     },
     actionButtonText() {
       if (this.$auth.hasRole('edu_parent')) {
-        return '填写学习记录'
+        return '\u586b\u5199\u5b66\u4e60\u8bb0\u5f55'
       }
-      return '维护'
+      return '\u7ef4\u62a4'
     },
     canEditEnrollment() {
       return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher') || this.$auth.hasRole('edu_parent')
     },
     dialogTitle() {
-      return this.$auth.hasRole('edu_parent') ? '填写学习记录' : '维护学习记录'
+      return this.$auth.hasRole('edu_parent') ? '\u586b\u5199\u5b66\u4e60\u8bb0\u5f55' : '\u7ef4\u62a4\u5b66\u4e60\u8bb0\u5f55'
     }
   },
   created() {
@@ -139,7 +154,7 @@ export default {
     },
     submitForm() {
       updateEnrollment(this.form).then(() => {
-        this.$modal.msgSuccess('保存成功')
+        this.$modal.msgSuccess('\u4fdd\u5b58\u6210\u529f')
         this.open = false
         this.getList()
       })

@@ -3,14 +3,14 @@
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path, onlyOneChild.query)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
-          <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="onlyOneChild.meta.title" />
+          <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="resolveTitle(onlyOneChild)" />
         </el-menu-item>
       </app-link>
     </template>
 
     <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
-        <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
+        <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="resolveTitle(item)" />
       </template>
       <sidebar-item
         v-for="(child, index) in item.children"
@@ -36,7 +36,6 @@ export default {
   components: { Item, AppLink },
   mixins: [FixiOSBug],
   props: {
-    // route object
     item: {
       type: Object,
       required: true
@@ -63,19 +62,16 @@ export default {
         if (item.hidden) {
           return false
         }
-        // Temp set(will be used if only has one showing child)
         this.onlyOneChild = item
         return true
       })
 
-      // When there is only one child router, the child router is displayed by default
       if (showingChildren.length === 1) {
         return true
       }
 
-      // Show parent if there are no child router to display
       if (showingChildren.length === 0) {
-        this.onlyOneChild = { ... parent, path: '', noShowingChildren: true }
+        this.onlyOneChild = { ...parent, path: '', noShowingChildren: true }
         return true
       }
 
@@ -89,10 +85,20 @@ export default {
         return this.basePath
       }
       if (routeQuery) {
-        let query = JSON.parse(routeQuery)
-        return { path: path.resolve(this.basePath, routePath), query: query }
+        const query = JSON.parse(routeQuery)
+        return { path: path.resolve(this.basePath, routePath), query }
       }
       return path.resolve(this.basePath, routePath)
+    },
+    resolveTitle(route) {
+      const defaultTitle = route && route.meta ? route.meta.title : ''
+      if (defaultTitle !== '\u62a5\u540d\u8bb0\u5f55') {
+        return defaultTitle
+      }
+      if (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')) {
+        return '\u5b66\u4e60\u8bb0\u5f55'
+      }
+      return defaultTitle
     }
   }
 }
