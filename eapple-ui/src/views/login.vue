@@ -14,7 +14,7 @@
       <div class="shell-topline"></div>
       <section class="login-intro">
         <p class="eyebrow">After-school Service Platform</p>
-        <h1>中小学智能课后服务平台</h1>
+        <h1 class="intro-title">中小学智能课后服务平台</h1>
         <p class="subtitle">
           面向学校课后服务管理场景，围绕学生、家长、教师与管理员四类角色，
           提供课程发布、在线报名、学习跟踪、作业问答、平台通知与 AI 辅助服务。
@@ -49,58 +49,64 @@
         <div class="form-orbit orbit-a"></div>
         <div class="form-orbit orbit-b"></div>
         <div class="form-head">
-          <span class="form-badge">身份认证</span>
-          <h3>欢迎登录</h3>
-          <p>请选择登录身份，并输入账号与密码进入对应工作台。</p>
+          <span class="form-badge">WELCOME</span>
+          <h3 class="login-title">欢迎登录</h3>
+          <span class="login-title-accent"></span>
         </div>
 
-        <el-form-item prop="loginRole" class="role-selector-item">
-          <div class="role-selector">
-            <button
-              v-for="item in roleOptions"
-              :key="item.value"
-              type="button"
-              class="role-option"
-              :class="{ active: loginForm.loginRole === item.value }"
-              @click="selectRole(item.value)"
-            >
-              <strong>{{ item.label }}</strong>
-            </button>
+        <div class="form-body">
+          <div class="form-section section-roles">
+            <el-form-item prop="loginRole" class="role-selector-item">
+              <div class="role-selector">
+                <button
+                  v-for="item in roleOptions"
+                  :key="item.value"
+                  type="button"
+                  class="role-option"
+                  :class="{ active: loginForm.loginRole === item.value }"
+                  @click="selectRole(item.value)"
+                >
+                  <strong>{{ item.label }}</strong>
+                </button>
+              </div>
+            </el-form-item>
           </div>
-        </el-form-item>
 
-        <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.username"
-            type="text"
-            auto-complete="off"
-            placeholder="请输入账号"
-          >
-            <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
-          </el-input>
-        </el-form-item>
+          <div class="form-section section-account">
+            <el-form-item prop="username" class="field-item">
+              <el-input
+                v-model="loginForm.username"
+                type="text"
+                auto-complete="off"
+                placeholder="请输入账号"
+              >
+                <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+              </el-input>
+            </el-form-item>
 
-        <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.password"
-            :type="passwordVisible ? 'text' : 'password'"
-            auto-complete="off"
-            placeholder="请输入密码"
-            @keyup.enter.native="handleLogin"
-          >
-            <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
-            <span
-              slot="suffix"
-              class="password-toggle"
-              @click="passwordVisible = !passwordVisible"
-            >
-              <svg-icon :icon-class="passwordVisible ? 'eye-open' : 'eye'" class="password-toggle-icon" />
-            </span>
-          </el-input>
-        </el-form-item>
+            <el-form-item prop="password" class="field-item">
+              <el-input
+                v-model="loginForm.password"
+                :type="passwordVisible ? 'text' : 'password'"
+                auto-complete="off"
+                placeholder="请输入密码"
+                @keyup.enter.native="handleLogin"
+              >
+                <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+                <span
+                  slot="suffix"
+                  class="password-toggle"
+                  @click="passwordVisible = !passwordVisible"
+                >
+                  <svg-icon :icon-class="passwordVisible ? 'eye-open' : 'eye'" class="password-toggle-icon" />
+                </span>
+              </el-input>
+            </el-form-item>
 
-        <div class="login-options">
-          <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
+            <div class="login-options">
+              <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
+            </div>
+          </div>
         </div>
 
         <el-form-item style="width: 100%">
@@ -650,21 +656,59 @@ export default {
     0 10px 20px rgba(47, 194, 168, 0.16);
 }
 
-.login-intro h1 {
+.intro-title {
   position: relative;
   z-index: 1;
   margin: 0;
-  color: #15333b;
+  font-family: "STZhongsong", "STSong", "SimSun", "Songti SC", "Noto Serif SC", serif;
+  display: inline-block;
+  max-width: none;
+  white-space: nowrap;
+  padding: 16px 22px 18px 18px;
+  color: #1f2f36;
   font-size: 42px;
-  line-height: 1.2;
-  text-shadow: 0 10px 28px rgba(33, 182, 200, 0.15);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow:
+    0 10px 24px rgba(71, 126, 145, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.intro-title::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid rgba(86, 206, 214, 0.42);
+  border-radius: 28px;
+  background: rgba(205, 246, 248, 0.46);
+  box-shadow:
+    0 18px 36px rgba(74, 180, 192, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -8px 18px rgba(114, 218, 229, 0.14);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+.intro-title::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  right: 18px;
+  height: 38%;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.06));
+  opacity: 0.92;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .subtitle {
   position: relative;
   z-index: 1;
   max-width: 540px;
-  margin: 22px 0 0;
+  margin: 24px 0 0;
   color: #55707a;
   font-size: 16px;
   line-height: 1.9;
@@ -846,42 +890,81 @@ export default {
 }
 
 .form-head {
-  margin-bottom: 26px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(53, 213, 181, 0.16);
+  position: relative;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
 }
 
 .form-badge {
   display: inline-flex;
   align-items: center;
-  padding: 7px 12px;
+  padding: 7px 14px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 183, 60, 0.48), rgba(255, 232, 166, 0.68));
-  color: #9a4f00;
-  font-size: 12px;
+  border: 1px solid rgba(104, 157, 169, 0.26);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(236, 247, 248, 0.58));
+  color: #567786;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 8px 18px rgba(65, 112, 125, 0.08);
+}
+
+.login-title {
+  margin: 16px 0 0;
+  width: fit-content;
+  font-family: "STSong", "SimSun", "Songti SC", "Noto Serif SC", serif;
+  font-size: 40px;
+  line-height: 1.08;
   font-weight: 700;
   letter-spacing: 0.06em;
+  color: #5a8fa2;
+  text-shadow:
+    0 10px 24px rgba(96, 180, 198, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.login-title-accent {
+  display: block;
+  width: 128px;
+  height: 8px;
+  margin-top: 14px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(147, 219, 228, 0.16), rgba(111, 210, 224, 0.94), rgba(147, 219, 228, 0.16));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 10px 20px rgba(255, 165, 36, 0.22);
+    0 10px 22px rgba(82, 188, 205, 0.16),
+    inset 0 1px 0 rgba(243, 253, 255, 0.72);
 }
 
-.form-head h3 {
-  margin: 18px 0 10px;
-  color: #163743;
-  font-size: 32px;
-  letter-spacing: 0.01em;
-  text-shadow: 0 6px 20px rgba(49, 184, 149, 0.14);
+.form-body {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 8px;
 }
 
-.form-head p {
-  margin: 0;
-  color: #5f7482;
-  line-height: 1.7;
+.form-section {
+  padding: 14px;
+  border: 1px solid rgba(123, 216, 221, 0.18);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(236, 251, 255, 0.22));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 24px rgba(62, 145, 160, 0.08);
+}
+
+.section-roles {
+  padding: 12px;
+}
+
+.section-account {
+  padding: 14px 14px 10px;
 }
 
 .role-selector-item {
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .role-selector {
@@ -895,8 +978,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 92px;
-  padding: 12px 16px;
+  min-height: 84px;
+  padding: 10px 16px;
   border: 1px solid rgba(141, 217, 220, 0.36);
   border-radius: 18px;
   background:
@@ -940,9 +1023,17 @@ export default {
 
 .role-option strong {
   color: #1f4254;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.01em;
+}
+
+.field-item {
+  margin-bottom: 14px;
+}
+
+.field-item:last-of-type {
+  margin-bottom: 0;
 }
 
 .role-option.active {
@@ -1006,7 +1097,7 @@ export default {
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
-  margin: 8px 0 24px;
+  margin: 14px 0 4px;
   color: #667f8b;
   font-size: 13px;
 }
@@ -1231,8 +1322,12 @@ export default {
     padding: 14px 4px 4px;
   }
 
-  .login-intro h1 {
-    font-size: 30px;
+  .intro-title {
+    white-space: normal;
+    padding: 14px 18px 16px 16px;
+    font-size: 32px;
+    line-height: 1.16;
+    letter-spacing: 0.03em;
   }
 
   .subtitle {
@@ -1250,6 +1345,21 @@ export default {
   .login-form {
     padding: 24px 18px 22px;
     border-radius: 22px;
+  }
+
+  .login-title {
+    font-size: 34px;
+  }
+
+  .login-title-accent {
+    width: 102px;
+  }
+
+  .form-section,
+  .section-roles,
+  .section-account {
+    padding: 12px;
+    border-radius: 18px;
   }
 
   .login-options {
