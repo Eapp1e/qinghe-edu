@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 
 /**
- * 骞冲彴鍚姩绋嬪簭
+ * EAPPLE education platform launcher.
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class EduPlatformApplication
@@ -13,16 +13,14 @@ public class EduPlatformApplication
     public static void main(String[] args)
     {
         SpringApplication.run(EduPlatformApplication.class, args);
-        System.out.println("(#^.^#)  涓皬瀛︽櫤鑳借鍚庢湇鍔″钩鍙板惎鍔ㄦ垚鍔焅n" +
-                " .-------.       ____     __        \n" +
-                " |  _ _   \\      \\   \\   /  /      \n" +
-                " | ( ' )  |       \\  _. /  '       \n" +
-                " |(_ o _) /        _( )_ .'        \n" +
-                " | (_,_).' __  ___(_ o _)'         \n" +
-                " |  |\\ \\  |  ||   |(_,_)'          \n" +
-                " |  | \\ `'   /|   `-'  /           \n" +
-                " |  |  \\    /  \\      /            \n" +
-                " ''-'   `'-'    `-..-'             ");
+        System.out.println(
+                "\n" +
+                "  EEEEE    A    PPPP   PPPP   L      EEEEE\n" +
+                "  E       A A   P   P  P   P  L      E    \n" +
+                "  EEEE   AAAAA  PPPP   PPPP   L      EEEE \n" +
+                "  E      A   A  P      P      L      E    \n" +
+                "  EEEEE  A   A  P      P      LLLLL  EEEEE\n" +
+                "\n" +
+                "  platform started successfully.\n");
     }
 }
-

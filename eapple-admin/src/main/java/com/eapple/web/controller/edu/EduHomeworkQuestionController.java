@@ -34,7 +34,7 @@ public class EduHomeworkQuestionController extends BaseController
         return getDataTable(list);
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:question:query')")
+    @PreAuthorize("@ss.hasPermi('edu:question:query') or @ss.hasAnyRoles('admin,edu_admin,edu_teacher,edu_parent,edu_student')")
     @GetMapping("/{questionId}")
     public AjaxResult getInfo(@PathVariable Long questionId)
     {
@@ -49,7 +49,7 @@ public class EduHomeworkQuestionController extends BaseController
         return toAjax(questionService.insertQuestion(question));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:question:edit')")
+    @PreAuthorize("@ss.hasPermi('edu:question:edit') or @ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
     @PostMapping("/regenerate/{questionId}")
     public AjaxResult regenerate(@PathVariable Long questionId)
     {

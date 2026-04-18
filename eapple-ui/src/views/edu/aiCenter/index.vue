@@ -22,9 +22,7 @@
       <div class="overview-card accent-card">
         <div class="card-head">
           <div>
-            <span class="card-badge">Model Switch</span>
             <h3>模型选择</h3>
-            <p>{{ pageConfig.modelTip }}</p>
           </div>
         </div>
         <div class="model-picker">
@@ -55,7 +53,6 @@
       </div>
 
       <div class="overview-card compact-card">
-        <span class="card-badge">Usage Snapshot</span>
         <h3>{{ pageConfig.snapshotTitle }}</h3>
         <div class="mini-stats mini-stats-dual">
           <div>
@@ -71,7 +68,6 @@
       </div>
 
       <div class="overview-card compact-card">
-        <span class="card-badge">Feature Map</span>
         <h3>{{ pageConfig.featureTitle }}</h3>
         <ul class="feature-list">
           <li
@@ -91,9 +87,7 @@
     <section class="log-panel">
       <div class="panel-head">
         <div>
-          <span class="card-badge">Recent Activity</span>
           <h3>{{ pageConfig.logTitle }}</h3>
-          <p>{{ pageConfig.logDescription }}</p>
         </div>
         <el-button size="mini" icon="el-icon-refresh" @click="refreshData">刷新</el-button>
       </div>
@@ -245,8 +239,7 @@ export default {
           features: [
             { label: '课程通知生成', path: '/edu/course' },
             { label: '教学建议生成', path: '/edu/course' },
-            { label: '作业答疑辅助', path: '/edu/question' },
-            { label: '教学表达优化', path: '/edu/course' }
+            { label: '作业答疑辅助', path: '/edu/question' }
           ],
           logTitle: '我的最近 AI 调用',
           logDescription: '展示当前教师账号最近的 AI 调用记录，便于回看通知与教学建议生成结果。'
@@ -468,8 +461,7 @@ export default {
   max-width: 760px;
 }
 
-.hero-badge,
-.card-badge {
+.hero-badge {
   display: inline-flex;
   align-items: center;
   padding: 7px 12px;
@@ -497,7 +489,8 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  min-width: 280px;
+  min-width: 240px;
+  max-width: 280px;
 }
 
 .stat-card,
@@ -510,7 +503,7 @@ export default {
 }
 
 .stat-card {
-  padding: 18px;
+  padding: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
   box-shadow: 0 16px 28px rgba(11, 32, 40, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
@@ -522,9 +515,9 @@ export default {
 
 .stat-card strong {
   display: block;
-  margin-top: 10px;
+  margin-top: 8px;
   color: #ffffff;
-  font-size: 26px;
+  font-size: 24px;
 }
 
 .biz-type-cell {
@@ -649,9 +642,12 @@ export default {
 .card-head h3,
 .panel-head h3,
 .overview-card h3 {
-  margin: 14px 0 8px;
+  margin: 0 0 8px;
   color: #173746;
   font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  font-family: "STZhongsong", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
 }
 
 .card-head p,

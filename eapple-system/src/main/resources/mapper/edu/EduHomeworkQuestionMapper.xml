@@ -44,6 +44,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="studentUserId != null">
                 and student_user_id = #{studentUserId}
             </if>
+            <if test="courseName != null and courseName != ''">
+                and course_name like concat('%', #{courseName}, '%')
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and student_name like concat('%', #{studentName}, '%')
+            </if>
             <if test="questionTitle != null and questionTitle != ''">
                 and question_title like concat('%', #{questionTitle}, '%')
             </if>

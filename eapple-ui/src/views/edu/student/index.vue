@@ -113,18 +113,9 @@
 
     <template v-else>
       <section v-show="showSearch" class="filter-panel">
-        <div class="panel-title">
-          <div>
-            <strong>档案筛选</strong>
-            <span>支持按学生、家长、年级、班级和状态快速检索学生档案。</span>
-          </div>
-        </div>
         <el-form ref="queryForm" :model="queryParams" label-width="72px" class="filter-form" size="small" inline>
           <el-form-item label="学生姓名" prop="studentName">
             <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="handleQuery" />
-          </el-form-item>
-          <el-form-item label="家长姓名" prop="parentName">
-            <el-input v-model="queryParams.parentName" placeholder="请输入家长姓名" clearable @keyup.enter.native="handleQuery" />
           </el-form-item>
           <el-form-item label="年级" prop="gradeName">
             <el-input v-model="queryParams.gradeName" placeholder="请输入年级" clearable @keyup.enter.native="handleQuery" />
@@ -156,14 +147,13 @@
       </section>
 
       <section class="content-layout">
-        <el-card shadow="never" class="list-panel">
-          <div slot="header" class="panel-header">
-            <div>
-              <strong>档案列表</strong>
-              <span>集中查看学生基础信息、家长关联、班级归属和兴趣标签。</span>
+          <el-card shadow="never" class="list-panel">
+            <div slot="header" class="panel-header">
+              <div>
+                <strong>档案列表</strong>
+              </div>
+              <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
             </div>
-            <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
-          </div>
 
           <el-table v-loading="loading" :data="studentList" class="content-table">
             <el-table-column label="学生姓名" min-width="150">
@@ -319,7 +309,6 @@ export default {
         pageNum: 1,
         pageSize: 10,
         studentName: '',
-        parentName: '',
         gradeName: '',
         className: '',
         status: ''
@@ -419,7 +408,6 @@ export default {
         pageNum: 1,
         pageSize: 10,
         studentName: '',
-        parentName: '',
         gradeName: '',
         className: '',
         status: ''
@@ -772,7 +760,6 @@ export default {
   padding: 20px 22px 6px;
 }
 
-.panel-title,
 .panel-header {
   display: flex;
   align-items: flex-start;
@@ -781,19 +768,10 @@ export default {
   margin-bottom: 14px;
 }
 
-.panel-title strong,
 .panel-header strong {
   display: block;
   color: #18394a;
   font-size: 18px;
-}
-
-.panel-title span,
-.panel-header span {
-  display: block;
-  margin-top: 4px;
-  color: #6e8794;
-  font-size: 13px;
 }
 
 .filter-form {

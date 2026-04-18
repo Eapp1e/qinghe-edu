@@ -386,7 +386,7 @@ export default {
       windowStart.setDate(windowStart.getDate() - 6)
       const recentCourseMap = {}
       ;(this.dashboard.recentCourses || []).forEach(item => {
-        const date = this.parseDate(item.startDate || item.createTime)
+        const date = this.parseDate(item.createTime || item.startDate)
         if (!date) return
         if (date > today || date < windowStart) return
         const key = parseTime(date, '{y}-{m}-{d}')

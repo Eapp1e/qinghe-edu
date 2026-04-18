@@ -23,37 +23,50 @@
     </section>
 
     <section class="toolbar-panel">
-      <el-form v-show="showSearch" :inline="true" :model="queryParams" size="small" class="query-form">
-        <el-form-item label="课程名称">
-          <el-input v-model="queryParams.courseName" placeholder="请输入课程名称" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item label="分类">
-          <el-input v-model="queryParams.category" placeholder="请输入课程分类" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item v-if="canManageCourse" label="状态">
-          <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
-            <el-option label="启用中" value="0" />
-            <el-option label="已停开" value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" size="mini" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-          <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
-
-      <div class="toolbar-actions">
+      <div v-if="isTeacherView" class="teacher-cta-strip">
         <el-button
-          v-if="canManageCourse"
-          type="primary"
-          plain
-          size="mini"
+          size="medium"
           icon="el-icon-plus"
+          class="teacher-cta-button"
           @click="handleAdd"
         >
-          发布课程
+          发布新课程
         </el-button>
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+      </div>
+
+      <div class="toolbar-main">
+        <el-form v-show="showSearch" :inline="true" :model="queryParams" size="small" class="query-form">
+          <el-form-item label="课程名称">
+            <el-input v-model="queryParams.courseName" placeholder="请输入课程名称" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="分类">
+            <el-input v-model="queryParams.category" placeholder="请输入课程分类" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item v-if="canManageCourse" label="状态">
+            <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
+              <el-option label="启用中" value="0" />
+              <el-option label="已停开" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" size="mini" icon="el-icon-search" @click="handleQuery">搜索</el-button>
+            <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-form>
+
+        <div class="toolbar-actions">
+          <el-button
+            v-if="canManageCourse && !isTeacherView"
+            type="primary"
+            plain
+            size="mini"
+            icon="el-icon-plus"
+            @click="handleAdd"
+          >
+            发布课程
+          </el-button>
+          <right-toolbar @queryTable="getList" />
+        </div>
       </div>
     </section>
 
@@ -601,9 +614,9 @@ export default {
   position: relative;
   z-index: 1;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   gap: 12px;
   margin-bottom: 16px;
   padding: 18px 20px;
@@ -613,14 +626,58 @@ export default {
   box-shadow: 0 20px 34px rgba(41, 130, 141, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
+.toolbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.teacher-cta-strip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px 0 2px;
+}
+
+.teacher-cta-button {
+  min-width: 176px;
+  height: 44px;
+  padding: 0 20px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: 14px;
+  border: 1px solid rgba(68, 196, 181, 0.3);
+  background: linear-gradient(180deg, rgba(228, 248, 239, 0.98), rgba(214, 242, 231, 0.96));
+  color: #116f64;
+  box-shadow: 0 8px 16px rgba(41, 130, 141, 0.1);
+}
+
+::v-deep .teacher-cta-button:hover,
+::v-deep .teacher-cta-button:focus {
+  background: linear-gradient(180deg, rgba(222, 245, 235, 0.98), rgba(206, 237, 225, 0.96));
+  border-color: rgba(68, 196, 181, 0.36);
+  color: #0f665d;
+  box-shadow: 0 10px 18px rgba(41, 130, 141, 0.12);
+}
+
+::v-deep .teacher-cta-button i {
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .query-form {
   flex: 1;
+  margin-bottom: 0;
 }
 
 .toolbar-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .content-table {
@@ -790,6 +847,19 @@ export default {
   .hero-stats {
     min-width: 0;
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .toolbar-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .teacher-cta-strip {
+    justify-content: stretch;
+  }
+
+  .teacher-cta-button {
+    width: 100%;
   }
 
   .toolbar-actions {

@@ -33,6 +33,8 @@ export function delQuestion(questionId) {
 export function regenerateQuestionAnswer(questionId) {
   return request({
     url: '/edu/question/regenerate/' + questionId,
-    method: 'post'
+    method: 'post',
+    timeout: 120000,
+    noErrorMessage: true
   })
 }

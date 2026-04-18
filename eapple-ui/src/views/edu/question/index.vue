@@ -1,10 +1,10 @@
-<template>
+﻿<template>
   <div class="app-container question-page">
     <section class="hero-panel">
       <div class="hero-copy">
-        <span class="hero-badge">Homework Q&A</span>
+        <span class="hero-badge">Homework Q&amp;A</span>
         <h1>作业问答</h1>
-        <p>面向学生课后辅导场景，支持提交问题、查看 AI 解答，并在教师或管理员视角下统一追踪问答处理情况。</p>
+        <p>{{ heroDescription }}</p>
       </div>
       <div class="hero-metrics">
         <div class="metric-card">
@@ -18,14 +18,64 @@
       </div>
     </section>
 
-    <section class="toolbar-panel">
-      <div class="toolbar-copy">
-        <strong>AI 课后辅导</strong>
-        <span>学生可提交问题，教师可重新生成更合适的 AI 回答。</span>
-      </div>
-      <div class="toolbar-actions">
-        <el-button v-hasPermi="['edu:question:add']" type="primary" plain size="mini" icon="el-icon-plus" @click="handleAdd">提交问题</el-button>
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+    <section
+      v-show="showSearch"
+      class="toolbar-card search-toolbar"
+    >
+      <div class="search-toolbar-row">
+        <el-form
+          ref="queryForm"
+          :model="queryParams"
+          inline
+          size="small"
+          class="search-form"
+        >
+          <el-form-item label="课程" prop="courseName">
+            <el-input
+              v-model="queryParams.courseName"
+              placeholder="请输入课程名称"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="学生" prop="studentName">
+            <el-input
+              v-model="queryParams.studentName"
+              placeholder="请输入学生姓名"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="标题" prop="questionTitle">
+            <el-input
+              v-model="queryParams.questionTitle"
+              placeholder="请输入问题标题"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="状态" prop="answerStatus">
+            <el-select v-model="queryParams.answerStatus" placeholder="全部状态" clearable>
+              <el-option label="待解答" value="0" />
+              <el-option label="已解答" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" size="small" @click="handleQuery">查询</el-button>
+            <el-button size="small" @click="resetQuery">重置</el-button>
+            <el-button
+              v-if="canSubmitQuestion"
+              type="primary"
+              plain
+              size="small"
+              icon="el-icon-plus"
+              @click="handleAdd"
+            >
+              提交问题
+            </el-button>
+          </el-form-item>
+        </el-form>
+        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" class="inline-right-toolbar" />
       </div>
     </section>
 
@@ -43,7 +93,14 @@
       <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button type="text" size="mini" @click="handleViewAnswer(scope.row)">查看解答</el-button>
-          <el-button v-hasPermi="['edu:question:edit']" type="text" size="mini" @click="handleRegenerate(scope.row)">重新生成</el-button>
+          <el-button
+            v-if="canRegenerateAnswer"
+            type="text"
+            size="mini"
+            @click="handleRegenerate(scope.row)"
+          >
+            重新解答
+          </el-button>
           <el-button v-hasPermi="['edu:question:remove']" type="text" size="mini" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -86,7 +143,18 @@
         </div>
         <div class="answer-block answer-result">
           <span>AI 解答</span>
-          <div class="answer-rich" v-html="renderAnswerHtml(currentQuestion.aiAnswer || '当前暂无解答内容，请稍后再查看。')" />
+          <div
+            v-if="regeneratingQuestionId === currentQuestion.questionId"
+            class="answer-pending"
+          >
+            <i class="el-icon-loading" />
+            <span>AI 生成中，请稍候...</span>
+          </div>
+          <div
+            v-else
+            class="answer-rich"
+            v-html="renderAnswerHtml(currentQuestion.aiAnswer || '当前暂无解答内容，请稍后再查看。')"
+          />
         </div>
       </div>
       <div slot="footer">
@@ -111,7 +179,15 @@ export default {
       answerOpen: false,
       questionList: [],
       currentQuestion: {},
-      queryParams: { pageNum: 1, pageSize: 10 },
+      regeneratingQuestionId: null,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        courseName: undefined,
+        studentName: undefined,
+        questionTitle: undefined,
+        answerStatus: undefined
+      },
       form: {},
       rules: {
         questionTitle: [{ required: true, message: '请输入问题标题', trigger: 'blur' }],
@@ -122,6 +198,30 @@ export default {
   computed: {
     answeredCount() {
       return this.questionList.filter(item => item.answerStatus === '1').length
+    },
+    isTeacherRole() {
+      return this.$auth.hasRole('edu_teacher')
+    },
+    isStudentOrParentRole() {
+      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+    },
+    isAdminSideRole() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin')
+    },
+    canSubmitQuestion() {
+      return this.isStudentOrParentRole
+    },
+    canRegenerateAnswer() {
+      return this.isTeacherRole || this.isAdminSideRole
+    },
+    heroDescription() {
+      if (this.isTeacherRole) {
+        return '面向教师日常辅导场景，可集中查看学生提问，并重新生成更贴合课堂节奏的 AI 解答。'
+      }
+      if (this.isAdminSideRole) {
+        return '面向平台管理场景，可统一查看课后问答处理情况，并对 AI 解答结果进行复核与优化。'
+      }
+      return '面向学生课后辅导场景，支持提交问题、查看 AI 解答，并与教师形成更高效的课后答疑闭环。'
     },
     answerDialogTitle() {
       return this.currentQuestion.studentName ? `${this.currentQuestion.studentName} 的作业解答` : '作业解答详情'
@@ -136,8 +236,17 @@ export default {
       listQuestion(this.queryParams).then(res => {
         this.questionList = res.rows
         this.total = res.total
+      }).finally(() => {
         this.loading = false
       })
+    },
+    handleQuery() {
+      this.queryParams.pageNum = 1
+      this.getList()
+    },
+    resetQuery() {
+      this.resetForm('queryForm')
+      this.handleQuery()
     },
     handleAdd() {
       this.form = {}
@@ -161,10 +270,33 @@ export default {
       this.answerOpen = true
     },
     handleRegenerate(row) {
-      regenerateQuestionAnswer(row.questionId).then(res => {
-        this.$alert(res.data, 'AI 重新生成结果', { dangerouslyUseHTMLString: false })
-        this.getList()
-      })
+      this.currentQuestion = {
+        ...row,
+        aiAnswer: row.aiAnswer || ''
+      }
+      this.regeneratingQuestionId = row.questionId
+      this.answerOpen = true
+      regenerateQuestionAnswer(row.questionId)
+        .then(res => {
+          const latestAnswer = res.data || ''
+          const index = this.questionList.findIndex(item => item.questionId === row.questionId)
+          if (index > -1) {
+            this.$set(this.questionList, index, {
+              ...this.questionList[index],
+              aiAnswer: latestAnswer,
+              answerStatus: '1'
+            })
+          }
+          this.currentQuestion = {
+            ...row,
+            aiAnswer: latestAnswer,
+            answerStatus: '1'
+          }
+          this.$message.success('AI 解答已更新')
+        })
+        .finally(() => {
+          this.regeneratingQuestionId = null
+        })
     },
     handleDelete(row) {
       this.$modal.confirm('确认删除该问题吗？').then(() => delQuestion(row.questionId)).then(() => {
@@ -252,36 +384,56 @@ export default {
   font-size: 28px;
 }
 
-.toolbar-panel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+.toolbar-card {
   margin-bottom: 16px;
-  padding: 18px 20px;
-  border: 1px solid rgba(130, 112, 82, 0.1);
+  padding: 18px 20px 4px;
+  border: 1px solid rgba(103, 216, 219, 0.18);
   border-radius: 22px;
-  background: rgba(255, 252, 247, 0.84);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
+  box-shadow:
+    0 20px 34px rgba(41, 130, 141, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
-.toolbar-copy strong {
+.search-toolbar {
   display: block;
-  color: #2d4038;
-  font-size: 16px;
 }
 
-.toolbar-copy span {
-  display: block;
-  margin-top: 6px;
-  color: #748078;
-  font-size: 13px;
-}
-
-.toolbar-actions {
+.search-toolbar-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.search-form {
+  flex: 1;
+}
+
+.inline-right-toolbar {
+  flex-shrink: 0;
+}
+
+::v-deep .search-form .el-form-item {
+  margin-bottom: 14px;
+}
+
+@media (max-width: 1400px) {
+  .search-toolbar-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-right-toolbar {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 900px) {
+  .inline-right-toolbar {
+    justify-content: flex-start;
+  }
 }
 
 .content-table {
@@ -338,6 +490,20 @@ export default {
   line-height: 1.8;
 }
 
+.answer-pending {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 84px;
+  color: #4a8f87;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.answer-pending i {
+  font-size: 18px;
+}
+
 .answer-rich :deep(h2),
 .answer-rich :deep(h3),
 .answer-rich :deep(h4) {
@@ -358,6 +524,46 @@ export default {
 
 .answer-rich :deep(li) {
   margin-bottom: 6px;
+}
+
+::v-deep .toolbar-card .el-form-item__label {
+  color: #456270;
+  font-weight: 600;
+}
+
+::v-deep .toolbar-card .el-input__inner,
+::v-deep .toolbar-card .el-select .el-input__inner {
+  border-color: rgba(134, 214, 222, 0.42);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  color: #355161;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+::v-deep .toolbar-card .el-input__inner:focus {
+  border-color: #25ddbf;
+  box-shadow:
+    0 0 0 4px rgba(37, 221, 191, 0.12),
+    0 12px 22px rgba(39, 182, 194, 0.12);
+}
+
+::v-deep .toolbar-card .el-button--primary {
+  border: none;
+  background: linear-gradient(135deg, #12e0a9 0%, #10c7c4 52%, #2a98ff 100%);
+  box-shadow: 0 16px 30px rgba(20, 175, 183, 0.22);
+}
+
+::v-deep .toolbar-card .el-button--primary:hover,
+::v-deep .toolbar-card .el-button--primary:focus {
+  filter: saturate(108%);
+  box-shadow: 0 18px 34px rgba(20, 175, 183, 0.28);
+}
+
+::v-deep .toolbar-card .el-button--primary.is-plain {
+  border: 1px solid rgba(49, 212, 198, 0.34);
+  color: #147f71;
+  background: rgba(236, 255, 251, 0.9);
+  box-shadow: none;
 }
 
 @media (max-width: 900px) {
