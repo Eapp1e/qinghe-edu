@@ -7,6 +7,7 @@
     </template>
 
     <div class="right-menu">
+      <div class="brand-watermark">QINGHE SMART LEARNING</div>
       <router-link to="/user/profile" class="action-link">个人中心</router-link>
       <button type="button" class="action-link logout-link" @click="logout">退出</button>
     </div>
@@ -87,6 +88,21 @@ export default {
     height: 100%;
     margin-left: auto;
 
+    .brand-watermark {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+      margin-right: 10px;
+      color: rgba(45, 89, 101, 0.42);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      white-space: nowrap;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+    }
+
     .action-link {
       display: inline-flex;
       align-items: center;
@@ -143,6 +159,10 @@ export default {
     padding: 0 12px;
 
     .right-menu {
+      .brand-watermark {
+        display: none;
+      }
+
       .action-link {
         margin-left: 6px;
         padding: 0 10px;

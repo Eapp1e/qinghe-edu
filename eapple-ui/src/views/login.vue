@@ -13,8 +13,8 @@
     <div class="login-shell">
       <div class="shell-topline"></div>
       <section class="login-intro">
-        <p class="eyebrow">After-school Service Platform</p>
-        <h1 class="intro-title">中小学智能课后服务平台</h1>
+        <p class="eyebrow">QINGHE After-school Service Platform</p>
+        <h1 class="intro-title">青禾|中小学智慧课后服务平台</h1>
         <p class="subtitle">
           面向学校课后服务管理场景，围绕学生、家长、教师与管理员四类角色，
           提供课程发布、在线报名、学习跟踪、作业问答、平台通知与 AI 辅助服务。
@@ -34,8 +34,8 @@
             <span>教师可借助 AI 生成课程通知、教学建议和作业答疑内容，提高工作效率。</span>
           </div>
           <div class="feature-card">
-            <strong>平台协同</strong>
-            <span>管理员统一管理用户、通知、统计报表与 AI 服务，保障课后服务高效联动。</span>
+            <strong>运营管理</strong>
+            <span>统一维护平台用户、课程公告、学习数据与 AI 日志，提升课后服务运营效率。</span>
           </div>
         </div>
       </section>
@@ -664,12 +664,12 @@ export default {
   display: inline-block;
   max-width: none;
   white-space: nowrap;
-  padding: 16px 22px 18px 18px;
+  padding: 16px 42px 18px 20px;
   color: #1f2f36;
-  font-size: 42px;
+  font-size: 40px;
   line-height: 1.08;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-shadow:
     0 10px 24px rgba(71, 126, 145, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.9);
@@ -704,11 +704,18 @@ export default {
   pointer-events: none;
 }
 
+.intro-title :deep(span),
+.intro-title :deep(em) {
+  font-style: normal;
+}
+
 .subtitle {
   position: relative;
   z-index: 1;
-  max-width: 540px;
+  max-width: 580px;
   margin: 24px 0 0;
+  padding-left: 12px;
+  box-sizing: border-box;
   color: #55707a;
   font-size: 16px;
   line-height: 1.9;

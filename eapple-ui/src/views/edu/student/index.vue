@@ -147,13 +147,14 @@
       </section>
 
       <section class="content-layout">
-          <el-card shadow="never" class="list-panel">
-            <div slot="header" class="panel-header">
-              <div>
-                <strong>档案列表</strong>
-              </div>
-              <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+        <el-card shadow="never" class="list-panel">
+          <div slot="header" class="panel-header">
+            <div>
+              <strong>档案列表</strong>
+              <span>集中查看学生基础信息、家长关联、班级归属和兴趣标签。</span>
             </div>
+            <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+          </div>
 
           <el-table v-loading="loading" :data="studentList" class="content-table">
             <el-table-column label="学生姓名" min-width="150">
@@ -320,8 +321,11 @@ export default {
     }
   },
   computed: {
+    roleKeys() {
+      return this.$store.getters.roles || []
+    },
     isOwnerView() {
-      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+      return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     activeCount() {
       return this.studentList.filter(item => item.status === '0').length
@@ -333,13 +337,13 @@ export default {
       return new Set(this.studentList.map(item => item.parentUserId).filter(Boolean)).size
     },
     canManageProfile() {
-      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin')
+      return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
     },
     canSelfEdit() {
-      return this.$auth.hasRole('edu_student')
+      return this.roleKeys.includes('edu_student')
     },
     isStudentOwner() {
-      return this.$auth.hasRole('edu_student')
+      return this.roleKeys.includes('edu_student')
     },
     ownerEmptyDescription() {
       if (this.isStudentOwner) {
@@ -358,19 +362,19 @@ export default {
       return rules
     },
     pageTitle() {
-      if (this.$auth.hasRole('edu_student')) {
+      if (this.roleKeys.includes('edu_student')) {
         return '我的档案'
       }
-      if (this.$auth.hasRole('edu_parent')) {
+      if (this.roleKeys.includes('edu_parent')) {
         return '学生档案'
       }
       return '学生档案'
     },
     pageDescription() {
-      if (this.$auth.hasRole('edu_student')) {
+      if (this.roleKeys.includes('edu_student')) {
         return '集中查看自己的基础信息、班级归属、兴趣标签和智能课程推荐结果。'
       }
-      if (this.$auth.hasRole('edu_parent')) {
+      if (this.roleKeys.includes('edu_parent')) {
         return '集中查看关联学生的基础档案、班级信息、兴趣标签和智能推荐课程。'
       }
       return '教师端和管理员端可查看全部学生档案，并维护学生基础信息、家长关联关系、年级班级与兴趣标签。'
@@ -774,13 +778,86 @@ export default {
   font-size: 18px;
 }
 
+.panel-header span {
+  display: block;
+  margin-top: 4px;
+  color: #6e8794;
+  font-size: 13px;
+}
+
 .filter-form {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
 }
 
 .filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: max-content;
   margin-left: auto;
+}
+
+::v-deep .filter-form .el-form-item {
+  display: flex;
+  align-items: center;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+::v-deep .filter-form .el-form-item:nth-child(1) {
+  width: 300px;
+}
+
+::v-deep .filter-form .el-form-item:nth-child(2),
+::v-deep .filter-form .el-form-item:nth-child(3) {
+  width: 230px;
+}
+
+::v-deep .filter-form .el-form-item:nth-child(4) {
+  width: 180px;
+}
+
+::v-deep .filter-form .el-form-item__label {
+  flex: 0 0 auto;
+  padding-right: 8px;
+  line-height: 38px;
+}
+
+::v-deep .filter-form .el-form-item__content {
+  display: flex;
+  align-items: center;
+  width: auto;
+  margin-left: 0 !important;
+  flex: 1;
+}
+
+::v-deep .filter-form .el-input,
+::v-deep .filter-form .el-select {
+  width: 100%;
+}
+
+::v-deep .filter-form .el-input__inner,
+::v-deep .filter-form .el-select .el-input__inner {
+  border-color: rgba(134, 214, 222, 0.42);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  color: #355161;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+::v-deep .filter-form .el-input__inner:focus,
+::v-deep .filter-form .el-select .el-input.is-focus .el-input__inner,
+::v-deep .filter-form .el-select .el-input__inner:focus {
+  border-color: #25ddbf;
+  box-shadow:
+    0 0 0 4px rgba(37, 221, 191, 0.12),
+    0 12px 22px rgba(39, 182, 194, 0.12);
 }
 
 .content-layout {
@@ -967,6 +1044,14 @@ export default {
   .info-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .filter-form {
+    flex-wrap: wrap;
+  }
+
+  .filter-actions {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 768px) {
@@ -986,6 +1071,20 @@ export default {
 
   .filter-actions {
     margin-left: 0;
+    flex-wrap: wrap;
+  }
+
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  ::v-deep .filter-form .el-form-item,
+  ::v-deep .filter-form .el-form-item:nth-child(1),
+  ::v-deep .filter-form .el-form-item:nth-child(2),
+  ::v-deep .filter-form .el-form-item:nth-child(3),
+  ::v-deep .filter-form .el-form-item:nth-child(4) {
+    width: 100%;
   }
 }
 </style>

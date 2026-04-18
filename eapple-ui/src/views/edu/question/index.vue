@@ -196,17 +196,20 @@ export default {
     }
   },
   computed: {
+    roleKeys() {
+      return this.$store.getters.roles || []
+    },
     answeredCount() {
       return this.questionList.filter(item => item.answerStatus === '1').length
     },
     isTeacherRole() {
-      return this.$auth.hasRole('edu_teacher')
+      return this.roleKeys.includes('edu_teacher')
     },
     isStudentOrParentRole() {
-      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+      return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     isAdminSideRole() {
-      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin')
+      return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
     },
     canSubmitQuestion() {
       return this.isStudentOrParentRole

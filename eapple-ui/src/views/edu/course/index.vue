@@ -226,17 +226,20 @@ export default {
     }
   },
   computed: {
+    roleKeys() {
+      return this.$store.getters.roles || []
+    },
     isTeacherView() {
-      return this.$auth.hasRole('edu_teacher')
+      return this.roleKeys.includes('edu_teacher')
     },
     isAdminView() {
-      return this.$auth.hasRole('admin')
+      return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
     },
     canManageCourse() {
       return this.isTeacherView || this.isAdminView
     },
     canEnrollCourse() {
-      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+      return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     openCount() {
       return this.courseList.filter(item => item.status === '0').length
@@ -283,7 +286,7 @@ export default {
       })
     },
     getChildren() {
-      if (!this.$auth.hasRole('edu_parent')) {
+      if (!this.roleKeys.includes('edu_parent')) {
         return
       }
       listMyChildren().then(res => {
@@ -396,7 +399,7 @@ export default {
         .trim()
     },
     resolveStudentUserId() {
-      if (!this.$auth.hasRole('edu_parent')) {
+      if (!this.roleKeys.includes('edu_parent')) {
         return undefined
       }
       if (this.childrenList.length === 0) {

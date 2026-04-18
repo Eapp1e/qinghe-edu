@@ -98,8 +98,11 @@ export default {
     }
   },
   computed: {
+    roleKeys() {
+      return this.$store.getters.roles || []
+    },
     isStudentOrParent() {
-      return this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')
+      return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     pageTitle() {
       return this.isStudentOrParent ? '\u5b66\u4e60\u8bb0\u5f55' : '\u62a5\u540d\u8bb0\u5f55'
@@ -117,19 +120,19 @@ export default {
       return this.enrollmentList.filter(item => item.status === '1').length
     },
     showActionColumn() {
-      return !this.$auth.hasRole('edu_student')
+      return !this.roleKeys.includes('edu_student')
     },
     actionButtonText() {
-      if (this.$auth.hasRole('edu_parent')) {
+      if (this.roleKeys.includes('edu_parent')) {
         return '\u586b\u5199\u5b66\u4e60\u8bb0\u5f55'
       }
       return '\u7ef4\u62a4'
     },
     canEditEnrollment() {
-      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin') || this.$auth.hasRole('edu_teacher') || this.$auth.hasRole('edu_parent')
+      return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin') || this.roleKeys.includes('edu_teacher') || this.roleKeys.includes('edu_parent')
     },
     dialogTitle() {
-      return this.$auth.hasRole('edu_parent') ? '\u586b\u5199\u5b66\u4e60\u8bb0\u5f55' : '\u7ef4\u62a4\u5b66\u4e60\u8bb0\u5f55'
+      return this.roleKeys.includes('edu_parent') ? '\u586b\u5199\u5b66\u4e60\u8bb0\u5f55' : '\u7ef4\u62a4\u5b66\u4e60\u8bb0\u5f55'
     }
   },
   created() {

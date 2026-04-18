@@ -1,11 +1,11 @@
-﻿<template>
+<template>
   <div class="sidebar-logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <span class="sidebar-title only-text">课</span>
+        <span class="sidebar-title only-text">&#38738;</span>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <span class="sidebar-title">课后服务平台</span>
+        <span class="sidebar-title">&#38738;&#31166;&#26234;&#23398;</span>
       </router-link>
     </transition>
   </div>
@@ -54,7 +54,7 @@ export default {
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: 0 14px;
+    padding: 0 18px;
     background: transparent;
     overflow: hidden;
     text-decoration: none;
@@ -67,21 +67,25 @@ export default {
     width: 100%;
     height: 100%;
     margin: 0;
-    font-size: 15px;
-    font-size: 17px;
+    padding-top: 1px;
+    font-family: "STZhongsong", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+    font-size: 24px;
     font-weight: 700;
     line-height: 1;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.1em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
-    color: #f5fbf8;
-    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.16);
+    color: #f7fbf6;
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.04),
+      0 2px 12px rgba(0, 0, 0, 0.16);
   }
 
   .sidebar-title.only-text {
-    font-size: 18px;
+    font-size: 20px;
+    letter-spacing: 0.06em;
   }
 
   &.collapse {
