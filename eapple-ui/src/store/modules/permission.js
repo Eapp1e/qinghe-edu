@@ -59,14 +59,22 @@ function appendRoleRoutes(routes) {
   })
   if (!hasOnlineCourse && auth.hasRole('edu_student')) {
     result.splice(2, 0, {
-      name: 'EduOnlineCourse',
-      path: 'edu/online-course',
-      component: 'edu/onlineCourse/index',
+      name: '',
+      path: '/',
+      component: 'Layout',
       hidden: false,
-      meta: {
-        title: '网课中心',
-        icon: 'online'
-      }
+      meta: null,
+      children: [
+        {
+          path: 'edu/online-course',
+          component: 'edu/onlineCourse/index',
+          name: 'EduOnlineCourse',
+          meta: {
+            title: '网课中心',
+            icon: 'online'
+          }
+        }
+      ]
     })
   }
   return result
