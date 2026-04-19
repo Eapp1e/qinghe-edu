@@ -215,3 +215,10 @@ update sys_menu set icon = 'peoples', update_by = 'edu_platform', update_time = 
 update sys_menu set icon = 'bell', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3008;
 delete from sys_role_menu where menu_id = 3000;
 delete from sys_menu where menu_id = 3000;
+
+-- 学生端新增网课中心菜单
+insert ignore into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, `query`, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values (3009, '网课中心', 0, 4, 'edu/online-course', 'edu/onlineCourse/index', '', 'EduOnlineCourse', 1, 0, 'C', '0', '0', '', 'online', 'edu_platform', sysdate(), '', null, '学生端网课学习资源入口');
+
+insert ignore into sys_role_menu(role_id, menu_id) values (104, 3009);
+update sys_menu set icon = 'online', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3009;

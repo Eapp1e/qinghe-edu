@@ -1,4 +1,4 @@
-import auth from '@/plugins/auth'
+﻿import auth from '@/plugins/auth'
 import router, { constantRoutes, dynamicRoutes } from '@/router'
 import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
@@ -26,16 +26,15 @@ const permission = {
     },
     SET_SIDEBAR_ROUTERS: (state, routes) => {
       state.sidebarRouters = routes
-    },
+    }
   },
   actions: {
-    // 生成路由
     GenerateRoutes({ commit }) {
       return new Promise(resolve => {
-        // 向后端请求路由数据
         getRouters().then(res => {
-          const sdata = JSON.parse(JSON.stringify(res.data))
-          const rdata = JSON.parse(JSON.stringify(res.data))
+          const routeData = appendRoleRoutes(res.data || [])
+          const sdata = JSON.parse(JSON.stringify(routeData))
+          const rdata = JSON.parse(JSON.stringify(routeData))
           const sidebarRoutes = filterAsyncRouter(sdata)
           const rewriteRoutes = filterAsyncRouter(rdata, false, true)
           const asyncRoutes = filterDynamicRoutes(dynamicRoutes)
@@ -52,14 +51,33 @@ const permission = {
   }
 }
 
-// 遍历后台传来的路由字符串，转换为组件对象
+function appendRoleRoutes(routes) {
+  const result = Array.isArray(routes) ? routes.slice() : []
+  const hasOnlineCourse = result.some(route => {
+    const routePath = route.path || ''
+    return routePath === 'edu/online-course' || routePath === '/edu/online-course'
+  })
+  if (!hasOnlineCourse && auth.hasRole('edu_student')) {
+    result.splice(2, 0, {
+      name: 'EduOnlineCourse',
+      path: 'edu/online-course',
+      component: 'edu/onlineCourse/index',
+      hidden: false,
+      meta: {
+        title: '网课中心',
+        icon: 'online'
+      }
+    })
+  }
+  return result
+}
+
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
     if (type && route.children) {
       route.children = filterChildren(route.children)
     }
     if (route.component) {
-      // Layout ParentView 组件特殊处理
       if (route.component === 'Layout') {
         route.component = Layout
       } else if (route.component === 'ParentView') {
@@ -73,19 +91,19 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     if (route.children != null && route.children && route.children.length) {
       route.children = filterAsyncRouter(route.children, route, type)
     } else {
-      delete route['children']
-      delete route['redirect']
+      delete route.children
+      delete route.redirect
     }
     return true
   })
 }
 
 function filterChildren(childrenMap, lastRouter = false) {
-  var children = []
+  const children = []
   childrenMap.forEach(el => {
     el.path = lastRouter ? lastRouter.path + '/' + el.path : el.path
     if (el.children && el.children.length && el.component === 'ParentView') {
-      children = children.concat(filterChildren(el.children, el))
+      children.push(...filterChildren(el.children, el))
     } else {
       children.push(el)
     }
@@ -93,7 +111,6 @@ function filterChildren(childrenMap, lastRouter = false) {
   return children
 }
 
-// 动态路由遍历，验证是否具备权限
 export function filterDynamicRoutes(routes) {
   const res = []
   routes.forEach(route => {
@@ -113,10 +130,8 @@ export function filterDynamicRoutes(routes) {
 export const loadView = (view) => {
   if (process.env.NODE_ENV === 'development') {
     return (resolve) => require([`@/views/${view}`], resolve)
-  } else {
-    // 使用 import 实现生产环境的路由懒加载
-    return () => import(`@/views/${view}`)
   }
+  return () => import(`@/views/${view}`)
 }
 
 export default permission
