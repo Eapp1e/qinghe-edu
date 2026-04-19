@@ -13,6 +13,8 @@ public interface IEduAiService
 
     String generateCourseRecommendation(Long studentUserId, String prompt);
 
+    String generateOnlineResourceRecommendation(Long userId, String prompt);
+
     String getCurrentModel();
 
     List<EduAiModelOption> getAvailableModels();

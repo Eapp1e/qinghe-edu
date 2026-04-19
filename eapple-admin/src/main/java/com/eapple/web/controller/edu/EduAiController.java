@@ -1,14 +1,23 @@
 package com.eapple.web.controller.edu;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.eapple.common.core.controller.BaseController;
 import com.eapple.common.core.domain.AjaxResult;
+import com.eapple.common.exception.ServiceException;
+import com.eapple.common.utils.SecurityUtils;
+import com.eapple.common.utils.StringUtils;
 import com.eapple.system.service.edu.IEduAiService;
 
 @RestController
@@ -39,6 +48,48 @@ public class EduAiController extends BaseController
         return success(aiService.updateCurrentModel(body.getModelName()));
     }
 
+    @PreAuthorize("@ss.hasRole('admin') or @ss.hasRole('edu_admin') or @ss.hasRole('edu_teacher') or @ss.hasRole('edu_parent') or @ss.hasRole('edu_student')")
+    @PostMapping("/online-resource-recommend")
+    public AjaxResult onlineResourceRecommend(@RequestBody OnlineResourceBody body)
+    {
+        if (body == null || StringUtils.isEmpty(body.getInterest()))
+        {
+            throw new ServiceException("请输入想学习的内容");
+        }
+        if (body.getResources() == null || body.getResources().isEmpty())
+        {
+            throw new ServiceException("当前资源库为空，暂时无法推荐");
+        }
+
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("用户想学内容：").append(body.getInterest()).append("\n");
+        prompt.append("资源库：\n");
+        for (OnlineResourceItem item : body.getResources())
+        {
+            if (item == null || StringUtils.isEmpty(item.getTitle()) || StringUtils.isEmpty(item.getLink()))
+            {
+                continue;
+            }
+            prompt.append("- 标题：").append(item.getTitle())
+                    .append("；来源：").append(StringUtils.defaultString(item.getSource(), ""))
+                    .append("；分类：").append(StringUtils.defaultString(item.getCategory(), ""))
+                    .append("；描述：").append(StringUtils.defaultString(item.getDescription(), ""))
+                    .append("；链接：").append(item.getLink())
+                    .append("\n");
+        }
+
+        String content = aiService.generateOnlineResourceRecommendation(SecurityUtils.getUserId(), prompt.toString());
+        try
+        {
+            JSONArray array = JSON.parseArray(content);
+            return success(array.toJavaList(JSONObject.class));
+        }
+        catch (Exception e)
+        {
+            throw new ServiceException("AI 推荐结果解析失败，请重试");
+        }
+    }
+
     public static class ModelBody
     {
         private String modelName;
@@ -51,6 +102,92 @@ public class EduAiController extends BaseController
         public void setModelName(String modelName)
         {
             this.modelName = modelName;
+        }
+    }
+
+    public static class OnlineResourceBody
+    {
+        private String interest;
+
+        private List<OnlineResourceItem> resources = new ArrayList<>();
+
+        public String getInterest()
+        {
+            return interest;
+        }
+
+        public void setInterest(String interest)
+        {
+            this.interest = interest;
+        }
+
+        public List<OnlineResourceItem> getResources()
+        {
+            return resources;
+        }
+
+        public void setResources(List<OnlineResourceItem> resources)
+        {
+            this.resources = resources;
+        }
+    }
+
+    public static class OnlineResourceItem
+    {
+        private String title;
+        private String source;
+        private String category;
+        private String description;
+        private String link;
+
+        public String getTitle()
+        {
+            return title;
+        }
+
+        public void setTitle(String title)
+        {
+            this.title = title;
+        }
+
+        public String getSource()
+        {
+            return source;
+        }
+
+        public void setSource(String source)
+        {
+            this.source = source;
+        }
+
+        public String getCategory()
+        {
+            return category;
+        }
+
+        public void setCategory(String category)
+        {
+            this.category = category;
+        }
+
+        public String getDescription()
+        {
+            return description;
+        }
+
+        public void setDescription(String description)
+        {
+            this.description = description;
+        }
+
+        public String getLink()
+        {
+            return link;
+        }
+
+        public void setLink(String link)
+        {
+            this.link = link;
         }
     }
 }

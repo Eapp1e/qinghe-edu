@@ -21,3 +21,11 @@ export function updateCurrentAiModel(modelName) {
     data: { modelName }
   })
 }
+
+export function recommendOnlineResources(data) {
+  return request({
+    url: '/edu/ai/online-resource-recommend',
+    method: 'post',
+    data
+  })
+}
