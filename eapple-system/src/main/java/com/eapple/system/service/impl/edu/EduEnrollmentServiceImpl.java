@@ -18,15 +18,15 @@ public class EduEnrollmentServiceImpl implements IEduEnrollmentService
     @Override
     public List<EduCourseEnrollment> selectEnrollmentList(EduCourseEnrollment enrollment)
     {
-        if (SecurityUtils.hasRole("edu_teacher"))
+        if (SecurityUtils.hasExactRole("edu_teacher"))
         {
             enrollment.setTeacherUserId(SecurityUtils.getUserId());
         }
-        if (SecurityUtils.hasRole("edu_parent"))
+        if (SecurityUtils.hasExactRole("edu_parent"))
         {
             enrollment.setParentUserId(SecurityUtils.getUserId());
         }
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             enrollment.setStudentUserId(SecurityUtils.getUserId());
         }
@@ -47,12 +47,12 @@ public class EduEnrollmentServiceImpl implements IEduEnrollmentService
         {
             throw new ServiceException("报名记录不存在");
         }
-        if (!SecurityUtils.isAdmin() && SecurityUtils.hasRole("edu_teacher")
+        if (!SecurityUtils.isAdmin() && SecurityUtils.hasExactRole("edu_teacher")
                 && !SecurityUtils.getUserId().equals(dbEnrollment.getTeacherUserId()))
         {
             throw new ServiceException("只能管理本人课程的报名记录");
         }
-        if (!SecurityUtils.isAdmin() && SecurityUtils.hasRole("edu_parent")
+        if (!SecurityUtils.isAdmin() && SecurityUtils.hasExactRole("edu_parent")
                 && !SecurityUtils.getUserId().equals(dbEnrollment.getParentUserId()))
         {
             throw new ServiceException("只能维护当前家长关联学生的报名记录");

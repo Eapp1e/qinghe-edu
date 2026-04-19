@@ -51,6 +51,7 @@ export default {
   width: 100%;
   position: relative;
   overflow: hidden;
+  background: var(--surface-bg);
 
   &:fullscreen,
   &:-webkit-full-screen,

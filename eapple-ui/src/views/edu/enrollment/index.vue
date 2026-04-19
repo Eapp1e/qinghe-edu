@@ -283,13 +283,17 @@ export default {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
-  padding: 18px 20px;
-  border: 1px solid rgba(103, 216, 219, 0.18);
+  padding: 20px 22px 6px;
+  border: 1px solid rgba(157, 232, 233, 0.42);
   border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
+    rgba(255, 255, 255, 0.26);
   box-shadow:
-    0 20px 34px rgba(41, 130, 141, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    0 22px 40px rgba(41, 130, 141, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .query-form {
@@ -348,6 +352,11 @@ export default {
 ::v-deep .el-table th {
   background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
   color: #34505f;
+}
+
+::v-deep .el-table th:first-child .cell,
+::v-deep .el-table td:first-child .cell {
+  padding-left: 18px;
 }
 
 ::v-deep .el-table tr {

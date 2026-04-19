@@ -6,7 +6,7 @@
 @import './btn.scss';
 
 :root {
-  --edu-bg: #f6f3eb;
+  --edu-bg: #d9e2cc;
   --edu-surface: rgba(255, 252, 245, 0.88);
   --edu-surface-strong: #fffdf7;
   --edu-border: rgba(130, 112, 82, 0.14);
@@ -29,9 +29,8 @@ body {
   margin: 0;
   color: var(--edu-text);
   background:
-    radial-gradient(circle at top left, rgba(207, 225, 186, 0.45), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(255, 225, 178, 0.24), transparent 26%),
-    linear-gradient(180deg, #f4efe4 0%, #f8f6ef 32%, #f5f8f1 100%);
+    radial-gradient(circle at top left, rgba(170, 199, 138, 0.3), transparent 22%),
+    linear-gradient(180deg, #d7dfca 0%, #dbe4cf 36%, #d9e2cc 100%);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -135,6 +134,7 @@ aside {
 
 .app-container {
   padding: 22px;
+  background: transparent;
 }
 
 .components-container {

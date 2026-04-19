@@ -6,7 +6,7 @@
         <h1>{{ pageTitle }}</h1>
         <p>{{ pageDescription }}</p>
       </div>
-      <div class="hero-stats">
+      <div :class="['hero-stats', { 'hero-stats--compact': !isTeacherView }]">
         <div class="stat-card">
           <span>{{ isTeacherView ? '我的课程' : '课程总数' }}</span>
           <strong>{{ total }}</strong>
@@ -252,7 +252,7 @@ export default {
         return '我的课程'
       }
       if (this.isAdminView) {
-        return '课程管理'
+        return '课程中心'
       }
       return '课程中心'
     },
@@ -591,6 +591,12 @@ export default {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   min-width: 380px;
+  margin-left: auto;
+}
+
+.hero-stats--compact {
+  grid-template-columns: repeat(2, 1fr);
+  min-width: 250px;
 }
 
 .stat-card {
@@ -622,11 +628,15 @@ export default {
   justify-content: flex-start;
   gap: 12px;
   margin-bottom: 16px;
-  padding: 18px 20px;
-  border: 1px solid rgba(103, 216, 219, 0.18);
+  padding: 20px 22px 6px;
+  border: 1px solid rgba(157, 232, 233, 0.42);
   border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
-  box-shadow: 0 20px 34px rgba(41, 130, 141, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
+    rgba(255, 255, 255, 0.26);
+  box-shadow: 0 22px 40px rgba(41, 130, 141, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .toolbar-main {
@@ -640,7 +650,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 4px 0 2px;
+  padding: 0;
 }
 
 .teacher-cta-button {
@@ -759,6 +769,11 @@ export default {
 ::v-deep .el-table th {
   background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
   color: #34505f;
+}
+
+::v-deep .el-table th:first-child .cell,
+::v-deep .el-table td:first-child .cell {
+  padding-left: 18px;
 }
 
 ::v-deep .el-table tr {

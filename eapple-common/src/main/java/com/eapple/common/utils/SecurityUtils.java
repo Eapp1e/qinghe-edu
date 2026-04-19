@@ -173,6 +173,19 @@ public class SecurityUtils
     }
 
     /**
+     * 精确判断当前用户是否拥有指定角色，不将超级管理员视为其他业务角色。
+     *
+     * @param role 角色标识
+     * @return 是否拥有指定角色
+     */
+    public static boolean hasExactRole(String role)
+    {
+        List<SysRole> roleList = getLoginUser().getUser().getRoles();
+        Collection<String> roles = roleList.stream().map(SysRole::getRoleKey).collect(Collectors.toSet());
+        return hasExactRole(roles, role);
+    }
+
+    /**
      * 鍒ゆ柇鏄惁鍖呭惈瑙掕壊
      * 
      * @param roles 瑙掕壊鍒楄〃
@@ -183,6 +196,19 @@ public class SecurityUtils
     {
         return roles.stream().filter(StringUtils::hasText)
                 .anyMatch(x -> Constants.SUPER_ADMIN.equals(x) || PatternMatchUtils.simpleMatch(x, role));
+    }
+
+    /**
+     * 精确判断角色集合中是否包含指定角色。
+     *
+     * @param roles 角色集合
+     * @param role 角色标识
+     * @return 是否精确包含
+     */
+    public static boolean hasExactRole(Collection<String> roles, String role)
+    {
+        return roles.stream().filter(StringUtils::hasText)
+                .anyMatch(x -> PatternMatchUtils.simpleMatch(x, role));
     }
 
 }

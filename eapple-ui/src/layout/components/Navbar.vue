@@ -9,7 +9,15 @@
     <div class="right-menu">
       <div class="brand-watermark">QINGHE SMART LEARNING</div>
       <router-link to="/user/profile" class="action-link">个人中心</router-link>
-      <button type="button" class="action-link logout-link" @click="logout">退出</button>
+      <el-dropdown trigger="click" @command="handleCommand">
+        <button type="button" class="action-link settings-link icon-only" title="设置">
+          <i class="el-icon-setting" />
+        </button>
+        <el-dropdown-menu slot="dropdown" class="settings-dropdown">
+          <el-dropdown-item command="background">切换背景色</el-dropdown-item>
+          <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
   </div>
 </template>
@@ -31,9 +39,25 @@ export default {
     },
     showLogo() {
       return this.$store.state.settings.sidebarLogo
+    },
+    backgroundMode() {
+      return this.$store.state.settings.backgroundMode || 'warm'
     }
   },
   methods: {
+    handleCommand(command) {
+      if (command === 'background') {
+        const nextMode = this.backgroundMode === 'classic' ? 'warm' : 'classic'
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'backgroundMode',
+          value: nextMode
+        })
+        return
+      }
+      if (command === 'logout') {
+        this.logout()
+      }
+    },
     logout() {
       this.$confirm('确认退出当前平台账号吗？', '提示', {
         confirmButtonText: '确定',
@@ -61,13 +85,10 @@ export default {
   overflow: hidden;
   border-bottom: 1px solid rgba(129, 224, 224, 0.16);
   border-radius: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+  background: var(--nav-bg);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 10px 24px rgba(15, 35, 46, 0.06);
-  backdrop-filter: blur(16px) saturate(130%);
-  -webkit-backdrop-filter: blur(16px) saturate(130%);
 
   .topmenu-container {
     position: absolute;
@@ -132,7 +153,7 @@ export default {
       }
     }
 
-    .logout-link {
+    .settings-link {
       cursor: pointer;
       outline: none;
       background: linear-gradient(135deg, rgba(18, 224, 169, 0.92) 0%, rgba(16, 199, 196, 0.86) 52%, rgba(42, 152, 255, 0.88) 100%);
@@ -151,7 +172,37 @@ export default {
         filter: none;
       }
     }
+
+    .icon-only {
+      width: 34px;
+      min-width: 34px;
+      padding: 0;
+
+      i {
+        margin: 0;
+        font-size: 14px;
+      }
+    }
   }
+}
+
+::v-deep .settings-dropdown {
+  border-radius: 14px;
+  border: 1px solid rgba(160, 205, 184, 0.28);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 32px rgba(38, 76, 82, 0.12);
+  overflow: hidden;
+}
+
+::v-deep .settings-dropdown .el-dropdown-menu__item {
+  color: #214a58;
+  font-weight: 600;
+}
+
+::v-deep .settings-dropdown .el-dropdown-menu__item:focus,
+::v-deep .settings-dropdown .el-dropdown-menu__item:not(.is-disabled):hover {
+  background: rgba(226, 246, 237, 0.72);
+  color: #0f8570;
 }
 
 @media (max-width: 768px) {

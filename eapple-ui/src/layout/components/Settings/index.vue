@@ -282,6 +282,7 @@ export default {
             "dynamicTitle":${this.dynamicTitle},
             "footerVisible":${this.footerVisible},
             "sideTheme":"${this.sideTheme}",
+            "backgroundMode":"${this.$store.state.settings.backgroundMode || 'warm'}",
             "theme":"${this.theme}"
           }`
       )

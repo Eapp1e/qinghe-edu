@@ -1,13 +1,14 @@
 import defaultSettings from '@/settings'
 import { useDynamicTitle } from '@/utils/dynamicTitle'
 
-const { sideTheme, showSettings, navType, tagsView, tagsViewPersist, tagsIcon, tagsViewStyle, fixedHeader, sidebarLogo, dynamicTitle, footerVisible, footerContent } = defaultSettings
+const { sideTheme, backgroundMode, showSettings, navType, tagsView, tagsViewPersist, tagsIcon, tagsViewStyle, fixedHeader, sidebarLogo, dynamicTitle, footerVisible, footerContent } = defaultSettings
 
 const storageSetting = JSON.parse(localStorage.getItem('layout-setting')) || ''
 const state = {
   title: '',
   theme: storageSetting.theme || '#409EFF',
   sideTheme: storageSetting.sideTheme || sideTheme,
+  backgroundMode: storageSetting.backgroundMode || backgroundMode,
   showSettings: showSettings,
   navType: storageSetting.navType === undefined ? navType : storageSetting.navType,
   tagsView: storageSetting.tagsView === undefined ? tagsView : storageSetting.tagsView,
@@ -35,6 +36,9 @@ const actions = {
   // 修改布局设置
   changeSetting({ commit }, data) {
     commit('CHANGE_SETTING', data)
+    const currentSetting = JSON.parse(localStorage.getItem('layout-setting') || '{}')
+    currentSetting[data.key] = data.value
+    localStorage.setItem('layout-setting', JSON.stringify(currentSetting))
   },
   // 设置网页标题
   setTitle({ commit }, title) {

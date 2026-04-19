@@ -438,11 +438,15 @@ export default {
   justify-content: space-between;
   gap: 16px;
   padding: 18px 20px 4px;
-  border: 1px solid rgba(103, 216, 219, 0.18);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
+  border: 1px solid rgba(157, 232, 233, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
+    rgba(255, 255, 255, 0.26);
   box-shadow:
-    0 20px 34px rgba(41, 130, 141, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    0 22px 40px rgba(41, 130, 141, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .quick-actions {

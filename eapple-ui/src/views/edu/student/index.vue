@@ -151,7 +151,6 @@
           <div slot="header" class="panel-header">
             <div>
               <strong>档案列表</strong>
-              <span>集中查看学生基础信息、家长关联、班级归属和兴趣标签。</span>
             </div>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
           </div>
@@ -633,6 +632,16 @@ export default {
   border: 1px solid rgba(103, 216, 219, 0.18);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 253, 255, 0.88));
   box-shadow: 0 20px 34px rgba(41, 130, 141, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.filter-panel {
+  border-color: rgba(157, 232, 233, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
+    rgba(255, 255, 255, 0.26);
+  box-shadow: 0 22px 40px rgba(41, 130, 141, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .profile-card {

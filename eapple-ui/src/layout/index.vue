@@ -1,5 +1,5 @@
 <template>
-  <div :class="classObj" class="app-wrapper" :style="{'--current-color': theme, '--current-color-light': theme + '1a', '--current-color-dark-bg': theme + '33'}">
+  <div :class="[classObj, `bg-mode-${backgroundMode}`]" class="app-wrapper" :style="layoutStyle">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
     <sidebar v-if="!sidebar.hide" class="sidebar-container"/>
     <div :class="{sidebarHide:sidebar.hide}" class="main-container">
@@ -31,6 +31,7 @@ export default {
     ...mapState({
       theme: state => state.settings.theme,
       sideTheme: state => state.settings.sideTheme,
+      backgroundMode: state => state.settings.backgroundMode,
       sidebar: state => state.app.sidebar,
       device: state => state.app.device,
       fixedHeader: state => state.settings.fixedHeader
@@ -45,6 +46,22 @@ export default {
     },
     variables() {
       return variables
+    },
+    layoutStyle() {
+      const warmShell = '#d9e2cc'
+      const warmSurface = '#d9e2cc'
+      const classicShell = '#d9e2cc'
+      const classicSurface = '#f7f7f5'
+      const isWarm = this.backgroundMode !== 'classic'
+      return {
+        '--current-color': this.theme,
+        '--current-color-light': this.theme + '1a',
+        '--current-color-dark-bg': this.theme + '33',
+        '--shell-bg': isWarm ? warmShell : classicShell,
+        '--surface-bg': isWarm ? warmSurface : classicSurface,
+        '--nav-bg': isWarm ? warmSurface : '#ffffff',
+        '--tags-bg': isWarm ? warmSurface : '#ffffff'
+      }
     }
   },
   methods: {
@@ -67,11 +84,16 @@ export default {
     position: relative;
     height: 100%;
     width: 100%;
+    background: var(--shell-bg);
 
     &.mobile.openSidebar {
       position: fixed;
       top: 0;
     }
+  }
+
+  .main-container {
+    background: transparent;
   }
 
   .main-container:has(.fixed-header) {

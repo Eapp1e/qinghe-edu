@@ -59,7 +59,7 @@ public class EduCourseServiceImpl implements IEduCourseService
     @Override
     public int insertCourse(EduCourse course)
     {
-        if (!SecurityUtils.hasRole("edu_teacher") && !SecurityUtils.isAdmin())
+        if (!SecurityUtils.hasExactRole("edu_teacher") && !SecurityUtils.isAdmin())
         {
             throw new ServiceException("只有教师或管理员可以发布课程");
         }
@@ -129,7 +129,7 @@ public class EduCourseServiceImpl implements IEduCourseService
         enrollment.setTeacherUserId(course.getTeacherUserId());
         enrollment.setTeacherName(course.getTeacherName());
         enrollment.setStatus("0");
-        enrollment.setSignupSource(SecurityUtils.hasRole("edu_parent") ? "parent" : "student");
+        enrollment.setSignupSource(SecurityUtils.hasExactRole("edu_parent") ? "parent" : "student");
         enrollment.setCreateBy(SecurityUtils.getUsername());
 
         int rows = enrollmentMapper.insertEnrollment(enrollment);
@@ -240,11 +240,11 @@ public class EduCourseServiceImpl implements IEduCourseService
 
     private void fillQueryScope(EduCourse course, boolean onlyMine)
     {
-        if (SecurityUtils.hasRole("edu_teacher"))
+        if (SecurityUtils.hasExactRole("edu_teacher"))
         {
             course.setTeacherUserId(SecurityUtils.getUserId());
         }
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             course.getParams().put("currentUserId", SecurityUtils.getUserId());
             course.getParams().put("currentRole", "student");
@@ -254,7 +254,7 @@ public class EduCourseServiceImpl implements IEduCourseService
                 course.setStatus("0");
             }
         }
-        if (SecurityUtils.hasRole("edu_parent"))
+        if (SecurityUtils.hasExactRole("edu_parent"))
         {
             course.getParams().put("currentUserId", SecurityUtils.getUserId());
             course.getParams().put("currentRole", "parent");
@@ -278,7 +278,7 @@ public class EduCourseServiceImpl implements IEduCourseService
 
     private void ensureCourseOwner(EduCourse course)
     {
-        if (!SecurityUtils.isAdmin() && SecurityUtils.hasRole("edu_teacher")
+        if (!SecurityUtils.isAdmin() && SecurityUtils.hasExactRole("edu_teacher")
                 && !SecurityUtils.getUserId().equals(course.getTeacherUserId()))
         {
             throw new ServiceException("只能操作本人发布的课程");
@@ -287,7 +287,7 @@ public class EduCourseServiceImpl implements IEduCourseService
 
     private Long resolveStudentUserId(Long studentUserId)
     {
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             Long currentUserId = SecurityUtils.getUserId();
             if (studentUserId != null && !currentUserId.equals(studentUserId))
@@ -297,7 +297,7 @@ public class EduCourseServiceImpl implements IEduCourseService
             return currentUserId;
         }
 
-        if (SecurityUtils.hasRole("edu_parent"))
+        if (SecurityUtils.hasExactRole("edu_parent"))
         {
             if (studentUserId == null)
             {

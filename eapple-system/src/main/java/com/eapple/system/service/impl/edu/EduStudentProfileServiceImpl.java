@@ -26,11 +26,11 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public List<EduStudentProfile> selectProfileList(EduStudentProfile profile)
     {
-        if (SecurityUtils.hasRole("edu_parent"))
+        if (SecurityUtils.hasExactRole("edu_parent"))
         {
             profile.setParentUserId(SecurityUtils.getUserId());
         }
-        else if (SecurityUtils.hasRole("edu_student"))
+        else if (SecurityUtils.hasExactRole("edu_student"))
         {
             profile.setStudentUserId(SecurityUtils.getUserId());
         }
@@ -62,7 +62,7 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     @Override
     public int insertProfile(EduStudentProfile profile)
     {
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             profile.setStudentUserId(SecurityUtils.getUserId());
             if (StringUtils.isEmpty(profile.getStudentName()))
@@ -89,7 +89,7 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     {
         EduStudentProfile currentProfile = profileMapper.selectProfileById(profile.getProfileId());
         ensureProfileEditable(currentProfile);
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             profile.setStudentUserId(currentProfile.getStudentUserId());
             profile.setStatus(currentProfile.getStatus());
@@ -149,11 +149,11 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         {
             throw new ServiceException("学生档案不存在");
         }
-        if (SecurityUtils.hasRole("edu_student") && !SecurityUtils.getUserId().equals(profile.getStudentUserId()))
+        if (SecurityUtils.hasExactRole("edu_student") && !SecurityUtils.getUserId().equals(profile.getStudentUserId()))
         {
             throw new ServiceException("只能查看自己的学生档案");
         }
-        if (SecurityUtils.hasRole("edu_parent") && !SecurityUtils.getUserId().equals(profile.getParentUserId()))
+        if (SecurityUtils.hasExactRole("edu_parent") && !SecurityUtils.getUserId().equals(profile.getParentUserId()))
         {
             throw new ServiceException("只能查看自己关联孩子的学生档案");
         }
@@ -161,7 +161,7 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
 
     private void ensureProfileEditable(EduStudentProfile profile)
     {
-        if (SecurityUtils.hasRole("edu_teacher") || SecurityUtils.isAdmin())
+        if (SecurityUtils.hasExactRole("edu_teacher") || SecurityUtils.isAdmin())
         {
             return;
         }

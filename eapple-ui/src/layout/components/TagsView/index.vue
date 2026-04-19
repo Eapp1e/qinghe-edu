@@ -394,8 +394,8 @@ $tags-bar-height: 34px;
 .tags-view-container {
   height: $tags-bar-height;
   width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #d8dce5;
+  background: var(--tags-bg);
+  border-bottom: 1px solid rgba(163, 196, 174, 0.34);
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -445,9 +445,9 @@ $tags-bar-height: 34px;
       cursor: pointer;
       height: 26px;
       line-height: 26px;
-      border: 1px solid #d8dce5;
+      border: 1px solid rgba(167, 198, 176, 0.34);
       color: #495060;
-      background: #fff;
+      background: rgba(255, 252, 247, 0.74);
       padding: 0 8px;
       font-size: 12px;
       margin-left: 5px;
@@ -463,7 +463,7 @@ $tags-bar-height: 34px;
     border-color: #42b983;
     &::before {
       content: '';
-      background: #fff;
+      background: rgba(255, 255, 255, 0.92);
       display: inline-block;
       width: 8px;
       height: 8px;
@@ -529,8 +529,8 @@ $tags-bar-height: 34px;
     }
   }
   &.tags-view-container--chrome {
-    --chrome-strip-bg: #ffffff;
-    --chrome-strip-border: #e4e7ed;
+    --chrome-strip-bg: var(--tags-bg);
+    --chrome-strip-border: rgba(163, 196, 174, 0.34);
     --chrome-tab-text: #606266;
 
     overflow: visible;

@@ -32,15 +32,15 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
     @Override
     public List<EduHomeworkQuestion> selectQuestionList(EduHomeworkQuestion question)
     {
-        if (SecurityUtils.hasRole("edu_teacher"))
+        if (SecurityUtils.hasExactRole("edu_teacher"))
         {
             question.setTeacherUserId(SecurityUtils.getUserId());
         }
-        if (SecurityUtils.hasRole("edu_parent"))
+        if (SecurityUtils.hasExactRole("edu_parent"))
         {
             question.setParentUserId(SecurityUtils.getUserId());
         }
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             question.setStudentUserId(SecurityUtils.getUserId());
         }
@@ -106,11 +106,11 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
 
     private Long resolveStudentUserId(Long studentUserId)
     {
-        if (SecurityUtils.hasRole("edu_student"))
+        if (SecurityUtils.hasExactRole("edu_student"))
         {
             return SecurityUtils.getUserId();
         }
-        if (SecurityUtils.hasRole("edu_parent"))
+        if (SecurityUtils.hasExactRole("edu_parent"))
         {
             if (studentUserId == null)
             {
