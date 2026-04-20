@@ -14,7 +14,7 @@
       >
         <sidebar-item
           v-for="(route, index) in sidebarRouters"
-          :key="route.path + index"
+          :key="routeKey(route, index)"
           :item="route"
           :base-path="route.path"
         />
@@ -50,6 +50,15 @@ export default {
     },
     isCollapse() {
       return !this.sidebar.opened
+    }
+  },
+  methods: {
+    routeKey(route, index) {
+      const metaTitle = route && route.meta ? route.meta.title : ''
+      const child = Array.isArray(route.children) && route.children.length ? route.children[0] : null
+      const childTitle = child && child.meta ? child.meta.title : ''
+      const childPath = child && child.path ? child.path : ''
+      return [route.path || '', metaTitle, childTitle, childPath, index].join('::')
     }
   }
 }

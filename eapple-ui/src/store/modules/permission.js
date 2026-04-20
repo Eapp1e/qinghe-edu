@@ -25,7 +25,7 @@ const permission = {
       state.topbarRouters = routes
     },
     SET_SIDEBAR_ROUTERS: (state, routes) => {
-      state.sidebarRouters = routes
+      state.sidebarRouters = applySidebarOrder(routes)
     }
   },
   actions: {
@@ -57,7 +57,7 @@ function appendRoleRoutes(routes) {
     const routePath = route.path || ''
     return routePath === 'edu/online-course' || routePath === '/edu/online-course'
   })
-  if (!hasOnlineCourse && auth.hasRole('edu_student')) {
+  if (!hasOnlineCourse && (auth.hasRole('edu_student') || auth.hasRole('admin') || auth.hasRole('edu_admin'))) {
     result.splice(2, 0, {
       name: '',
       path: '/',
@@ -71,13 +71,100 @@ function appendRoleRoutes(routes) {
           name: 'EduOnlineCourse',
           meta: {
             title: '网课中心',
-            icon: 'online'
+            icon: 'guide'
           }
         }
       ]
     })
   }
   return result
+}
+
+function getSidebarSortMode() {
+  try {
+    const layoutSetting = JSON.parse(localStorage.getItem('layout-setting') || '{}')
+    return {
+      mode: layoutSetting.sidebarSortMode || 'default',
+      order: Array.isArray(layoutSetting.sidebarCustomOrder) ? layoutSetting.sidebarCustomOrder : []
+    }
+  } catch (error) {
+    return {
+      mode: 'default',
+      order: []
+    }
+  }
+}
+
+function applySidebarOrder(routes) {
+  const { mode, order } = getSidebarSortMode()
+  const list = Array.isArray(routes) ? routes.map(route => normalizeRouteOrder(route, mode, order)) : []
+  if (mode !== 'custom') {
+    return list
+  }
+  const hiddenRoutes = list.filter(route => route.hidden)
+  const visibleRoutes = list.filter(route => !route.hidden)
+  visibleRoutes.sort((a, b) => compareRouteByCustomOrder(a, b, order))
+  return hiddenRoutes.concat(visibleRoutes)
+}
+
+function normalizeRouteOrder(route, mode, order) {
+  const nextRoute = { ...route }
+  if (Array.isArray(route.children) && route.children.length) {
+    const orderedChildren = route.children.map(child => normalizeRouteOrder(child, mode, order))
+    if (mode === 'custom') {
+      const hiddenChildren = orderedChildren.filter(child => child.hidden)
+      const visibleChildren = orderedChildren.filter(child => !child.hidden)
+      visibleChildren.sort((a, b) => compareRouteByCustomOrder(a, b, order))
+      nextRoute.children = hiddenChildren.concat(visibleChildren)
+    } else {
+      nextRoute.children = orderedChildren
+    }
+  }
+  return nextRoute
+}
+
+function compareRouteByCustomOrder(a, b, order) {
+  const keyA = getRouteOrderKey(a)
+  const keyB = getRouteOrderKey(b)
+  const indexA = order.indexOf(keyA)
+  const indexB = order.indexOf(keyB)
+  if (indexA === -1 && indexB === -1) {
+    return 0
+  }
+  if (indexA === -1) {
+    return 1
+  }
+  if (indexB === -1) {
+    return -1
+  }
+  return indexA - indexB
+}
+
+function getRouteOrderKey(route) {
+  const info = getRouteDisplayInfo(route)
+  return `${info.title}::${info.path}`
+}
+
+function getRouteDisplayInfo(route) {
+  if (!route) {
+    return {
+      title: '',
+      path: ''
+    }
+  }
+  const title = (((route || {}).meta || {}).title || '').toString()
+  const path = ((route || {}).path || '').toString()
+  if (title) {
+    return { title, path }
+  }
+  const visibleChildren = Array.isArray(route.children) ? route.children.filter(item => !item.hidden) : []
+  if (visibleChildren.length === 1) {
+    return getRouteDisplayInfo(visibleChildren[0])
+  }
+  return {
+    title: '',
+    path
+  }
 }
 
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {

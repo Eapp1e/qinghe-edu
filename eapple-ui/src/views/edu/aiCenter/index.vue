@@ -167,7 +167,7 @@ export default {
       },
       queryParams: {
         pageNum: 1,
-        pageSize: 6
+        pageSize: 10
       },
       aiModelOptions: [],
       currentAiModel: '',
@@ -330,6 +330,7 @@ export default {
       })
     },
     refreshData() {
+      this.queryParams.pageNum = 1
       this.getLogList()
       this.getLogSummary()
     },
@@ -368,6 +369,7 @@ export default {
         teaching_suggestion: '教学建议生成',
         homework_answer: '作业问答',
         course_recommendation: '课程推荐',
+        online_resource_recommendation: '网课推荐',
         learning_guidance: '学习辅导',
         parent_support: '家长陪学',
         ai_chat: '智能对话'

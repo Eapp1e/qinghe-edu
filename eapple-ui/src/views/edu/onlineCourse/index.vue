@@ -18,7 +18,7 @@
       </div>
     </section>
 
-    <section class="ai-recommend-panel">
+    <section v-if="!isAdminView" class="ai-recommend-panel">
       <div class="ai-recommend-head">
         <div>
           <h3>网课推荐</h3>
@@ -68,16 +68,26 @@
     </section>
 
     <section class="toolbar-panel">
-      <div class="toolbar-filters">
-        <button
-          v-for="item in stageOptions"
-          :key="item.value"
-          type="button"
-          :class="['filter-chip', { active: activeStage === item.value }]"
-          @click="activeStage = item.value"
+      <div class="toolbar-row">
+        <div class="toolbar-filters">
+          <button
+            v-for="item in stageOptions"
+            :key="item.value"
+            type="button"
+            :class="['filter-chip', { active: activeStage === item.value }]"
+            @click="activeStage = item.value"
+          >
+            {{ item.label }}
+          </button>
+        </div>
+        <el-button
+          v-if="isAdminView"
+          class="resource-manage-btn"
+          icon="el-icon-plus"
+          @click="openResourceDialog"
         >
-          {{ item.label }}
-        </button>
+          添加资源
+        </el-button>
       </div>
       <div class="toolbar-filters secondary">
         <button
@@ -119,11 +129,96 @@
         </button>
       </article>
     </section>
+
+    <el-dialog
+      v-if="isAdminView"
+      title="添加网课资源"
+      :visible.sync="resourceDialogOpen"
+      width="720px"
+      append-to-body
+    >
+      <el-form ref="resourceForm" :model="resourceForm" :rules="resourceRules" label-width="96px" class="resource-form">
+        <el-row :gutter="18">
+          <el-col :span="12">
+            <el-form-item label="资源标题" prop="title">
+              <el-input v-model="resourceForm.title" placeholder="请输入资源标题" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="资源来源" prop="source">
+              <el-input v-model="resourceForm.source" placeholder="如：教育部平台 / 故宫博物院" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="18">
+          <el-col :span="12">
+            <el-form-item label="资源类型" prop="sourceType">
+              <el-select v-model="resourceForm.sourceType" placeholder="请选择资源类型" class="full-width">
+                <el-option label="官方平台" value="official" />
+                <el-option label="视频学习" value="video" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属分类" prop="category">
+              <el-select v-model="resourceForm.category" placeholder="请选择所属分类" class="full-width">
+                <el-option
+                  v-for="item in categoryOptions.filter(item => item.value !== 'all')"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="18">
+          <el-col :span="12">
+            <el-form-item label="适用阶段" prop="stage">
+              <el-select v-model="resourceForm.stage" placeholder="请选择适用阶段" class="full-width">
+                <el-option label="小学" value="primary" />
+                <el-option label="初中" value="middle" />
+                <el-option label="通用拓展" value="common" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="阶段展示" prop="stageLabel">
+              <el-input v-model="resourceForm.stageLabel" placeholder="如：小学 / 初中" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="资源描述" prop="description">
+          <el-input v-model="resourceForm.description" type="textarea" :rows="3" placeholder="请输入资源简介" />
+        </el-form-item>
+        <el-row :gutter="18">
+          <el-col :span="12">
+            <el-form-item label="链接地址" prop="link">
+              <el-input v-model="resourceForm.link" placeholder="请输入可跳转链接" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="展示文案" prop="freeText">
+              <el-input v-model="resourceForm.freeText" placeholder="如：免费使用 / 免费检索" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="资源标签" prop="tagsText">
+          <el-input v-model="resourceForm.tagsText" placeholder="多个标签请用中文逗号分隔" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="resourceDialogOpen = false">取消</el-button>
+        <el-button type="primary" @click="submitResource">保存资源</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { recommendOnlineResources } from '@/api/edu/ai'
+
+const ONLINE_RESOURCE_STORAGE_KEY = 'edu.onlineCourse.customResources'
 
 export default {
   name: 'EduOnlineCourse',
@@ -134,6 +229,30 @@ export default {
       interestInput: '',
       aiLoading: false,
       aiRecommendations: [],
+      resourceDialogOpen: false,
+      resourceForm: {
+        title: '',
+        source: '',
+        sourceType: 'official',
+        category: '',
+        stage: 'common',
+        stageLabel: '',
+        description: '',
+        link: '',
+        freeText: '免费使用',
+        tagsText: ''
+      },
+      resourceRules: {
+        title: [{ required: true, message: '请填写资源标题', trigger: 'blur' }],
+        source: [{ required: true, message: '请填写资源来源', trigger: 'blur' }],
+        sourceType: [{ required: true, message: '请选择资源类型', trigger: 'change' }],
+        category: [{ required: true, message: '请选择所属分类', trigger: 'change' }],
+        stage: [{ required: true, message: '请选择适用阶段', trigger: 'change' }],
+        stageLabel: [{ required: true, message: '请填写阶段展示文案', trigger: 'blur' }],
+        description: [{ required: true, message: '请填写资源描述', trigger: 'blur' }],
+        link: [{ required: true, message: '请填写链接地址', trigger: 'blur' }],
+        freeText: [{ required: true, message: '请填写展示文案', trigger: 'blur' }]
+      },
       stageOptions: [
         { label: '全部阶段', value: 'all' },
         { label: '小学', value: 'primary' },
@@ -407,6 +526,9 @@ export default {
     }
   },
   computed: {
+    isAdminView() {
+      return this.$auth.hasRole('admin') || this.$auth.hasRole('edu_admin')
+    },
     filteredResources() {
       return this.resources.filter(item => {
         const stageMatched = this.activeStage === 'all' || item.stage === this.activeStage || item.stage === 'common'
@@ -421,7 +543,80 @@ export default {
       return this.resources.filter(item => item.sourceType === 'video').length
     }
   },
+  created() {
+    this.resources = this.loadResourceList()
+  },
   methods: {
+    loadResourceList() {
+      const defaults = this.resources.slice()
+      const custom = this.getCustomResources()
+      return defaults.concat(custom)
+    },
+    getCustomResources() {
+      try {
+        const raw = localStorage.getItem(ONLINE_RESOURCE_STORAGE_KEY)
+        const parsed = raw ? JSON.parse(raw) : []
+        return Array.isArray(parsed) ? parsed : []
+      } catch (error) {
+        return []
+      }
+    },
+    saveCustomResources(list) {
+      localStorage.setItem(ONLINE_RESOURCE_STORAGE_KEY, JSON.stringify(list || []))
+    },
+    openResourceDialog() {
+      this.resourceDialogOpen = true
+      this.$nextTick(() => {
+        this.resetResourceForm()
+      })
+    },
+    resetResourceForm() {
+      this.resourceForm = {
+        title: '',
+        source: '',
+        sourceType: 'official',
+        category: '',
+        stage: 'common',
+        stageLabel: '',
+        description: '',
+        link: '',
+        freeText: '免费使用',
+        tagsText: ''
+      }
+      if (this.$refs.resourceForm) {
+        this.$refs.resourceForm.resetFields()
+      }
+    },
+    submitResource() {
+      this.$refs.resourceForm.validate(valid => {
+        if (!valid) {
+          return
+        }
+        const resource = {
+          title: this.resourceForm.title.trim(),
+          source: this.resourceForm.source.trim(),
+          description: this.resourceForm.description.trim(),
+          category: this.resourceForm.category,
+          stage: this.resourceForm.stage,
+          stageLabel: this.resourceForm.stageLabel.trim(),
+          sourceType: this.resourceForm.sourceType,
+          typeLabel: this.resourceForm.sourceType === 'official' ? '官方平台' : '视频学习',
+          typeClass: this.resourceForm.sourceType,
+          freeText: this.resourceForm.freeText.trim(),
+          tags: (this.resourceForm.tagsText || '')
+            .split(/[，,]/)
+            .map(item => item.trim())
+            .filter(Boolean),
+          link: this.resourceForm.link.trim()
+        }
+        const customResources = this.getCustomResources()
+        customResources.unshift(resource)
+        this.saveCustomResources(customResources)
+        this.resources = this.loadResourceList()
+        this.resourceDialogOpen = false
+        this.$modal.msgSuccess('资源已添加到网课中心')
+      })
+    },
     openResource(item) {
       this.openLink(item.link)
     },
@@ -514,11 +709,24 @@ export default {
       }))
     },
     extractKeywords(interest) {
-      return interest
+      const normalized = interest
         .replace(/[，。；、,.!?！？]/g, ' ')
+        .toLowerCase()
+      const words = normalized
         .split(/\s+/)
-        .map(item => item.trim().toLowerCase())
+        .map(item => item.trim())
         .filter(Boolean)
+      const dictionary = [
+        '数学', '思维', '奥数', '逻辑', '编程', 'scratch', '英语', '绘本', '口语', '拼读',
+        '科学', '实验', '科普', '天文', '美术', '手工', '绘画', '历史', '人文', '传统文化',
+        '国博', '故宫', '阅读', '语文'
+      ]
+      dictionary.forEach(word => {
+        if (normalized.includes(word) && !words.includes(word)) {
+          words.push(word)
+        }
+      })
+      return words
     },
     compressText(text, maxLength) {
       if (!text) {
@@ -557,7 +765,7 @@ export default {
         return { item, score }
       })
 
-      return scored
+      const matched = scored
         .filter(entry => entry.score > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, 3)
@@ -567,6 +775,37 @@ export default {
           reason: `推荐学习 ${entry.item.category} 方向内容，和“${interest}”较为匹配。`,
           link: entry.item.link
         }))
+      if (matched.length) {
+        return matched
+      }
+
+      const categoryFallbackMap = [
+        { keys: ['数学', '思维', '奥数', '逻辑'], category: '数学提升' },
+        { keys: ['编程', 'scratch'], category: '编程启蒙' },
+        { keys: ['英语', '绘本', '口语', '拼读'], category: '英语拓展' },
+        { keys: ['科学', '实验', '科普', '天文'], category: '科学探究' },
+        { keys: ['美术', '手工', '绘画', '故宫', '传统文化'], category: '美育素养' },
+        { keys: ['历史', '人文', '国博', '阅读', '语文'], category: '综合课程' }
+      ]
+      const target = categoryFallbackMap.find(item => item.keys.some(key => interest.toLowerCase().includes(key)))
+      if (target) {
+        return this.resources
+          .filter(item => item.category === target.category)
+          .slice(0, 3)
+          .map(item => ({
+            title: item.title,
+            source: item.source,
+            reason: `推荐 ${target.category} 方向资源，适合围绕“${interest}”继续学习。`,
+            link: item.link
+          }))
+      }
+
+      return this.resources.slice(0, 3).map(item => ({
+        title: item.title,
+        source: item.source,
+        reason: `可先从该平台开始了解“${interest}”相关内容。`,
+        link: item.link
+      }))
     }
   }
 }
@@ -817,8 +1056,31 @@ export default {
   gap: 12px;
 }
 
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .toolbar-filters.secondary {
   margin-top: 14px;
+}
+
+.resource-manage-btn {
+  flex: 0 0 auto;
+  height: 42px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #66d7b7 0%, #58a7f4 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 14px 24px rgba(73, 171, 204, 0.18);
+}
+
+.resource-form .full-width {
+  width: 100%;
 }
 
 .filter-chip {
@@ -978,6 +1240,11 @@ export default {
   .hero-panel,
   .ai-recommend-head {
     flex-direction: column;
+  }
+
+  .toolbar-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .hero-stats--compact,

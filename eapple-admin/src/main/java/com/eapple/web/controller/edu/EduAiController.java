@@ -79,14 +79,96 @@ public class EduAiController extends BaseController
         }
 
         String content = aiService.generateOnlineResourceRecommendation(SecurityUtils.getUserId(), prompt.toString());
+        return success(normalizeRecommendationList(content));
+    }
+
+    private List<JSONObject> normalizeRecommendationList(String content)
+    {
+        JSONArray array = parseRecommendationArray(content);
+        List<JSONObject> result = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++)
+        {
+            Object item = array.get(i);
+            if (item instanceof JSONObject)
+            {
+                JSONObject object = (JSONObject) item;
+                if (StringUtils.isNotEmpty(object.getString("title")) && StringUtils.isNotEmpty(object.getString("link")))
+                {
+                    result.add(object);
+                }
+            }
+        }
+        return result;
+    }
+
+    private JSONArray parseRecommendationArray(String content)
+    {
+        if (StringUtils.isEmpty(content))
+        {
+            return new JSONArray();
+        }
+
+        JSONArray parsed = tryParseArray(content);
+        if (parsed != null)
+        {
+            return parsed;
+        }
+
+        String normalized = content.trim()
+                .replace("```json", "")
+                .replace("```JSON", "")
+                .replace("```", "")
+                .trim();
+
+        parsed = tryParseArray(normalized);
+        if (parsed != null)
+        {
+            return parsed;
+        }
+
         try
         {
-            JSONArray array = JSON.parseArray(content);
-            return success(array.toJavaList(JSONObject.class));
+            JSONObject object = JSON.parseObject(normalized);
+            JSONArray array = object.getJSONArray("recommendations");
+            if (array == null)
+            {
+                array = object.getJSONArray("data");
+            }
+            if (array == null)
+            {
+                array = object.getJSONArray("items");
+            }
+            if (array != null)
+            {
+                return array;
+            }
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {
-            throw new ServiceException("AI 推荐结果解析失败，请重试");
+        }
+
+        int start = normalized.indexOf('[');
+        int end = normalized.lastIndexOf(']');
+        if (start >= 0 && end > start)
+        {
+            parsed = tryParseArray(normalized.substring(start, end + 1));
+            if (parsed != null)
+            {
+                return parsed;
+            }
+        }
+        return new JSONArray();
+    }
+
+    private JSONArray tryParseArray(String text)
+    {
+        try
+        {
+            return JSON.parseArray(text);
+        }
+        catch (Exception ignored)
+        {
+            return null;
         }
     }
 

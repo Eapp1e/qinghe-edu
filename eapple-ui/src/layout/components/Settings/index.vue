@@ -1,5 +1,12 @@
 <template>
-  <el-drawer size="280px" :visible="showSettings" :with-header="false" :append-to-body="true" :before-close="closeSetting" :lock-scroll="false">
+  <el-drawer
+    size="280px"
+    :visible="showSettings"
+    :with-header="false"
+    :append-to-body="true"
+    :before-close="closeSetting"
+    :lock-scroll="false"
+  >
     <div class="drawer-container">
       <div>
         <div class="setting-drawer-content">
@@ -8,42 +15,83 @@
           </div>
           <div class="nav-wrap">
             <el-tooltip content="左侧菜单" placement="bottom">
-              <div class="item left" @click="handleNavType(1)" :style="{'--theme': theme}" :class="{ activeItem: navType == 1 }">
+              <div
+                class="item left"
+                :style="{ '--theme': theme }"
+                :class="{ activeItem: navType === 1 }"
+                @click="handleNavType(1)"
+              >
                 <b></b><b></b>
               </div>
             </el-tooltip>
 
             <el-tooltip content="混合菜单" placement="bottom">
-              <div class="item mix" @click="handleNavType(2)" :style="{'--theme': theme}" :class="{ activeItem: navType == 2 }">
+              <div
+                class="item mix"
+                :style="{ '--theme': theme }"
+                :class="{ activeItem: navType === 2 }"
+                @click="handleNavType(2)"
+              >
                 <b></b><b></b>
               </div>
             </el-tooltip>
+
             <el-tooltip content="顶部菜单" placement="bottom">
-              <div class="item top" @click="handleNavType(3)" :style="{'--theme': theme}" :class="{ activeItem: navType == 3 }">
+              <div
+                class="item top"
+                :style="{ '--theme': theme }"
+                :class="{ activeItem: navType === 3 }"
+                @click="handleNavType(3)"
+              >
                 <b></b><b></b>
               </div>
             </el-tooltip>
           </div>
+
           <div class="setting-drawer-title">
             <h3 class="drawer-title">主题风格设置</h3>
           </div>
           <div class="setting-drawer-block-checbox">
             <div class="setting-drawer-block-checbox-item" @click="handleTheme('theme-dark')">
               <img src="@/assets/images/dark.svg" alt="dark">
-              <div v-if="sideTheme === 'theme-dark'" class="setting-drawer-block-checbox-selectIcon" style="display: block;">
+              <div
+                v-if="sideTheme === 'theme-dark'"
+                class="setting-drawer-block-checbox-selectIcon"
+                style="display: block;"
+              >
                 <i aria-label="图标: check" class="anticon anticon-check">
-                  <svg viewBox="64 64 896 896" data-icon="check" width="1em" height="1em" :fill="theme" aria-hidden="true" focusable="false" class="">
-                    <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2L404.7 724.5 207 474a32 32 0 0 0-25.1-12.2H112c-6.7 0-10.4 7.7-6.3 12.9l273.9 347c12.8 16.2 37.4 16.2 50.3 0l488.4-618.9c4.1-5.1.4-12.8-6.3-12.8z"/>
+                  <svg
+                    viewBox="64 64 896 896"
+                    data-icon="check"
+                    width="1em"
+                    height="1em"
+                    :fill="theme"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2L404.7 724.5 207 474a32 32 0 0 0-25.1-12.2H112c-6.7 0-10.4 7.7-6.3 12.9l273.9 347c12.8 16.2 37.4 16.2 50.3 0l488.4-618.9c4.1-5.1.4-12.8-6.3-12.8z" />
                   </svg>
                 </i>
               </div>
             </div>
             <div class="setting-drawer-block-checbox-item" @click="handleTheme('theme-light')">
               <img src="@/assets/images/light.svg" alt="light">
-              <div v-if="sideTheme === 'theme-light'" class="setting-drawer-block-checbox-selectIcon" style="display: block;">
+              <div
+                v-if="sideTheme === 'theme-light'"
+                class="setting-drawer-block-checbox-selectIcon"
+                style="display: block;"
+              >
                 <i aria-label="图标: check" class="anticon anticon-check">
-                  <svg viewBox="64 64 896 896" data-icon="check" width="1em" height="1em" :fill="theme" aria-hidden="true" focusable="false" class="">
-                    <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2L404.7 724.5 207 474a32 32 0 0 0-25.1-12.2H112c-6.7 0-10.4 7.7-6.3 12.9l273.9 347c12.8 16.2 37.4 16.2 50.3 0l488.4-618.9c4.1-5.1.4-12.8-6.3-12.8z"/>
+                  <svg
+                    viewBox="64 64 896 896"
+                    data-icon="check"
+                    width="1em"
+                    height="1em"
+                    :fill="theme"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2L404.7 724.5 207 474a32 32 0 0 0-25.1-12.2H112c-6.7 0-10.4 7.7-6.3 12.9l273.9 347c12.8 16.2 37.4 16.2 50.3 0l488.4-618.9c4.1-5.1.4-12.8-6.3-12.8z" />
                   </svg>
                 </i>
               </div>
@@ -52,11 +100,14 @@
 
           <div class="drawer-item">
             <span>主题颜色</span>
-            <theme-picker style="float: right;height: 26px;margin: -3px 8px 0 0;" @change="themeChange" />
+            <theme-picker
+              style="float: right; height: 26px; margin: -3px 8px 0 0;"
+              @change="themeChange"
+            />
           </div>
         </div>
 
-        <el-divider/>
+        <el-divider />
 
         <h3 class="drawer-title">系统布局配置</h3>
 
@@ -79,18 +130,26 @@
           <span>标签页样式</span>
           <el-radio-group v-model="tagsViewStyle" :disabled="!tagsView" size="mini" class="drawer-switch">
             <el-radio-button label="card">卡片</el-radio-button>
-            <el-radio-button label="chrome">谷歌</el-radio-button>
+            <el-radio-button label="chrome">胶囊</el-radio-button>
           </el-radio-group>
         </div>
 
         <div class="drawer-item">
-          <span>固定 Header</span>
+          <span>固定顶栏</span>
           <el-switch v-model="fixedHeader" class="drawer-switch" />
         </div>
 
         <div class="drawer-item">
           <span>显示 Logo</span>
           <el-switch v-model="sidebarLogo" class="drawer-switch" />
+        </div>
+
+        <div class="drawer-item drawer-item--stacked">
+          <span>侧栏排序</span>
+          <el-radio-group v-model="sidebarSortMode" size="mini" class="drawer-switch drawer-switch--radio">
+            <el-radio-button label="default">默认排序</el-radio-button>
+            <el-radio-button label="custom">自定义排序</el-radio-button>
+          </el-radio-group>
         </div>
 
         <div class="drawer-item">
@@ -103,7 +162,7 @@
           <el-switch v-model="footerVisible" class="drawer-switch" />
         </div>
 
-        <el-divider/>
+        <el-divider />
 
         <el-button size="small" type="primary" plain icon="el-icon-document-add" @click="saveSetting">保存配置</el-button>
         <el-button size="small" plain icon="el-icon-refresh" @click="resetSetting">重置配置</el-button>
@@ -193,6 +252,18 @@ export default {
         })
       }
     },
+    sidebarSortMode: {
+      get() {
+        return this.$store.state.settings.sidebarSortMode
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'sidebarSortMode',
+          value: val
+        })
+        this.syncSidebarRoutes()
+      }
+    },
     dynamicTitle: {
       get() {
         return this.$store.state.settings.dynamicTitle
@@ -220,16 +291,14 @@ export default {
   watch: {
     navType: {
       handler(val) {
-        if (val == 1) {
-          this.$store.dispatch("app/toggleSideBarHide", false)
+        if (val === 1) {
+          this.$store.dispatch('app/toggleSideBarHide', false)
         }
-        if (val == 2) {
-        }
-        if (val == 3) {
-          this.$store.dispatch("app/toggleSideBarHide", true)
+        if (val === 3) {
+          this.$store.dispatch('app/toggleSideBarHide', true)
         }
         if ([1, 3].includes(val)) {
-          this.$store.commit("SET_SIDEBAR_ROUTERS",this.$store.state.permission.defaultRoutes)
+          this.syncSidebarRoutes()
         }
       },
       immediate: true,
@@ -258,21 +327,26 @@ export default {
       })
       this.navType = val
     },
+    syncSidebarRoutes() {
+      this.$store.commit('SET_SIDEBAR_ROUTERS', this.$store.state.permission.defaultRoutes)
+    },
     openSetting() {
       this.showSettings = true
     },
-    closeSetting(){
+    closeSetting() {
       this.showSettings = false
     },
     saveSetting() {
-      this.$modal.loading("正在保存到本地，请稍候...")
+      this.$modal.loading('正在保存到本地，请稍候...')
       if (!this.tagsViewPersist) {
         this.$cache.local.remove('tags-view-visited')
       }
       this.$cache.local.set(
-        "layout-setting",
+        'layout-setting',
         `{
             "navType":${this.navType},
+            "sidebarSortMode":"${this.sidebarSortMode}",
+            "sidebarCustomOrder":${JSON.stringify(this.$store.state.settings.sidebarCustomOrder || [])},
             "tagsView":${this.tagsView},
             "tagsIcon":${this.tagsIcon},
             "tagsViewStyle":"${this.tagsViewStyle}",
@@ -286,13 +360,15 @@ export default {
             "theme":"${this.theme}"
           }`
       )
-      setTimeout(this.$modal.closeLoading(), 1000)
+      setTimeout(() => this.$modal.closeLoading(), 1000)
     },
     resetSetting() {
-      this.$modal.loading("正在清除设置缓存并刷新，请稍候...")
+      this.$modal.loading('正在清除设置缓存并刷新，请稍候...')
       this.$cache.local.remove('tags-view-visited')
-      this.$cache.local.remove("layout-setting")
-      setTimeout("window.location.reload()", 1000)
+      this.$cache.local.remove('layout-setting')
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     }
   }
 }
@@ -361,12 +437,22 @@ export default {
     padding: 12px 0;
   }
 
+  .drawer-item--stacked {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
   .drawer-switch {
-    float: right
+    float: right;
+  }
+
+  .drawer-switch--radio {
+    float: none;
   }
 }
 
-// 导航模式
 .nav-wrap {
   display: flex;
   justify-content: flex-start;
@@ -395,36 +481,40 @@ export default {
       height: 30%;
       background: #fff;
     }
+
     b:last-child {
-      width: 30%;
-      background: #1b2a47;
       position: absolute;
-      height: 100%;
       top: 0;
+      width: 30%;
+      height: 100%;
       border-radius: 4px 0 0 4px;
+      background: #1b2a47;
     }
   }
+
   .mix {
     b:first-child {
-      border-radius: 4px 4px 0 0;
       display: block;
       height: 30%;
+      border-radius: 4px 4px 0 0;
       background: #1b2a47;
     }
+
     b:last-child {
-      width: 30%;
-      background: #1b2a47;
       position: absolute;
+      width: 30%;
       height: 70%;
       border-radius: 0 0 0 4px;
+      background: #1b2a47;
     }
   }
+
   .top {
     b:first-child {
       display: block;
       height: 30%;
-      background: #1b2a47;
       border-radius: 4px 4px 0 0;
+      background: #1b2a47;
     }
   }
 }

@@ -4,6 +4,8 @@ module.exports = {
   backgroundMode: 'warm',
   showSettings: true,
   navType: 1,
+  sidebarSortMode: 'default',
+  sidebarCustomOrder: [],
   tagsView: true,
   tagsViewPersist: false,
   tagsIcon: false,
