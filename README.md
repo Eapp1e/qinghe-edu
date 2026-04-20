@@ -1,118 +1,188 @@
-# 中小学智能课后服务平台
+# 青禾智学课后服务平台
 
-基于 `Spring Boot + Vue + MyBatis + JWT` 的中小学智能课后服务平台，面向学生、家长、教师和管理员四类角色，支持课后课程管理、报名管理、作业问答、AI 辅助内容生成与平台运营管理。
+基于 `Spring Boot + Vue 2 + MyBatis + JWT + MySQL` 的中小学智能课后服务平台，面向学生、家长、教师与管理员四类角色，支持课后课程管理、报名记录管理、学生档案维护、作业问答、网课资源整合与 AI 辅助能力接入。
 
 ## 项目简介
 
-本项目以中小学课后服务业务为核心，结合学校课后课程组织、家校协同和智能问答场景，构建一套完整的课后服务管理平台。系统在保留前后端分离架构优势的基础上，融入大模型能力，用于课程通知生成、教学建议生成、作业问题解答和 AI 调用日志管理。
+青禾智学课后服务平台聚焦中小学课后延时服务场景，结合课程发布、兴趣班报名、家校协同、学生成长档案与智能问答需求，构建了一套可直接演示、可继续二次开发的前后端分离系统。
+
+项目保留了成熟后台管理框架的工程化能力，同时结合教育业务进行重构，形成了适用于毕业设计、课程设计和教学演示的完整平台：
+
+- 学生端：查看课程、报名课程、提问作业问题、获取 AI 解答、浏览网课资源
+- 家长端：查看孩子档案、代报名课程、填写学习记录、查看 AI 互动历史
+- 教师端：发布课程、启停课程、查看报名情况、使用 AI 生成通知与教学建议
+- 管理端：统一管理平台用户、课程、公告、AI 日志、统计图表与网课资源
 
 ## 核心功能
 
-### 学生端
+### 1. 平台首页与数据看板
 
-- 查看课后课程与兴趣班信息
-- 报名课程与取消报名
-- 提交作业问题并查看 AI 解答
-- 查看个人学生档案与相关学习信息
+- 首页展示平台动态、近期课程安排、热门选课排行与活跃趋势图表
+- 基于 ECharts 实现可视化统计展示
+- 支持不同角色查看统一的平台公共信息
 
-### 家长端
+### 2. 课程中心
 
-- 为孩子报名课程
-- 查看孩子学习记录与报名信息
-- 查看 AI 互动历史
-- 维护孩子档案信息
+- 教师可发布课程、编辑课程、调整课程状态
+- 学生和家长可查看课程列表并完成报名
+- 管理员可统一查看全部课程与运行状态
 
-### 教师端
+### 3. 学生档案
 
-- 发布、编辑、删除课程
-- 查看报名名单
-- 使用 AI 生成课程通知
-- 使用 AI 生成教学建议
+- 学生与家长可维护本人或孩子的档案信息
+- 教师与管理员可查看全量学生档案
+- 档案支持兴趣标签、年级班级、家长关联等信息维护
+- 可结合学生档案进行 AI 课程推荐
 
-### 管理员端
+### 4. 报名记录 / 学习记录
 
-- 查看平台首页与统计图表
-- 管理平台用户
-- 管理平台公告
-- 查看 AI 日志与平台运营数据
+- 学生、家长可查看课程报名结果与学习情况
+- 家长端可补充学习记录
+- 教师和管理员可查看课程参与情况与过程数据
+
+### 5. 作业问答
+
+- 学生可提交作业问题并查看 AI 解答
+- 教师和管理员可查看问答记录，并支持重新生成解答
+- 问答记录与 AI 中心联动展示
+
+### 6. AI 中心
+
+- 支持查看模型选项、最近 AI 使用记录、调用状态与结果
+- 支持不同角色展示差异化 AI 使用入口
+- 已接入硅基流动模型接口，支持问答、通知生成、教学建议、资源推荐等场景
+
+### 7. 平台公告
+
+- 公告支持发布、查看、已读记录管理
+- 学生和家长侧重查看
+- 教师和管理员可进行更完整的运营管理
+
+### 8. 网课中心
+
+- 整合官方平台、科普站点与优质免费视频资源
+- 学生端可进行 AI 网课推荐
+- 管理端支持维护和新增网课资源
+
+### 9. 平台用户管理
+
+- 管理员可统一查看平台用户
+- 支持学生、家长、教师账号注册与角色区分
+- 支持账号状态控制、重置密码和基础信息维护
 
 ## 技术栈
 
 ### 后端
 
-- Spring Boot
+- Spring Boot 4
 - Spring Security
 - MyBatis
+- PageHelper
 - JWT
+- Druid
+- Fastjson2
 - MySQL
+- Maven
 
 ### 前端
 
 - Vue 2
-- Element UI
-- Vuex
 - Vue Router
+- Vuex
+- Element UI
 - ECharts
+- Axios
+- Sass
+- SortableJS / vuedraggable
 
-### AI 能力
+### AI 与平台能力
 
-- 大模型 API 接入
-- 课程通知生成
-- 教学建议生成
-- 作业问题智能问答
-- AI 调用日志记录
-
-## 角色账号
-
-默认测试账号如下，密码统一为 `admin123`：
-
-| 角色 | 账号 | 说明 |
-| --- | --- | --- |
-| 管理员 | `edu_admin` | 负责平台整体管理与数据查看 |
-| 教师 | `edu_teacher` | 负责课程发布、通知生成与教学建议 |
-| 家长 | `edu_parent` | 负责为孩子报名、查看学习记录 |
-| 学生 | `edu_student` | 负责课程报名、作业提问与查看 AI 解答 |
+- SiliconFlow 大模型接口接入
+- AI 安全关键词过滤与调用日志记录
+- 教育业务场景下的问答、推荐、内容生成能力
 
 ## 项目结构
 
 ```text
-eapple-admin        后端启动模块
-eapple-common       公共模块
-eapple-framework    安全认证与基础框架模块
-eapple-system       业务系统模块
+eapple-admin        后端启动模块，包含控制器与应用启动类
+eapple-common       通用工具、基础常量、公共封装
+eapple-framework    安全认证、权限控制、系统基础框架
+eapple-system       教育业务核心模块
 eapple-ui           前端项目
-sql                 数据库脚本
-doc                 项目说明文档
+sql                 数据库初始化与演示数据脚本
+doc                 项目文档与补充说明
+runtime             本地运行生成目录
 ```
 
-## 数据库脚本
+## 主要业务模块
 
-初始化数据库时建议按以下顺序导入：
+### 后端实体与业务对象
+
+当前教育业务核心对象主要包括：
+
+- `EduCourse`：课后课程
+- `EduCourseEnrollment`：课程报名记录
+- `EduHomeworkQuestion`：作业问答
+- `EduStudentProfile`：学生档案
+- `EduAiLog`：AI 调用日志
+- `EduAiModelOption`：AI 模型选项
+- `EduDashboardVo`：平台首页统计对象
+
+### 前端页面模块
+
+`eapple-ui/src/views/edu` 下主要包含：
+
+- `dashboard`：平台首页
+- `course`：课程中心
+- `student`：学生档案
+- `enrollment`：报名记录 / 学习记录
+- `question`：作业问答
+- `aiCenter`：AI 中心
+- `aiLog`：AI 日志
+- `platformUser`：平台用户
+- `platformNotice`：平台公告
+- `onlineCourse`：网课中心
+
+## 数据库脚本说明
+
+`sql` 目录下已包含基础表结构、平台升级脚本与演示数据脚本，当前常用脚本包括：
+
+- `ry_20260321.sql`
+- `edu_after_school.sql`
+- `edu_platform_bootstrap.sql`
+- `edu_platform_upgrade.sql`
+- `edu_demo_data.sql`
+- `edu_demo_course_expansion.sql`
+- `edu_demo_family_expansion.sql`
+- `edu_demo_question_expansion.sql`
+- `edu_notice_refresh.sql`
+- `quartz.sql`
+
+推荐初始化顺序：
 
 1. `sql/ry_20260321.sql`
 2. `sql/edu_after_school.sql`
-3. `sql/edu_demo_data.sql`
-
-如果已经在当前库中完成初始化，可跳过重复导入。
+3. `sql/edu_platform_bootstrap.sql`
+4. `sql/edu_platform_upgrade.sql`
+5. `sql/edu_demo_data.sql`
+6. 根据需要补充导入扩展演示脚本
 
 ## 运行环境
 
 - JDK 17+
-- MySQL 8.x
 - Maven 3.8+
 - Node.js 16+
+- MySQL 8.x
 
 ## 后端启动
 
-进入项目根目录后，确保 Maven 使用 JDK 17：
+在项目根目录执行：
 
 ```powershell
-$env:JAVA_HOME='D:\java\jdk\jdk17'
-$env:Path='D:\java\jdk\jdk17\bin;' + $env:Path
 mvn -pl eapple-admin -am -DskipTests compile
 ```
 
-在 IDEA 中启动主类：
+启动主类：
 
 `eapple-admin/src/main/java/com/eapple/EduPlatformApplication.java`
 
@@ -122,7 +192,7 @@ mvn -pl eapple-admin -am -DskipTests compile
 
 ## 前端启动
 
-进入前端目录：
+进入前端目录后执行：
 
 ```powershell
 cd eapple-ui
@@ -132,53 +202,55 @@ npm run dev
 
 默认前端地址：
 
-- [http://localhost:80/](http://localhost:80/)
+- [http://localhost/](http://localhost/)
 
 ## AI 配置说明
 
-后端配置文件位于：
+AI 相关配置位于：
 
-- [eapple-admin/src/main/resources/application.yml](/D:/Progects/Codex/bishe/eapple-admin/src/main/resources/application.yml:1)
+[application.yml](/D:/Progects/Codex/bishe/eapple-admin/src/main/resources/application.yml:1)
 
-默认可以使用 Mock 模式演示 AI 能力。若需要接入真实大模型 API，可在配置中补充：
+当前项目已支持：
 
-- `enabled`
-- `baseUrl`
-- `apiKey`
-- `model`
+- AI 问答
+- AI 教学建议生成
+- AI 课程通知生成
+- AI 网课推荐
+- AI 调用日志记录
 
-## 推荐演示流程
+如需切换模型或更换平台，可在配置中调整：
 
-### 管理员
+- `edu.ai.enabled`
+- `edu.ai.endpoint`
+- `edu.ai.apiKey`
+- `edu.ai.model`
+- `edu.ai.timeoutSeconds`
+- `edu.ai.maxPromptLength`
 
-1. 登录平台首页查看统计图表
-2. 查看平台用户管理
-3. 查看平台公告
-4. 查看 AI 日志
+## 演示账号建议
 
-### 教师
+项目已内置多组演示账号，并支持学生、家长、教师的自助注册。建议演示时使用四类典型角色：
 
-1. 进入课程中心发布课程
-2. 使用 AI 生成课程通知
-3. 使用 AI 生成教学建议
-4. 查看报名记录
-
-### 家长
-
-1. 查看学生档案
-2. 为孩子报名课程
-3. 查看报名记录
-
-### 学生
-
-1. 查看课程中心并报名课程
-2. 提交作业问题
-3. 查看 AI 解答
+- 管理员：查看平台全局数据、平台用户、公告与 AI 日志
+- 教师：发布课程、处理报名、生成通知与教学建议
+- 家长：查看学生档案、报名课程、填写学习记录
+- 学生：报名课程、提交作业问题、使用网课中心与 AI 推荐
 
 ## 项目亮点
 
-- 面向中小学课后服务业务场景，功能结构完整
-- 支持学生、家长、教师、管理员四类角色协同
-- 引入 AI 能力，增强通知生成、教学建议和问答体验
-- 前后端分离，便于后续二次开发与部署
-- 适合作为毕业设计、课程设计和项目实践示例
+- 面向中小学课后服务场景，功能结构完整，角色划分清晰
+- 基于前后端分离架构，适合继续扩展和二次开发
+- 融合 AI 问答、推荐与内容生成能力，具备展示性和实用性
+- 包含完整演示数据、网课资源、图表首页与多角色流程
+- 界面风格已针对教育平台场景进行统一美化和品牌重构
+
+## 适用场景
+
+- 毕业设计
+- 课程设计
+- 教育信息化系统原型展示
+- Spring Boot 与 Vue 前后端分离项目练习
+
+## 仓库地址
+
+- Gitee: [https://gitee.com/eapp1e/edu-after-school](https://gitee.com/eapp1e/edu-after-school)
