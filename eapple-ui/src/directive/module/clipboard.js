@@ -1,11 +1,12 @@
-﻿/**
-* v-clipboard 鏂囧瓧澶嶅埗鍓创
-* Copyright (c) 2026 Eapp1e
-*/
+/**
+ * v-clipboard 文字复制剪贴
+ * Copyright (c) 2026 Eapp1e
+ */
 
 import Clipboard from 'clipboard'
+
 export default {
-  bind(el, binding, vnode) {
+  bind(el, binding) {
     switch (binding.arg) {
       case 'success':
         el._vClipBoard_success = binding.value
@@ -16,7 +17,7 @@ export default {
       default: {
         const clipboard = new Clipboard(el, {
           text: () => binding.value,
-          action: () => binding.arg === 'cut' ? 'cut' : 'copy'
+          action: () => (binding.arg === 'cut' ? 'cut' : 'copy')
         })
         clipboard.on('success', e => {
           const callback = el._vClipBoard_success
@@ -36,8 +37,10 @@ export default {
     } else if (binding.arg === 'error') {
       el._vClipBoard_error = binding.value
     } else {
-      el._vClipBoard.text = function () { return binding.value }
-      el._vClipBoard.action = () => binding.arg === 'cut' ? 'cut' : 'copy'
+      el._vClipBoard.text = function () {
+        return binding.value
+      }
+      el._vClipBoard.action = () => (binding.arg === 'cut' ? 'cut' : 'copy')
     }
   },
   unbind(el, binding) {
@@ -52,4 +55,3 @@ export default {
     }
   }
 }
-
