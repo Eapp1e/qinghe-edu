@@ -1,9 +1,11 @@
 package com.eapple.web.controller.edu;
 
 import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import com.eapple.common.core.controller.BaseController;
 import com.eapple.common.core.domain.AjaxResult;
 import com.eapple.common.core.page.TableDataInfo;
 import com.eapple.common.enums.BusinessType;
+import com.eapple.common.utils.poi.ExcelUtil;
 import com.eapple.system.domain.edu.EduCourseEnrollment;
 import com.eapple.system.service.edu.IEduEnrollmentService;
 
@@ -30,6 +33,16 @@ public class EduEnrollmentController extends BaseController
         startPage();
         List<EduCourseEnrollment> list = enrollmentService.selectEnrollmentList(enrollment);
         return getDataTable(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:enrollment:list')")
+    @Log(title = "报名记录", businessType = BusinessType.EXPORT)
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, EduCourseEnrollment enrollment)
+    {
+        List<EduCourseEnrollment> list = enrollmentService.selectEnrollmentList(enrollment);
+        ExcelUtil<EduCourseEnrollment> util = new ExcelUtil<EduCourseEnrollment>(EduCourseEnrollment.class);
+        util.exportExcel(response, list, "报名记录数据");
     }
 
     @PreAuthorize("@ss.hasPermi('edu:enrollment:edit') or @ss.hasRole('edu_parent')")

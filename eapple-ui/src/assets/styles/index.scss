@@ -203,6 +203,77 @@ aside {
   font-weight: 600;
 }
 
+.toolbar-icon-btn {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(77, 102, 86, 0.06);
+
+  i {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+.toolbar-icon-btn.el-button--default {
+  border-color: rgba(130, 112, 82, 0.18) !important;
+  background: rgba(255, 252, 247, 0.96) !important;
+  color: #6b736f !important;
+}
+
+.toolbar-icon-btn.el-button--primary {
+  border-color: rgba(130, 112, 82, 0.18) !important;
+  background: rgba(255, 252, 247, 0.96) !important;
+  color: #4da59b !important;
+  box-shadow: 0 8px 18px rgba(77, 102, 86, 0.06) !important;
+}
+
+.toolbar-icon-btn.el-button--default:hover,
+.toolbar-icon-btn.el-button--default:focus,
+.toolbar-icon-btn.el-button--primary:hover,
+.toolbar-icon-btn.el-button--primary:focus {
+  border-color: rgba(130, 112, 82, 0.24) !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(77, 102, 86, 0.1) !important;
+  filter: none !important;
+}
+
+.toolbar-icon-btn.el-button--default:hover,
+.toolbar-icon-btn.el-button--default:focus {
+  color: #4d5a4f !important;
+}
+
+.toolbar-icon-btn.el-button--primary:hover,
+.toolbar-icon-btn.el-button--primary:focus {
+  color: #358b82 !important;
+}
+
+.toolbar-gradient-btn {
+  border: 1px solid rgba(51, 201, 187, 0.16) !important;
+  background: linear-gradient(135deg, #18dfae 0%, #17ccc5 48%, #2e99ff 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(24, 182, 192, 0.16) !important;
+}
+
+.toolbar-gradient-btn:hover,
+.toolbar-gradient-btn:focus {
+  border-color: rgba(51, 201, 187, 0.22) !important;
+  background: linear-gradient(135deg, #1be3b2 0%, #18d0ca 48%, #309dff 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(24, 182, 192, 0.2) !important;
+  filter: none !important;
+}
+
+.toolbar-gradient-btn.el-button--primary.is-plain,
+.toolbar-gradient-btn.is-plain {
+  background: linear-gradient(135deg, #18dfae 0%, #17ccc5 48%, #2e99ff 100%) !important;
+  color: #ffffff !important;
+}
+
 .el-button--primary {
   border-color: #5f8f4e;
   background: linear-gradient(135deg, #6ea55d 0%, #4f8544 100%);
@@ -232,9 +303,23 @@ aside {
   background: rgba(255, 252, 247, 0.9);
 }
 
-.el-table th.el-table__cell {
-  background: #f5efe2;
-  color: #4d5a4f;
+.app-container .el-table th.el-table__cell,
+.app-container ::v-deep .el-table th.el-table__cell {
+  background: #d1d5db !important;
+  color: #374151 !important;
+  border-bottom: 2px solid #bcc3cc !important;
+  box-shadow: none !important;
+  font-weight: 700;
+}
+
+.app-container .el-table td.el-table__cell,
+.app-container ::v-deep .el-table td.el-table__cell {
+  background: #ffffff !important;
+}
+
+.app-container .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell,
+.app-container ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background: #eef1f4 !important;
 }
 
 .el-dialog {

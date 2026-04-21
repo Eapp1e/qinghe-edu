@@ -1,4 +1,4 @@
-package com.eapple.common.utils.file;
+﻿package com.eapple.common.utils.file;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +21,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.common.utils.uuid.IdUtils;
 
 /**
- * 鏂囦欢澶勭悊宸ュ叿绫?
+ * 閺傚洣娆㈡径鍕倞瀹搞儱鍙跨猾?
  * 
  * @author Eapp1e
  */
@@ -30,10 +30,10 @@ public class FileUtils
     public static String FILENAME_PATTERN = "[a-zA-Z0-9_\\-\\|\\.\\u4e00-\\u9fa5]+";
 
     /**
-     * 杈撳嚭鎸囧畾鏂囦欢鐨刡yte鏁扮粍
+     * 鏉堟挸鍤幐鍥х暰閺傚洣娆㈤惃鍒te閺佹壆绮?
      * 
-     * @param filePath 鏂囦欢璺緞
-     * @param os 杈撳嚭娴?
+     * @param filePath 閺傚洣娆㈢捄顖氱窞
+     * @param os 鏉堟挸鍤ù?
      * @return
      */
     public static void writeBytes(String filePath, OutputStream os) throws IOException
@@ -66,11 +66,11 @@ public class FileUtils
     }
 
     /**
-     * 鍐欐暟鎹埌鏂囦欢涓?
+     * 閸愭瑦鏆熼幑顔煎煂閺傚洣娆㈡稉?
      *
-     * @param data 鏁版嵁
-     * @return 鐩爣鏂囦欢
-     * @throws IOException IO寮傚父
+     * @param data 閺佺増宓?
+     * @return 閻╊喗鐖ｉ弬鍥︽
+     * @throws IOException IO瀵倸鐖?
      */
     public static String writeImportBytes(byte[] data) throws IOException
     {
@@ -78,12 +78,12 @@ public class FileUtils
     }
 
     /**
-     * 鍐欐暟鎹埌鏂囦欢涓?
+     * 閸愭瑦鏆熼幑顔煎煂閺傚洣娆㈡稉?
      *
-     * @param data 鏁版嵁
-     * @param uploadDir 鐩爣鏂囦欢
-     * @return 鐩爣鏂囦欢
-     * @throws IOException IO寮傚父
+     * @param data 閺佺増宓?
+     * @param uploadDir 閻╊喗鐖ｉ弬鍥︽
+     * @return 閻╊喗鐖ｉ弬鍥︽
+     * @throws IOException IO瀵倸鐖?
      */
     public static String writeBytes(byte[] data, String uploadDir) throws IOException
     {
@@ -105,10 +105,10 @@ public class FileUtils
     }
 
     /**
-     * 绉婚櫎璺緞涓殑璇锋眰鍓嶇紑鐗囨
+     * 缁夊娅庣捄顖氱窞娑擃厾娈戠拠閿嬬湴閸撳秶绱戦悧鍥唽
      * 
-     * @param filePath 鏂囦欢璺緞
-     * @return 绉婚櫎鍚庣殑鏂囦欢璺緞
+     * @param filePath 閺傚洣娆㈢捄顖氱窞
+     * @return 缁夊娅庨崥搴ｆ畱閺傚洣娆㈢捄顖氱窞
      */
     public static String stripPrefix(String filePath)
     {
@@ -116,16 +116,16 @@ public class FileUtils
     }
 
     /**
-     * 鍒犻櫎鏂囦欢
+     * 閸掔娀娅庨弬鍥︽
      * 
-     * @param filePath 鏂囦欢
+     * @param filePath 閺傚洣娆?
      * @return
      */
     public static boolean deleteFile(String filePath)
     {
         boolean flag = false;
         File file = new File(filePath);
-        // 璺緞涓烘枃浠朵笖涓嶄负绌哄垯杩涜鍒犻櫎
+        // 鐠侯垰绶炴稉鐑樻瀮娴犳湹绗栨稉宥勮礋缁屽搫鍨潻娑滎攽閸掔娀娅?
         if (file.isFile() && file.exists())
         {
             flag = file.delete();
@@ -134,10 +134,10 @@ public class FileUtils
     }
 
     /**
-     * 鏂囦欢鍚嶇О楠岃瘉
+     * 閺傚洣娆㈤崥宥囆炴宀冪槈
      * 
-     * @param filename 鏂囦欢鍚嶇О
-     * @return true 姝ｅ父 false 闈炴硶
+     * @param filename 閺傚洣娆㈤崥宥囆?
+     * @return true 濮濓絽鐖?false 闂堢偞纭?
      */
     public static boolean isValidFilename(String filename)
     {
@@ -145,35 +145,35 @@ public class FileUtils
     }
 
     /**
-     * 妫€鏌ユ枃浠舵槸鍚﹀彲涓嬭浇
+     * 濡偓閺屻儲鏋冩禒鑸垫Ц閸氾箑褰叉稉瀣祰
      * 
-     * @param resource 闇€瑕佷笅杞界殑鏂囦欢
-     * @return true 姝ｅ父 false 闈炴硶
+     * @param resource 闂団偓鐟曚椒绗呮潪鐣屾畱閺傚洣娆?
+     * @return true 濮濓絽鐖?false 闂堢偞纭?
      */
     public static boolean checkAllowDownload(String resource)
     {
-        // 绂佹鐩綍涓婅烦绾у埆
+        // 缁備焦顒涢惄顔肩秿娑撳﹨鐑︾痪褍鍩?
         if (StringUtils.contains(resource, ".."))
         {
             return false;
         }
 
-        // 妫€鏌ュ厑璁镐笅杞界殑鏂囦欢瑙勫垯
+        // 濡偓閺屻儱鍘戠拋闀愮瑓鏉炵晫娈戦弬鍥︽鐟欏嫬鍨?
         if (ArrayUtils.contains(MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, FileTypeUtils.getFileType(resource)))
         {
             return true;
         }
 
-        // 涓嶅湪鍏佽涓嬭浇鐨勬枃浠惰鍒?
+        // 娑撳秴婀崗浣筋啅娑撳娴囬惃鍕瀮娴犳儼顫夐崚?
         return false;
     }
 
     /**
-     * 涓嬭浇鏂囦欢鍚嶉噸鏂扮紪鐮?
+     * 娑撳娴囬弬鍥︽閸氬秹鍣搁弬鎵椽閻?
      * 
-     * @param request 璇锋眰瀵硅薄
-     * @param fileName 鏂囦欢鍚?
-     * @return 缂栫爜鍚庣殑鏂囦欢鍚?
+     * @param request 鐠囬攱鐪扮€电钖?
+     * @param fileName 閺傚洣娆㈤崥?
+     * @return 缂傛牜鐖滈崥搴ｆ畱閺傚洣娆㈤崥?
      */
     public static String setFileDownloadHeader(HttpServletRequest request, String fileName) throws UnsupportedEncodingException
     {
@@ -181,33 +181,33 @@ public class FileUtils
         String filename = fileName;
         if (agent.contains("MSIE"))
         {
-            // IE娴忚鍣?
+            // IE濞村繗顫嶉崳?
             filename = URLEncoder.encode(filename, "utf-8");
             filename = filename.replace("+", " ");
         }
         else if (agent.contains("Firefox"))
         {
-            // 鐏嫄娴忚鍣?
+            // 閻忣偆瀚勫ù蹇氼潔閸?
             filename = new String(fileName.getBytes(), "ISO8859-1");
         }
         else if (agent.contains("Chrome"))
         {
-            // google娴忚鍣?
+            // google濞村繗顫嶉崳?
             filename = URLEncoder.encode(filename, "utf-8");
         }
         else
         {
-            // 鍏跺畠娴忚鍣?
+            // 閸忚泛鐣犲ù蹇氼潔閸?
             filename = URLEncoder.encode(filename, "utf-8");
         }
         return filename;
     }
 
     /**
-     * 涓嬭浇鏂囦欢鍚嶉噸鏂扮紪鐮?
+     * 娑撳娴囬弬鍥︽閸氬秹鍣搁弬鎵椽閻?
      *
-     * @param response 鍝嶅簲瀵硅薄
-     * @param realFileName 鐪熷疄鏂囦欢鍚?
+     * @param response 閸濆秴绨茬€电钖?
+     * @param realFileName 閻喎鐤勯弬鍥︽閸?
      */
     public static void setAttachmentResponseHeader(HttpServletResponse response, String realFileName) throws UnsupportedEncodingException
     {
@@ -227,10 +227,10 @@ public class FileUtils
     }
 
     /**
-     * 鐧惧垎鍙风紪鐮佸伐鍏锋柟娉?
+     * 閻ф儳鍨庨崣椋庣椽閻礁浼愰崗閿嬫煙濞?
      *
-     * @param s 闇€瑕佺櫨鍒嗗彿缂栫爜鐨勫瓧绗︿覆
-     * @return 鐧惧垎鍙风紪鐮佸悗鐨勫瓧绗︿覆
+     * @param s 闂団偓鐟曚胶娅ㄩ崚鍡楀娇缂傛牜鐖滈惃鍕摟缁楋缚瑕?
+     * @return 閻ф儳鍨庨崣椋庣椽閻礁鎮楅惃鍕摟缁楋缚瑕?
      */
     public static String percentEncode(String s) throws UnsupportedEncodingException
     {
@@ -239,10 +239,10 @@ public class FileUtils
     }
 
     /**
-     * 鑾峰彇鍥惧儚鍚庣紑
+     * 閼惧嘲褰囬崶鎯у剼閸氬海绱?
      * 
-     * @param photoByte 鍥惧儚鏁版嵁
-     * @return 鍚庣紑鍚?
+     * @param photoByte 閸ユ儳鍎氶弫鐗堝祦
+     * @return 閸氬海绱戦崥?
      */
     public static String getFileExtendName(byte[] photoByte)
     {
@@ -268,10 +268,10 @@ public class FileUtils
     }
 
     /**
-     * 鑾峰彇鏂囦欢鍚嶇О /profile/upload/2022/04/16/ruoyi.png -- ruoyi.png
+     * 閼惧嘲褰囬弬鍥︽閸氬秶袨 /profile/upload/2022/04/16/qinghe.png -- qinghe.png
      * 
-     * @param fileName 璺緞鍚嶇О
-     * @return 娌℃湁鏂囦欢璺緞鐨勫悕绉?
+     * @param fileName 鐠侯垰绶為崥宥囆?
+     * @return 濞屸剝婀侀弬鍥︽鐠侯垰绶為惃鍕倳缁?
      */
     public static String getName(String fileName)
     {
@@ -286,10 +286,10 @@ public class FileUtils
     }
 
     /**
-     * 鑾峰彇涓嶅甫鍚庣紑鏂囦欢鍚嶇О /profile/upload/2022/04/16/ruoyi.png -- ruoyi
+     * 閼惧嘲褰囨稉宥呯敨閸氬海绱戦弬鍥︽閸氬秶袨 /profile/upload/2022/04/16/qinghe.png -- qinghe
      * 
-     * @param fileName 璺緞鍚嶇О
-     * @return 娌℃湁鏂囦欢璺緞鍜屽悗缂€鐨勫悕绉?
+     * @param fileName 鐠侯垰绶為崥宥囆?
+     * @return 濞屸剝婀侀弬鍥︽鐠侯垰绶為崪灞芥倵缂傗偓閻ㄥ嫬鎮曠粔?
      */
     public static String getNameNotSuffix(String fileName)
     {
@@ -301,4 +301,5 @@ public class FileUtils
         return baseName;
     }
 }
+
 

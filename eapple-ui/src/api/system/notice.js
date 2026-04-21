@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { download } from '@/utils/request'
 
 // 查询公告列表
 export function listNotice(query) {
@@ -76,4 +77,8 @@ export function listNoticeReadUsers(query) {
     method: 'get',
     params: query
   })
+}
+
+export function exportNotice(query) {
+  return download('/system/notice/export', query, `platform_notice_${new Date().getTime()}.xlsx`)
 }

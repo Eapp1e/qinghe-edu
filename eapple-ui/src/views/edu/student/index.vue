@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="app-container student-page">
     <section class="hero-panel">
       <div class="hero-copy">
@@ -112,38 +112,56 @@
     </section>
 
     <template v-else>
-      <section v-show="showSearch" class="filter-panel">
-        <el-form ref="queryForm" :model="queryParams" label-width="72px" class="filter-form" size="small" inline>
-          <el-form-item label="学生姓名" prop="studentName">
-            <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="handleQuery" />
-          </el-form-item>
-          <el-form-item label="年级" prop="gradeName">
-            <el-input v-model="queryParams.gradeName" placeholder="请输入年级" clearable @keyup.enter.native="handleQuery" />
-          </el-form-item>
-          <el-form-item label="班级" prop="className">
-            <el-input v-model="queryParams.className" placeholder="请输入班级" clearable @keyup.enter.native="handleQuery" />
-          </el-form-item>
-          <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
-              <el-option label="正常" value="0" />
-              <el-option label="停用" value="1" />
-            </el-select>
-          </el-form-item>
-          <el-form-item class="filter-actions">
-            <el-button type="primary" size="small" icon="el-icon-search" @click="handleQuery">查询</el-button>
-            <el-button size="small" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+      <section v-show="showSearch" class="toolbar-panel">
+        <div class="toolbar-main">
+          <el-form ref="queryForm" :model="queryParams" size="small" inline class="query-form">
+            <el-form-item label="学生姓名" prop="studentName">
+              <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="handleQuery" />
+            </el-form-item>
+            <el-form-item label="年级" prop="gradeName">
+              <el-input v-model="queryParams.gradeName" placeholder="请输入年级" clearable @keyup.enter.native="handleQuery" />
+            </el-form-item>
+            <el-form-item label="班级" prop="className">
+              <el-input v-model="queryParams.className" placeholder="请输入班级" clearable @keyup.enter.native="handleQuery" />
+            </el-form-item>
+            <el-form-item label="状态" prop="status" class="status-select">
+              <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
+                <el-option label="正常" value="0" />
+                <el-option label="停用" value="1" />
+              </el-select>
+            </el-form-item>
+            <div class="query-inline-actions">
+              <el-tooltip content="查询" placement="top">
+                <el-button type="primary" size="mini" class="toolbar-icon-btn" icon="el-icon-search" @click="handleQuery" />
+              </el-tooltip>
+              <el-tooltip content="重置筛选" placement="top">
+                <el-button size="mini" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+              </el-tooltip>
+            </div>
+          </el-form>
+
+          <div class="toolbar-actions">
             <el-button
               v-if="canManageProfile"
               v-hasPermi="['edu:student:add']"
-              type="success"
-              size="small"
+              type="primary"
+              size="mini"
               icon="el-icon-plus"
+              class="toolbar-gradient-btn"
               @click="handleAdd"
             >
-              新增档案
+              新建档案
             </el-button>
-          </el-form-item>
-        </el-form>
+            <el-button
+              v-if="canManageProfile"
+              size="mini"
+              icon="el-icon-download"
+              @click="handleExport"
+            >
+              导出
+            </el-button>
+          </div>
+        </div>
       </section>
 
       <section class="content-layout">
@@ -270,7 +288,7 @@
               <div
                 class="ai-rich-content"
                 v-html="renderAiHtml(item.recommendationReason || '该课程与学生当前档案较为匹配，建议优先关注。')"
-              />
+              ></div>
             </div>
           </div>
         </div>
@@ -287,7 +305,7 @@
 </template>
 
 <script>
-import { addStudent, delStudent, listStudent, updateStudent } from '@/api/edu/student'
+import { addStudent, delStudent, exportStudent, listStudent, updateStudent } from '@/api/edu/student'
 import { recommendCourse } from '@/api/edu/course'
 import { renderAiContentHtml } from '@/utils/aiContent'
 
@@ -416,6 +434,9 @@ export default {
         status: ''
       }
       this.getList()
+    },
+    handleExport() {
+      exportStudent(this.queryParams)
     },
     handleAdd() {
       this.form = { status: '0', gender: '男' }
@@ -608,7 +629,7 @@ export default {
 }
 
 .owner-layout,
-.filter-panel,
+.toolbar-panel,
 .list-panel {
   position: relative;
   z-index: 1;
@@ -626,7 +647,7 @@ export default {
 }
 
 .profile-card,
-.filter-panel,
+.toolbar-panel,
 .list-panel {
   border-radius: 24px;
   border: 1px solid rgba(103, 216, 219, 0.18);
@@ -634,7 +655,7 @@ export default {
   box-shadow: 0 20px 34px rgba(41, 130, 141, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
-.filter-panel {
+.toolbar-panel {
   border-color: rgba(157, 232, 233, 0.42);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
@@ -770,7 +791,7 @@ export default {
 
 .filter-panel {
   margin-bottom: 16px;
-  padding: 20px 22px 6px;
+  padding: 18px 20px 4px;
 }
 
 .panel-header {
@@ -794,50 +815,75 @@ export default {
   font-size: 13px;
 }
 
-.filter-form {
+.toolbar-panel {
+  margin-bottom: 16px;
+  padding: 20px 22px 6px;
+}
+
+.toolbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.query-form {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 10px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
 }
 
-.filter-actions {
+.query-inline-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin-left: 0;
+}
+
+.toolbar-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  min-width: max-content;
-  margin-left: auto;
+  flex-shrink: 0;
 }
 
-::v-deep .filter-form .el-form-item {
-  display: flex;
+::v-deep .query-form .el-form-item {
+  display: inline-flex;
   align-items: center;
-  margin-right: 0;
+  margin-right: 4px;
   margin-bottom: 0;
 }
 
-::v-deep .filter-form .el-form-item:nth-child(1) {
-  width: 300px;
+::v-deep .query-form .el-form-item:nth-child(1) {
+  width: 220px;
 }
 
-::v-deep .filter-form .el-form-item:nth-child(2),
-::v-deep .filter-form .el-form-item:nth-child(3) {
-  width: 230px;
-}
-
-::v-deep .filter-form .el-form-item:nth-child(4) {
+::v-deep .query-form .el-form-item:nth-child(2),
+::v-deep .query-form .el-form-item:nth-child(3) {
   width: 180px;
 }
 
-::v-deep .filter-form .el-form-item__label {
+::v-deep .query-form .el-form-item:nth-child(4) {
+  width: 180px;
+  margin-right: 0;
+}
+
+::v-deep .query-form .el-form-item:last-child {
+  margin-right: 0;
+}
+
+::v-deep .query-form .el-form-item__label {
   flex: 0 0 auto;
   padding-right: 8px;
   line-height: 38px;
 }
 
-::v-deep .filter-form .el-form-item__content {
+::v-deep .query-form .el-form-item__content {
   display: flex;
   align-items: center;
   width: auto;
@@ -845,13 +891,17 @@ export default {
   flex: 1;
 }
 
-::v-deep .filter-form .el-input,
-::v-deep .filter-form .el-select {
+::v-deep .query-form .el-input,
+::v-deep .query-form .el-select {
   width: 100%;
 }
 
-::v-deep .filter-form .el-input__inner,
-::v-deep .filter-form .el-select .el-input__inner {
+::v-deep .status-select .el-input__inner {
+  width: 136px;
+}
+
+::v-deep .query-form .el-input__inner,
+::v-deep .query-form .el-select .el-input__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
@@ -860,9 +910,9 @@ export default {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-::v-deep .filter-form .el-input__inner:focus,
-::v-deep .filter-form .el-select .el-input.is-focus .el-input__inner,
-::v-deep .filter-form .el-select .el-input__inner:focus {
+::v-deep .query-form .el-input__inner:focus,
+::v-deep .query-form .el-select .el-input.is-focus .el-input__inner,
+::v-deep .query-form .el-select .el-input__inner:focus {
   border-color: #25ddbf;
   box-shadow:
     0 0 0 4px rgba(37, 221, 191, 0.12),
@@ -1018,12 +1068,12 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.72);
+  background: #eef1f4 !important;
 }
 
 ::v-deep .el-input__inner,
@@ -1054,11 +1104,12 @@ export default {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .filter-form {
-    flex-wrap: wrap;
+  .toolbar-main {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .filter-actions {
+  .toolbar-actions {
     justify-content: flex-start;
   }
 }
@@ -1078,21 +1129,16 @@ export default {
     justify-content: flex-start;
   }
 
-  .filter-actions {
-    margin-left: 0;
-    flex-wrap: wrap;
-  }
-
-  .filter-form {
+  .query-form {
     flex-direction: column;
     align-items: stretch;
   }
 
-  ::v-deep .filter-form .el-form-item,
-  ::v-deep .filter-form .el-form-item:nth-child(1),
-  ::v-deep .filter-form .el-form-item:nth-child(2),
-  ::v-deep .filter-form .el-form-item:nth-child(3),
-  ::v-deep .filter-form .el-form-item:nth-child(4) {
+  ::v-deep .query-form .el-form-item,
+  ::v-deep .query-form .el-form-item:nth-child(1),
+  ::v-deep .query-form .el-form-item:nth-child(2),
+  ::v-deep .query-form .el-form-item:nth-child(3),
+  ::v-deep .query-form .el-form-item:nth-child(4) {
     width: 100%;
   }
 }

@@ -2,6 +2,9 @@ package com.eapple.web.controller.edu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.eapple.common.annotation.Log;
 import com.eapple.common.core.controller.BaseController;
 import com.eapple.common.core.domain.AjaxResult;
+import com.eapple.common.enums.BusinessType;
 import com.eapple.common.exception.ServiceException;
 import com.eapple.common.utils.SecurityUtils;
 import com.eapple.common.utils.StringUtils;
@@ -49,6 +54,7 @@ public class EduAiController extends BaseController
     }
 
     @PreAuthorize("@ss.hasRole('admin') or @ss.hasRole('edu_admin') or @ss.hasRole('edu_teacher') or @ss.hasRole('edu_parent') or @ss.hasRole('edu_student')")
+    @Log(title = "网课推荐", businessType = BusinessType.OTHER)
     @PostMapping("/online-resource-recommend")
     public AjaxResult onlineResourceRecommend(@RequestBody OnlineResourceBody body)
     {
@@ -79,7 +85,12 @@ public class EduAiController extends BaseController
         }
 
         String content = aiService.generateOnlineResourceRecommendation(SecurityUtils.getUserId(), prompt.toString());
-        return success(normalizeRecommendationList(content));
+        List<JSONObject> recommendations = normalizeRecommendationList(content);
+        if (recommendations.isEmpty())
+        {
+            recommendations = buildLocalRecommendations(body.getInterest(), body.getResources());
+        }
+        return success(recommendations);
     }
 
     private List<JSONObject> normalizeRecommendationList(String content)
@@ -157,7 +168,7 @@ public class EduAiController extends BaseController
                 return parsed;
             }
         }
-        return new JSONArray();
+        return parseLineRecommendations(normalized);
     }
 
     private JSONArray tryParseArray(String text)
@@ -170,6 +181,107 @@ public class EduAiController extends BaseController
         {
             return null;
         }
+    }
+
+    private JSONArray parseLineRecommendations(String text)
+    {
+        JSONArray result = new JSONArray();
+        if (StringUtils.isEmpty(text))
+        {
+            return result;
+        }
+        Pattern linkPattern = Pattern.compile("(https?://[^\\s\\]）>]+)");
+        String[] lines = text.split("\\r?\\n");
+        for (String rawLine : lines)
+        {
+            String line = StringUtils.trim(rawLine);
+            if (StringUtils.isEmpty(line))
+            {
+                continue;
+            }
+            Matcher matcher = linkPattern.matcher(line);
+            if (!matcher.find())
+            {
+                continue;
+            }
+            String link = matcher.group(1);
+            String title = line.substring(0, matcher.start()).replaceAll("^[\\-\\d\\.、\\s]+", "").trim();
+            String reason = line.substring(matcher.end()).replaceAll("^[：:：\\-\\s]+", "").trim();
+            JSONObject object = new JSONObject();
+            object.put("title", StringUtils.isEmpty(title) ? "推荐资源" : title);
+            object.put("link", link);
+            object.put("reason", StringUtils.isEmpty(reason) ? "与当前学习兴趣较匹配" : reason);
+            result.add(object);
+        }
+        return result;
+    }
+
+    private List<JSONObject> buildLocalRecommendations(String interest, List<OnlineResourceItem> resources)
+    {
+        List<JSONObject> result = new ArrayList<>();
+        if (resources == null || resources.isEmpty())
+        {
+            return result;
+        }
+
+        String normalizedInterest = StringUtils.defaultString(interest).toLowerCase();
+        String[] keywords = normalizedInterest.split("[,，、\\s]+");
+        List<JSONObject> matched = new ArrayList<>();
+        List<JSONObject> secondary = new ArrayList<>();
+
+        for (OnlineResourceItem item : resources)
+        {
+            if (item == null || StringUtils.isEmpty(item.getTitle()) || StringUtils.isEmpty(item.getLink()))
+            {
+                continue;
+            }
+
+            String resourceText = (StringUtils.defaultString(item.getTitle()) + " "
+                    + StringUtils.defaultString(item.getCategory()) + " "
+                    + StringUtils.defaultString(item.getDescription()) + " "
+                    + StringUtils.defaultString(item.getSource())).toLowerCase(Locale.ROOT);
+
+            int score = 0;
+            for (String keyword : keywords)
+            {
+                String current = StringUtils.trim(keyword);
+                if (StringUtils.isNotEmpty(current) && resourceText.contains(current))
+                {
+                    score++;
+                }
+            }
+
+            JSONObject object = new JSONObject();
+            object.put("title", item.getTitle());
+            object.put("link", item.getLink());
+            object.put("reason", score > 0
+                    ? "与“" + interest + "”较匹配，可优先从该资源开始学习。"
+                    : "属于当前资源库中较通用的优质学习入口，可作为延伸学习参考。");
+
+            if (score > 0)
+            {
+                matched.add(object);
+            }
+            else
+            {
+                secondary.add(object);
+            }
+        }
+
+        result.addAll(matched);
+        for (JSONObject item : secondary)
+        {
+            if (result.size() >= 4)
+            {
+                break;
+            }
+            result.add(item);
+        }
+        if (result.size() > 4)
+        {
+            return new ArrayList<>(result.subList(0, 4));
+        }
+        return result;
     }
 
     public static class ModelBody

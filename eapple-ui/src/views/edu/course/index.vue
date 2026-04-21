@@ -6,7 +6,7 @@
         <h1>{{ pageTitle }}</h1>
         <p>{{ pageDescription }}</p>
       </div>
-      <div :class="['hero-stats', { 'hero-stats--compact': !isTeacherView }]">
+      <div class="hero-stats hero-stats--compact">
         <div class="stat-card">
           <span>{{ isTeacherView ? '我的课程' : '课程总数' }}</span>
           <strong>{{ total }}</strong>
@@ -15,25 +15,10 @@
           <span>{{ isTeacherView ? '已启用课程' : '开放课程' }}</span>
           <strong>{{ openCount }}</strong>
         </div>
-        <div v-if="isTeacherView" class="stat-card">
-          <span>已停开课程</span>
-          <strong>{{ closedCount }}</strong>
-        </div>
       </div>
     </section>
 
     <section class="toolbar-panel">
-      <div v-if="isTeacherView" class="teacher-cta-strip">
-        <el-button
-          size="medium"
-          icon="el-icon-plus"
-          class="teacher-cta-button"
-          @click="handleAdd"
-        >
-          发布新课程
-        </el-button>
-      </div>
-
       <div class="toolbar-main">
         <el-form v-show="showSearch" :inline="true" :model="queryParams" size="small" class="query-form">
           <el-form-item label="课程名称">
@@ -42,29 +27,45 @@
           <el-form-item label="分类">
             <el-input v-model="queryParams.category" placeholder="请输入课程分类" clearable @keyup.enter.native="getList" />
           </el-form-item>
-          <el-form-item v-if="canManageCourse" label="状态">
+          <el-form-item v-if="canManageCourse" label="状态" class="status-select">
             <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
               <el-option label="启用中" value="0" />
               <el-option label="已停开" value="1" />
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="mini" icon="el-icon-search" @click="handleQuery">搜索</el-button>
-            <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+            <el-tooltip content="查询" placement="top">
+              <el-button type="primary" size="mini" class="toolbar-icon-btn" icon="el-icon-search" @click="handleQuery" />
+            </el-tooltip>
+            <el-tooltip content="重置筛选" placement="top">
+              <el-button size="mini" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+            </el-tooltip>
           </el-form-item>
         </el-form>
 
         <div class="toolbar-actions">
+          <el-button
+            v-if="isTeacherView"
+            type="primary"
+            size="mini"
+            icon="el-icon-plus"
+            class="toolbar-gradient-btn"
+            @click="handleAdd"
+          >
+            发布课程
+          </el-button>
           <el-button
             v-if="canManageCourse && !isTeacherView"
             type="primary"
             plain
             size="mini"
             icon="el-icon-plus"
+            class="toolbar-gradient-btn"
             @click="handleAdd"
           >
             发布课程
           </el-button>
+          <el-button size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
           <right-toolbar @queryTable="getList" />
         </div>
       </div>
@@ -180,6 +181,7 @@ import {
   cancelEnrollCourse,
   delCourse,
   enrollCourse,
+  exportCourse,
   generateCourseNotice,
   generateTeachingSuggestion,
   listCourse,
@@ -243,9 +245,6 @@ export default {
     },
     openCount() {
       return this.courseList.filter(item => item.status === '0').length
-    },
-    closedCount() {
-      return this.courseList.filter(item => item.status === '1').length
     },
     pageTitle() {
       if (this.isTeacherView) {
@@ -317,6 +316,9 @@ export default {
         status: undefined
       }
       this.getList()
+    },
+    handleExport() {
+      exportCourse(this.queryParams)
     },
     reset() {
       this.form = {
@@ -438,13 +440,7 @@ export default {
         this.openAiPreview('AI 生成通知', '课程通知', row, content)
         this.getList()
       }).catch(() => {
-        if (row.aiNotice) {
-          this.$modal.msgWarning('AI 通知生成超时，已为你展示上一次成功生成的内容')
-          this.openAiPreview('AI 生成通知', '课程通知', row, row.aiNotice)
-        } else {
-          this.aiPreviewOpen = false
-          this.$modal.msgError('AI 通知生成超时，请稍后重试')
-        }
+        this.handleAiFailure(row, 'AI 生成通知', '课程通知', row.aiNotice)
       }).finally(() => {
         this.stopAiGenerating()
       })
@@ -456,16 +452,19 @@ export default {
         this.openAiPreview('AI 教学建议', '教学建议', row, content)
         this.getList()
       }).catch(() => {
-        if (row.aiSuggestion) {
-          this.$modal.msgWarning('AI 教学建议生成超时，已为你展示上一次成功生成的内容')
-          this.openAiPreview('AI 教学建议', '教学建议', row, row.aiSuggestion)
-        } else {
-          this.aiPreviewOpen = false
-          this.$modal.msgError('AI 教学建议生成超时，请稍后重试')
-        }
+        this.handleAiFailure(row, 'AI 教学建议', '教学建议', row.aiSuggestion)
       }).finally(() => {
         this.stopAiGenerating()
       })
+    },
+    handleAiFailure(row, title, type, fallbackContent) {
+      if (fallbackContent) {
+        this.$modal.msgWarning(`${type}生成较慢，已回退展示上一次成功内容`)
+        this.openAiPreview(title, type, row, fallbackContent)
+        return
+      }
+      this.aiPreviewOpen = false
+      this.$modal.msgWarning(`${type}暂时未生成成功，请稍后重试`)
     },
     openAiPreview(title, type, row, content) {
       this.aiPreviewTitle = title
@@ -691,6 +690,21 @@ export default {
   justify-content: flex-end;
   gap: 10px;
   flex-shrink: 0;
+  padding-top: 0;
+}
+
+::v-deep .query-form .el-form-item {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+::v-deep .query-form .el-form-item:last-child {
+  margin-right: 0;
+}
+
+::v-deep .status-select .el-input__inner {
+  width: 148px;
 }
 
 .content-table {
@@ -767,8 +781,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -781,7 +795,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.7);
+  background: #eef1f4 !important;
 }
 
 ::v-deep .el-dialog {

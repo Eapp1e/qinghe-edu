@@ -35,20 +35,26 @@
         <el-form-item label="姓名">
           <el-input v-model="queryParams.nickName" placeholder="如 李老师 / 王家长" clearable @keyup.enter.native="getList" />
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="状态" class="status-select">
           <el-select v-model="queryParams.status" clearable placeholder="全部状态">
             <el-option label="启用" value="0" />
             <el-option label="停用" value="1" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" @click="getList">查询</el-button>
-          <el-button size="small" @click="resetQuery">重置</el-button>
+          <el-tooltip content="查询" placement="top">
+            <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
+          </el-tooltip>
+          <el-tooltip content="重置筛选" placement="top">
+            <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+          </el-tooltip>
         </el-form-item>
       </el-form>
 
       <div class="quick-actions">
-        <el-button type="primary" plain size="small" @click="handleAdd">新增平台用户</el-button>
+        <el-button type="primary" plain size="small" class="toolbar-gradient-btn" @click="handleAdd">新建用户</el-button>
+        <el-button size="small" icon="el-icon-download" @click="handleExport">导出</el-button>
+        <right-toolbar @queryTable="getList" />
       </div>
     </section>
 
@@ -160,6 +166,7 @@
 import { addUser, changeUserStatus, delUser, getUser, listUser, resetUserPwd, updateUser } from '@/api/system/user'
 import { listRole } from '@/api/system/role'
 import { listStudent } from '@/api/edu/student'
+import { saveAs } from 'file-saver'
 
 export default {
   name: 'EduPlatformUserPage',
@@ -255,6 +262,37 @@ export default {
     resetQuery() {
       this.queryParams = { pageNum: 1, pageSize: 10, userName: '', nickName: '', status: '' }
       this.getList()
+    },
+    async handleExport() {
+      try {
+        const requestParams = {
+          ...this.queryParams,
+          pageNum: 1,
+          pageSize: 500
+        }
+        const res = await listUser(requestParams)
+        const rows = res.rows || []
+        const filteredRows = rows
+          .filter(item => this.isEduPlatformUser(item))
+          .sort((a, b) => (a.userId || 0) - (b.userId || 0))
+        const enrichedRows = await this.enrichUserRoles(filteredRows)
+        const csvRows = [
+          ['账号', '姓名', '角色类型', '联系方式', '状态', '备注']
+        ].concat(
+          enrichedRows.map(item => [
+            this.escapeCsvValue(item.userName),
+            this.escapeCsvValue(this.resolveDisplayName(item)),
+            this.escapeCsvValue(this.resolveRoleLabel(item)),
+            this.escapeCsvValue(item.phonenumber || ''),
+            this.escapeCsvValue(item.status === '0' ? '启用' : '停用'),
+            this.escapeCsvValue(item.remark || '')
+          ])
+        )
+        const content = '\uFEFF' + csvRows.map(row => row.join(',')).join('\r\n')
+        saveAs(new Blob([content], { type: 'text/csv;charset=utf-8;' }), `platform_user_${new Date().getTime()}.csv`)
+      } catch (error) {
+        this.$modal.msgWarning('平台用户导出失败，请稍后重试')
+      }
     },
     resetFormData() {
       this.form = {
@@ -354,6 +392,10 @@ export default {
       if (label.includes('家长')) return 'warning'
       if (label.includes('学生')) return ''
       return 'info'
+    },
+    escapeCsvValue(value) {
+      const text = value == null ? '' : String(value)
+      return `"${text.replace(/"/g, '""')}"`
     },
     handleAdd() {
       this.resetFormData()
@@ -631,6 +673,10 @@ export default {
   box-shadow: none;
 }
 
+::v-deep .status-select .el-input__inner {
+  width: 148px;
+}
+
 ::v-deep .el-table {
   overflow: hidden;
   border-radius: 24px;
@@ -640,8 +686,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -654,7 +700,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.7);
+  background: #eef1f4 !important;
 }
 
 ::v-deep .el-dialog {

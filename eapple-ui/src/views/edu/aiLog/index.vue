@@ -31,8 +31,12 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="mini" icon="el-icon-search" @click="getList">搜索</el-button>
-          <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">重置</el-button>
+          <el-tooltip content="查询" placement="top">
+            <el-button type="primary" size="mini" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
+          </el-tooltip>
+          <el-tooltip content="重置筛选" placement="top">
+            <el-button size="mini" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+          </el-tooltip>
         </el-form-item>
       </el-form>
 
@@ -291,8 +295,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
 }
 
 ::v-deep .el-table tr {
@@ -300,7 +304,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.7);
+  background: #eef1f4 !important;
 }
 
 ::v-deep .el-pagination .btn-next,

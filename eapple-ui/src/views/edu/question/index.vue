@@ -41,6 +41,7 @@
           <el-form-item label="学生" prop="studentName">
             <el-input
               v-model="queryParams.studentName"
+              class="input-student"
               placeholder="请输入学生姓名"
               clearable
               @keyup.enter.native="handleQuery"
@@ -55,27 +56,40 @@
             />
           </el-form-item>
           <el-form-item label="状态" prop="answerStatus">
-            <el-select v-model="queryParams.answerStatus" placeholder="全部状态" clearable>
+            <el-select v-model="queryParams.answerStatus" class="select-status" placeholder="全部状态" clearable>
               <el-option label="待解答" value="0" />
               <el-option label="已解答" value="1" />
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="handleQuery">查询</el-button>
-            <el-button size="small" @click="resetQuery">重置</el-button>
-            <el-button
-              v-if="canSubmitQuestion"
-              type="primary"
-              plain
-              size="small"
-              icon="el-icon-plus"
-              @click="handleAdd"
-            >
-              提交问题
-            </el-button>
+            <el-tooltip content="查询" placement="top">
+              <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="handleQuery" />
+            </el-tooltip>
+            <el-tooltip content="重置筛选" placement="top">
+              <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+            </el-tooltip>
           </el-form-item>
         </el-form>
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" class="inline-right-toolbar" />
+        <div class="toolbar-actions">
+          <el-button
+            v-if="canSubmitQuestion"
+            type="primary"
+            size="small"
+            icon="el-icon-edit-outline"
+            @click="handleAdd"
+          >
+            提交问题
+          </el-button>
+          <el-button
+            v-if="canExportQuestion"
+            size="small"
+            icon="el-icon-download"
+            @click="handleExport"
+          >
+            导出
+          </el-button>
+          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" class="inline-right-toolbar" />
+        </div>
       </div>
     </section>
 
@@ -165,7 +179,7 @@
 </template>
 
 <script>
-import { addQuestion, delQuestion, listQuestion, regenerateQuestionAnswer } from '@/api/edu/question'
+import { addQuestion, delQuestion, exportQuestion, listQuestion, regenerateQuestionAnswer } from '@/api/edu/question'
 import { renderAiContentHtml } from '@/utils/aiContent'
 
 export default {
@@ -216,6 +230,9 @@ export default {
     },
     canRegenerateAnswer() {
       return this.isTeacherRole || this.isAdminSideRole
+    },
+    canExportQuestion() {
+      return this.isTeacherRole || this.isAdminSideRole || this.isStudentOrParentRole
     },
     heroDescription() {
       if (this.isTeacherRole) {
@@ -268,6 +285,9 @@ export default {
         })
       })
     },
+    handleExport() {
+      exportQuestion(this.queryParams)
+    },
     handleViewAnswer(row) {
       this.currentQuestion = { ...row }
       this.answerOpen = true
@@ -296,6 +316,9 @@ export default {
             answerStatus: '1'
           }
           this.$message.success('AI 解答已更新')
+        })
+        .catch(() => {
+          this.$message.error('重新解答失败，请稍后重试')
         })
         .finally(() => {
           this.regeneratingQuestionId = null
@@ -417,8 +440,25 @@ export default {
   flex: 1;
 }
 
+::v-deep .search-form .input-student .el-input__inner {
+  width: 156px;
+}
+
+::v-deep .search-form .select-status .el-input__inner {
+  width: 148px;
+}
+
 .inline-right-toolbar {
   flex-shrink: 0;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-top: 1px;
 }
 
 ::v-deep .search-form .el-form-item {
@@ -533,6 +573,21 @@ export default {
   margin-bottom: 6px;
 }
 
+::v-deep .el-table th {
+  background: #d1d5db !important;
+  color: #374151 !important;
+  border-bottom: 2px solid #bcc3cc !important;
+  box-shadow: none !important;
+}
+
+::v-deep .el-table tr {
+  background-color: #ffffff !important;
+}
+
+::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
+  background: #eef1f4 !important;
+}
+
 ::v-deep .el-table th:first-child .cell,
 ::v-deep .el-table td:first-child .cell {
   padding-left: 18px;
@@ -585,6 +640,15 @@ export default {
 
   .hero-metrics {
     min-width: 0;
+  }
+
+  .submit-highlight-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .submit-highlight-btn {
+    width: 100%;
   }
 }
 </style>

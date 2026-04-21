@@ -1,22 +1,22 @@
-package com.eapple.common.utils.file;
+﻿package com.eapple.common.utils.file;
 
 import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 鏂囦欢绫诲瀷宸ュ叿绫?
+ * 閺傚洣娆㈢猾璇茬€峰銉ュ徔缁?
  *
  * @author Eapp1e
  */
 public class FileTypeUtils
 {
     /**
-     * 鑾峰彇鏂囦欢绫诲瀷
+     * 閼惧嘲褰囬弬鍥︽缁鐎?
      * <p>
-     * 渚嬪: ruoyi.txt, 杩斿洖: txt
+     * 娓氬顩? qinghe.txt, 鏉╂柨娲? txt
      * 
-     * @param file 鏂囦欢鍚?
-     * @return 鍚庣紑锛堜笉鍚?.")
+     * @param file 閺傚洣娆㈤崥?
+     * @return 閸氬海绱戦敍鍫滅瑝閸?.")
      */
     public static String getFileType(File file)
     {
@@ -28,12 +28,12 @@ public class FileTypeUtils
     }
 
     /**
-     * 鑾峰彇鏂囦欢绫诲瀷
+     * 閼惧嘲褰囬弬鍥︽缁鐎?
      * <p>
-     * 渚嬪: ruoyi.txt, 杩斿洖: txt
+     * 娓氬顩? qinghe.txt, 鏉╂柨娲? txt
      *
-     * @param fileName 鏂囦欢鍚?
-     * @return 鍚庣紑锛堜笉鍚?.")
+     * @param fileName 閺傚洣娆㈤崥?
+     * @return 閸氬海绱戦敍鍫滅瑝閸?.")
      */
     public static String getFileType(String fileName)
     {
@@ -46,10 +46,10 @@ public class FileTypeUtils
     }
 
     /**
-     * 鑾峰彇鏂囦欢绫诲瀷
+     * 閼惧嘲褰囬弬鍥︽缁鐎?
      * 
-     * @param photoByte 鏂囦欢瀛楄妭鐮?
-     * @return 鍚庣紑锛堜笉鍚?.")
+     * @param photoByte 閺傚洣娆㈢€涙濡惍?
+     * @return 閸氬海绱戦敍鍫滅瑝閸?.")
      */
     public static String getFileExtendName(byte[] photoByte)
     {

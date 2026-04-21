@@ -1,4 +1,4 @@
-package com.eapple.web.core.config;
+﻿package com.eapple.web.core.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,25 +12,25 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
- * Swagger2鐨勬帴鍙ｉ厤缃?
+ * Swagger2閻ㄥ嫭甯撮崣锝夊帳缂?
  * 
  * @author Eapp1e
  */
 @Configuration
 public class SwaggerConfig
 {
-    /** 绯荤粺鍩虹閰嶇疆 */
+    /** 缁崵绮洪崺铏诡攨闁板秶鐤?*/
     @Autowired
-    private PlatformConfig ruoyiConfig;
+    private PlatformConfig platformConfig;
     
     /**
-     * 鑷畾涔夌殑 OpenAPI 瀵硅薄
+     * 閼奉亜鐣炬稊澶屾畱 OpenAPI 鐎电钖?
      */
     @Bean
     public OpenAPI customOpenApi()
     {
         return new OpenAPI().components(new Components()
-            // 璁剧疆璁よ瘉鐨勮姹傚ご
+            // 鐠佸墽鐤嗙拋銈堢槈閻ㄥ嫯顕Ч鍌氥仈
             .addSecuritySchemes("apikey", securityScheme()))
             .addSecurityItem(new SecurityRequirement().addList("apikey"))
             .info(getApiInfo());
@@ -47,19 +47,21 @@ public class SwaggerConfig
     }
     
     /**
-     * 娣诲姞鎽樿淇℃伅
+     * 濞ｈ濮為幗妯款洣娣団剝浼?
      */
     public Info getApiInfo()
     {
         return new Info()
-            // 璁剧疆鏍囬
-            .title("鏍囬锛氳嫢渚濈鐞嗙郴缁焈鎺ュ彛鏂囨。")
-            // 鎻忚堪
-            .description("鎻忚堪锛氱敤浜庣鐞嗛泦鍥㈡棗涓嬪叕鍙哥殑浜哄憳淇℃伅,鍏蜂綋鍖呮嫭XXX,XXX妯″潡...")
-            // 浣滆€呬俊鎭?
-            .contact(new Contact().name(ruoyiConfig.getName()))
-            // 鐗堟湰
-            .version("鐗堟湰鍙?" + ruoyiConfig.getVersion());
+            // 鐠佸墽鐤嗛弽鍥暯
+            .title("閺嶅洭顣介敍姘冲娓氭繄顓搁悶鍡欓兇缂佺剤閹恒儱褰涢弬鍥ㄣ€?)
+            // 閹诲繗鍫?
+            .description("閹诲繗鍫敍姘辨暏娴滃海顓搁悶鍡涙肠閸ャ垺妫楁稉瀣彆閸欏摜娈戞禍鍝勬喅娣団剝浼?閸忚渹缍嬮崠鍛XXX,XXX濡€虫健...")
+            // 娴ｆ粏鈧懍淇婇幁?
+            .contact(new Contact().name(platformConfig.getName()))
+            // 閻楀牊婀?
+            .version("閻楀牊婀伴崣?" + platformConfig.getVersion());
     }
 }
+
+
 

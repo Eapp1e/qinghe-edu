@@ -89,7 +89,9 @@
         <div>
           <h3>{{ pageConfig.logTitle }}</h3>
         </div>
-        <el-button size="mini" icon="el-icon-refresh" @click="refreshData">刷新</el-button>
+        <el-tooltip content="刷新" placement="top">
+          <el-button size="mini" class="toolbar-icon-btn" icon="el-icon-refresh" @click="refreshData" />
+        </el-tooltip>
       </div>
 
       <el-table v-loading="loading" :data="aiLogList" class="content-table">
@@ -270,7 +272,8 @@ export default {
         featureTitle: '学习辅助能力',
         features: [
           { label: '作业问题解答', path: '/edu/question' },
-          { label: '课程推荐理由', path: '/edu/student' }
+          { label: '课程推荐理由', path: '/edu/student' },
+          { label: '网课推荐', path: '/edu/online-course' }
         ],
         logTitle: '我的最近 AI 使用',
         logDescription: '展示当前学生账号最近的 AI 调用记录，便于回看作业问答与学习辅助内容。'
@@ -832,8 +835,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
 }
 
 @media (max-width: 1100px) {

@@ -1,6 +1,7 @@
 package com.eapple.web.controller.edu;
 
 import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import com.eapple.common.core.controller.BaseController;
 import com.eapple.common.core.domain.AjaxResult;
 import com.eapple.common.core.page.TableDataInfo;
 import com.eapple.common.enums.BusinessType;
+import com.eapple.common.utils.poi.ExcelUtil;
 import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.service.edu.IEduStudentProfileService;
 
@@ -33,6 +35,16 @@ public class EduStudentProfileController extends BaseController
         startPage();
         List<EduStudentProfile> list = profileService.selectProfileList(profile);
         return getDataTable(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:student:list')")
+    @Log(title = "学生档案", businessType = BusinessType.EXPORT)
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, EduStudentProfile profile)
+    {
+        List<EduStudentProfile> list = profileService.selectProfileList(profile);
+        ExcelUtil<EduStudentProfile> util = new ExcelUtil<EduStudentProfile>(EduStudentProfile.class);
+        util.exportExcel(response, list, "学生档案数据");
     }
 
     @PreAuthorize("@ss.hasPermi('edu:student:list')")

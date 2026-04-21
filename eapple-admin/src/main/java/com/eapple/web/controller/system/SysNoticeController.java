@@ -1,6 +1,7 @@
 package com.eapple.web.controller.system;
 
 import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +20,7 @@ import com.eapple.common.core.domain.AjaxResult;
 import com.eapple.common.core.page.TableDataInfo;
 import com.eapple.common.core.text.Convert;
 import com.eapple.common.enums.BusinessType;
+import com.eapple.common.utils.poi.ExcelUtil;
 import com.eapple.system.domain.SysNotice;
 import com.eapple.system.service.ISysNoticeReadService;
 import com.eapple.system.service.ISysNoticeService;
@@ -48,6 +50,16 @@ public class SysNoticeController extends BaseController
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('system:notice:list') or @ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
+    @Log(title = "平台公告", businessType = BusinessType.EXPORT)
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysNotice notice)
+    {
+        List<SysNotice> list = noticeService.selectNoticeList(notice);
+        ExcelUtil<SysNotice> util = new ExcelUtil<SysNotice>(SysNotice.class);
+        util.exportExcel(response, list, "平台公告数据");
     }
 
     /**

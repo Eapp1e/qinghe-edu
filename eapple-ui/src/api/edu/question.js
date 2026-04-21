@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { download } from '@/utils/request'
 
 export function listQuestion(query) {
   return request({
@@ -37,4 +38,8 @@ export function regenerateQuestionAnswer(questionId) {
     timeout: 120000,
     noErrorMessage: true
   })
+}
+
+export function exportQuestion(query) {
+  return download('/edu/question/export', query, `homework_question_${new Date().getTime()}.xlsx`)
 }

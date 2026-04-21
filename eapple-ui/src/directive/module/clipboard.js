@@ -1,6 +1,6 @@
-/**
-* v-clipboard 文字复制剪贴
-* Copyright (c) 2021 ruoyi
+﻿/**
+* v-clipboard 鏂囧瓧澶嶅埗鍓创
+* Copyright (c) 2026 Eapp1e
 */
 
 import Clipboard from 'clipboard'
@@ -52,3 +52,4 @@ export default {
     }
   }
 }
+

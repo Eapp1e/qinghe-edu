@@ -1,33 +1,33 @@
-package com.eapple.common.config;
+﻿package com.eapple.common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 璇诲彇椤圭洰鐩稿叧閰嶇疆
+ * 鐠囪褰囨い鍦窗閻╃鍙ч柊宥囩枂
  * 
  * @author Eapp1e
  */
 @Component
-@ConfigurationProperties(prefix = "ruoyi")
+@ConfigurationProperties(prefix = "platform")
 public class PlatformConfig
 {
-    /** 椤圭洰鍚嶇О */
+    /** 妞ゅ湱娲伴崥宥囆?*/
     private String name;
 
-    /** 鐗堟湰 */
+    /** 閻楀牊婀?*/
     private String version;
 
-    /** 鐗堟潈骞翠唤 */
+    /** 閻楀牊娼堥獮缈犲敜 */
     private String copyrightYear;
 
-    /** 涓婁紶璺緞 */
+    /** 娑撳﹣绱剁捄顖氱窞 */
     private static String profile;
 
-    /** 鑾峰彇鍦板潃寮€鍏?*/
+    /** 閼惧嘲褰囬崷鏉挎絻瀵偓閸?*/
     private static boolean addressEnabled;
 
-    /** 楠岃瘉鐮佺被鍨?*/
+    /** 妤犲矁鐦夐惍浣鸿閸?*/
     private static String captchaType;
 
     public String getName()
@@ -89,7 +89,7 @@ public class PlatformConfig
     }
 
     /**
-     * 鑾峰彇瀵煎叆涓婁紶璺緞
+     * 閼惧嘲褰囩€电厧鍙嗘稉濠佺炊鐠侯垰绶?
      */
     public static String getImportPath()
     {
@@ -97,7 +97,7 @@ public class PlatformConfig
     }
 
     /**
-     * 鑾峰彇澶村儚涓婁紶璺緞
+     * 閼惧嘲褰囨径鏉戝剼娑撳﹣绱剁捄顖氱窞
      */
     public static String getAvatarPath()
     {
@@ -105,7 +105,7 @@ public class PlatformConfig
     }
 
     /**
-     * 鑾峰彇涓嬭浇璺緞
+     * 閼惧嘲褰囨稉瀣祰鐠侯垰绶?
      */
     public static String getDownloadPath()
     {
@@ -113,11 +113,12 @@ public class PlatformConfig
     }
 
     /**
-     * 鑾峰彇涓婁紶璺緞
+     * 閼惧嘲褰囨稉濠佺炊鐠侯垰绶?
      */
     public static String getUploadPath()
     {
         return getProfile() + "/upload";
     }
 }
+
 

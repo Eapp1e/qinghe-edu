@@ -1,118 +1,102 @@
-# 平台基础配置
-ruoyi:
-  # 平台名称
+﻿# 骞冲彴鍩虹閰嶇疆
+platform:
+  # 骞冲彴鍚嶇О
   name: EduAfterSchool
-  # 平台版本
+  # 骞冲彴鐗堟湰
   version: 3.9.2
-  # 版权年份
+  # 鐗堟潈骞翠唤
   copyrightYear: 2026
-  # 文件上传路径
-  profile: D:/ruoyi/uploadPath
-  # 是否开启 IP 归属地查询
-  addressEnabled: false
-  # 验证码类型：math 或 char
+  # 鏂囦欢涓婁紶璺緞
+  profile: D:/qinghe/uploadPath
+  # 鏄惁寮€鍚?IP 褰掑睘鍦版煡璇?  addressEnabled: false
+  # 楠岃瘉鐮佺被鍨嬶細math 鎴?char
   captchaType: math
 
-# 服务端配置
-server:
-  # 监听端口
+# 鏈嶅姟绔厤缃?server:
+  # 鐩戝惉绔彛
   port: 8080
   servlet:
-    # 应用上下文路径
-    context-path: /
+    # 搴旂敤涓婁笅鏂囪矾寰?    context-path: /
   tomcat:
-    # URL 编码
+    # URL 缂栫爜
     uri-encoding: UTF-8
-    # 最大等待队列长度
-    accept-count: 1000
+    # 鏈€澶х瓑寰呴槦鍒楅暱搴?    accept-count: 1000
     threads:
-      # 最大工作线程数
+      # 鏈€澶у伐浣滅嚎绋嬫暟
       max: 800
-      # 最小空闲线程数
+      # 鏈€灏忕┖闂茬嚎绋嬫暟
       min-spare: 100
 
-# 日志配置
+# 鏃ュ織閰嶇疆
 logging:
   level:
     com.eapple: debug
     org.springframework: warn
 
-# 用户密码策略
+# 鐢ㄦ埛瀵嗙爜绛栫暐
 user:
   password:
-    # 最大重试次数
-    maxRetryCount: 5
-    # 锁定时间，单位分钟
-    lockTime: 10
+    # 鏈€澶ч噸璇曟鏁?    maxRetryCount: 5
+    # 閿佸畾鏃堕棿锛屽崟浣嶅垎閽?    lockTime: 10
 
-# Spring 配置
+# Spring 閰嶇疆
 spring:
   messages:
-    # 国际化资源路径
-    basename: i18n/messages
+    # 鍥介檯鍖栬祫婧愯矾寰?    basename: i18n/messages
   profiles:
     active: druid
   servlet:
     multipart:
-      # 单个文件最大值
-      max-file-size: 10MB
-      # 单次请求最大值
-      max-request-size: 20MB
+      # 鍗曚釜鏂囦欢鏈€澶у€?      max-file-size: 10MB
+      # 鍗曟璇锋眰鏈€澶у€?      max-request-size: 20MB
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
   devtools:
     restart:
-      # 热部署开关
-      enabled: true
+      # 鐑儴缃插紑鍏?      enabled: true
   data:
     redis:
-      # Redis 地址
+      # Redis 鍦板潃
       host: localhost
-      # Redis 端口
+      # Redis 绔彛
       port: 6379
-      # Redis 数据库索引
-      database: 0
-      # Redis 密码
+      # Redis 鏁版嵁搴撶储寮?      database: 0
+      # Redis 瀵嗙爜
       password:
-      # 连接超时
+      # 杩炴帴瓒呮椂
       timeout: 10s
       lettuce:
         pool:
-          # 最小空闲连接
-          min-idle: 0
-          # 最大空闲连接
-          max-idle: 8
-          # 最大连接数
+          # 鏈€灏忕┖闂茶繛鎺?          min-idle: 0
+          # 鏈€澶х┖闂茶繛鎺?          max-idle: 8
+          # 鏈€澶ц繛鎺ユ暟
           max-active: 8
-          # 最大阻塞等待时间
-          max-wait: -1ms
+          # 鏈€澶ч樆濉炵瓑寰呮椂闂?          max-wait: -1ms
 
-# Token 配置
+# Token 閰嶇疆
 token:
-  # 令牌请求头
-  header: Authorization
-  # 令牌密钥
+  # 浠ょ墝璇锋眰澶?  header: Authorization
+  # 浠ょ墝瀵嗛挜
   secret: abcdefghijklmnopqrstuvwxyz
-  # 令牌有效期，单位分钟
+  # 浠ょ墝鏈夋晥鏈燂紝鍗曚綅鍒嗛挓
   expireTime: 30
 
-# MyBatis 配置
+# MyBatis 閰嶇疆
 mybatis:
-  # 别名包扫描路径
-  typeAliasesPackage: com.eapple.**.domain
-  # Mapper XML 扫描路径
+  # 鍒悕鍖呮壂鎻忚矾寰?  typeAliasesPackage: com.eapple.**.domain
+  # Mapper XML 鎵弿璺緞
   mapperLocations: classpath*:mapper/**/*Mapper.xml
-  # MyBatis 全局配置文件
+  # MyBatis 鍏ㄥ眬閰嶇疆鏂囦欢
   configLocation: classpath:mybatis/mybatis-config.xml
 
-# PageHelper 分页插件
+# PageHelper 鍒嗛〉鎻掍欢
 pagehelper:
   helperDialect: mysql
   supportMethodsArguments: true
   params: count=countSql
 
-# Springdoc 配置
+# Springdoc 閰嶇疆
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -122,27 +106,23 @@ springdoc:
     tags-sorter: alpha
   group-configs:
     - group: 'default'
-      display-name: '默认分组'
+      display-name: '榛樿鍒嗙粍'
       paths-to-match: '/**'
       packages-to-scan: com.eapple.web.controller.tool
 
-# Referer 白名单配置
-referer:
-  # 是否启用 Referer 校验
+# Referer 鐧藉悕鍗曢厤缃?referer:
+  # 鏄惁鍚敤 Referer 鏍￠獙
   enabled: false
-  # 允许的域名
-  allowed-domains: localhost,127.0.0.1
+  # 鍏佽鐨勫煙鍚?  allowed-domains: localhost,127.0.0.1
 
-# XSS 防护配置
+# XSS 闃叉姢閰嶇疆
 xss:
-  # 是否开启 XSS 防护
+  # 鏄惁寮€鍚?XSS 闃叉姢
   enabled: true
-  # 排除的路径
-  excludes: /system/notice
-  # 过滤的路径范围
-  urlPatterns: /system/*,/monitor/*,/tool/*
+  # 鎺掗櫎鐨勮矾寰?  excludes: /system/notice
+  # 杩囨护鐨勮矾寰勮寖鍥?  urlPatterns: /system/*,/monitor/*,/tool/*
 
-# 教育平台 AI 配置
+# 鏁欒偛骞冲彴 AI 閰嶇疆
 edu:
   ai:
     enabled: true
@@ -152,6 +132,8 @@ edu:
     timeoutSeconds: 90
     maxPromptLength: 1200
     bannedKeywords:
-      - 暴力
-      - 歧视
-      - 隐私
+      - 鏆村姏
+      - 姝ц
+      - 闅愮
+
+

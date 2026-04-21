@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { download } from '@/utils/request'
 
 export function listEnrollment(query) {
   return request({
@@ -14,4 +15,8 @@ export function updateEnrollment(data) {
     method: 'put',
     data
   })
+}
+
+export function exportEnrollment(query) {
+  return download('/edu/enrollment/export', query, `enrollment_${new Date().getTime()}.xlsx`)
 }

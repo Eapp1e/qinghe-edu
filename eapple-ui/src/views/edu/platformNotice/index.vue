@@ -33,19 +33,24 @@
             <el-option v-for="dict in dict.type.sys_notice_type" :key="dict.value" :label="dict.label" :value="dict.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="发布状态">
+        <el-form-item label="发布状态" class="status-select">
           <el-select v-model="queryParams.status" clearable placeholder="全部状态">
             <el-option v-for="dict in dict.type.sys_notice_status" :key="dict.value" :label="dict.label" :value="dict.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" size="small" @click="getList">查询</el-button>
-          <el-button size="small" @click="resetQuery">重置</el-button>
+          <el-tooltip content="查询" placement="top">
+            <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
+          </el-tooltip>
+          <el-tooltip content="重置筛选" placement="top">
+            <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+          </el-tooltip>
         </el-form-item>
       </el-form>
 
       <div v-if="canCreateNotice" class="quick-actions">
-        <el-button type="primary" plain size="small" @click="handleAdd">新建通知</el-button>
+        <el-button type="primary" plain size="small" class="toolbar-gradient-btn" @click="handleAdd">新建通知</el-button>
+        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
       </div>
     </section>
 
@@ -450,6 +455,9 @@ export default {
 }
 
 .quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding-bottom: 14px;
 }
 
@@ -537,6 +545,10 @@ export default {
   box-shadow: none;
 }
 
+::v-deep .status-select .el-input__inner {
+  width: 148px;
+}
+
 ::v-deep .el-table {
   overflow: hidden;
   border-radius: 24px;
@@ -546,8 +558,13 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
+}
+
+::v-deep .el-table th:first-child .cell,
+::v-deep .el-table td:first-child .cell {
+  padding-left: 18px;
 }
 
 ::v-deep .el-table tr {
@@ -555,7 +572,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.7);
+  background: #eef1f4 !important;
 }
 
 ::v-deep .el-dialog {

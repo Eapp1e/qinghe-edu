@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="app-container enrollment-page">
     <section class="hero-panel">
       <div class="hero-copy">
@@ -19,23 +19,38 @@
     </section>
 
     <section class="toolbar-panel">
-      <el-form :inline="true" :model="queryParams" size="small" v-show="showSearch" class="query-form">
-        <el-form-item :label="'\u5b66\u751f\u59d3\u540d'">
-          <el-input v-model="queryParams.studentName" :placeholder="'\u8bf7\u8f93\u5165\u5b66\u751f\u59d3\u540d'" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item :label="'\u72b6\u6001'">
-          <el-select v-model="queryParams.status" clearable :placeholder="'\u8bf7\u9009\u62e9\u72b6\u6001'">
-            <el-option :label="'\u5df2\u62a5\u540d'" value="0" />
-            <el-option :label="'\u5df2\u5b8c\u6210'" value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" size="mini" icon="el-icon-search" @click="getList">&#25628;&#32034;</el-button>
-          <el-button size="mini" icon="el-icon-refresh" @click="resetQuery">&#37325;&#32622;</el-button>
-        </el-form-item>
-      </el-form>
+      <div class="toolbar-main">
+        <el-form :inline="true" :model="queryParams" size="small" v-show="showSearch" class="query-form">
+          <el-form-item :label="'\u5b66\u751f'">
+            <el-input v-model="queryParams.studentName" :placeholder="'\u8bf7\u8f93\u5165\u5b66\u751f\u59d3\u540d'" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item :label="'\u8bfe\u7a0b'">
+            <el-input v-model="queryParams.courseName" :placeholder="'\u8bf7\u8f93\u5165\u8bfe\u7a0b\u540d\u79f0'" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item :label="'\u6559\u5e08'">
+            <el-input v-model="queryParams.teacherName" :placeholder="'\u8bf7\u8f93\u5165\u6559\u5e08\u59d3\u540d'" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item :label="'\u72b6\u6001'" class="status-select">
+            <el-select v-model="queryParams.status" clearable :placeholder="'\u8bf7\u9009\u62e9\u72b6\u6001'">
+              <el-option :label="'\u5df2\u62a5\u540d'" value="0" />
+              <el-option :label="'\u5df2\u5b8c\u6210'" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-tooltip content="查询" placement="top">
+              <el-button type="primary" size="mini" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
+            </el-tooltip>
+            <el-tooltip content="重置筛选" placement="top">
+              <el-button size="mini" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
 
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+        <div class="toolbar-actions">
+          <el-button size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
+          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+        </div>
+      </div>
     </section>
 
     <el-table v-loading="loading" :data="enrollmentList" class="content-table">
@@ -82,7 +97,7 @@
 </template>
 
 <script>
-import { listEnrollment, updateEnrollment } from '@/api/edu/enrollment'
+import { exportEnrollment, listEnrollment, updateEnrollment } from '@/api/edu/enrollment'
 
 export default {
   name: 'EduEnrollment',
@@ -93,7 +108,7 @@ export default {
       total: 0,
       open: false,
       enrollmentList: [],
-      queryParams: { pageNum: 1, pageSize: 10, studentName: undefined, status: undefined },
+      queryParams: { pageNum: 1, pageSize: 10, studentName: undefined, courseName: undefined, teacherName: undefined, status: undefined },
       form: {}
     }
   },
@@ -148,7 +163,7 @@ export default {
       })
     },
     resetQuery() {
-      this.queryParams = { pageNum: 1, pageSize: 10, studentName: undefined, status: undefined }
+      this.queryParams = { pageNum: 1, pageSize: 10, studentName: undefined, courseName: undefined, teacherName: undefined, status: undefined }
       this.getList()
     },
     handleUpdate(row) {
@@ -161,6 +176,9 @@ export default {
         this.open = false
         this.getList()
       })
+    },
+    handleExport() {
+      exportEnrollment(this.queryParams)
     }
   }
 }
@@ -278,10 +296,6 @@ export default {
 .toolbar-panel {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   margin-bottom: 16px;
   padding: 20px 22px 6px;
   border: 1px solid rgba(157, 232, 233, 0.42);
@@ -296,8 +310,39 @@ export default {
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
+.toolbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .query-form {
   flex: 1;
+  margin-bottom: 0;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-top: 0;
+}
+
+::v-deep .query-form .el-form-item {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+::v-deep .query-form .el-form-item:last-child {
+  margin-right: 0;
+}
+
+::v-deep .status-select .el-input__inner {
+  width: 148px;
 }
 
 .content-table {
@@ -350,8 +395,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: linear-gradient(180deg, rgba(235, 251, 255, 0.96), rgba(229, 255, 249, 0.92));
-  color: #34505f;
+  background: #d1d5db !important;
+  color: #374151 !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -364,7 +409,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: rgba(230, 255, 249, 0.7);
+  background: #eef1f4 !important;
 }
 
 ::v-deep .el-dialog {
@@ -398,9 +443,14 @@ export default {
     min-width: 0;
   }
 
-  .toolbar-panel {
+  .toolbar-main {
     flex-direction: column;
     align-items: stretch;
   }
+
+  .toolbar-actions {
+    justify-content: flex-start;
+  }
 }
 </style>
+

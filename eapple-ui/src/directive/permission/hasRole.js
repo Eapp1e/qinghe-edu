@@ -1,6 +1,6 @@
- /**
- * v-hasRole 角色权限处理
- * Copyright (c) 2019 ruoyi
+﻿ /**
+ * v-hasRole 瑙掕壊鏉冮檺澶勭悊
+ * Copyright (c) 2026 Eapp1e
  */
 
 import store from '@/store'
@@ -22,7 +22,8 @@ export default {
         el.parentNode && el.parentNode.removeChild(el)
       }
     } else {
-      throw new Error(`请设置角色权限标签值"`)
+      throw new Error(`璇疯缃鑹叉潈闄愭爣绛惧€?`)
     }
   }
 }
+

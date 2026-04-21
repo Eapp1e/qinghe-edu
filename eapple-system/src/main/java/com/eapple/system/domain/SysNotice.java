@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.eapple.common.annotation.Excel;
 import com.eapple.common.core.domain.BaseEntity;
 import com.eapple.common.xss.Xss;
 
@@ -21,15 +22,19 @@ public class SysNotice extends BaseEntity
     private Long noticeId;
 
     /** 公告标题 */
+    @Excel(name = "通知标题")
     private String noticeTitle;
 
     /** 公告类型（1通知 2公告） */
+    @Excel(name = "通知类型", readConverterExp = "1=通知,2=公告")
     private String noticeType;
 
     /** 公告内容 */
+    @Excel(name = "通知内容")
     private String noticeContent;
 
     /** 公告状态（0正常 1关闭） */
+    @Excel(name = "发布状态", readConverterExp = "0=已发布,1=草稿")
     private String status;
 
     /** 是否已读 */

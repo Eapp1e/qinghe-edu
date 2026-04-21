@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { download } from '@/utils/request'
 
 export function listStudent(query) {
   return request({
@@ -43,4 +44,8 @@ export function delStudent(profileId) {
     url: '/edu/student/' + profileId,
     method: 'delete'
   })
+}
+
+export function exportStudent(query) {
+  return download('/edu/student/export', query, `student_profile_${new Date().getTime()}.xlsx`)
 }
