@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eapple.system.mapper.SysNoticeReadMapper">
+
+    <resultMap type="SysNoticeRead" id="SysNoticeReadResult">
+        <id     property="readId"   column="read_id"     />
+        <result property="noticeId" column="notice_id"   />
+        <result property="userId"   column="user_id"     />
+        <result property="readTime" column="read_time"   />
+    </resultMap>
+
+    <!-- 鏂板宸茶璁板綍 -->
+    <insert id="insertNoticeRead" parameterType="SysNoticeRead">
+        insert ignore into sys_notice_read (notice_id, user_id, read_time)
+        values (#{noticeId}, #{userId}, sysdate())
+    </insert>
+
+    <!-- 鏌ヨ鏈鏁伴噺锛氭甯哥姸鎬佸叕鍛?鍑忓幓 褰撳墠鐢ㄦ埛宸茶鏁?-->
+    <select id="selectUnreadCount" resultType="int">
+        select count(*) from sys_notice n
+        where n.status = '0' and not exists (select 1 from sys_notice_read r where r.notice_id = n.notice_id and r.user_id = #{userId})
+    </select>
+
+    <!-- 鏌ヨ鏄惁宸茶 -->
+    <select id="selectIsRead" resultType="int">
+        select count(*) from sys_notice_read where notice_id = #{noticeId} and user_id = #{userId}
+    </select>
+
+    <!-- 鏌ヨ甯﹀凡璇荤姸鎬佺殑鍏憡鍒楄〃锛堢洿鎺ュ湪SQL涓檺鍒舵潯鏁帮級 -->
+    <select id="selectNoticeListWithReadStatus" resultType="SysNotice">
+        select
+            n.notice_id    as noticeId,
+            n.notice_title as noticeTitle,
+            n.notice_type  as noticeType,
+            n.status,
+            n.create_by    as createBy,
+            n.create_time  as createTime,
+            case when r.notice_id is not null then true else false end as isRead
+        from sys_notice n
+        left join sys_notice_read r
+            on r.notice_id = n.notice_id and r.user_id = #{userId}
+        where n.status = '0'
+        order by n.notice_id desc
+        limit #{limit}
+    </select>
+
+    <!-- 鎵归噺鏍囪宸茶 -->
+    <insert id="insertNoticeReadBatch">
+        insert ignore into sys_notice_read (notice_id, user_id, read_time)
+        values
+        <foreach collection="noticeIds" item="noticeId" separator=",">
+            (#{noticeId}, #{userId}, sysdate())
+        </foreach>
+    </insert>
+
+    <!-- 鍒犻櫎鍏憡鏃舵竻鐞嗗凡璇昏褰?-->
+    <delete id="deleteByNoticeIds">
+        delete from sys_notice_read where notice_id in
+        <foreach collection="noticeIds" item="noticeId" open="(" separator="," close=")">
+            #{noticeId}
+        </foreach>
+    </delete>
+
+    <!-- 鏌ヨ宸查槄璇绘煇鍏憡鐨勭敤鎴峰垪琛紝鏀寔鎸夌櫥褰曞悕/鐢ㄦ埛鍚嶆ā绯婄瓫閫?-->
+    <select id="selectReadUsersByNoticeId" resultType="java.util.Map">
+        select
+            u.user_id      as userId,
+            u.user_name    as userName,
+            u.nick_name    as nickName,
+            d.dept_name    as deptName,
+            group_concat(distinct sr.role_name order by sr.role_sort separator ' / ') as roleName,
+            u.phonenumber  as phonenumber,
+            r.read_time    as readTime
+        from sys_notice_read r
+        inner join sys_user u on u.user_id = r.user_id and u.del_flag = '0'
+        left join sys_dept d on d.dept_id = u.dept_id
+        left join sys_user_role ur on ur.user_id = u.user_id
+        left join sys_role sr on sr.role_id = ur.role_id and sr.del_flag = '0'
+        where r.notice_id = #{noticeId}
+          and not exists (
+              select 1
+              from sys_user_role ur2
+              inner join sys_role sr2 on sr2.role_id = ur2.role_id and sr2.del_flag = '0'
+              where ur2.user_id = u.user_id
+                and sr2.role_key in ('admin', 'edu_admin')
+          )
+        <if test="searchValue != null and searchValue != ''">
+            and (
+                u.user_name like concat('%', #{searchValue}, '%')
+                or u.nick_name like concat('%', #{searchValue}, '%')
+            )
+        </if>
+        group by u.user_id, u.user_name, u.nick_name, d.dept_name, u.phonenumber, r.read_time
+        order by r.read_time desc
+    </select>
+
+</mapper>

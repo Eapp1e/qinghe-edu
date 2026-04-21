@@ -1,0 +1,37 @@
+// accent palette
+$blue: #2f6fdf;
+$light-blue: #57a4ff;
+$red: #cf5b4e;
+$pink: #df7b8d;
+$green: #4d8b58;
+$tiffany: #4d9d92;
+$yellow: #f0bb63;
+$panGreen: #5b9a67;
+
+// sidebar theme
+$base-menu-color: rgba(239, 244, 233, 0.82);
+$base-menu-color-active: #ffffff;
+$base-menu-background: #1f2c24;
+$base-logo-title-color: #f9f7ef;
+
+$base-menu-light-color: rgba(44, 57, 49, 0.78);
+$base-menu-light-background: #f8f4ea;
+$base-logo-light-title-color: #233128;
+
+$base-sub-menu-background: #18231d;
+$base-sub-menu-hover: rgba(194, 220, 159, 0.14);
+
+$base-sidebar-width: 224px;
+
+:export {
+  menuColor: $base-menu-color;
+  menuLightColor: $base-menu-light-color;
+  menuColorActive: $base-menu-color-active;
+  menuBackground: $base-menu-background;
+  menuLightBackground: $base-menu-light-background;
+  subMenuBackground: $base-sub-menu-background;
+  subMenuHover: $base-sub-menu-hover;
+  sideBarWidth: $base-sidebar-width;
+  logoTitleColor: $base-logo-title-color;
+  logoLightTitleColor: $base-logo-light-title-color;
+}

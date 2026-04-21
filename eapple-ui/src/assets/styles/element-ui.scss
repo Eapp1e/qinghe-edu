@@ -1,0 +1,92 @@
+// cover some element-ui styles
+
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 500 !important;
+  color: #6d786d !important;
+}
+
+.el-upload {
+  input[type="file"] {
+    display: none !important;
+  }
+}
+
+.el-upload__input {
+  display: none;
+}
+
+.cell {
+  .el-tag {
+    margin-right: 0;
+  }
+}
+
+.small-padding {
+  .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+.fixed-width {
+  .el-button--mini {
+    width: auto;
+    min-width: 60px;
+    padding: 7px 12px;
+  }
+}
+
+.status-col {
+  .cell {
+    padding: 0 10px;
+    text-align: center;
+  }
+}
+
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+.upload-container {
+  .el-upload {
+    width: 100%;
+
+    .el-upload-dragger {
+      width: 100%;
+      height: 200px;
+      border-radius: 18px;
+      background: rgba(255, 252, 246, 0.95);
+    }
+  }
+}
+
+.el-dropdown-menu {
+  padding: 8px;
+  border: 1px solid rgba(130, 112, 82, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 16px 34px rgba(44, 57, 49, 0.12);
+
+  a {
+    display: block;
+  }
+}
+
+.el-dropdown-menu__item {
+  border-radius: 10px;
+}
+
+.el-range-editor.el-input__inner {
+  display: inline-flex !important;
+}
+
+.el-range-separator {
+  box-sizing: content-box;
+}
+
+.el-menu--collapse > div > .el-submenu > .el-submenu__title .el-submenu__icon-arrow {
+  display: none;
+}

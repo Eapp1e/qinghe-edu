@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eapple.system.mapper.edu.EduAiLogMapper">
+
+    <resultMap id="EduAiLogResult" type="EduAiLog">
+        <id property="logId" column="log_id"/>
+        <result property="businessType" column="business_type"/>
+        <result property="bizId" column="biz_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="roleType" column="role_type"/>
+        <result property="promptContent" column="prompt_content"/>
+        <result property="responseContent" column="response_content"/>
+        <result property="modelName" column="model_name"/>
+        <result property="status" column="status"/>
+        <result property="riskFlag" column="risk_flag"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="promptTokens" column="prompt_tokens"/>
+        <result property="completionTokens" column="completion_tokens"/>
+        <result property="latencyMs" column="latency_ms"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="logSelect">
+        select log_id, business_type, biz_id, user_id, user_name, role_type, prompt_content, response_content,
+               model_name, status, risk_flag, error_message, prompt_tokens, completion_tokens, latency_ms, create_time
+        from edu_ai_log
+    </sql>
+
+    <sql id="logWhere">
+        <where>
+            <if test="businessType != null and businessType != ''">
+                and business_type = #{businessType}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectAiLogList" parameterType="EduAiLog" resultMap="EduAiLogResult">
+        <include refid="logSelect"/>
+        <include refid="logWhere"/>
+        order by log_id desc
+        <if test="params.limitTop != null">
+            limit #{params.limitTop}
+        </if>
+    </select>
+
+    <insert id="insertAiLog" parameterType="EduAiLog" useGeneratedKeys="true" keyProperty="logId">
+        insert into edu_ai_log
+        (business_type, biz_id, user_id, user_name, role_type, prompt_content, response_content, model_name,
+         status, risk_flag, error_message, prompt_tokens, completion_tokens, latency_ms, create_time)
+        values
+        (#{businessType}, #{bizId}, #{userId}, #{userName}, #{roleType}, #{promptContent}, #{responseContent}, #{modelName},
+         #{status}, #{riskFlag}, #{errorMessage}, #{promptTokens}, #{completionTokens}, #{latencyMs}, sysdate())
+    </insert>
+
+    <select id="countAiLogs" parameterType="EduAiLog" resultType="Long">
+        select count(1) from edu_ai_log
+        <include refid="logWhere"/>
+    </select>
+</mapper>
