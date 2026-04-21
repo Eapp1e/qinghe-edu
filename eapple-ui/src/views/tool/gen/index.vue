@@ -1,36 +1,36 @@
-﻿<template>
+<template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="琛ㄥ悕绉? prop="tableName">
+      <el-form-item label="表名称" prop="tableName">
         <el-input
           v-model="queryParams.tableName"
-          placeholder="璇疯緭鍏ヨ〃鍚嶇О"
+          placeholder="请输入表名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="琛ㄦ弿杩? prop="tableComment">
+      <el-form-item label="表描述" prop="tableComment">
         <el-input
           v-model="queryParams.tableComment"
-          placeholder="璇疯緭鍏ヨ〃鎻忚堪"
+          placeholder="请输入表描述"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="鍒涘缓鏃堕棿">
+      <el-form-item label="创建时间">
         <el-date-picker
           v-model="dateRange"
           style="width: 240px"
           value-format="yyyy-MM-dd"
           type="daterange"
           range-separator="-"
-          start-placeholder="寮€濮嬫棩鏈?
-          end-placeholder="缁撴潫鏃ユ湡"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">鎼滅储</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">閲嶇疆</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -44,7 +44,7 @@
           :disabled="multiple"
           @click="handleGenTable"
           v-hasPermi="['tool:gen:code']"
-        >鐢熸垚</el-button>
+        >生成</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -54,7 +54,7 @@
           size="mini"
           @click="openCreateTable"
           v-hasRole="['admin']"
-        >鍒涘缓</el-button>
+        >创建</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -64,7 +64,7 @@
           size="mini"
           @click="openImportTable"
           v-hasPermi="['tool:gen:import']"
-        >瀵煎叆</el-button>
+        >导入</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -75,7 +75,7 @@
           :disabled="single"
           @click="handleEditTable"
           v-hasPermi="['tool:gen:edit']"
-        >淇敼</el-button>
+        >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -86,24 +86,24 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['tool:gen:remove']"
-        >鍒犻櫎</el-button>
+        >删除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table ref="tables" v-loading="loading" :data="tableList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
       <el-table-column type="selection" align="center" width="55"></el-table-column>
-      <el-table-column label="搴忓彿" type="index" width="50" align="center">
+      <el-table-column label="序号" type="index" width="50" align="center">
         <template slot-scope="scope">
           <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="琛ㄥ悕绉? align="center" prop="tableName" :show-overflow-tooltip="true" width="140" />
-      <el-table-column label="琛ㄦ弿杩? align="center" prop="tableComment" :show-overflow-tooltip="true" width="140" />
-      <el-table-column label="瀹炰綋" align="center" prop="className" :show-overflow-tooltip="true" width="140" />
-      <el-table-column label="鍒涘缓鏃堕棿" align="center" prop="createTime" sortable="custom" :sort-orders="['descending', 'ascending']" width="160" />
-      <el-table-column label="鏇存柊鏃堕棿" align="center" prop="updateTime" sortable="custom" :sort-orders="['descending', 'ascending']" width="160" />
-      <el-table-column label="鎿嶄綔" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="表名称" align="center" prop="tableName" :show-overflow-tooltip="true" width="140" />
+      <el-table-column label="表描述" align="center" prop="tableComment" :show-overflow-tooltip="true" width="140" />
+      <el-table-column label="实体" align="center" prop="className" :show-overflow-tooltip="true" width="140" />
+      <el-table-column label="创建时间" align="center" prop="createTime" sortable="custom" :sort-orders="['descending', 'ascending']" width="160" />
+      <el-table-column label="更新时间" align="center" prop="updateTime" sortable="custom" :sort-orders="['descending', 'ascending']" width="160" />
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             type="text"
@@ -111,35 +111,35 @@
             icon="el-icon-view"
             @click="handlePreview(scope.row)"
             v-hasPermi="['tool:gen:preview']"
-          >棰勮</el-button>
+          >预览</el-button>
           <el-button
             type="text"
             size="small"
             icon="el-icon-edit"
             @click="handleEditTable(scope.row)"
             v-hasPermi="['tool:gen:edit']"
-          >缂栬緫</el-button>
+          >编辑</el-button>
           <el-button
             type="text"
             size="small"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['tool:gen:remove']"
-          >鍒犻櫎</el-button>
+          >删除</el-button>
           <el-button
             type="text"
             size="small"
             icon="el-icon-refresh"
             @click="handleSynchDb(scope.row)"
             v-hasPermi="['tool:gen:edit']"
-          >鍚屾</el-button>
+          >同步</el-button>
           <el-button
             type="text"
             size="small"
             icon="el-icon-download"
             @click="handleGenTable(scope.row)"
             v-hasPermi="['tool:gen:code']"
-          >鐢熸垚浠ｇ爜</el-button>
+          >生成代码</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -150,7 +150,7 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-    <!-- 棰勮鐣岄潰 -->
+    <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body class="scrollbar">
       <el-tabs v-model="preview.activeName">
         <el-tab-pane
@@ -159,7 +159,7 @@
           :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
           :key="key"
         >
-          <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="value" v-clipboard:success="clipboardSuccess" style="float:right">澶嶅埗</el-link>
+          <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="value" v-clipboard:success="clipboardSuccess" style="float:right">复制</el-link>
           <pre><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
         </el-tab-pane>
       </el-tabs>
@@ -188,39 +188,39 @@ export default {
   components: { importTable, createTable },
   data() {
     return {
-      // 閬僵灞?
+      // 遮罩层
       loading: true,
-      // 鍞竴鏍囪瘑绗?
+      // 唯一标识符
       uniqueId: "",
-      // 閫変腑鏁扮粍
+      // 选中数组
       ids: [],
-      // 閫変腑琛ㄦ暟缁?
+      // 选中表数组
       tableNames: [],
-      // 闈炲崟涓鐢?
+      // 非单个禁用
       single: true,
-      // 闈炲涓鐢?
+      // 非多个禁用
       multiple: true,
-      // 鏄剧ず鎼滅储鏉′欢
+      // 显示搜索条件
       showSearch: true,
-      // 鎬绘潯鏁?
+      // 总条数
       total: 0,
-      // 琛ㄦ暟鎹?
+      // 表数据
       tableList: [],
-      // 鏃ユ湡鑼冨洿
+      // 日期范围
       dateRange: "",
-      // 榛樿鎺掑簭
+      // 默认排序
       defaultSort: { prop: "createTime", order: "descending" },
-      // 鏌ヨ鍙傛暟
+      // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         tableName: undefined,
         tableComment: undefined
       },
-      // 棰勮鍙傛暟
+      // 预览参数
       preview: {
         open: false,
-        title: "浠ｇ爜棰勮",
+        title: "代码预览",
         data: {},
         activeName: "domain.java"
       }
@@ -240,7 +240,7 @@ export default {
     }
   },
   methods: {
-    /** 鏌ヨ琛ㄩ泦鍚?*/
+    /** 查询表集合 */
     getList() {
       this.loading = true
       listTable(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
@@ -250,52 +250,52 @@ export default {
         }
       )
     },
-    /** 鎼滅储鎸夐挳鎿嶄綔 */
+    /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1
       this.getList()
     },
-    /** 鐢熸垚浠ｇ爜鎿嶄綔 */
+    /** 生成代码操作 */
     handleGenTable(row) {
       const tableNames = row.tableName || this.tableNames
       if (tableNames == "") {
-        this.$modal.msgError("璇烽€夋嫨瑕佺敓鎴愮殑鏁版嵁")
+        this.$modal.msgError("请选择要生成的数据")
         return
       }
       if(row.genType === "1") {
         genCode(row.tableName).then(() => {
-          this.$modal.msgSuccess("鎴愬姛鐢熸垚鍒拌嚜瀹氫箟璺緞锛? + row.genPath)
+          this.$modal.msgSuccess("成功生成到自定义路径：" + row.genPath)
         })
       } else {
         const zipName = Array.isArray(tableNames) ? "qinghe-code.zip" : tableNames + ".zip"
         this.$download.zip("/tool/gen/batchGenCode?tables=" + tableNames, zipName)
       }
     },
-    /** 鍚屾鏁版嵁搴撴搷浣?*/
+    /** 同步数据库操作 */
     handleSynchDb(row) {
       const tableName = row.tableName
-      this.$modal.confirm('纭瑕佸己鍒跺悓姝?' + tableName + '"琛ㄧ粨鏋勫悧锛?).then(function() {
+      this.$modal.confirm('确认要强制同步"' + tableName + '"表结构吗？').then(function() {
         return synchDb(tableName)
       }).then(() => {
-        this.$modal.msgSuccess("鍚屾鎴愬姛")
+        this.$modal.msgSuccess("同步成功")
       }).catch(() => {})
     },
-    /** 鎵撳紑瀵煎叆琛ㄥ脊绐?*/
+    /** 打开导入表弹窗 */
     openImportTable() {
       this.$refs.import.show()
     },
-    /** 鎵撳紑鍒涘缓琛ㄥ脊绐?*/
+    /** 打开创建表弹窗 */
     openCreateTable() {
       this.$refs.create.show()
     },
-    /** 閲嶇疆鎸夐挳鎿嶄綔 */
+    /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = []
       this.resetForm("queryForm")
       this.queryParams.pageNum = 1
       this.$refs.tables.sort(this.defaultSort.prop, this.defaultSort.order)
     },
-    /** 棰勮鎸夐挳 */
+    /** 预览按钮 */
     handlePreview(row) {
       previewTable(row.tableId).then(response => {
         this.preview.data = response.data
@@ -303,48 +303,47 @@ export default {
         this.preview.activeName = "domain.java"
       })
     },
-    /** 楂樹寒鏄剧ず */
+    /** 高亮显示 */
     highlightedCode(code, key) {
       const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"))
       var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length)
       const result = hljs.highlight(language, code || "", true)
       return result.value || '&nbsp;'
     },
-    /** 澶嶅埗浠ｇ爜鎴愬姛 */
+    /** 复制代码成功 */
     clipboardSuccess() {
-      this.$modal.msgSuccess("澶嶅埗鎴愬姛")
+      this.$modal.msgSuccess("复制成功")
     },
-    // 澶氶€夋閫変腑鏁版嵁
+    // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.tableId)
       this.tableNames = selection.map(item => item.tableName)
       this.single = selection.length != 1
       this.multiple = !selection.length
     },
-    /** 鎺掑簭瑙﹀彂浜嬩欢 */
+    /** 排序触发事件 */
     handleSortChange(column, prop, order) {
       this.queryParams.orderByColumn = column.prop
       this.queryParams.isAsc = column.order
       this.getList()
     },
-    /** 淇敼鎸夐挳鎿嶄綔 */
+    /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.tableId || this.ids[0]
       const tableName = row.tableName || this.tableNames[0]
       const params = { pageNum: this.queryParams.pageNum }
-      this.$tab.openPage("淇敼[" + tableName + "]鐢熸垚閰嶇疆", '/tool/gen-edit/index/' + tableId, params)
+      this.$tab.openPage("修改[" + tableName + "]生成配置", '/tool/gen-edit/index/' + tableId, params)
     },
-    /** 鍒犻櫎鎸夐挳鎿嶄綔 */
+    /** 删除按钮操作 */
     handleDelete(row) {
       const tableIds = row.tableId || this.ids
-      this.$modal.confirm('鏄惁纭鍒犻櫎琛ㄧ紪鍙蜂负"' + tableIds + '"鐨勬暟鎹」锛?).then(function() {
+      this.$modal.confirm('是否确认删除表编号为"' + tableIds + '"的数据项？').then(function() {
         return delTable(tableIds)
       }).then(() => {
         this.getList()
-        this.$modal.msgSuccess("鍒犻櫎鎴愬姛")
+        this.$modal.msgSuccess("删除成功")
       }).catch(() => {})
     }
   }
 }
 </script>
-

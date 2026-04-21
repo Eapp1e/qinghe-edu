@@ -41,6 +41,7 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
+eapple-admin/src/main/resources/application-private.yml
 
 !*/build/*.java
 !*/build/*.html
