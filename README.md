@@ -253,4 +253,4 @@ AI 相关配置位于：
 
 ## 仓库地址
 
-- Gitee: [https://gitee.com/eapp1e/edu-after-school](https://gitee.com/eapp1e/edu-after-school)
+- GitHub: [https://github.com/Eapp1e/qinghe-edu](https://github.com/Eapp1e/qinghe-edu)

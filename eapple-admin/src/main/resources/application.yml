@@ -127,7 +127,7 @@ edu:
   ai:
     enabled: true
     endpoint: https://api.siliconflow.cn/v1/chat/completions
-    apiKey: sk-ecgczhcnyeqhipysxzbxonmbgnbdysilgpuaemiimumevhrx
+    apiKey: ${SILICONFLOW_API_KEY:}
     model: Qwen/Qwen2.5-7B-Instruct
     timeoutSeconds: 90
     maxPromptLength: 1200
