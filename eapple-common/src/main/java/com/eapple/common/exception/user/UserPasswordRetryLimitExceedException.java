@@ -1,7 +1,7 @@
 package com.eapple.common.exception.user;
 
 /**
- * 鐢ㄦ埛閿欒鏈€澶ф鏁板紓甯哥被
+ * 用户密码重试次数超限异常类。
  * 
  * @author Eapp1e
  */

@@ -15,7 +15,7 @@ import com.eapple.system.service.ISysMenuService;
 import com.eapple.system.service.ISysRoleService;
 
 /**
- * 鐢ㄦ埛鏉冮檺澶勭悊
+ * 用户权限处理。
  * 
  * @author Eapp1e
  */
@@ -29,15 +29,15 @@ public class SysPermissionService
     private ISysMenuService menuService;
 
     /**
-     * 鑾峰彇瑙掕壊鏁版嵁鏉冮檺
+     * 获取角色数据权限。
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 瑙掕壊鏉冮檺淇℃伅
+     * @param user 用户信息
+     * @return 角色权限集合
      */
     public Set<String> getRolePermission(SysUser user)
     {
         Set<String> roles = new HashSet<String>();
-        // 绠＄悊鍛樻嫢鏈夋墍鏈夋潈闄?
+        // 超级管理员拥有所有权限
         if (user.isAdmin())
         {
             roles.add(Constants.SUPER_ADMIN);
@@ -50,15 +50,15 @@ public class SysPermissionService
     }
 
     /**
-     * 鑾峰彇鑿滃崟鏁版嵁鏉冮檺
+     * 获取菜单数据权限。
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 鑿滃崟鏉冮檺淇℃伅
+     * @param user 用户信息
+     * @return 菜单权限集合
      */
     public Set<String> getMenuPermission(SysUser user)
     {
         Set<String> perms = new HashSet<String>();
-        // 绠＄悊鍛樻嫢鏈夋墍鏈夋潈闄?
+        // 超级管理员拥有所有权限
         if (user.isAdmin())
         {
             perms.add(Constants.ALL_PERMISSION);
@@ -68,7 +68,7 @@ public class SysPermissionService
             List<SysRole> roles = user.getRoles();
             if (!CollectionUtils.isEmpty(roles))
             {
-                // 澶氳鑹茶缃畃ermissions灞炴€э紝浠ヤ究鏁版嵁鏉冮檺鍖归厤鏉冮檺
+                // 多角色情况下，遍历角色并汇总权限
                 for (SysRole role : roles)
                 {
                     if (StringUtils.equals(role.getStatus(), UserConstants.ROLE_NORMAL) && !role.isAdmin())

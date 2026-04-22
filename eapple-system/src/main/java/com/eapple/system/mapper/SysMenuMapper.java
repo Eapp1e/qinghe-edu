@@ -5,137 +5,137 @@ import org.apache.ibatis.annotations.Param;
 import com.eapple.common.core.domain.entity.SysMenu;
 
 /**
- * 鑿滃崟琛?鏁版嵁灞?
+ * 菜单管理数据层。
  *
  * @author Eapp1e
  */
 public interface SysMenuMapper
 {
     /**
-     * 鏌ヨ绯荤粺鑿滃崟鍒楄〃
+     * 查询系统菜单列表。
      *
-     * @param menu 鑿滃崟淇℃伅
-     * @return 鑿滃崟鍒楄〃
+     * @param menu 菜单信息
+     * @return 菜单列表
      */
     public List<SysMenu> selectMenuList(SysMenu menu);
 
     /**
-     * 鏍规嵁鐢ㄦ埛鎵€鏈夋潈闄?
+     * 查询系统所有权限标识。
      *
-     * @return 鏉冮檺鍒楄〃
+     * @return 权限标识集合
      */
     public List<String> selectMenuPerms();
 
     /**
-     * 鏍规嵁鐢ㄦ埛鏌ヨ绯荤粺鑿滃崟鍒楄〃
+     * 根据用户查询系统菜单列表。
      *
-     * @param menu 鑿滃崟淇℃伅
-     * @return 鑿滃崟鍒楄〃
+     * @param menu 菜单信息
+     * @return 菜单列表
      */
     public List<SysMenu> selectMenuListByUserId(SysMenu menu);
 
     /**
-     * 鏍规嵁瑙掕壊ID鏌ヨ鏉冮檺
+     * 根据角色 ID 查询权限标识。
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 鏉冮檺鍒楄〃
+     * @param roleId 角色 ID
+     * @return 权限标识集合
      */
     public List<String> selectMenuPermsByRoleId(Long roleId);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ鏉冮檺
+     * 根据用户 ID 查询权限标识。
      *
-     * @param userId 鐢ㄦ埛ID
-     * @return 鏉冮檺鍒楄〃
+     * @param userId 用户 ID
+     * @return 权限标识集合
      */
     public List<String> selectMenuPermsByUserId(Long userId);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ鑿滃崟
+     * 查询所有菜单。
      *
-     * @return 鑿滃崟鍒楄〃
+     * @return 菜单列表
      */
     public List<SysMenu> selectMenuTreeAll();
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ鑿滃崟
+     * 根据用户 ID 查询菜单。
      *
-     * @param userId 鐢ㄦ埛ID
-     * @return 鑿滃崟鍒楄〃
+     * @param userId 用户 ID
+     * @return 菜单列表
      */
     public List<SysMenu> selectMenuTreeByUserId(Long userId);
 
     /**
-     * 鏍规嵁瑙掕壊ID鏌ヨ鑿滃崟鏍戜俊鎭?
+     * 根据角色 ID 查询菜单树信息。
      * 
-     * @param roleId 瑙掕壊ID
-     * @param menuCheckStrictly 鑿滃崟鏍戦€夋嫨椤规槸鍚﹀叧鑱旀樉绀?
-     * @return 閫変腑鑿滃崟鍒楄〃
+     * @param roleId 角色 ID
+     * @param menuCheckStrictly 是否开启菜单树选择项关联显示
+     * @return 菜单列表
      */
     public List<Long> selectMenuListByRoleId(@Param("roleId") Long roleId, @Param("menuCheckStrictly") boolean menuCheckStrictly);
 
     /**
-     * 鏍规嵁鑿滃崟ID鏌ヨ淇℃伅
+     * 根据菜单 ID 查询信息。
      *
-     * @param menuId 鑿滃崟ID
-     * @return 鑿滃崟淇℃伅
+     * @param menuId 菜单 ID
+     * @return 菜单信息
      */
     public SysMenu selectMenuById(Long menuId);
 
     /**
-     * 鏄惁瀛樺湪鑿滃崟瀛愯妭鐐?
+     * 是否存在子节点。
      *
-     * @param menuId 鑿滃崟ID
-     * @return 缁撴灉
+     * @param menuId 菜单 ID
+     * @return 结果
      */
     public int hasChildByMenuId(Long menuId);
 
     /**
-     * 鏂板鑿滃崟淇℃伅
+     * 新增菜单信息。
      *
-     * @param menu 鑿滃崟淇℃伅
-     * @return 缁撴灉
+     * @param menu 菜单信息
+     * @return 结果
      */
     public int insertMenu(SysMenu menu);
 
     /**
-     * 淇敼鑿滃崟淇℃伅
+     * 修改菜单信息。
      *
-     * @param menu 鑿滃崟淇℃伅
-     * @return 缁撴灉
+     * @param menu 菜单信息
+     * @return 结果
      */
     public int updateMenu(SysMenu menu);
 
     /**
-     * 淇濆瓨鑿滃崟鎺掑簭
+     * 修改菜单排序。
      * 
-     * @param menu 鑿滃崟淇℃伅
+     * @param menu 菜单信息
      */
     public void updateMenuSort(SysMenu menu);
 
     /**
-     * 鍒犻櫎鑿滃崟绠＄悊淇℃伅
+     * 删除菜单管理信息。
      *
-     * @param menuId 鑿滃崟ID
-     * @return 缁撴灉
+     * @param menuId 菜单 ID
+     * @return 结果
      */
     public int deleteMenuById(Long menuId);
 
     /**
-     * 鏍￠獙鑿滃崟鍚嶇О鏄惁鍞竴
+     * 校验菜单名称是否唯一。
      *
-     * @param menuName 鑿滃崟鍚嶇О
-     * @param parentId 鐖惰彍鍗旾D
-     * @return 缁撴灉
+     * @param menuName 菜单名称
+     * @param parentId 父菜单 ID
+     * @return 结果
      */
     public SysMenu checkMenuNameUnique(@Param("menuName") String menuName, @Param("parentId") Long parentId);
 
     /**
-     * 鏍规嵁璺敱璺緞鎴栧悕绉版煡璇㈣彍鍗曚俊鎭紙鐢ㄤ簬鍞竴鎬ф牎楠岋級
+     * 根据路由路径或路由名称查询冲突菜单。
      *
-     * @param path 璺敱鍦板潃
-     * @param routeName 璺敱鍚嶇О
-     * @return 鍖归厤鐨勮彍鍗曞垪琛?
+     * @param path 路由地址
+     * @param routeName 路由名称
+     * @return 冲突菜单列表
      */
     public List<SysMenu> selectMenusByPathOrRouteName(@Param("path") String path, @Param("routeName") String routeName);
 }

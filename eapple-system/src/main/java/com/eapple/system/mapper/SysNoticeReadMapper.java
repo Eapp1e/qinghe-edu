@@ -7,69 +7,69 @@ import com.eapple.system.domain.SysNotice;
 import com.eapple.system.domain.SysNoticeRead;
 
 /**
- * 鍏憡宸茶璁板綍 鏁版嵁灞?
+ * 公告已读记录数据层。
  *
  * @author Eapp1e
  */
 public interface SysNoticeReadMapper
 {
     /**
-     * 鏂板宸茶璁板綍锛堝拷鐣ラ噸澶嶏級
+     * 新增公告已读记录。
      *
-     * @param noticeRead 宸茶璁板綍
-     * @return 缁撴灉
+     * @param noticeRead 已读记录对象
+     * @return 结果
      */
     public int insertNoticeRead(SysNoticeRead noticeRead);
 
     /**
-     * 鏌ヨ鏌愮敤鎴锋湭璇诲叕鍛婃暟閲?
+     * 查询用户未读公告数量。
      *
-     * @param userId 鐢ㄦ埛ID
-     * @return 鏈鏁伴噺
+     * @param userId 用户 ID
+     * @return 未读数量
      */
     public int selectUnreadCount(@Param("userId") Long userId);
 
     /**
-     * 鏌ヨ鏌愮敤鎴锋槸鍚﹀凡璇绘煇鍏憡
+     * 查询指定公告是否已读。
      *
-     * @param noticeId 鍏憡ID
-     * @param userId   鐢ㄦ埛ID
-     * @return 宸茶璁板綍鏁帮紙0鏈 1宸茶锛?
+     * @param noticeId 公告 ID
+     * @param userId 用户 ID
+     * @return 是否已读，1 表示已读
      */
     public int selectIsRead(@Param("noticeId") Long noticeId, @Param("userId") Long userId);
 
     /**
-     * 鎵归噺鏍囪宸茶
+     * 批量新增公告已读记录。
      *
-     * @param userId    鐢ㄦ埛ID
-     * @param noticeIds 鍏憡ID鏁扮粍
-     * @return 缁撴灉
+     * @param userId 用户 ID
+     * @param noticeIds 公告 ID 数组
+     * @return 结果
      */
     public int insertNoticeReadBatch(@Param("userId") Long userId, @Param("noticeIds") Long[] noticeIds);
 
     /**
-     * 鏌ヨ甯﹀凡璇荤姸鎬佺殑鍏憡鍒楄〃锛圫QL灞傞檺鍒舵潯鏁帮紝涓€娆℃煡璇㈠畬鎴愶級
+     * 查询公告列表及已读状态。
      *
-     * @param userId 鐢ㄦ埛ID
-     * @param limit  鏈€澶氳繑鍥炴潯鏁?
-     * @return 甯?isRead 鏍囪鐨勫叕鍛婂垪琛?
+     * @param userId 用户 ID
+     * @param limit 查询条数限制
+     * @return 公告列表
      */
     public List<SysNotice> selectNoticeListWithReadStatus(@Param("userId") Long userId, @Param("limit") int limit);
 
     /**
-     * 鏌ヨ宸查槄璇绘煇鍏憡鐨勭敤鎴峰垪琛?
+     * 查询指定公告的已读用户列表。
      *
-     * @param noticeId 鍏憡ID
-     * @param searchValue 鎼滅储鍊?
-     * @return 宸茶鐢ㄦ埛鍒楄〃
+     * @param noticeId 公告 ID
+     * @param searchValue 搜索关键词
+     * @return 已读用户列表
      */
     public List<Map<String, Object>> selectReadUsersByNoticeId(@Param("noticeId") Long noticeId, @Param("searchValue") String searchValue);
 
     /**
-     * 鍏憡鍒犻櫎鏃舵竻鐞嗗搴斿凡璇昏褰?
+     * 根据公告 ID 批量删除已读记录。
      *
-     * @param noticeIds 鍏憡ID鏁扮粍
-     * @return 缁撴灉
+     * @param noticeIds 公告 ID 数组
+     * @return 结果
      */
     public int deleteByNoticeIds(@Param("noticeIds") Long[] noticeIds);
 }

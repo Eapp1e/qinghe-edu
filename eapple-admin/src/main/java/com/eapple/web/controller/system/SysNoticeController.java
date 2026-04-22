@@ -26,8 +26,8 @@ import com.eapple.system.service.ISysNoticeReadService;
 import com.eapple.system.service.ISysNoticeService;
 
 /**
- * 鍏憡 淇℃伅鎿嶄綔澶勭悊
- * 
+ * 平台公告管理控制器。
+ *
  * @author Eapp1e
  */
 @RestController
@@ -41,7 +41,7 @@ public class SysNoticeController extends BaseController
     private ISysNoticeReadService noticeReadService;
 
     /**
-     * 鑾峰彇閫氱煡鍏憡鍒楄〃
+     * 获取平台公告列表。
      */
     @PreAuthorize("@ss.hasPermi('system:notice:list')")
     @GetMapping("/list")
@@ -63,7 +63,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 鏍规嵁閫氱煡鍏憡缂栧彿鑾峰彇璇︾粏淇℃伅
+     * 根据公告编号获取详细信息。
      */
     @GetMapping(value = "/{noticeId}")
     public AjaxResult getInfo(@PathVariable Long noticeId)
@@ -72,10 +72,10 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 鏂板閫氱煡鍏憡
+     * 新增平台公告。
      */
     @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
-    @Log(title = "閫氱煡鍏憡", businessType = BusinessType.INSERT)
+    @Log(title = "平台公告", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysNotice notice)
     {
@@ -84,10 +84,10 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 淇敼閫氱煡鍏憡
+     * 修改平台公告。
      */
     @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
-    @Log(title = "閫氱煡鍏憡", businessType = BusinessType.UPDATE)
+    @Log(title = "平台公告", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysNotice notice)
     {
@@ -96,7 +96,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 棣栭〉椤堕儴鍏憡鍒楄〃锛堣繑鍥炲叏閮ㄦ甯稿叕鍛婏紝甯﹀綋鍓嶇敤鎴峰凡璇绘爣璁帮紝鏈€澶?鏉★級
+     * 首页顶部公告列表，返回正常公告并附带当前用户已读标记，最多 5 条。
      */
     @GetMapping("/listTop")
     @ResponseBody
@@ -111,7 +111,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 鏍囪鍏憡宸茶
+     * 标记公告已读。
      */
     @PostMapping("/markRead")
     @ResponseBody
@@ -123,7 +123,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 鎵归噺鏍囪宸茶
+     * 批量标记公告已读。
      */
     @PostMapping("/markReadAll")
     @ResponseBody
@@ -136,7 +136,7 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 宸茶鐢ㄦ埛鍒楄〃鏁版嵁
+     * 已读用户列表数据。
      */
     @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
     @GetMapping("/readUsers/list")
@@ -149,10 +149,10 @@ public class SysNoticeController extends BaseController
     }
 
     /**
-     * 鍒犻櫎閫氱煡鍏憡
+     * 删除平台公告。
      */
     @PreAuthorize("@ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
-    @Log(title = "閫氱煡鍏憡", businessType = BusinessType.DELETE)
+    @Log(title = "平台公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
     public AjaxResult remove(@PathVariable Long[] noticeIds)
     {

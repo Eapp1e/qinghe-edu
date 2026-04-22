@@ -1,44 +1,44 @@
 package com.eapple.framework.web.domain.server;
 
 /**
- * 绯荤粺鏂囦欢鐩稿叧淇℃伅
+ * 系统磁盘相关信息。
  * 
  * @author Eapp1e
  */
 public class SysFile
 {
     /**
-     * 鐩樼璺緞
+     * 盘符路径。
      */
     private String dirName;
 
     /**
-     * 鐩樼绫诲瀷
+     * 盘符类型。
      */
     private String sysTypeName;
 
     /**
-     * 鏂囦欢绫诲瀷
+     * 文件系统类型。
      */
     private String typeName;
 
     /**
-     * 鎬诲ぇ灏?
+     * 总大小。
      */
     private String total;
 
     /**
-     * 鍓╀綑澶у皬
+     * 剩余大小。
      */
     private String free;
 
     /**
-     * 宸茬粡浣跨敤閲?
+     * 已用大小。
      */
     private String used;
 
     /**
-     * 璧勬簮鐨勪娇鐢ㄧ巼
+     * 资源使用率。
      */
     private double usage;
 

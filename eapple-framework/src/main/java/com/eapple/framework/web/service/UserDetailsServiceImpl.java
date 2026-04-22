@@ -16,7 +16,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.system.service.ISysUserService;
 
 /**
- * 鐢ㄦ埛楠岃瘉澶勭悊
+ * 用户认证处理。
  *
  * @author Eapp1e
  */
@@ -40,17 +40,17 @@ public class UserDetailsServiceImpl implements UserDetailsService
         SysUser user = userService.selectUserByUserName(username);
         if (StringUtils.isNull(user))
         {
-            log.info("鐧诲綍鐢ㄦ埛锛歿} 涓嶅瓨鍦?", username);
+            log.info("登录用户：{} 不存在.", username);
             throw new ServiceException(MessageUtils.message("user.not.exists"));
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
-            log.info("鐧诲綍鐢ㄦ埛锛歿} 宸茶鍒犻櫎.", username);
+            log.info("登录用户：{} 已被删除.", username);
             throw new ServiceException(MessageUtils.message("user.password.delete"));
         }
         else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
         {
-            log.info("鐧诲綍鐢ㄦ埛锛歿} 宸茶鍋滅敤.", username);
+            log.info("登录用户：{} 已被停用.", username);
             throw new ServiceException(MessageUtils.message("user.blocked"));
         }
 

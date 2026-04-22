@@ -1,34 +1,34 @@
 package com.eapple.framework.web.domain.server;
 
 /**
- * 绯荤粺鐩稿叧淇℃伅
+ * 系统相关信息。
  * 
  * @author Eapp1e
  */
 public class Sys
 {
     /**
-     * 鏈嶅姟鍣ㄥ悕绉?
+     * 服务器名称。
      */
     private String computerName;
 
     /**
-     * 鏈嶅姟鍣↖p
+     * 服务器 IP。
      */
     private String computerIp;
 
     /**
-     * 椤圭洰璺緞
+     * 项目路径。
      */
     private String userDir;
 
     /**
-     * 鎿嶄綔绯荤粺
+     * 操作系统。
      */
     private String osName;
 
     /**
-     * 绯荤粺鏋舵瀯
+     * 系统架构。
      */
     private String osArch;
 

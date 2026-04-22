@@ -22,7 +22,7 @@ import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
 
 /**
- * 鏈嶅姟鍣ㄧ浉鍏充俊鎭?
+ * 服务器相关信息。
  * 
  * @author Eapp1e
  */
@@ -31,27 +31,27 @@ public class Server
     private static final int OSHI_WAIT_SECOND = 1000;
     
     /**
-     * CPU鐩稿叧淇℃伅
+     * CPU 相关信息。
      */
     private Cpu cpu = new Cpu();
 
     /**
-     * 鍏у瓨鐩稿叧淇℃伅
+     * 内存相关信息。
      */
     private Mem mem = new Mem();
 
     /**
-     * JVM鐩稿叧淇℃伅
+     * JVM 相关信息。
      */
     private Jvm jvm = new Jvm();
 
     /**
-     * 鏈嶅姟鍣ㄧ浉鍏充俊鎭?
+     * 系统相关信息。
      */
     private Sys sys = new Sys();
 
     /**
-     * 纾佺洏鐩稿叧淇℃伅
+     * 磁盘信息列表。
      */
     private List<SysFile> sysFiles = new LinkedList<SysFile>();
 
@@ -111,22 +111,17 @@ public class Server
         HardwareAbstractionLayer hal = si.getHardware();
 
         setCpuInfo(hal.getProcessor());
-
         setMemInfo(hal.getMemory());
-
         setSysInfo();
-
         setJvmInfo();
-
         setSysFiles(si.getOperatingSystem());
     }
 
     /**
-     * 璁剧疆CPU淇℃伅
+     * 设置 CPU 信息。
      */
     private void setCpuInfo(CentralProcessor processor)
     {
-        // CPU淇℃伅
         long[] prevTicks = processor.getSystemCpuLoadTicks();
         Util.sleep(OSHI_WAIT_SECOND);
         long[] ticks = processor.getSystemCpuLoadTicks();
@@ -148,7 +143,7 @@ public class Server
     }
 
     /**
-     * 璁剧疆鍐呭瓨淇℃伅
+     * 设置内存信息。
      */
     private void setMemInfo(GlobalMemory memory)
     {
@@ -158,7 +153,7 @@ public class Server
     }
 
     /**
-     * 璁剧疆鏈嶅姟鍣ㄤ俊鎭?
+     * 设置服务器系统信息。
      */
     private void setSysInfo()
     {
@@ -171,7 +166,7 @@ public class Server
     }
 
     /**
-     * 璁剧疆Java铏氭嫙鏈?
+     * 设置 Java 虚拟机信息。
      */
     private void setJvmInfo() throws UnknownHostException
     {
@@ -184,7 +179,7 @@ public class Server
     }
 
     /**
-     * 璁剧疆纾佺洏淇℃伅
+     * 设置磁盘信息。
      */
     private void setSysFiles(OperatingSystem os)
     {
@@ -208,10 +203,10 @@ public class Server
     }
 
     /**
-     * 瀛楄妭杞崲
+     * 转换文件大小单位。
      * 
-     * @param size 瀛楄妭澶у皬
-     * @return 杞崲鍚庡€?
+     * @param size 文件大小
+     * @return 带单位的大小字符串
      */
     public String convertFileSize(long size)
     {

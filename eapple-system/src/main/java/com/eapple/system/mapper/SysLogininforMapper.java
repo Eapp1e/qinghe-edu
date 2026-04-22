@@ -4,39 +4,39 @@ import java.util.List;
 import com.eapple.system.domain.SysLogininfor;
 
 /**
- * 绯荤粺璁块棶鏃ュ織鎯呭喌淇℃伅 鏁版嵁灞?
+ * 系统访问日志数据层。
  * 
  * @author Eapp1e
  */
 public interface SysLogininforMapper
 {
     /**
-     * 鏂板绯荤粺鐧诲綍鏃ュ織
+     * 新增系统登录日志。
      * 
-     * @param logininfor 璁块棶鏃ュ織瀵硅薄
+     * @param logininfor 访问日志对象
      */
     public void insertLogininfor(SysLogininfor logininfor);
 
     /**
-     * 鏌ヨ绯荤粺鐧诲綍鏃ュ織闆嗗悎
+     * 查询系统登录日志集合。
      * 
-     * @param logininfor 璁块棶鏃ュ織瀵硅薄
-     * @return 鐧诲綍璁板綍闆嗗悎
+     * @param logininfor 访问日志对象
+     * @return 登录日志集合
      */
     public List<SysLogininfor> selectLogininforList(SysLogininfor logininfor);
 
     /**
-     * 鎵归噺鍒犻櫎绯荤粺鐧诲綍鏃ュ織
+     * 批量删除系统登录日志。
      * 
-     * @param infoIds 闇€瑕佸垹闄ょ殑鐧诲綍鏃ュ織ID
-     * @return 缁撴灉
+     * @param infoIds 访问日志 ID 数组
+     * @return 结果
      */
     public int deleteLogininforByIds(Long[] infoIds);
 
     /**
-     * 娓呯┖绯荤粺鐧诲綍鏃ュ織
+     * 清空系统登录日志。
      * 
-     * @return 缁撴灉
+     * @return 结果
      */
     public int cleanLogininfor();
 }

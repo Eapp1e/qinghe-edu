@@ -4,26 +4,26 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * 绮剧‘鐨勬诞鐐规暟杩愮畻
- * 
+ * 高精度算术运算工具类。
+ *
  * @author Eapp1e
  */
 public class Arith
 {
-
-    /** 榛樿闄ゆ硶杩愮畻绮惧害 */
+    /** 默认除法精度 */
     private static final int DEF_DIV_SCALE = 10;
 
-    /** 杩欎釜绫讳笉鑳藉疄渚嬪寲 */
+    /** 工具类不允许实例化 */
     private Arith()
     {
     }
 
     /**
-     * 鎻愪緵绮剧‘鐨勫姞娉曡繍绠椼€?
-     * @param v1 琚姞鏁?
-     * @param v2 鍔犳暟
-     * @return 涓や釜鍙傛暟鐨勫拰
+     * 提供精确加法运算。
+     *
+     * @param v1 被加数
+     * @param v2 加数
+     * @return 两数之和
      */
     public static double add(double v1, double v2)
     {
@@ -33,10 +33,11 @@ public class Arith
     }
 
     /**
-     * 鎻愪緵绮剧‘鐨勫噺娉曡繍绠椼€?
-     * @param v1 琚噺鏁?
-     * @param v2 鍑忔暟
-     * @return 涓や釜鍙傛暟鐨勫樊
+     * 提供精确减法运算。
+     *
+     * @param v1 被减数
+     * @param v2 减数
+     * @return 两数之差
      */
     public static double sub(double v1, double v2)
     {
@@ -46,10 +47,11 @@ public class Arith
     }
 
     /**
-     * 鎻愪緵绮剧‘鐨勪箻娉曡繍绠椼€?
-     * @param v1 琚箻鏁?
-     * @param v2 涔樻暟
-     * @return 涓や釜鍙傛暟鐨勭Н
+     * 提供精确乘法运算。
+     *
+     * @param v1 被乘数
+     * @param v2 乘数
+     * @return 两数之积
      */
     public static double mul(double v1, double v2)
     {
@@ -59,11 +61,12 @@ public class Arith
     }
 
     /**
-     * 鎻愪緵锛堢浉瀵癸級绮剧‘鐨勯櫎娉曡繍绠楋紝褰撳彂鐢熼櫎涓嶅敖鐨勬儏鍐垫椂锛岀簿纭埌
-     * 灏忔暟鐐逛互鍚?0浣嶏紝浠ュ悗鐨勬暟瀛楀洓鑸嶄簲鍏ャ€?
-     * @param v1 琚櫎鏁?
-     * @param v2 闄ゆ暟
-     * @return 涓や釜鍙傛暟鐨勫晢
+     * 提供默认精度的除法运算。
+     * 若结果无法精确表示，则按四舍五入保留默认小数位。
+     *
+     * @param v1 被除数
+     * @param v2 除数
+     * @return 两数之商
      */
     public static double div(double v1, double v2)
     {
@@ -71,19 +74,18 @@ public class Arith
     }
 
     /**
-     * 鎻愪緵锛堢浉瀵癸級绮剧‘鐨勯櫎娉曡繍绠椼€傚綋鍙戠敓闄や笉灏界殑鎯呭喌鏃讹紝鐢眘cale鍙傛暟鎸?
-     * 瀹氱簿搴︼紝浠ュ悗鐨勬暟瀛楀洓鑸嶄簲鍏ャ€?
-     * @param v1 琚櫎鏁?
-     * @param v2 闄ゆ暟
-     * @param scale 琛ㄧず琛ㄧず闇€瑕佺簿纭埌灏忔暟鐐逛互鍚庡嚑浣嶃€?
-     * @return 涓や釜鍙傛暟鐨勫晢
+     * 提供指定精度的除法运算。
+     *
+     * @param v1 被除数
+     * @param v2 除数
+     * @param scale 保留小数位数
+     * @return 两数之商
      */
     public static double div(double v1, double v2, int scale)
     {
         if (scale < 0)
         {
-            throw new IllegalArgumentException(
-                    "The scale must be a positive integer or zero");
+            throw new IllegalArgumentException("The scale must be a positive integer or zero");
         }
         BigDecimal b1 = new BigDecimal(Double.toString(v1));
         BigDecimal b2 = new BigDecimal(Double.toString(v2));
@@ -95,17 +97,17 @@ public class Arith
     }
 
     /**
-     * 鎻愪緵绮剧‘鐨勫皬鏁颁綅鍥涜垗浜斿叆澶勭悊銆?
-     * @param v 闇€瑕佸洓鑸嶄簲鍏ョ殑鏁板瓧
-     * @param scale 灏忔暟鐐瑰悗淇濈暀鍑犱綅
-     * @return 鍥涜垗浜斿叆鍚庣殑缁撴灉
+     * 对数字按指定精度进行四舍五入。
+     *
+     * @param v 待处理数字
+     * @param scale 保留小数位数
+     * @return 四舍五入后的结果
      */
     public static double round(double v, int scale)
     {
         if (scale < 0)
         {
-            throw new IllegalArgumentException(
-                    "The scale must be a positive integer or zero");
+            throw new IllegalArgumentException("The scale must be a positive integer or zero");
         }
         BigDecimal b = new BigDecimal(Double.toString(v));
         return b.divide(BigDecimal.ONE, scale, RoundingMode.HALF_UP).doubleValue();

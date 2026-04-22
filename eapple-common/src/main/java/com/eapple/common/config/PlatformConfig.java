@@ -1,33 +1,33 @@
-﻿package com.eapple.common.config;
+package com.eapple.common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 鐠囪褰囨い鍦窗閻╃鍙ч柊宥囩枂
- * 
+ * 平台基础配置。
+ *
  * @author Eapp1e
  */
 @Component
 @ConfigurationProperties(prefix = "platform")
 public class PlatformConfig
 {
-    /** 妞ゅ湱娲伴崥宥囆?*/
+    /** 平台名称 */
     private String name;
 
-    /** 閻楀牊婀?*/
+    /** 平台版本 */
     private String version;
 
-    /** 閻楀牊娼堥獮缈犲敜 */
+    /** 版权年份 */
     private String copyrightYear;
 
-    /** 娑撳﹣绱剁捄顖氱窞 */
+    /** 文件上传根目录 */
     private static String profile;
 
-    /** 閼惧嘲褰囬崷鏉挎絻瀵偓閸?*/
+    /** 是否开启地址解析 */
     private static boolean addressEnabled;
 
-    /** 妤犲矁鐦夐惍浣鸿閸?*/
+    /** 验证码类型 */
     private static String captchaType;
 
     public String getName()
@@ -80,16 +80,18 @@ public class PlatformConfig
         PlatformConfig.addressEnabled = addressEnabled;
     }
 
-    public static String getCaptchaType() {
+    public static String getCaptchaType()
+    {
         return captchaType;
     }
 
-    public void setCaptchaType(String captchaType) {
+    public void setCaptchaType(String captchaType)
+    {
         PlatformConfig.captchaType = captchaType;
     }
 
     /**
-     * 閼惧嘲褰囩€电厧鍙嗘稉濠佺炊鐠侯垰绶?
+     * 获取导入文件目录。
      */
     public static String getImportPath()
     {
@@ -97,7 +99,7 @@ public class PlatformConfig
     }
 
     /**
-     * 閼惧嘲褰囨径鏉戝剼娑撳﹣绱剁捄顖氱窞
+     * 获取头像上传目录。
      */
     public static String getAvatarPath()
     {
@@ -105,7 +107,7 @@ public class PlatformConfig
     }
 
     /**
-     * 閼惧嘲褰囨稉瀣祰鐠侯垰绶?
+     * 获取下载目录。
      */
     public static String getDownloadPath()
     {
@@ -113,12 +115,10 @@ public class PlatformConfig
     }
 
     /**
-     * 閼惧嘲褰囨稉濠佺炊鐠侯垰绶?
+     * 获取上传目录。
      */
     public static String getUploadPath()
     {
         return getProfile() + "/upload";
     }
 }
-
-

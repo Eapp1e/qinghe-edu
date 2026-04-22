@@ -3,39 +3,39 @@ package com.eapple.framework.web.domain.server;
 import com.eapple.common.utils.Arith;
 
 /**
- * CPU鐩稿叧淇℃伅
+ * CPU 信息。
  * 
  * @author Eapp1e
  */
 public class Cpu
 {
     /**
-     * 鏍稿績鏁?
+     * 核心数。
      */
     private int cpuNum;
 
     /**
-     * CPU鎬荤殑浣跨敤鐜?
+     * CPU 总使用量。
      */
     private double total;
 
     /**
-     * CPU绯荤粺浣跨敤鐜?
+     * CPU 系统使用率。
      */
     private double sys;
 
     /**
-     * CPU鐢ㄦ埛浣跨敤鐜?
+     * CPU 用户使用率。
      */
     private double used;
 
     /**
-     * CPU褰撳墠绛夊緟鐜?
+     * CPU 当前等待率。
      */
     private double wait;
 
     /**
-     * CPU褰撳墠绌洪棽鐜?
+     * CPU 当前空闲率。
      */
     private double free;
 

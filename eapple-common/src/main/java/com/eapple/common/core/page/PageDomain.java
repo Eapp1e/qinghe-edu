@@ -3,25 +3,25 @@ package com.eapple.common.core.page;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 鍒嗛〉鏁版嵁
- * 
+ * 分页请求参数。
+ *
  * @author Eapp1e
  */
 public class PageDomain
 {
-    /** 褰撳墠璁板綍璧峰绱㈠紩 */
+    /** 当前页码 */
     private Integer pageNum;
 
-    /** 姣忛〉鏄剧ず璁板綍鏁?*/
+    /** 每页条数 */
     private Integer pageSize;
 
-    /** 鎺掑簭鍒?*/
+    /** 排序字段 */
     private String orderByColumn;
 
-    /** 鎺掑簭鐨勬柟鍚慸esc鎴栬€卆sc */
+    /** 排序方向，支持 asc 或 desc */
     private String isAsc = "asc";
 
-    /** 鍒嗛〉鍙傛暟鍚堢悊鍖?*/
+    /** 是否启用合理化分页 */
     private Boolean reasonable = true;
 
     public String getOrderBy()
@@ -72,7 +72,7 @@ public class PageDomain
     {
         if (StringUtils.isNotEmpty(isAsc))
         {
-            // 鍏煎鍓嶇鎺掑簭绫诲瀷
+            // 兼容前端排序组件返回值。
             if ("ascending".equals(isAsc))
             {
                 isAsc = "asc";

@@ -16,7 +16,7 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.framework.datasource.DynamicDataSourceContextHolder;
 
 /**
- * 澶氭暟鎹簮澶勭悊
+ * 多数据源处理切面。
  * 
  * @author Eapp1e
  */
@@ -50,13 +50,13 @@ public class DataSourceAspect
         }
         finally
         {
-            // 閿€姣佹暟鎹簮 鍦ㄦ墽琛屾柟娉曚箣鍚?
+            // 方法执行结束后清理数据源上下文
             DynamicDataSourceContextHolder.clearDataSourceType();
         }
     }
 
     /**
-     * 鑾峰彇闇€瑕佸垏鎹㈢殑鏁版嵁婧?
+     * 获取需要切换的数据源定义。
      */
     public DataSource getDataSource(ProceedingJoinPoint point)
     {

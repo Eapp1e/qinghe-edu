@@ -4,73 +4,73 @@ import java.util.List;
 import com.eapple.system.domain.SysConfig;
 
 /**
- * 鍙傛暟閰嶇疆 鏁版嵁灞?
+ * 参数配置数据层。
  * 
  * @author Eapp1e
  */
 public interface SysConfigMapper
 {
     /**
-     * 鏌ヨ鍙傛暟閰嶇疆淇℃伅
+     * 查询参数配置信息。
      * 
-     * @param config 鍙傛暟閰嶇疆淇℃伅
-     * @return 鍙傛暟閰嶇疆淇℃伅
+     * @param config 参数配置对象
+     * @return 参数配置信息
      */
     public SysConfig selectConfig(SysConfig config);
 
     /**
-     * 閫氳繃ID鏌ヨ閰嶇疆
+     * 根据 ID 查询参数配置。
      * 
-     * @param configId 鍙傛暟ID
-     * @return 鍙傛暟閰嶇疆淇℃伅
+     * @param configId 参数配置 ID
+     * @return 参数配置对象
      */
     public SysConfig selectConfigById(Long configId);
 
     /**
-     * 鏌ヨ鍙傛暟閰嶇疆鍒楄〃
+     * 查询参数配置列表。
      * 
-     * @param config 鍙傛暟閰嶇疆淇℃伅
-     * @return 鍙傛暟閰嶇疆闆嗗悎
+     * @param config 参数配置对象
+     * @return 参数配置集合
      */
     public List<SysConfig> selectConfigList(SysConfig config);
 
     /**
-     * 鏍规嵁閿悕鏌ヨ鍙傛暟閰嶇疆淇℃伅
+     * 根据参数键名查询配置。
      * 
-     * @param configKey 鍙傛暟閿悕
-     * @return 鍙傛暟閰嶇疆淇℃伅
+     * @param configKey 参数键名
+     * @return 参数配置对象
      */
     public SysConfig checkConfigKeyUnique(String configKey);
 
     /**
-     * 鏂板鍙傛暟閰嶇疆
+     * 新增参数配置。
      * 
-     * @param config 鍙傛暟閰嶇疆淇℃伅
-     * @return 缁撴灉
+     * @param config 参数配置对象
+     * @return 结果
      */
     public int insertConfig(SysConfig config);
 
     /**
-     * 淇敼鍙傛暟閰嶇疆
+     * 修改参数配置。
      * 
-     * @param config 鍙傛暟閰嶇疆淇℃伅
-     * @return 缁撴灉
+     * @param config 参数配置对象
+     * @return 结果
      */
     public int updateConfig(SysConfig config);
 
     /**
-     * 鍒犻櫎鍙傛暟閰嶇疆
+     * 根据 ID 删除参数配置。
      * 
-     * @param configId 鍙傛暟ID
-     * @return 缁撴灉
+     * @param configId 参数配置 ID
+     * @return 结果
      */
     public int deleteConfigById(Long configId);
 
     /**
-     * 鎵归噺鍒犻櫎鍙傛暟淇℃伅
+     * 批量删除参数配置。
      * 
-     * @param configIds 闇€瑕佸垹闄ょ殑鍙傛暟ID
-     * @return 缁撴灉
+     * @param configIds 参数配置 ID 数组
+     * @return 结果
      */
     public int deleteConfigByIds(Long[] configIds);
 }

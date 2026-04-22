@@ -5,7 +5,7 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
- * 璇锋眰鏂瑰紡
+ * HTTP 请求方法。
  *
  * @author Eapp1e
  */

@@ -4,41 +4,41 @@ import java.util.List;
 import com.eapple.system.domain.SysRoleDept;
 
 /**
- * 瑙掕壊涓庨儴闂ㄥ叧鑱旇〃 鏁版嵁灞?
+ * 角色与部门关联数据层。
  * 
  * @author Eapp1e
  */
 public interface SysRoleDeptMapper
 {
     /**
-     * 閫氳繃瑙掕壊ID鍒犻櫎瑙掕壊鍜岄儴闂ㄥ叧鑱?
+     * 根据角色 ID 删除角色与部门关联。
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleId 角色 ID
+     * @return 结果
      */
     public int deleteRoleDeptByRoleId(Long roleId);
 
     /**
-     * 鎵归噺鍒犻櫎瑙掕壊閮ㄩ棬鍏宠仈淇℃伅
+     * 批量删除角色与部门关联。
      * 
-     * @param ids 闇€瑕佸垹闄ょ殑鏁版嵁ID
-     * @return 缁撴灉
+     * @param ids 关联 ID 数组
+     * @return 结果
      */
     public int deleteRoleDept(Long[] ids);
 
     /**
-     * 鏌ヨ閮ㄩ棬浣跨敤鏁伴噺
+     * 根据部门 ID 查询角色部门关联数量。
      * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉
+     * @param deptId 部门 ID
+     * @return 结果
      */
     public int selectCountRoleDeptByDeptId(Long deptId);
 
     /**
-     * 鎵归噺鏂板瑙掕壊閮ㄩ棬淇℃伅
+     * 批量新增角色与部门关联。
      * 
-     * @param roleDeptList 瑙掕壊閮ㄩ棬鍒楄〃
-     * @return 缁撴灉
+     * @param roleDeptList 角色部门关联列表
+     * @return 结果
      */
     public int batchRoleDept(List<SysRoleDept> roleDeptList);
 }

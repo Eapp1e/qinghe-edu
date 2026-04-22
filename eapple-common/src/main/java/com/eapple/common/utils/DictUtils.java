@@ -12,22 +12,22 @@ import com.eapple.common.core.redis.RedisCache;
 import com.eapple.common.utils.spring.SpringUtils;
 
 /**
- * 瀛楀吀宸ュ叿绫?
- * 
+ * 数据字典工具类。
+ *
  * @author Eapp1e
  */
 public class DictUtils
 {
     /**
-     * 鍒嗛殧绗?
+     * 多值分隔符。
      */
     public static final String SEPARATOR = ",";
 
     /**
-     * 璁剧疆瀛楀吀缂撳瓨
-     * 
-     * @param key 鍙傛暟閿?
-     * @param dictDatas 瀛楀吀鏁版嵁鍒楄〃
+     * 写入字典缓存。
+     *
+     * @param key 缓存键
+     * @param dictDatas 字典数据集合
      */
     public static void setDictCache(String key, List<SysDictData> dictDatas)
     {
@@ -35,10 +35,10 @@ public class DictUtils
     }
 
     /**
-     * 鑾峰彇瀛楀吀缂撳瓨
-     * 
-     * @param key 鍙傛暟閿?
-     * @return dictDatas 瀛楀吀鏁版嵁鍒楄〃
+     * 获取字典缓存。
+     *
+     * @param key 缓存键
+     * @return 字典数据集合
      */
     public static List<SysDictData> getDictCache(String key)
     {
@@ -59,11 +59,11 @@ public class DictUtils
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鍜屽瓧鍏稿€艰幏鍙栧瓧鍏告爣绛?
-     * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @param dictValue 瀛楀吀鍊?
-     * @return 瀛楀吀鏍囩
+     * 根据字典类型和字典值获取字典标签。
+     *
+     * @param dictType 字典类型
+     * @param dictValue 字典值
+     * @return 字典标签
      */
     public static String getDictLabel(String dictType, String dictValue)
     {
@@ -75,11 +75,11 @@ public class DictUtils
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鍜屽瓧鍏告爣绛捐幏鍙栧瓧鍏稿€?
-     * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @param dictLabel 瀛楀吀鏍囩
-     * @return 瀛楀吀鍊?
+     * 根据字典类型和字典标签获取字典值。
+     *
+     * @param dictType 字典类型
+     * @param dictLabel 字典标签
+     * @return 字典值
      */
     public static String getDictValue(String dictType, String dictLabel)
     {
@@ -91,12 +91,12 @@ public class DictUtils
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鍜屽瓧鍏稿€艰幏鍙栧瓧鍏告爣绛?
-     * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @param dictValue 瀛楀吀鍊?
-     * @param separator 鍒嗛殧绗?
-     * @return 瀛楀吀鏍囩
+     * 根据字典类型和字典值获取字典标签。
+     *
+     * @param dictType 字典类型
+     * @param dictValue 字典值
+     * @param separator 多值分隔符
+     * @return 字典标签
      */
     public static String getDictLabel(String dictType, String dictValue, String separator)
     {
@@ -111,23 +111,23 @@ public class DictUtils
             return dictMap.getOrDefault(dictValue, StringUtils.EMPTY);
         }
         StringBuilder labelBuilder = new StringBuilder();
-        for (String seperatedValue : dictValue.split(separator))
+        for (String separatedValue : dictValue.split(separator))
         {
-            if (dictMap.containsKey(seperatedValue))
+            if (dictMap.containsKey(separatedValue))
             {
-                labelBuilder.append(dictMap.get(seperatedValue)).append(separator);
+                labelBuilder.append(dictMap.get(separatedValue)).append(separator);
             }
         }
         return StringUtils.removeEnd(labelBuilder.toString(), separator);
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鍜屽瓧鍏告爣绛捐幏鍙栧瓧鍏稿€?
-     * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @param dictLabel 瀛楀吀鏍囩
-     * @param separator 鍒嗛殧绗?
-     * @return 瀛楀吀鍊?
+     * 根据字典类型和字典标签获取字典值。
+     *
+     * @param dictType 字典类型
+     * @param dictLabel 字典标签
+     * @param separator 多值分隔符
+     * @return 字典值
      */
     public static String getDictValue(String dictType, String dictLabel, String separator)
     {
@@ -142,21 +142,21 @@ public class DictUtils
             return dictMap.getOrDefault(dictLabel, StringUtils.EMPTY);
         }
         StringBuilder valueBuilder = new StringBuilder();
-        for (String seperatedValue : dictLabel.split(separator))
+        for (String separatedValue : dictLabel.split(separator))
         {
-            if (dictMap.containsKey(seperatedValue))
+            if (dictMap.containsKey(separatedValue))
             {
-                valueBuilder.append(dictMap.get(seperatedValue)).append(separator);
+                valueBuilder.append(dictMap.get(separatedValue)).append(separator);
             }
         }
         return StringUtils.removeEnd(valueBuilder.toString(), separator);
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鑾峰彇瀛楀吀鎵€鏈夊€?
+     * 获取字典值列表。
      *
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀鍊?
+     * @param dictType 字典类型
+     * @return 多个字典值拼接后的字符串
      */
     public static String getDictValues(String dictType)
     {
@@ -174,10 +174,10 @@ public class DictUtils
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鑾峰彇瀛楀吀鎵€鏈夋爣绛?
+     * 获取字典标签列表。
      *
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀鍊?
+     * @param dictType 字典类型
+     * @return 多个字典标签拼接后的字符串
      */
     public static String getDictLabels(String dictType)
     {
@@ -195,9 +195,9 @@ public class DictUtils
     }
 
     /**
-     * 鍒犻櫎鎸囧畾瀛楀吀缂撳瓨
-     * 
-     * @param key 瀛楀吀閿?
+     * 删除指定字典缓存。
+     *
+     * @param key 字典键
      */
     public static void removeDictCache(String key)
     {
@@ -205,7 +205,7 @@ public class DictUtils
     }
 
     /**
-     * 娓呯┖瀛楀吀缂撳瓨
+     * 清空所有字典缓存。
      */
     public static void clearDictCache()
     {
@@ -214,10 +214,10 @@ public class DictUtils
     }
 
     /**
-     * 璁剧疆cache key
-     * 
-     * @param configKey 鍙傛暟閿?
-     * @return 缂撳瓨閿甼ey
+     * 生成字典缓存键。
+     *
+     * @param configKey 字典键
+     * @return 缓存键
      */
     public static String getCacheKey(String configKey)
     {

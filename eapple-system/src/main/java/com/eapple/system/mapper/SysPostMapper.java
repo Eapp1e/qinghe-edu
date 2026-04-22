@@ -4,96 +4,96 @@ import java.util.List;
 import com.eapple.system.domain.SysPost;
 
 /**
- * 宀椾綅淇℃伅 鏁版嵁灞?
+ * 岗位信息数据层。
  * 
  * @author Eapp1e
  */
 public interface SysPostMapper
 {
     /**
-     * 鏌ヨ宀椾綅鏁版嵁闆嗗悎
+     * 查询岗位信息集合。
      * 
-     * @param post 宀椾綅淇℃伅
-     * @return 宀椾綅鏁版嵁闆嗗悎
+     * @param post 岗位信息
+     * @return 岗位信息集合
      */
     public List<SysPost> selectPostList(SysPost post);
 
     /**
-     * 鏌ヨ鎵€鏈夊矖浣?
+     * 查询所有岗位。
      * 
-     * @return 宀椾綅鍒楄〃
+     * @return 岗位列表
      */
     public List<SysPost> selectPostAll();
 
     /**
-     * 閫氳繃宀椾綅ID鏌ヨ宀椾綅淇℃伅
+     * 通过岗位 ID 查询岗位信息。
      * 
-     * @param postId 宀椾綅ID
-     * @return 瑙掕壊瀵硅薄淇℃伅
+     * @param postId 岗位 ID
+     * @return 岗位信息
      */
     public SysPost selectPostById(Long postId);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鑾峰彇宀椾綅閫夋嫨妗嗗垪琛?
+     * 根据用户 ID 查询岗位 ID 集合。
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 閫変腑宀椾綅ID鍒楄〃
+     * @param userId 用户 ID
+     * @return 岗位 ID 集合
      */
     public List<Long> selectPostListByUserId(Long userId);
 
     /**
-     * 鏌ヨ鐢ㄦ埛鎵€灞炲矖浣嶇粍
+     * 根据用户名查询岗位列表。
      * 
-     * @param userName 鐢ㄦ埛鍚?
-     * @return 缁撴灉
+     * @param userName 用户名
+     * @return 岗位集合
      */
     public List<SysPost> selectPostsByUserName(String userName);
 
     /**
-     * 鍒犻櫎宀椾綅淇℃伅
+     * 通过岗位 ID 删除岗位信息。
      * 
-     * @param postId 宀椾綅ID
-     * @return 缁撴灉
+     * @param postId 岗位 ID
+     * @return 结果
      */
     public int deletePostById(Long postId);
 
     /**
-     * 鎵归噺鍒犻櫎宀椾綅淇℃伅
+     * 批量删除岗位信息。
      * 
-     * @param postIds 闇€瑕佸垹闄ょ殑宀椾綅ID
-     * @return 缁撴灉
+     * @param postIds 岗位 ID 数组
+     * @return 结果
      */
     public int deletePostByIds(Long[] postIds);
 
     /**
-     * 淇敼宀椾綅淇℃伅
+     * 修改岗位信息。
      * 
-     * @param post 宀椾綅淇℃伅
-     * @return 缁撴灉
+     * @param post 岗位信息
+     * @return 结果
      */
     public int updatePost(SysPost post);
 
     /**
-     * 鏂板宀椾綅淇℃伅
+     * 新增岗位信息。
      * 
-     * @param post 宀椾綅淇℃伅
-     * @return 缁撴灉
+     * @param post 岗位信息
+     * @return 结果
      */
     public int insertPost(SysPost post);
 
     /**
-     * 鏍￠獙宀椾綅鍚嶇О
+     * 校验岗位名称是否唯一。
      * 
-     * @param postName 宀椾綅鍚嶇О
-     * @return 缁撴灉
+     * @param postName 岗位名称
+     * @return 结果
      */
     public SysPost checkPostNameUnique(String postName);
 
     /**
-     * 鏍￠獙宀椾綅缂栫爜
+     * 校验岗位编码是否唯一。
      * 
-     * @param postCode 宀椾綅缂栫爜
-     * @return 缁撴灉
+     * @param postCode 岗位编码
+     * @return 结果
      */
     public SysPost checkPostCodeUnique(String postCode);
 }

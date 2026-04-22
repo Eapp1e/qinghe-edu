@@ -4,41 +4,41 @@ import java.util.List;
 import com.eapple.system.domain.SysRoleMenu;
 
 /**
- * 瑙掕壊涓庤彍鍗曞叧鑱旇〃 鏁版嵁灞?
+ * 角色与菜单关联数据层。
  * 
  * @author Eapp1e
  */
 public interface SysRoleMenuMapper
 {
     /**
-     * 鏌ヨ鑿滃崟浣跨敤鏁伴噺
+     * 查询菜单是否存在角色关联。
      * 
-     * @param menuId 鑿滃崟ID
-     * @return 缁撴灉
+     * @param menuId 菜单 ID
+     * @return 结果
      */
     public int checkMenuExistRole(Long menuId);
 
     /**
-     * 閫氳繃瑙掕壊ID鍒犻櫎瑙掕壊鍜岃彍鍗曞叧鑱?
+     * 根据角色 ID 删除角色与菜单关联。
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleId 角色 ID
+     * @return 结果
      */
     public int deleteRoleMenuByRoleId(Long roleId);
 
     /**
-     * 鎵归噺鍒犻櫎瑙掕壊鑿滃崟鍏宠仈淇℃伅
+     * 批量删除角色与菜单关联。
      * 
-     * @param ids 闇€瑕佸垹闄ょ殑鏁版嵁ID
-     * @return 缁撴灉
+     * @param ids 关联 ID 数组
+     * @return 结果
      */
     public int deleteRoleMenu(Long[] ids);
 
     /**
-     * 鎵归噺鏂板瑙掕壊鑿滃崟淇℃伅
+     * 批量新增角色与菜单关联。
      * 
-     * @param roleMenuList 瑙掕壊鑿滃崟鍒楄〃
-     * @return 缁撴灉
+     * @param roleMenuList 角色菜单关联列表
+     * @return 结果
      */
     public int batchRoleMenu(List<SysRoleMenu> roleMenuList);
 }

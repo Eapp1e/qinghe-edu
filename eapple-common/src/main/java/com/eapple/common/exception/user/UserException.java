@@ -3,7 +3,7 @@ package com.eapple.common.exception.user;
 import com.eapple.common.exception.base.BaseException;
 
 /**
- * 鐢ㄦ埛淇℃伅寮傚父绫?
+ * 用户信息异常类。
  * 
  * @author Eapp1e
  */

@@ -4,44 +4,44 @@ import java.util.function.Function;
 import com.eapple.common.utils.DesensitizedUtil;
 
 /**
- * 鑴辨晱绫诲瀷
+ * 脱敏类型。
  *
  * @author Eapp1e
  */
 public enum DesensitizedType
 {
     /**
-     * 濮撳悕锛岀2浣嶆槦鍙锋浛鎹?
+     * 用户名，从第 2 位开始脱敏。
      */
     USERNAME(s -> s.replaceAll("(\\S)\\S(\\S*)", "$1*$2")),
 
     /**
-     * 瀵嗙爜锛屽叏閮ㄥ瓧绗﹂兘鐢?浠ｆ浛
+     * 密码，全部字符使用 * 替换。
      */
     PASSWORD(DesensitizedUtil::password),
 
     /**
-     * 韬唤璇侊紝涓棿10浣嶆槦鍙锋浛鎹?
+     * 身份证号，中间 10 位脱敏。
      */
     ID_CARD(s -> s.replaceAll("(\\d{4})\\d{10}(\\d{3}[Xx]|\\d{4})", "$1** **** ****$2")),
 
     /**
-     * 鎵嬫満鍙凤紝涓棿4浣嶆槦鍙锋浛鎹?
+     * 手机号，中间 4 位脱敏。
      */
     PHONE(s -> s.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2")),
 
     /**
-     * 鐢靛瓙閭锛屼粎鏄剧ず绗竴涓瓧姣嶅拰@鍚庨潰鐨勫湴鍧€鏄剧ず锛屽叾浠栨槦鍙锋浛鎹?
+     * 邮箱，仅保留首字符和域名。
      */
     EMAIL(s -> s.replaceAll("(^.)[^@]*(@.*$)", "$1****$2")),
 
     /**
-     * 閾惰鍗″彿锛屼繚鐣欐渶鍚?浣嶏紝鍏朵粬鏄熷彿鏇挎崲
+     * 银行卡号，仅保留后 3 位。
      */
     BANK_CARD(s -> s.replaceAll("\\d{15}(\\d{3})", "**** **** **** **** $1")),
 
     /**
-     * 杞︾墝鍙风爜锛屽寘鍚櫘閫氳溅杈嗐€佹柊鑳芥簮杞﹁締
+     * 车牌号，按规则进行脱敏。
      */
     CAR_LICENSE(DesensitizedUtil::carLicense);
 

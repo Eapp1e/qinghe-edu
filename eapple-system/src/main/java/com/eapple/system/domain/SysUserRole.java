@@ -4,16 +4,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
- * 鐢ㄦ埛鍜岃鑹插叧鑱?sys_user_role
+ * 用户和角色关联对象，对应表 sys_user_role。
  * 
  * @author Eapp1e
  */
 public class SysUserRole
 {
-    /** 鐢ㄦ埛ID */
+    /** 用户 ID */
     private Long userId;
     
-    /** 瑙掕壊ID */
+    /** 角色 ID */
     private Long roleId;
 
     public Long getUserId()
@@ -37,8 +37,9 @@ public class SysUserRole
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+    public String toString()
+    {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("userId", getUserId())
             .append("roleId", getRoleId())
             .toString();

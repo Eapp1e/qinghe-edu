@@ -4,41 +4,41 @@ import java.util.List;
 import com.eapple.system.domain.SysUserPost;
 
 /**
- * 鐢ㄦ埛涓庡矖浣嶅叧鑱旇〃 鏁版嵁灞?
+ * 用户与岗位关联数据层。
  * 
  * @author Eapp1e
  */
 public interface SysUserPostMapper
 {
     /**
-     * 閫氳繃鐢ㄦ埛ID鍒犻櫎鐢ㄦ埛鍜屽矖浣嶅叧鑱?
+     * 根据用户 ID 删除用户与岗位关联。
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 缁撴灉
+     * @param userId 用户 ID
+     * @return 结果
      */
     public int deleteUserPostByUserId(Long userId);
 
     /**
-     * 閫氳繃宀椾綅ID鏌ヨ宀椾綅浣跨敤鏁伴噺
+     * 根据岗位 ID 统计用户岗位关联数量。
      * 
-     * @param postId 宀椾綅ID
-     * @return 缁撴灉
+     * @param postId 岗位 ID
+     * @return 结果
      */
     public int countUserPostById(Long postId);
 
     /**
-     * 鎵归噺鍒犻櫎鐢ㄦ埛鍜屽矖浣嶅叧鑱?
+     * 批量删除用户与岗位关联。
      * 
-     * @param ids 闇€瑕佸垹闄ょ殑鏁版嵁ID
-     * @return 缁撴灉
+     * @param ids 关联 ID 数组
+     * @return 结果
      */
     public int deleteUserPost(Long[] ids);
 
     /**
-     * 鎵归噺鏂板鐢ㄦ埛宀椾綅淇℃伅
+     * 批量新增用户与岗位关联。
      * 
-     * @param userPostList 鐢ㄦ埛宀椾綅鍒楄〃
-     * @return 缁撴灉
+     * @param userPostList 用户岗位关联列表
+     * @return 结果
      */
     public int batchUserPost(List<SysUserPost> userPostList);
 }

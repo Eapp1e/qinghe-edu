@@ -4,80 +4,80 @@ import java.util.List;
 import com.eapple.common.core.domain.entity.SysDictType;
 
 /**
- * 瀛楀吀琛?鏁版嵁灞?
+ * 字典类型数据层。
  * 
  * @author Eapp1e
  */
 public interface SysDictTypeMapper
 {
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ瀛楀吀绫诲瀷
+     * 根据条件分页查询字典类型。
      * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 瀛楀吀绫诲瀷闆嗗悎淇℃伅
+     * @param dictType 字典类型信息
+     * @return 字典类型集合
      */
     public List<SysDictType> selectDictTypeList(SysDictType dictType);
 
     /**
-     * 鏍规嵁鎵€鏈夊瓧鍏哥被鍨?
+     * 查询所有字典类型。
      * 
-     * @return 瀛楀吀绫诲瀷闆嗗悎淇℃伅
+     * @return 字典类型集合
      */
     public List<SysDictType> selectDictTypeAll();
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷ID鏌ヨ淇℃伅
+     * 根据字典类型 ID 查询信息。
      * 
-     * @param dictId 瀛楀吀绫诲瀷ID
-     * @return 瀛楀吀绫诲瀷
+     * @param dictId 字典类型 ID
+     * @return 字典类型信息
      */
     public SysDictType selectDictTypeById(Long dictId);
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鏌ヨ淇℃伅
+     * 根据字典类型查询信息。
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀绫诲瀷
+     * @param dictType 字典类型
+     * @return 字典类型信息
      */
     public SysDictType selectDictTypeByType(String dictType);
 
     /**
-     * 閫氳繃瀛楀吀ID鍒犻櫎瀛楀吀淇℃伅
+     * 通过字典类型 ID 删除字典类型。
      * 
-     * @param dictId 瀛楀吀ID
-     * @return 缁撴灉
+     * @param dictId 字典类型 ID
+     * @return 结果
      */
     public int deleteDictTypeById(Long dictId);
 
     /**
-     * 鎵归噺鍒犻櫎瀛楀吀绫诲瀷淇℃伅
+     * 批量删除字典类型。
      * 
-     * @param dictIds 闇€瑕佸垹闄ょ殑瀛楀吀ID
-     * @return 缁撴灉
+     * @param dictIds 字典类型 ID 数组
+     * @return 结果
      */
     public int deleteDictTypeByIds(Long[] dictIds);
 
     /**
-     * 鏂板瀛楀吀绫诲瀷淇℃伅
+     * 新增字典类型信息。
      * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 缁撴灉
+     * @param dictType 字典类型信息
+     * @return 结果
      */
     public int insertDictType(SysDictType dictType);
 
     /**
-     * 淇敼瀛楀吀绫诲瀷淇℃伅
+     * 修改字典类型信息。
      * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 缁撴灉
+     * @param dictType 字典类型信息
+     * @return 结果
      */
     public int updateDictType(SysDictType dictType);
 
     /**
-     * 鏍￠獙瀛楀吀绫诲瀷绉版槸鍚﹀敮涓€
+     * 校验字典类型是否唯一。
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 缁撴灉
+     * @param dictType 字典类型
+     * @return 结果
      */
     public SysDictType checkDictTypeUnique(String dictType);
 }

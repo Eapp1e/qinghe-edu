@@ -4,30 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 澶?Sheet 瀵煎嚭鏃剁殑鏁版嵁淇℃伅
+ * 多 Sheet 导出时的数据信息封装。
  *
- * 浣跨敤绀轰緥锛?
+ * 使用示例：
  * <pre>
  *   List<ExcelSheet<?>> sheets = new ArrayList<>();
- *   sheets.add(new ExcelSheet<>("鍙傛暟鏁版嵁", configList, Config.class, "鍙傛暟淇℃伅"));
- *   sheets.add(new ExcelSheet<>("宀椾綅鏁版嵁", postList, Post.class, "宀椾綅淇℃伅"));
+ *   sheets.add(new ExcelSheet<>("参数数据", configList, Config.class, "参数信息"));
+ *   sheets.add(new ExcelSheet<>("岗位数据", postList, Post.class, "岗位信息"));
  *   return ExcelUtil.exportMultiSheet(sheets);
  * </pre>
- * 
+ *
  * @author Eapp1e
  */
 public class ExcelSheet<T>
 {
-    /** Sheet 鍚嶇О */
+    /** Sheet 名称 */
     private String sheetName;
 
-    /** 瀵煎嚭鏁版嵁闆嗗悎 */
+    /** 导出数据集合 */
     private List<T> list;
 
-    /** 鏁版嵁瀵瑰簲鐨勫疄浣?Class */
+    /** 数据对应的实体类型 */
     private Class<T> clazz;
 
-    /** Sheet 椤堕儴澶ф爣棰橈紙鍙负绌猴級 */
+    /** Sheet 顶部大标题，可为空 */
     private String title;
 
     public ExcelSheet(String sheetName, List<T> list, Class<T> clazz)

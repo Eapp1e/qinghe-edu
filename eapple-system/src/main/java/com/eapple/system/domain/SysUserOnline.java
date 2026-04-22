@@ -1,34 +1,34 @@
 package com.eapple.system.domain;
 
 /**
- * 褰撳墠鍦ㄧ嚎浼氳瘽
+ * 在线用户信息。
  * 
  * @author Eapp1e
  */
 public class SysUserOnline
 {
-    /** 浼氳瘽缂栧彿 */
+    /** 会话令牌标识 */
     private String tokenId;
 
-    /** 閮ㄩ棬鍚嶇О */
+    /** 部门名称 */
     private String deptName;
 
-    /** 鐢ㄦ埛鍚嶇О */
+    /** 用户名称 */
     private String userName;
 
-    /** 鐧诲綍IP鍦板潃 */
+    /** 登录 IP 地址 */
     private String ipaddr;
 
-    /** 鐧诲綍鍦板潃 */
+    /** 登录地点 */
     private String loginLocation;
 
-    /** 娴忚鍣ㄧ被鍨?*/
+    /** 浏览器类型 */
     private String browser;
 
-    /** 鎿嶄綔绯荤粺 */
+    /** 操作系统 */
     private String os;
 
-    /** 鐧诲綍鏃堕棿 */
+    /** 登录时间 */
     private Long loginTime;
 
     public String getTokenId()

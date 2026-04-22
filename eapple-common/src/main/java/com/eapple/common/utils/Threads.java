@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 绾跨▼鐩稿叧宸ュ叿绫?
- * 
+ * 线程相关工具类。
+ *
  * @author Eapp1e
  */
 public class Threads
@@ -18,7 +18,7 @@ public class Threads
     private static final Logger logger = LoggerFactory.getLogger(Threads.class);
 
     /**
-     * sleep绛夊緟,鍗曚綅涓烘绉?
+     * 让当前线程休眠指定毫秒数。
      */
     public static void sleep(long milliseconds)
     {
@@ -33,11 +33,9 @@ public class Threads
     }
 
     /**
-     * 鍋滄绾跨▼姹?
-     * 鍏堜娇鐢╯hutdown, 鍋滄鎺ユ敹鏂颁换鍔″苟灏濊瘯瀹屾垚鎵€鏈夊凡瀛樺湪浠诲姟.
-     * 濡傛灉瓒呮椂, 鍒欒皟鐢╯hutdownNow, 鍙栨秷鍦╳orkQueue涓璓ending鐨勪换鍔?骞朵腑鏂墍鏈夐樆濉炲嚱鏁?
-     * 濡傛灉浠嶇劧瓒呮檪锛屽墖寮峰埗閫€鍑?
-     * 鍙﹀鍦╯hutdown鏃剁嚎绋嬫湰韬璋冪敤涓柇鍋氫簡澶勭悊.
+     * 优雅关闭线程池。
+     * 先调用 shutdown 停止接收新任务，再等待现有任务执行完成；
+     * 若超时未结束，则调用 shutdownNow 强制中断。
      */
     public static void shutdownAndAwaitTermination(ExecutorService pool)
     {
@@ -64,7 +62,7 @@ public class Threads
     }
 
     /**
-     * 鎵撳嵃绾跨▼寮傚父淇℃伅
+     * 打印异步任务中的异常信息。
      */
     public static void printException(Runnable r, Throwable t)
     {

@@ -4,7 +4,7 @@ import com.eapple.common.utils.MessageUtils;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 鍩虹寮傚父
+ * 基础异常。
  * 
  * @author Eapp1e
  */
@@ -13,22 +13,22 @@ public class BaseException extends RuntimeException
     private static final long serialVersionUID = 1L;
 
     /**
-     * 鎵€灞炴ā鍧?
+     * 所属模块。
      */
     private String module;
 
     /**
-     * 閿欒鐮?
+     * 错误码。
      */
     private String code;
 
     /**
-     * 閿欒鐮佸搴旂殑鍙傛暟
+     * 错误码对应的参数列表。
      */
     private Object[] args;
 
     /**
-     * 閿欒娑堟伅
+     * 默认错误消息。
      */
     private String defaultMessage;
 

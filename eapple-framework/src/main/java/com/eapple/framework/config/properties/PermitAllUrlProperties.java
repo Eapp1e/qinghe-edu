@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.eapple.common.annotation.Anonymous;
 
 /**
- * 璁剧疆Anonymous娉ㄨВ鍏佽鍖垮悕璁块棶鐨剈rl
+ * 收集 {@link Anonymous} 注解允许匿名访问的 URL。
  * 
  * @author Eapp1e
  */
@@ -44,12 +44,12 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
         map.keySet().forEach(info -> {
             HandlerMethod handlerMethod = map.get(info);
 
-            // 鑾峰彇鏂规硶涓婅竟鐨勬敞瑙?鏇夸唬path variable 涓?*
+            // 获取方法上的注解，并将 path variable 替换为 *
             Anonymous method = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), Anonymous.class);
             Optional.ofNullable(method).ifPresent(anonymous -> Objects.requireNonNull(info.getPathPatternsCondition().getPatternValues())
                     .forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK))));
 
-            // 鑾峰彇绫讳笂杈圭殑娉ㄨВ, 鏇夸唬path variable 涓?*
+            // 获取类上的注解，并将 path variable 替换为 *
             Anonymous controller = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Anonymous.class);
             Optional.ofNullable(controller).ifPresent(anonymous -> Objects.requireNonNull(info.getPathPatternsCondition().getPatternValues())
                     .forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK))));

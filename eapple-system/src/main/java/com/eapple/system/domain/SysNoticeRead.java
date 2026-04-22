@@ -5,22 +5,22 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
- * 鍏憡宸茶璁板綍琛?sys_notice_read
+ * 公告已读记录对象，对应表 sys_notice_read。
  *
  * @author Eapp1e
  */
 public class SysNoticeRead
 {
-    /** 涓婚敭 */
+    /** 主键 ID */
     private Long readId;
 
-    /** 鍏憡ID */
+    /** 公告 ID */
     private Long noticeId;
 
-    /** 鐢ㄦ埛ID */
+    /** 用户 ID */
     private Long userId;
 
-    /** 闃呰鏃堕棿 */
+    /** 已读时间 */
     private Date readTime;
 
     public Long getReadId()

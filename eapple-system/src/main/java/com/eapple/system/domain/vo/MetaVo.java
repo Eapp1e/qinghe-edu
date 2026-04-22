@@ -3,29 +3,29 @@ package com.eapple.system.domain.vo;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 璺敱鏄剧ず淇℃伅
+ * 路由元信息对象。
  * 
  * @author Eapp1e
  */
 public class MetaVo
 {
     /**
-     * 璁剧疆璇ヨ矾鐢卞湪渚ц竟鏍忓拰闈㈠寘灞戜腑灞曠ず鐨勫悕瀛?
+     * 菜单标题。
      */
     private String title;
 
     /**
-     * 璁剧疆璇ヨ矾鐢辩殑鍥炬爣锛屽搴旇矾寰剆rc/assets/icons/svg
+     * 菜单图标，对应前端 src/assets/icons/svg。
      */
     private String icon;
 
     /**
-     * 璁剧疆涓簍rue锛屽垯涓嶄細琚?<keep-alive>缂撳瓨
+     * 是否禁用缓存，true 表示不使用 <keep-alive> 缓存。
      */
     private boolean noCache;
 
     /**
-     * 鍐呴摼鍦板潃锛坔ttp(s)://寮€澶达級
+     * 外链地址，必须以 http(s):// 开头。
      */
     private String link;
 

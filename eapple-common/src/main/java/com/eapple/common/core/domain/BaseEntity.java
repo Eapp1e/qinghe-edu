@@ -9,36 +9,36 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Entity鍩虹被
- * 
+ * 实体基类。
+ *
  * @author Eapp1e
  */
 public class BaseEntity implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鎼滅储鍊?*/
+    /** 搜索关键字 */
     @JsonIgnore
     private String searchValue;
 
-    /** 鍒涘缓鑰?*/
+    /** 创建者 */
     private String createBy;
 
-    /** 鍒涘缓鏃堕棿 */
+    /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
-    /** 鏇存柊鑰?*/
+    /** 更新者 */
     private String updateBy;
 
-    /** 鏇存柊鏃堕棿 */
+    /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
-    /** 澶囨敞 */
+    /** 备注 */
     private String remark;
 
-    /** 璇锋眰鍙傛暟 */
+    /** 请求扩展参数 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> params;
 

@@ -3,24 +3,24 @@ package com.eapple.framework.web.domain.server;
 import com.eapple.common.utils.Arith;
 
 /**
- * 鍏у瓨鐩稿叧淇℃伅
+ * 内存相关信息。
  * 
  * @author Eapp1e
  */
 public class Mem
 {
     /**
-     * 鍐呭瓨鎬婚噺
+     * 内存总量。
      */
     private double total;
 
     /**
-     * 宸茬敤鍐呭瓨
+     * 已用内存。
      */
     private double used;
 
     /**
-     * 鍓╀綑鍐呭瓨
+     * 剩余内存。
      */
     private double free;
 

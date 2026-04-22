@@ -5,34 +5,34 @@ import com.eapple.common.utils.Arith;
 import com.eapple.common.utils.DateUtils;
 
 /**
- * JVM鐩稿叧淇℃伅
+ * JVM 信息。
  * 
  * @author Eapp1e
  */
 public class Jvm
 {
     /**
-     * 褰撳墠JVM鍗犵敤鐨勫唴瀛樻€绘暟(M)
+     * JVM 当前内存总量（M）。
      */
     private double total;
 
     /**
-     * JVM鏈€澶у彲鐢ㄥ唴瀛樻€绘暟(M)
+     * JVM 最大可用内存总量（M）。
      */
     private double max;
 
     /**
-     * JVM绌洪棽鍐呭瓨(M)
+     * JVM 空闲内存（M）。
      */
     private double free;
 
     /**
-     * JDK鐗堟湰
+     * JDK 版本。
      */
     private String version;
 
     /**
-     * JDK璺緞
+     * JDK 安装路径。
      */
     private String home;
 
@@ -77,7 +77,7 @@ public class Jvm
     }
 
     /**
-     * 鑾峰彇JDK鍚嶇О
+     * 获取 JDK 名称。
      */
     public String getName()
     {
@@ -105,7 +105,7 @@ public class Jvm
     }
 
     /**
-     * JDK鍚姩鏃堕棿
+     * JDK 启动时间。
      */
     public String getStartTime()
     {
@@ -113,7 +113,7 @@ public class Jvm
     }
 
     /**
-     * JDK杩愯鏃堕棿
+     * JDK 运行时长。
      */
     public String getRunTime()
     {
@@ -121,7 +121,7 @@ public class Jvm
     }
 
     /**
-     * 杩愯鍙傛暟
+     * 运行参数。
      */
     public String getInputArgs()
     {
