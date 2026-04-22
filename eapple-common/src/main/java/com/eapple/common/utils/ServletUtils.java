@@ -18,14 +18,14 @@ import com.eapple.common.constant.Constants;
 import com.eapple.common.core.text.Convert;
 
 /**
- * 瀹㈡埛绔伐鍏风被
- * 
+ * Servlet 工具类。
+ *
  * @author Eapp1e
  */
 public class ServletUtils
 {
     /**
-     * 鑾峰彇String鍙傛暟
+     * 获取 String 类型参数。
      */
     public static String getParameter(String name)
     {
@@ -33,7 +33,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇String鍙傛暟
+     * 获取 String 类型参数。
      */
     public static String getParameter(String name, String defaultValue)
     {
@@ -41,7 +41,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇Integer鍙傛暟
+     * 获取 Integer 类型参数。
      */
     public static Integer getParameterToInt(String name)
     {
@@ -49,7 +49,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇Integer鍙傛暟
+     * 获取 Integer 类型参数。
      */
     public static Integer getParameterToInt(String name, Integer defaultValue)
     {
@@ -57,7 +57,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇Boolean鍙傛暟
+     * 获取 Boolean 类型参数。
      */
     public static Boolean getParameterToBool(String name)
     {
@@ -65,7 +65,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇Boolean鍙傛暟
+     * 获取 Boolean 类型参数。
      */
     public static Boolean getParameterToBool(String name, Boolean defaultValue)
     {
@@ -73,10 +73,10 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰緱鎵€鏈夎姹傚弬鏁?
+     * 获取请求参数映射。
      *
-     * @param request 璇锋眰瀵硅薄{@link ServletRequest}
-     * @return Map
+     * @param request 请求对象 {@link ServletRequest}
+     * @return 参数映射
      */
     public static Map<String, String[]> getParams(ServletRequest request)
     {
@@ -85,10 +85,10 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰緱鎵€鏈夎姹傚弬鏁?
+     * 获取请求参数键值映射。
      *
-     * @param request 璇锋眰瀵硅薄{@link ServletRequest}
-     * @return Map
+     * @param request 请求对象 {@link ServletRequest}
+     * @return 参数映射
      */
     public static Map<String, String> getParamMap(ServletRequest request)
     {
@@ -101,7 +101,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇request
+     * 获取当前请求对象。
      */
     public static HttpServletRequest getRequest()
     {
@@ -109,7 +109,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇response
+     * 获取当前响应对象。
      */
     public static HttpServletResponse getResponse()
     {
@@ -117,7 +117,7 @@ public class ServletUtils
     }
 
     /**
-     * 鑾峰彇session
+     * 获取当前会话对象。
      */
     public static HttpSession getSession()
     {
@@ -131,10 +131,10 @@ public class ServletUtils
     }
 
     /**
-     * 灏嗗瓧绗︿覆娓叉煋鍒板鎴风
-     * 
-     * @param response 娓叉煋瀵硅薄
-     * @param string 寰呮覆鏌撶殑瀛楃涓?
+     * 将字符串渲染到客户端。
+     *
+     * @param response 响应对象
+     * @param string 需要输出的字符串
      */
     public static void renderString(HttpServletResponse response, String string)
     {
@@ -152,9 +152,10 @@ public class ServletUtils
     }
 
     /**
-     * 鏄惁鏄疉jax寮傛璇锋眰
-     * 
-     * @param request
+     * 是否为 Ajax 异步请求。
+     *
+     * @param request 请求对象
+     * @return true 表示是 Ajax 请求
      */
     public static boolean isAjaxRequest(HttpServletRequest request)
     {
@@ -181,10 +182,10 @@ public class ServletUtils
     }
 
     /**
-     * 鍐呭缂栫爜
-     * 
-     * @param str 鍐呭
-     * @return 缂栫爜鍚庣殑鍐呭
+     * URL 编码。
+     *
+     * @param str 原始字符串
+     * @return 编码后的字符串
      */
     public static String urlEncode(String str)
     {
@@ -199,10 +200,10 @@ public class ServletUtils
     }
 
     /**
-     * 鍐呭瑙ｇ爜
-     * 
-     * @param str 鍐呭
-     * @return 瑙ｇ爜鍚庣殑鍐呭
+     * URL 解码。
+     *
+     * @param str 编码字符串
+     * @return 解码后的字符串
      */
     public static String urlDecode(String str)
     {

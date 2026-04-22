@@ -4,38 +4,38 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 琛ㄦ牸鍒嗛〉鏁版嵁瀵硅薄
- * 
+ * 表格分页数据对象。
+ *
  * @author Eapp1e
  */
 public class TableDataInfo implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鎬昏褰曟暟 */
+    /** 总记录数。 */
     private long total;
 
-    /** 鍒楄〃鏁版嵁 */
+    /** 列表数据。 */
     private List<?> rows;
 
-    /** 娑堟伅鐘舵€佺爜 */
+    /** 状态码。 */
     private int code;
 
-    /** 娑堟伅鍐呭 */
+    /** 返回消息。 */
     private String msg;
 
     /**
-     * 琛ㄦ牸鏁版嵁瀵硅薄
+     * 表格分页数据对象。
      */
     public TableDataInfo()
     {
     }
 
     /**
-     * 鍒嗛〉
-     * 
-     * @param list 鍒楄〃鏁版嵁
-     * @param total 鎬昏褰曟暟
+     * 构造数据。
+     *
+     * @param list 列表数据
+     * @param total 总记录数
      */
     public TableDataInfo(List<?> list, long total)
     {

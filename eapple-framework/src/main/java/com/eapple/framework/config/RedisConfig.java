@@ -10,8 +10,8 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * redis閰嶇疆
- * 
+ * Redis 配置。
+ *
  * @author Eapp1e
  */
 @SuppressWarnings("deprecation")
@@ -28,11 +28,11 @@ public class RedisConfig extends CachingConfigurerSupport
 
         FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
 
-        // 浣跨敤StringRedisSerializer鏉ュ簭鍒楀寲鍜屽弽搴忓垪鍖杛edis鐨刱ey鍊?
+        // Redis 的 key 使用 StringRedisSerializer 序列化方式
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(serializer);
 
-        // Hash鐨刱ey涔熼噰鐢⊿tringRedisSerializer鐨勫簭鍒楀寲鏂瑰紡
+        // Hash 的 key 也使用 StringRedisSerializer 序列化方式
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(serializer);
 
@@ -50,7 +50,7 @@ public class RedisConfig extends CachingConfigurerSupport
     }
 
     /**
-     * 闄愭祦鑴氭湰
+     * 限流 Lua 脚本。
      */
     private String limitScriptText()
     {
