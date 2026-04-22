@@ -8,10 +8,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 鑷畾涔夋敞瑙ｉ槻姝㈣〃鍗曢噸澶嶆彁浜?
- * 
- * @author Eapp1e
+ * 防止重复提交注解。
  *
+ * @author Eapp1e
  */
 @Inherited
 @Target(ElementType.METHOD)
@@ -20,12 +19,12 @@ import java.lang.annotation.Target;
 public @interface RepeatSubmit
 {
     /**
-     * 闂撮殧鏃堕棿(ms)锛屽皬浜庢鏃堕棿瑙嗕负閲嶅鎻愪氦
+     * 间隔时间（毫秒），小于此时间视为重复提交。
      */
     public int interval() default 5000;
 
     /**
-     * 鎻愮ず娑堟伅
+     * 提示消息。
      */
-    public String message() default "??????";
+    public String message() default "不允许重复提交，请稍后再试";
 }

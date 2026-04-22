@@ -10,7 +10,7 @@ import com.eapple.common.config.serializer.SensitiveJsonSerializer;
 import com.eapple.common.enums.DesensitizedType;
 
 /**
- * 鏁版嵁鑴辨晱娉ㄨВ
+ * 数据脱敏注解。
  *
  * @author Eapp1e
  */
