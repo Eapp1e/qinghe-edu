@@ -20,7 +20,7 @@ import com.eapple.framework.manager.factory.AsyncFactory;
 import com.eapple.framework.web.service.TokenService;
 
 /**
- * 鑷畾涔夐€€鍑哄鐞嗙被 杩斿洖鎴愬姛
+ * 自定义退出成功处理类
  * 
  * @author Eapp1e
  */
@@ -31,9 +31,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler
     private TokenService tokenService;
 
     /**
-     * 閫€鍑哄鐞?
-     * 
-     * @return
+     * 退出成功处理
      */
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -43,9 +41,9 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler
         if (StringUtils.isNotNull(loginUser))
         {
             String userName = loginUser.getUsername();
-            // 鍒犻櫎鐢ㄦ埛缂撳瓨璁板綍
+            // 删除用户缓存记录
             tokenService.delLoginUser(loginUser.getToken());
-            // 璁板綍鐢ㄦ埛閫€鍑烘棩蹇?
+            // 记录用户退出日志
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(userName, Constants.LOGOUT, MessageUtils.message("user.logout.success")));
         }
         ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.success(MessageUtils.message("user.logout.success"))));

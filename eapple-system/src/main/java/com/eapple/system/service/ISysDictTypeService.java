@@ -5,94 +5,94 @@ import com.eapple.common.core.domain.entity.SysDictData;
 import com.eapple.common.core.domain.entity.SysDictType;
 
 /**
- * 瀛楀吀 涓氬姟灞?
+ * 字典类型服务接口
  * 
  * @author Eapp1e
  */
 public interface ISysDictTypeService
 {
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ瀛楀吀绫诲瀷
+     * 根据条件分页查询字典类型列表
      * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 瀛楀吀绫诲瀷闆嗗悎淇℃伅
+     * @param dictType 字典类型信息
+     * @return 字典类型集合
      */
     public List<SysDictType> selectDictTypeList(SysDictType dictType);
 
     /**
-     * 鏍规嵁鎵€鏈夊瓧鍏哥被鍨?
+     * 查询所有字典类型
      * 
-     * @return 瀛楀吀绫诲瀷闆嗗悎淇℃伅
+     * @return 字典类型集合
      */
     public List<SysDictType> selectDictTypeAll();
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鏌ヨ瀛楀吀鏁版嵁
+     * 根据字典类型查询字典数据
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀鏁版嵁闆嗗悎淇℃伅
+     * @param dictType 字典类型
+     * @return 字典数据集合
      */
     public List<SysDictData> selectDictDataByType(String dictType);
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷ID鏌ヨ淇℃伅
+     * 根据字典类型 ID 查询信息
      * 
-     * @param dictId 瀛楀吀绫诲瀷ID
-     * @return 瀛楀吀绫诲瀷
+     * @param dictId 字典类型 ID
+     * @return 字典类型
      */
     public SysDictType selectDictTypeById(Long dictId);
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鏌ヨ淇℃伅
+     * 根据字典类型查询信息
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀绫诲瀷
+     * @param dictType 字典类型
+     * @return 字典类型
      */
     public SysDictType selectDictTypeByType(String dictType);
 
     /**
-     * 鎵归噺鍒犻櫎瀛楀吀淇℃伅
+     * 批量删除字典类型信息
      * 
-     * @param dictIds 闇€瑕佸垹闄ょ殑瀛楀吀ID
+     * @param dictIds 需要删除的字典类型 ID
      */
     public void deleteDictTypeByIds(Long[] dictIds);
 
     /**
-     * 鍔犺浇瀛楀吀缂撳瓨鏁版嵁
+     * 加载字典缓存数据
      */
     public void loadingDictCache();
 
     /**
-     * 娓呯┖瀛楀吀缂撳瓨鏁版嵁
+     * 清空字典缓存数据
      */
     public void clearDictCache();
 
     /**
-     * 閲嶇疆瀛楀吀缂撳瓨鏁版嵁
+     * 重置字典缓存数据
      */
     public void resetDictCache();
 
     /**
-     * 鏂板淇濆瓨瀛楀吀绫诲瀷淇℃伅
+     * 新增字典类型信息
      * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 缁撴灉
+     * @param dictType 字典类型信息
+     * @return 结果
      */
     public int insertDictType(SysDictType dictType);
 
     /**
-     * 淇敼淇濆瓨瀛楀吀绫诲瀷淇℃伅
+     * 修改字典类型信息
      * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 缁撴灉
+     * @param dictType 字典类型信息
+     * @return 结果
      */
     public int updateDictType(SysDictType dictType);
 
     /**
-     * 鏍￠獙瀛楀吀绫诲瀷绉版槸鍚﹀敮涓€
+     * 校验字典类型名称是否唯一
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 缁撴灉
+     * @param dictType 字典类型
+     * @return 结果
      */
     public boolean checkDictTypeUnique(SysDictType dictType);
 }

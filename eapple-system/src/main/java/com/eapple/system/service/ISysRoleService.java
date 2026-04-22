@@ -6,168 +6,168 @@ import com.eapple.common.core.domain.entity.SysRole;
 import com.eapple.system.domain.SysUserRole;
 
 /**
- * 瑙掕壊涓氬姟灞?
+ * 角色服务接口
  * 
  * @author Eapp1e
  */
 public interface ISysRoleService
 {
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ瑙掕壊鏁版嵁
+     * 根据条件分页查询角色列表
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 瑙掕壊鏁版嵁闆嗗悎淇℃伅
+     * @param role 角色信息
+     * @return 角色集合
      */
     public List<SysRole> selectRoleList(SysRole role);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ瑙掕壊鍒楄〃
+     * 根据用户 ID 查询角色列表
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 瑙掕壊鍒楄〃
+     * @param userId 用户 ID
+     * @return 角色列表
      */
     public List<SysRole> selectRolesByUserId(Long userId);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ瑙掕壊鏉冮檺
+     * 根据用户 ID 查询角色权限
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 鏉冮檺鍒楄〃
+     * @param userId 用户 ID
+     * @return 权限集合
      */
     public Set<String> selectRolePermissionByUserId(Long userId);
 
     /**
-     * 鏌ヨ鎵€鏈夎鑹?
+     * 查询所有角色
      * 
-     * @return 瑙掕壊鍒楄〃
+     * @return 角色列表
      */
     public List<SysRole> selectRoleAll();
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鑾峰彇瑙掕壊閫夋嫨妗嗗垪琛?
+     * 根据用户 ID 获取角色选择框列表
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 閫変腑瑙掕壊ID鍒楄〃
+     * @param userId 用户 ID
+     * @return 角色 ID 列表
      */
     public List<Long> selectRoleListByUserId(Long userId);
 
     /**
-     * 閫氳繃瑙掕壊ID鏌ヨ瑙掕壊
+     * 通过角色 ID 查询角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 瑙掕壊瀵硅薄淇℃伅
+     * @param roleId 角色 ID
+     * @return 角色对象信息
      */
     public SysRole selectRoleById(Long roleId);
 
     /**
-     * 鏍￠獙瑙掕壊鍚嶇О鏄惁鍞竴
+     * 校验角色名称是否唯一
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     public boolean checkRoleNameUnique(SysRole role);
 
     /**
-     * 鏍￠獙瑙掕壊鏉冮檺鏄惁鍞竴
+     * 校验角色权限字符是否唯一
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     public boolean checkRoleKeyUnique(SysRole role);
 
     /**
-     * 鏍￠獙瑙掕壊鏄惁鍏佽鎿嶄綔
+     * 校验角色是否允许操作
      * 
-     * @param role 瑙掕壊淇℃伅
+     * @param role 角色信息
      */
     public void checkRoleAllowed(SysRole role);
 
     /**
-     * 鏍￠獙瑙掕壊鏄惁鏈夋暟鎹潈闄?
+     * 校验角色是否具备数据权限
      * 
-     * @param roleIds 瑙掕壊id
+     * @param roleIds 角色 ID
      */
     public void checkRoleDataScope(Long... roleIds);
 
     /**
-     * 閫氳繃瑙掕壊ID鏌ヨ瑙掕壊浣跨敤鏁伴噺
+     * 通过角色 ID 查询角色使用数量
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleId 角色 ID
+     * @return 结果
      */
     public int countUserRoleByRoleId(Long roleId);
 
     /**
-     * 鏂板淇濆瓨瑙掕壊淇℃伅
+     * 新增角色信息
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     public int insertRole(SysRole role);
 
     /**
-     * 淇敼淇濆瓨瑙掕壊淇℃伅
+     * 修改角色信息
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     public int updateRole(SysRole role);
 
     /**
-     * 淇敼瑙掕壊鐘舵€?
+     * 修改角色状态
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     public int updateRoleStatus(SysRole role);
 
     /**
-     * 淇敼鏁版嵁鏉冮檺淇℃伅
+     * 修改数据权限
      * 
-     * @param role 瑙掕壊淇℃伅
-     * @return 缁撴灉
+     * @param role 角色信息
+     * @return 结果
      */
     public int authDataScope(SysRole role);
 
     /**
-     * 閫氳繃瑙掕壊ID鍒犻櫎瑙掕壊
+     * 通过角色 ID 删除角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleId 角色 ID
+     * @return 结果
      */
     public int deleteRoleById(Long roleId);
 
     /**
-     * 鎵归噺鍒犻櫎瑙掕壊淇℃伅
+     * 批量删除角色信息
      * 
-     * @param roleIds 闇€瑕佸垹闄ょ殑瑙掕壊ID
-     * @return 缁撴灉
+     * @param roleIds 需要删除的角色 ID
+     * @return 结果
      */
     public int deleteRoleByIds(Long[] roleIds);
 
     /**
-     * 鍙栨秷鎺堟潈鐢ㄦ埛瑙掕壊
+     * 取消授权用户角色
      * 
-     * @param userRole 鐢ㄦ埛鍜岃鑹插叧鑱斾俊鎭?
-     * @return 缁撴灉
+     * @param userRole 用户与角色关联信息
+     * @return 结果
      */
     public int deleteAuthUser(SysUserRole userRole);
 
     /**
-     * 鎵归噺鍙栨秷鎺堟潈鐢ㄦ埛瑙掕壊
+     * 批量取消授权用户角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @param userIds 闇€瑕佸彇娑堟巿鏉冪殑鐢ㄦ埛鏁版嵁ID
-     * @return 缁撴灉
+     * @param roleId 角色 ID
+     * @param userIds 需要取消授权的用户 ID
+     * @return 结果
      */
     public int deleteAuthUsers(Long roleId, Long[] userIds);
 
     /**
-     * 鎵归噺閫夋嫨鎺堟潈鐢ㄦ埛瑙掕壊
+     * 批量选择授权用户角色
      * 
-     * @param roleId 瑙掕壊ID
-     * @param userIds 闇€瑕佸垹闄ょ殑鐢ㄦ埛鏁版嵁ID
-     * @return 缁撴灉
+     * @param roleId 角色 ID
+     * @param userIds 需要授权的用户 ID
+     * @return 结果
      */
     public int insertAuthUsers(Long roleId, Long[] userIds);
 }

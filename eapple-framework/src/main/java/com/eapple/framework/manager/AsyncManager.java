@@ -7,24 +7,24 @@ import com.eapple.common.utils.Threads;
 import com.eapple.common.utils.spring.SpringUtils;
 
 /**
- * 寮傛浠诲姟绠＄悊鍣?
+ * 异步任务管理器
  * 
  * @author Eapp1e
  */
 public class AsyncManager
 {
     /**
-     * 鎿嶄綔寤惰繜10姣
+     * 操作延迟 10 毫秒
      */
     private final int OPERATE_DELAY_TIME = 10;
 
     /**
-     * 寮傛鎿嶄綔浠诲姟璋冨害绾跨▼姹?
+     * 异步操作任务调度线程池
      */
     private ScheduledExecutorService executor = SpringUtils.getBean("scheduledExecutorService");
 
     /**
-     * 鍗曚緥妯″紡
+     * 单例模式
      */
     private AsyncManager(){}
 
@@ -36,9 +36,9 @@ public class AsyncManager
     }
 
     /**
-     * 鎵ц浠诲姟
+     * 执行任务
      * 
-     * @param task 浠诲姟
+     * @param task 定时任务
      */
     public void execute(TimerTask task)
     {
@@ -46,7 +46,7 @@ public class AsyncManager
     }
 
     /**
-     * 鍋滄浠诲姟绾跨▼姹?
+     * 关闭任务线程池
      */
     public void shutdown()
     {
