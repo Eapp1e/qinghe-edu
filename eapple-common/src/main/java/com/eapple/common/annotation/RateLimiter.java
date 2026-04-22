@@ -9,8 +9,8 @@ import com.eapple.common.constant.CacheConstants;
 import com.eapple.common.enums.LimitType;
 
 /**
- * 闄愭祦娉ㄨВ
- * 
+ * 限流注解。
+ *
  * @author Eapp1e
  */
 @Target(ElementType.METHOD)
@@ -19,22 +19,22 @@ import com.eapple.common.enums.LimitType;
 public @interface RateLimiter
 {
     /**
-     * 闄愭祦key
+     * 限流 key。
      */
     public String key() default CacheConstants.RATE_LIMIT_KEY;
 
     /**
-     * 闄愭祦鏃堕棿,鍗曚綅绉?
+     * 限流时间，单位秒。
      */
     public int time() default 60;
 
     /**
-     * 闄愭祦娆℃暟
+     * 限流次数。
      */
     public int count() default 100;
 
     /**
-     * 闄愭祦绫诲瀷
+     * 限流类型。
      */
     public LimitType limitType() default LimitType.DEFAULT;
 }

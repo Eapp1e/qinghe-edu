@@ -10,7 +10,7 @@ import com.eapple.system.mapper.SysNoticeReadMapper;
 import com.eapple.system.service.ISysNoticeReadService;
 
 /**
- * 鍏憡宸茶璁板綍 鏈嶅姟灞傚疄鐜?
+ * 公告已读记录服务实现。
  *
  * @author Eapp1e
  */
@@ -21,7 +21,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     private SysNoticeReadMapper noticeReadMapper;
 
     /**
-     * 鏍囪宸茶
+     * 标记公告已读。
      */
     @Override
     public void markRead(Long noticeId, Long userId)
@@ -33,7 +33,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     }
 
     /**
-     * 鏌ヨ鏌愮敤鎴锋湭璇诲叕鍛婃暟閲?
+     * 查询某个用户的未读公告数量。
      */
     @Override
     public int selectUnreadCount(Long userId)
@@ -42,7 +42,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     }
 
     /**
-     * 鏌ヨ鍏憡鍒楄〃骞舵爣璁板綋鍓嶇敤鎴峰凡璇荤姸鎬?
+     * 查询公告列表并标记当前用户是否已读。
      */
     @Override
     public List<SysNotice> selectNoticeListWithReadStatus(Long userId, int limit)
@@ -51,7 +51,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     }
 
     /**
-     * 鎵归噺鏍囪宸茶
+     * 批量标记已读。
      */
     @Override
     public void markReadBatch(Long userId, Long[] noticeIds)
@@ -64,7 +64,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     }
 
     /**
-     * 鏌ヨ宸查槄璇绘煇鍏憡鐨勭敤鎴峰垪琛?
+     * 查询公告已读用户列表。
      */
     @Override
     public List<Map<String, Object>> selectReadUsersByNoticeId(Long noticeId, String searchValue)
@@ -73,7 +73,7 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     }
 
     /**
-     * 鍒犻櫎鍏憡鏃舵竻鐞嗗搴斿凡璇昏褰?
+     * 删除公告时清理已读记录。
      */
     @Override
     public void deleteByNoticeIds(Long[] noticeIds)

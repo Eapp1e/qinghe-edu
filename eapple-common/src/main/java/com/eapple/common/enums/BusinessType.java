@@ -1,59 +1,59 @@
 package com.eapple.common.enums;
 
 /**
- * 涓氬姟鎿嶄綔绫诲瀷
- * 
+ * 业务操作类型。
+ *
  * @author Eapp1e
  */
 public enum BusinessType
 {
     /**
-     * 鍏跺畠
+     * 其他。
      */
     OTHER,
 
     /**
-     * 鏂板
+     * 新增。
      */
     INSERT,
 
     /**
-     * 淇敼
+     * 修改。
      */
     UPDATE,
 
     /**
-     * 鍒犻櫎
+     * 删除。
      */
     DELETE,
 
     /**
-     * 鎺堟潈
+     * 授权。
      */
     GRANT,
 
     /**
-     * 瀵煎嚭
+     * 导出。
      */
     EXPORT,
 
     /**
-     * 瀵煎叆
+     * 导入。
      */
     IMPORT,
 
     /**
-     * 寮洪€€
+     * 强退。
      */
     FORCE,
 
     /**
-     * 鐢熸垚浠ｇ爜
+     * 生成代码。
      */
     GENCODE,
-    
+
     /**
-     * 娓呯┖鏁版嵁
+     * 清空数据。
      */
     CLEAN,
 }

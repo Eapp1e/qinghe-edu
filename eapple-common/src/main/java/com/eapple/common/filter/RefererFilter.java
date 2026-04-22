@@ -13,14 +13,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * 闃茬洍閾捐繃婊ゅ櫒
- * 
+ * Referer 白名单过滤器。
+ *
  * @author Eapp1e
  */
 public class RefererFilter implements Filter
 {
     /**
-     * 鍏佽鐨勫煙鍚嶅垪琛?
+     * 允许访问的域名列表。
      */
     public List<String> allowedDomains;
 
@@ -40,14 +40,14 @@ public class RefererFilter implements Filter
 
         String referer = req.getHeader("Referer");
 
-        // 濡傛灉Referer涓虹┖锛屾嫆缁濊闂?
+        // 如果 Referer 为空，则拒绝访问
         if (referer == null || referer.isEmpty())
         {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied: Referer header is required");
             return;
         }
 
-        // 妫€鏌eferer鏄惁鍦ㄥ厑璁哥殑鍩熷悕鍒楄〃涓?
+        // 判断 Referer 是否在允许的域名列表中
         boolean allowed = false;
         for (String domain : allowedDomains)
         {
@@ -58,7 +58,7 @@ public class RefererFilter implements Filter
             }
         }
 
-        // 鏍规嵁妫€鏌ョ粨鏋滃喅瀹氭槸鍚︽斁琛?
+        // 允许访问则放行，否则返回 403
         if (allowed)
         {
             chain.doFilter(request, response);

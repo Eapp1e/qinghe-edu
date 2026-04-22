@@ -19,8 +19,8 @@ import com.eapple.system.mapper.SysDictTypeMapper;
 import com.eapple.system.service.ISysDictTypeService;
 
 /**
- * 瀛楀吀 涓氬姟灞傚鐞?
- * 
+ * 字典类型服务实现。
+ *
  * @author Eapp1e
  */
 @Service
@@ -33,7 +33,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     private SysDictDataMapper dictDataMapper;
 
     /**
-     * 椤圭洰鍚姩鏃讹紝鍒濆鍖栧瓧鍏稿埌缂撳瓨
+     * 项目启动时初始化字典缓存。
      */
     @PostConstruct
     public void init()
@@ -42,10 +42,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ瀛楀吀绫诲瀷
-     * 
-     * @param dictType 瀛楀吀绫诲瀷淇℃伅
-     * @return 瀛楀吀绫诲瀷闆嗗悎淇℃伅
+     * 根据条件分页查询字典类型列表。
+     *
+     * @param dictType 字典类型条件
+     * @return 字典类型集合
      */
     @Override
     public List<SysDictType> selectDictTypeList(SysDictType dictType)
@@ -54,9 +54,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏍规嵁鎵€鏈夊瓧鍏哥被鍨?
-     * 
-     * @return 瀛楀吀绫诲瀷闆嗗悎淇℃伅
+     * 查询所有字典类型。
+     *
+     * @return 字典类型集合
      */
     @Override
     public List<SysDictType> selectDictTypeAll()
@@ -65,10 +65,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鏌ヨ瀛楀吀鏁版嵁
-     * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀鏁版嵁闆嗗悎淇℃伅
+     * 根据字典类型查询字典数据。
+     *
+     * @param dictType 字典类型
+     * @return 字典数据集合
      */
     @Override
     public List<SysDictData> selectDictDataByType(String dictType)
@@ -88,10 +88,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷ID鏌ヨ淇℃伅
-     * 
-     * @param dictId 瀛楀吀绫诲瀷ID
-     * @return 瀛楀吀绫诲瀷
+     * 根据字典类型 ID 查询信息。
+     *
+     * @param dictId 字典类型 ID
+     * @return 字典类型
      */
     @Override
     public SysDictType selectDictTypeById(Long dictId)
@@ -100,10 +100,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鏌ヨ淇℃伅
-     * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀绫诲瀷
+     * 根据字典类型编码查询信息。
+     *
+     * @param dictType 字典类型编码
+     * @return 字典类型
      */
     @Override
     public SysDictType selectDictTypeByType(String dictType)
@@ -112,9 +112,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鎵归噺鍒犻櫎瀛楀吀绫诲瀷淇℃伅
-     * 
-     * @param dictIds 闇€瑕佸垹闄ょ殑瀛楀吀ID
+     * 批量删除字典类型信息。
+     *
+     * @param dictIds 需要删除的字典类型 ID
      */
     @Override
     public void deleteDictTypeByIds(Long[] dictIds)
@@ -124,7 +124,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.countDictDataByType(dictType.getDictType()) > 0)
             {
-                throw new ServiceException(String.format("%1$s宸插垎閰?涓嶈兘鍒犻櫎", dictType.getDictName()));
+                throw new ServiceException(String.format("%1$s已分配数据，不能删除", dictType.getDictName()));
             }
             dictTypeMapper.deleteDictTypeById(dictId);
             DictUtils.removeDictCache(dictType.getDictType());
@@ -132,22 +132,25 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鍔犺浇瀛楀吀缂撳瓨鏁版嵁
+     * 加载字典缓存数据。
      */
     @Override
     public void loadingDictCache()
     {
         SysDictData dictData = new SysDictData();
         dictData.setStatus("0");
-        Map<String, List<SysDictData>> dictDataMap = dictDataMapper.selectDictDataList(dictData).stream().collect(Collectors.groupingBy(SysDictData::getDictType));
+        Map<String, List<SysDictData>> dictDataMap = dictDataMapper.selectDictDataList(dictData).stream()
+                .collect(Collectors.groupingBy(SysDictData::getDictType));
         for (Map.Entry<String, List<SysDictData>> entry : dictDataMap.entrySet())
         {
-            DictUtils.setDictCache(entry.getKey(), entry.getValue().stream().sorted(Comparator.comparing(SysDictData::getDictSort)).collect(Collectors.toList()));
+            DictUtils.setDictCache(entry.getKey(), entry.getValue().stream()
+                    .sorted(Comparator.comparing(SysDictData::getDictSort))
+                    .collect(Collectors.toList()));
         }
     }
 
     /**
-     * 娓呯┖瀛楀吀缂撳瓨鏁版嵁
+     * 清空字典缓存数据。
      */
     @Override
     public void clearDictCache()
@@ -156,7 +159,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 閲嶇疆瀛楀吀缂撳瓨鏁版嵁
+     * 重置字典缓存数据。
      */
     @Override
     public void resetDictCache()
@@ -166,10 +169,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏂板淇濆瓨瀛楀吀绫诲瀷淇℃伅
-     * 
-     * @param dict 瀛楀吀绫诲瀷淇℃伅
-     * @return 缁撴灉
+     * 新增字典类型信息。
+     *
+     * @param dict 字典类型信息
+     * @return 结果
      */
     @Override
     public int insertDictType(SysDictType dict)
@@ -183,10 +186,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 淇敼淇濆瓨瀛楀吀绫诲瀷淇℃伅
-     * 
-     * @param dict 瀛楀吀绫诲瀷淇℃伅
-     * @return 缁撴灉
+     * 修改字典类型信息。
+     *
+     * @param dict 字典类型信息
+     * @return 结果
      */
     @Override
     @Transactional
@@ -204,10 +207,10 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     }
 
     /**
-     * 鏍￠獙瀛楀吀绫诲瀷绉版槸鍚﹀敮涓€
-     * 
-     * @param dict 瀛楀吀绫诲瀷
-     * @return 缁撴灉
+     * 校验字典类型是否唯一。
+     *
+     * @param dict 字典类型
+     * @return 校验结果
      */
     @Override
     public boolean checkDictTypeUnique(SysDictType dict)

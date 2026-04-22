@@ -1,37 +1,37 @@
 package com.eapple.common.constant;
 
 /**
- * 浠诲姟璋冨害閫氱敤甯搁噺
- * 
+ * 定时任务通用常量。
+ *
  * @author Eapp1e
  */
 public class ScheduleConstants
 {
     public static final String TASK_CLASS_NAME = "TASK_CLASS_NAME";
 
-    /** 鎵ц鐩爣key */
+    /** 定时任务属性 key。 */
     public static final String TASK_PROPERTIES = "TASK_PROPERTIES";
 
-    /** 榛樿 */
+    /** 默认策略。 */
     public static final String MISFIRE_DEFAULT = "0";
 
-    /** 绔嬪嵆瑙﹀彂鎵ц */
+    /** 忽略错过执行策略。 */
     public static final String MISFIRE_IGNORE_MISFIRES = "1";
 
-    /** 瑙﹀彂涓€娆℃墽琛?*/
+    /** 立即执行一次策略。 */
     public static final String MISFIRE_FIRE_AND_PROCEED = "2";
 
-    /** 涓嶈Е鍙戠珛鍗虫墽琛?*/
+    /** 不触发立即执行。 */
     public static final String MISFIRE_DO_NOTHING = "3";
 
     public enum Status
     {
         /**
-         * 姝ｅ父
+         * 正常。
          */
         NORMAL("0"),
         /**
-         * 鏆傚仠
+         * 暂停。
          */
         PAUSE("1");
 
