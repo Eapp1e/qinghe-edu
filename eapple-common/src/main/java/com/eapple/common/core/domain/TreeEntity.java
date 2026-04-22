@@ -4,27 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tree鍩虹被
- * 
+ * 树形结构基类。
+ *
  * @author Eapp1e
  */
 public class TreeEntity extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鐖惰彍鍗曞悕绉?*/
+    /** 父级名称 */
     private String parentName;
 
-    /** 鐖惰彍鍗旾D */
+    /** 父级编号 */
     private Long parentId;
 
-    /** 鏄剧ず椤哄簭 */
+    /** 显示顺序 */
     private Integer orderNum;
 
-    /** 绁栫骇鍒楄〃 */
+    /** 祖级列表 */
     private String ancestors;
 
-    /** 瀛愰儴闂?*/
+    /** 子节点集合 */
     private List<?> children = new ArrayList<>();
 
     public String getParentName()

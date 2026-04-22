@@ -12,8 +12,8 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import com.eapple.common.core.domain.entity.SysUser;
 
 /**
- * 鐧诲綍鐢ㄦ埛韬唤鏉冮檺
- * 
+ * 登录用户身份权限对象。
+ *
  * @author Eapp1e
  */
 public class LoginUser implements UserDetails
@@ -21,57 +21,57 @@ public class LoginUser implements UserDetails
     private static final long serialVersionUID = 1L;
 
     /**
-     * 鐢ㄦ埛ID
+     * 用户 ID。
      */
     private Long userId;
 
     /**
-     * 閮ㄩ棬ID
+     * 部门 ID。
      */
     private Long deptId;
 
     /**
-     * 鐢ㄦ埛鍞竴鏍囪瘑
+     * 用户唯一标识 token。
      */
     private String token;
 
     /**
-     * 鐧诲綍鏃堕棿
+     * 登录时间。
      */
     private Long loginTime;
 
     /**
-     * 杩囨湡鏃堕棿
+     * 过期时间。
      */
     private Long expireTime;
 
     /**
-     * 鐧诲綍IP鍦板潃
+     * 登录 IP 地址。
      */
     private String ipaddr;
 
     /**
-     * 鐧诲綍鍦扮偣
+     * 登录地点。
      */
     private String loginLocation;
 
     /**
-     * 娴忚鍣ㄧ被鍨?
+     * 浏览器类型。
      */
     private String browser;
 
     /**
-     * 鎿嶄綔绯荤粺
+     * 操作系统。
      */
     private String os;
 
     /**
-     * 鏉冮檺鍒楄〃
+     * 权限集合。
      */
     private Set<String> permissions;
 
     /**
-     * 鐢ㄦ埛淇℃伅
+     * 用户信息。
      */
     private SysUser user;
 
@@ -137,7 +137,7 @@ public class LoginUser implements UserDetails
     }
 
     /**
-     * 璐︽埛鏄惁鏈繃鏈?杩囨湡鏃犳硶楠岃瘉
+     * 账户是否未过期，过期无法验证。
      */
     @JSONField(serialize = false)
     @Override
@@ -147,9 +147,7 @@ public class LoginUser implements UserDetails
     }
 
     /**
-     * 鎸囧畾鐢ㄦ埛鏄惁瑙ｉ攣,閿佸畾鐨勭敤鎴锋棤娉曡繘琛岃韩浠介獙璇?
-     * 
-     * @return
+     * 账户是否未锁定，锁定账户无法进行身份验证。
      */
     @JSONField(serialize = false)
     @Override
@@ -159,9 +157,7 @@ public class LoginUser implements UserDetails
     }
 
     /**
-     * 鎸囩ず鏄惁宸茶繃鏈熺殑鐢ㄦ埛鐨勫嚟鎹?瀵嗙爜),杩囨湡鐨勫嚟鎹槻姝㈣璇?
-     * 
-     * @return
+     * 凭证是否未过期，过期的凭证将阻止认证。
      */
     @JSONField(serialize = false)
     @Override
@@ -171,9 +167,7 @@ public class LoginUser implements UserDetails
     }
 
     /**
-     * 鏄惁鍙敤 ,绂佺敤鐨勭敤鎴蜂笉鑳借韩浠介獙璇?
-     * 
-     * @return
+     * 用户是否启用，禁用用户无法进行身份验证。
      */
     @JSONField(serialize = false)
     @Override

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 /**
- * 璺敱閰嶇疆淇℃伅
+ * 前端路由对象。
  * 
  * @author Eapp1e
  */
@@ -12,47 +12,47 @@ import java.util.List;
 public class RouterVo
 {
     /**
-     * 璺敱鍚嶅瓧
+     * 路由名称。
      */
     private String name;
 
     /**
-     * 璺敱鍦板潃
+     * 路由地址。
      */
     private String path;
 
     /**
-     * 鏄惁闅愯棌璺敱锛屽綋璁剧疆 true 鐨勬椂鍊欒璺敱涓嶄細鍐嶄晶杈规爮鍑虹幇
+     * 是否隐藏路由。true 时不会在侧边栏中展示。
      */
     private boolean hidden;
 
     /**
-     * 閲嶅畾鍚戝湴鍧€锛屽綋璁剧疆 noRedirect 鐨勬椂鍊欒璺敱鍦ㄩ潰鍖呭睉瀵艰埅涓笉鍙鐐瑰嚮
+     * 重定向地址。设置为 noRedirect 时不可在面包屑中点击。
      */
     private String redirect;
 
     /**
-     * 缁勪欢鍦板潃
+     * 组件路径。
      */
     private String component;
 
     /**
-     * 璺敱鍙傛暟锛氬 {"id": 1, "name": "ry"}
+     * 路由参数，例如 {"id": 1, "name": "ry"}。
      */
     private String query;
 
     /**
-     * 褰撲綘涓€涓矾鐢变笅闈㈢殑 children 澹版槑鐨勮矾鐢卞ぇ浜?涓椂锛岃嚜鍔ㄤ細鍙樻垚宓屽鐨勬ā寮?-濡傜粍浠堕〉闈?
+     * 当只有一个子路由时，是否始终显示根路由。
      */
     private Boolean alwaysShow;
 
     /**
-     * 鍏朵粬鍏冪礌
+     * 路由元信息。
      */
     private MetaVo meta;
 
     /**
-     * 瀛愯矾鐢?
+     * 子路由列表。
      */
     private List<RouterVo> children;
 

@@ -19,13 +19,13 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import com.eapple.common.constant.Constants;
 import com.eapple.common.utils.StringUtils;
-import org.springframework.http.MediaType;
 
 /**
- * 閫氱敤http鍙戦€佹柟娉?
- * 
+ * Http 请求工具类。
+ *
  * @author Eapp1e
  */
 public class HttpUtils
@@ -33,10 +33,10 @@ public class HttpUtils
     private static final Logger log = LoggerFactory.getLogger(HttpUtils.class);
 
     /**
-     * 鍚戞寚瀹?URL 鍙戦€丟ET鏂规硶鐨勮姹?
+     * 发送 GET 请求。
      *
-     * @param url 鍙戦€佽姹傜殑 URL
-     * @return 鎵€浠ｈ〃杩滅▼璧勬簮鐨勫搷搴旂粨鏋?
+     * @param url 请求地址
+     * @return 响应内容
      */
     public static String sendGet(String url)
     {
@@ -44,11 +44,11 @@ public class HttpUtils
     }
 
     /**
-     * 鍚戞寚瀹?URL 鍙戦€丟ET鏂规硶鐨勮姹?
+     * 发送 GET 请求。
      *
-     * @param url 鍙戦€佽姹傜殑 URL
-     * @param param 璇锋眰鍙傛暟锛岃姹傚弬鏁板簲璇ユ槸 name1=value1&name2=value2 鐨勫舰寮忋€?
-     * @return 鎵€浠ｈ〃杩滅▼璧勬簮鐨勫搷搴旂粨鏋?
+     * @param url 请求地址
+     * @param param 请求参数，格式为 name1=value1&name2=value2
+     * @return 响应内容
      */
     public static String sendGet(String url, String param)
     {
@@ -56,12 +56,12 @@ public class HttpUtils
     }
 
     /**
-     * 鍚戞寚瀹?URL 鍙戦€丟ET鏂规硶鐨勮姹?
+     * 发送 GET 请求。
      *
-     * @param url 鍙戦€佽姹傜殑 URL
-     * @param param 璇锋眰鍙傛暟锛岃姹傚弬鏁板簲璇ユ槸 name1=value1&name2=value2 鐨勫舰寮忋€?
-     * @param contentType 缂栫爜绫诲瀷
-     * @return 鎵€浠ｈ〃杩滅▼璧勬簮鐨勫搷搴旂粨鏋?
+     * @param url 请求地址
+     * @param param 请求参数，格式为 name1=value1&name2=value2
+     * @param contentType 响应字符集
+     * @return 响应内容
      */
     public static String sendGet(String url, String param, String contentType)
     {
@@ -87,19 +87,19 @@ public class HttpUtils
         }
         catch (ConnectException e)
         {
-            log.error("璋冪敤HttpUtils.sendGet ConnectException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendGet ConnectException, url={}, param={}", url, param, e);
         }
         catch (SocketTimeoutException e)
         {
-            log.error("璋冪敤HttpUtils.sendGet SocketTimeoutException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendGet SocketTimeoutException, url={}, param={}", url, param, e);
         }
         catch (IOException e)
         {
-            log.error("璋冪敤HttpUtils.sendGet IOException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendGet IOException, url={}, param={}", url, param, e);
         }
         catch (Exception e)
         {
-            log.error("璋冪敤HttpsUtil.sendGet Exception, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendGet Exception, url={}, param={}", url, param, e);
         }
         finally
         {
@@ -112,18 +112,18 @@ public class HttpUtils
             }
             catch (Exception ex)
             {
-                log.error("璋冪敤in.close Exception, url=" + url + ",param=" + param, ex);
+                log.error("HttpUtils.sendGet close exception, url={}, param={}", url, param, ex);
             }
         }
         return result.toString();
     }
 
     /**
-     * 鍚戞寚瀹?URL 鍙戦€丳OST鏂规硶鐨勮姹?
+     * 发送 POST 请求。
      *
-     * @param url 鍙戦€佽姹傜殑 URL
-     * @param param 璇锋眰鍙傛暟锛岃姹傚弬鏁板簲璇ユ槸 name1=value1&name2=value2 鐨勫舰寮忋€?
-     * @return 鎵€浠ｈ〃杩滅▼璧勬簮鐨勫搷搴旂粨鏋?
+     * @param url 请求地址
+     * @param param 请求参数
+     * @return 响应内容
      */
     public static String sendPost(String url, String param)
     {
@@ -131,12 +131,12 @@ public class HttpUtils
     }
 
     /**
-     * 鍚戞寚瀹?URL 鍙戦€丳OST鏂规硶鐨勮姹?
-     * 
-     * @param url 鍙戦€佽姹傜殑 URL
-     * @param param 璇锋眰鍙傛暟
-     * @param contentType 鍐呭绫诲瀷
-     * @return 鎵€浠ｈ〃杩滅▼璧勬簮鐨勫搷搴旂粨鏋?
+     * 发送 POST 请求。
+     *
+     * @param url 请求地址
+     * @param param 请求参数
+     * @param contentType 请求内容类型
+     * @return 响应内容
      */
     public static String sendPost(String url, String param, String contentType)
     {
@@ -168,19 +168,19 @@ public class HttpUtils
         }
         catch (ConnectException e)
         {
-            log.error("璋冪敤HttpUtils.sendPost ConnectException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendPost ConnectException, url={}, param={}", url, param, e);
         }
         catch (SocketTimeoutException e)
         {
-            log.error("璋冪敤HttpUtils.sendPost SocketTimeoutException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendPost SocketTimeoutException, url={}, param={}", url, param, e);
         }
         catch (IOException e)
         {
-            log.error("璋冪敤HttpUtils.sendPost IOException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendPost IOException, url={}, param={}", url, param, e);
         }
         catch (Exception e)
         {
-            log.error("璋冪敤HttpsUtil.sendPost Exception, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendPost Exception, url={}, param={}", url, param, e);
         }
         finally
         {
@@ -197,17 +197,32 @@ public class HttpUtils
             }
             catch (IOException ex)
             {
-                log.error("璋冪敤in.close Exception, url=" + url + ",param=" + param, ex);
+                log.error("HttpUtils.sendPost close exception, url={}, param={}", url, param, ex);
             }
         }
         return result.toString();
     }
 
+    /**
+     * 发送 HTTPS POST 请求。
+     *
+     * @param url 请求地址
+     * @param param 请求参数
+     * @return 响应内容
+     */
     public static String sendSSLPost(String url, String param)
     {
         return sendSSLPost(url, param, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
     }
 
+    /**
+     * 发送 HTTPS POST 请求。
+     *
+     * @param url 请求地址
+     * @param param 请求参数
+     * @param contentType 请求内容类型
+     * @return 响应内容
+     */
     public static String sendSSLPost(String url, String param, String contentType)
     {
         StringBuilder result = new StringBuilder();
@@ -226,7 +241,6 @@ public class HttpUtils
             conn.setRequestProperty("Content-Type", contentType);
             conn.setDoOutput(true);
             conn.setDoInput(true);
-
             conn.setSSLSocketFactory(sc.getSocketFactory());
             conn.setHostnameVerifier(new TrustAnyHostnameVerifier());
             conn.connect();
@@ -246,19 +260,19 @@ public class HttpUtils
         }
         catch (ConnectException e)
         {
-            log.error("璋冪敤HttpUtils.sendSSLPost ConnectException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendSSLPost ConnectException, url={}, param={}", url, param, e);
         }
         catch (SocketTimeoutException e)
         {
-            log.error("璋冪敤HttpUtils.sendSSLPost SocketTimeoutException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendSSLPost SocketTimeoutException, url={}, param={}", url, param, e);
         }
         catch (IOException e)
         {
-            log.error("璋冪敤HttpUtils.sendSSLPost IOException, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendSSLPost IOException, url={}, param={}", url, param, e);
         }
         catch (Exception e)
         {
-            log.error("璋冪敤HttpsUtil.sendSSLPost Exception, url=" + url + ",param=" + param, e);
+            log.error("HttpUtils.sendSSLPost Exception, url={}, param={}", url, param, e);
         }
         return result.toString();
     }

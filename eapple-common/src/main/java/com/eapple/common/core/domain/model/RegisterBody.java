@@ -1,8 +1,8 @@
 package com.eapple.common.core.domain.model;
 
 /**
- * 鐢ㄦ埛娉ㄥ唽瀵硅薄
- * 
+ * 用户注册对象。
+ *
  * @author Eapp1e
  */
 public class RegisterBody extends LoginBody

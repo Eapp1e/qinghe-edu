@@ -5,17 +5,17 @@ import org.springframework.stereotype.Component;
 import com.eapple.common.utils.ServletUtils;
 
 /**
- * 鏈嶅姟鐩稿叧閰嶇疆
- * 
+ * 服务地址配置。
+ *
  * @author Eapp1e
  */
 @Component
 public class ServerConfig
 {
     /**
-     * 鑾峰彇瀹屾暣鐨勮姹傝矾寰勶紝鍖呮嫭锛氬煙鍚嶏紝绔彛锛屼笂涓嬫枃璁块棶璺緞
-     * 
-     * @return 鏈嶅姟鍦板潃
+     * 获取完整的请求地址，包含域名、端口与上下文路径。
+     *
+     * @return 服务访问地址
      */
     public String getUrl()
     {

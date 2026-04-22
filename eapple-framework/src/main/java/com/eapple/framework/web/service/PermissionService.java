@@ -11,17 +11,18 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.framework.security.context.PermissionContextHolder;
 
 /**
- * 鑷畾涔夋潈闄愬疄鐜帮紝ss 鍙栬嚜 Spring Security 棣栧瓧姣? * 
+ * 自定义权限实现，ss 取自 Spring Security 首字母
+ *
  * @author Eapp1e
  */
 @Service("ss")
 public class PermissionService
 {
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁鍏峰鏌愭潈闄?
-     * 
-     * @param permission 鏉冮檺瀛楃涓?
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愭潈闄?
+     * 验证用户是否具备指定权限
+     *
+     * @param permission 权限标识
+     * @return 是否具备权限
      */
     public boolean hasPermi(String permission)
     {
@@ -39,10 +40,10 @@ public class PermissionService
     }
 
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁涓嶅叿澶囨煇鏉冮檺锛屼笌 hasPermi閫昏緫鐩稿弽
+     * 验证用户是否不具备指定权限，与 hasPermi 逻辑相反
      *
-     * @param permission 鏉冮檺瀛楃涓?
-     * @return 鐢ㄦ埛鏄惁涓嶅叿澶囨煇鏉冮檺
+     * @param permission 权限标识
+     * @return 是否不具备权限
      */
     public boolean lacksPermi(String permission)
     {
@@ -50,10 +51,10 @@ public class PermissionService
     }
 
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁鍏锋湁浠ヤ笅浠绘剰涓€涓潈闄?
+     * 验证用户是否具备以下任意一个权限
      *
-     * @param permissions 浠?PERMISSION_DELIMITER 涓哄垎闅旂鐨勬潈闄愬垪琛?
-     * @return 鐢ㄦ埛鏄惁鍏锋湁浠ヤ笅浠绘剰涓€涓潈闄?
+     * @param permissions 多个权限标识，使用权限分隔符拼接
+     * @return 是否具备任意权限
      */
     public boolean hasAnyPermi(String permissions)
     {
@@ -79,10 +80,10 @@ public class PermissionService
     }
 
     /**
-     * 鍒ゆ柇鐢ㄦ埛鏄惁鎷ユ湁鏌愪釜瑙掕壊
-     * 
-     * @param role 瑙掕壊瀛楃涓?
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愯鑹?
+     * 判断用户是否拥有某个角色
+     *
+     * @param role 角色标识
+     * @return 是否拥有角色
      */
     public boolean hasRole(String role)
     {
@@ -107,10 +108,10 @@ public class PermissionService
     }
 
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁涓嶅叿澶囨煇瑙掕壊锛屼笌 isRole閫昏緫鐩稿弽銆?
+     * 验证用户是否不具备某个角色，与 isRole 逻辑相反
      *
-     * @param role 瑙掕壊鍚嶇О
-     * @return 鐢ㄦ埛鏄惁涓嶅叿澶囨煇瑙掕壊
+     * @param role 角色标识
+     * @return 是否不具备角色
      */
     public boolean lacksRole(String role)
     {
@@ -118,10 +119,10 @@ public class PermissionService
     }
 
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁鍏锋湁浠ヤ笅浠绘剰涓€涓鑹?
+     * 验证用户是否拥有以下任意一个角色
      *
-     * @param roles 浠?ROLE_DELIMITER 涓哄垎闅旂鐨勮鑹插垪琛?
-     * @return 鐢ㄦ埛鏄惁鍏锋湁浠ヤ笅浠绘剰涓€涓鑹?
+     * @param roles 多个角色标识，使用角色分隔符拼接
+     * @return 是否拥有任意角色
      */
     public boolean hasAnyRoles(String roles)
     {
@@ -145,11 +146,11 @@ public class PermissionService
     }
 
     /**
-     * 鍒ゆ柇鏄惁鍖呭惈鏉冮檺
-     * 
-     * @param permissions 鏉冮檺鍒楄〃
-     * @param permission 鏉冮檺瀛楃涓?
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愭潈闄?
+     * 判断权限集合中是否包含指定权限
+     *
+     * @param permissions 权限集合
+     * @param permission 权限标识
+     * @return 是否包含权限
      */
     private boolean hasPermissions(Set<String> permissions, String permission)
     {

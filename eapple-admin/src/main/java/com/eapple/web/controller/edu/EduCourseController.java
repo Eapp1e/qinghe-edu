@@ -70,7 +70,7 @@ public class EduCourseController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('edu:course:add') or @ss.hasRole('edu_teacher')")
-    @Log(title = "璇惧悗璇剧▼", businessType = BusinessType.INSERT)
+    @Log(title = "课后课程", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody EduCourse course)
     {
@@ -78,7 +78,7 @@ public class EduCourseController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('edu:course:edit') or @ss.hasRole('edu_teacher')")
-    @Log(title = "璇惧悗璇剧▼", businessType = BusinessType.UPDATE)
+    @Log(title = "课后课程", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody EduCourse course)
     {
@@ -86,7 +86,7 @@ public class EduCourseController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('edu:course:remove')")
-    @Log(title = "璇惧悗璇剧▼", businessType = BusinessType.DELETE)
+    @Log(title = "课后课程", businessType = BusinessType.DELETE)
     @DeleteMapping("/{courseIds}")
     public AjaxResult remove(@PathVariable Long[] courseIds)
     {

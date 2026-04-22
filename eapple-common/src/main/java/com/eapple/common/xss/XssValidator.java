@@ -7,8 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 鑷畾涔墄ss鏍￠獙娉ㄨВ瀹炵幇
- * 
+ * 自定义 XSS 校验注解实现
+ *
  * @author Eapp1e
  */
 public class XssValidator implements ConstraintValidator<Xss, String>

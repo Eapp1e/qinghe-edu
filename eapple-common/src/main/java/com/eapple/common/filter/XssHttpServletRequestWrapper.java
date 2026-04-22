@@ -13,14 +13,16 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.common.utils.html.EscapeUtil;
 
 /**
- * XSS杩囨护澶勭悊
+ * XSS 过滤包装请求
  * 
  * @author Eapp1e
  */
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
 {
     /**
-     * @param request
+     * 构造包装请求
+     * 
+     * @param request 原始请求
      */
     public XssHttpServletRequestWrapper(HttpServletRequest request)
     {
@@ -37,7 +39,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
             String[] escapesValues = new String[length];
             for (int i = 0; i < length; i++)
             {
-                // 闃瞲ss鏀诲嚮鍜岃繃婊ゅ墠鍚庣┖鏍?
+                // 清理参数中的 XSS 内容
                 escapesValues[i] = EscapeUtil.clean(values[i]).trim();
             }
             return escapesValues;
@@ -48,20 +50,20 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
     @Override
     public ServletInputStream getInputStream() throws IOException
     {
-        // 闈瀓son绫诲瀷锛岀洿鎺ヨ繑鍥?
+        // 非 JSON 类型请求，直接返回原始输入流
         if (!isJsonRequest())
         {
             return super.getInputStream();
         }
 
-        // 涓虹┖锛岀洿鎺ヨ繑鍥?
+        // 请求体为空时，直接返回原始输入流
         String json = IOUtils.toString(super.getInputStream(), "utf-8");
         if (StringUtils.isEmpty(json))
         {
             return super.getInputStream();
         }
 
-        // xss杩囨护
+        // 清理 JSON 内容中的 XSS 代码
         json = EscapeUtil.clean(json).trim();
         byte[] jsonBytes = json.getBytes("utf-8");
         final ByteArrayInputStream bis = new ByteArrayInputStream(jsonBytes);
@@ -99,9 +101,9 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper
     }
 
     /**
-     * 鏄惁鏄疛son璇锋眰
+     * 是否为 JSON 请求
      * 
-     * @param request
+     * @return 是否为 JSON 请求
      */
     public boolean isJsonRequest()
     {

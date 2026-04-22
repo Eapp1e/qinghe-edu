@@ -4,96 +4,96 @@ import java.util.List;
 import com.eapple.system.domain.SysPost;
 
 /**
- * 宀椾綅淇℃伅 鏈嶅姟灞?
- * 
+ * 岗位信息服务接口。
+ *
  * @author Eapp1e
  */
 public interface ISysPostService
 {
     /**
-     * 鏌ヨ宀椾綅淇℃伅闆嗗悎
-     * 
-     * @param post 宀椾綅淇℃伅
-     * @return 宀椾綅鍒楄〃
+     * 查询岗位信息集合。
+     *
+     * @param post 岗位条件
+     * @return 岗位集合
      */
     public List<SysPost> selectPostList(SysPost post);
 
     /**
-     * 鏌ヨ鎵€鏈夊矖浣?
-     * 
-     * @return 宀椾綅鍒楄〃
+     * 查询所有岗位。
+     *
+     * @return 岗位集合
      */
     public List<SysPost> selectPostAll();
 
     /**
-     * 閫氳繃宀椾綅ID鏌ヨ宀椾綅淇℃伅
-     * 
-     * @param postId 宀椾綅ID
-     * @return 瑙掕壊瀵硅薄淇℃伅
+     * 根据岗位 ID 查询岗位信息。
+     *
+     * @param postId 岗位 ID
+     * @return 岗位对象
      */
     public SysPost selectPostById(Long postId);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鑾峰彇宀椾綅閫夋嫨妗嗗垪琛?
-     * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 閫変腑宀椾綅ID鍒楄〃
+     * 根据用户 ID 获取岗位选择框列表。
+     *
+     * @param userId 用户 ID
+     * @return 岗位 ID 列表
      */
     public List<Long> selectPostListByUserId(Long userId);
 
     /**
-     * 鏍￠獙宀椾綅鍚嶇О
-     * 
-     * @param post 宀椾綅淇℃伅
-     * @return 缁撴灉
+     * 校验岗位名称是否唯一。
+     *
+     * @param post 岗位信息
+     * @return 校验结果
      */
     public boolean checkPostNameUnique(SysPost post);
 
     /**
-     * 鏍￠獙宀椾綅缂栫爜
-     * 
-     * @param post 宀椾綅淇℃伅
-     * @return 缁撴灉
+     * 校验岗位编码是否唯一。
+     *
+     * @param post 岗位信息
+     * @return 校验结果
      */
     public boolean checkPostCodeUnique(SysPost post);
 
     /**
-     * 閫氳繃宀椾綅ID鏌ヨ宀椾綅浣跨敤鏁伴噺
-     * 
-     * @param postId 宀椾綅ID
-     * @return 缁撴灉
+     * 根据岗位 ID 查询岗位使用数量。
+     *
+     * @param postId 岗位 ID
+     * @return 结果
      */
     public int countUserPostById(Long postId);
 
     /**
-     * 鍒犻櫎宀椾綅淇℃伅
-     * 
-     * @param postId 宀椾綅ID
-     * @return 缁撴灉
+     * 删除岗位信息。
+     *
+     * @param postId 岗位 ID
+     * @return 结果
      */
     public int deletePostById(Long postId);
 
     /**
-     * 鎵归噺鍒犻櫎宀椾綅淇℃伅
-     * 
-     * @param postIds 闇€瑕佸垹闄ょ殑宀椾綅ID
-     * @return 缁撴灉
+     * 批量删除岗位信息。
+     *
+     * @param postIds 需要删除的岗位 ID
+     * @return 结果
      */
     public int deletePostByIds(Long[] postIds);
 
     /**
-     * 鏂板淇濆瓨宀椾綅淇℃伅
-     * 
-     * @param post 宀椾綅淇℃伅
-     * @return 缁撴灉
+     * 新增岗位信息。
+     *
+     * @param post 岗位信息
+     * @return 结果
      */
     public int insertPost(SysPost post);
 
     /**
-     * 淇敼淇濆瓨宀椾綅淇℃伅
-     * 
-     * @param post 宀椾綅淇℃伅
-     * @return 缁撴灉
+     * 修改岗位信息。
+     *
+     * @param post 岗位信息
+     * @return 结果
      */
     public int updatePost(SysPost post);
 }

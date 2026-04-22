@@ -1,7 +1,7 @@
 package com.eapple.common.exception.user;
 
 /**
- * 鐢ㄦ埛瀵嗙爜涓嶆纭垨涓嶇鍚堣鑼冨紓甯哥被
+ * 用户密码不匹配异常类。
  * 
  * @author Eapp1e
  */

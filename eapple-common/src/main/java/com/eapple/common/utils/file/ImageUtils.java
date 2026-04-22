@@ -14,7 +14,7 @@ import com.eapple.common.constant.Constants;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 鍥剧墖澶勭悊宸ュ叿绫?
+ * 图片读取工具类。
  *
  * @author Eapp1e
  */
@@ -31,7 +31,7 @@ public class ImageUtils
         }
         catch (Exception e)
         {
-            log.error("鍥剧墖鍔犺浇寮傚父 {}", e);
+            log.error("读取图片失败 {}", e);
             return null;
         }
         finally
@@ -50,16 +50,16 @@ public class ImageUtils
         }
         catch (Exception e)
         {
-            log.error("鑾峰彇鍥剧墖寮傚父 {}", e);
+            log.error("获取图片文件失败 {}", e);
         }
         return null;
     }
 
     /**
-     * 璇诲彇鏂囦欢涓哄瓧鑺傛暟鎹?
-     * 
-     * @param url 鍦板潃
-     * @return 瀛楄妭鏁版嵁
+     * 读取图片为字节数组。
+     *
+     * @param url 图片地址
+     * @return 图片字节数组
      */
     public static byte[] readFile(String url)
     {
@@ -68,7 +68,6 @@ public class ImageUtils
         {
             if (url.startsWith("http"))
             {
-                // 缃戠粶鍦板潃
                 URL urlObj = new URL(url);
                 URLConnection urlConnection = urlObj.openConnection();
                 urlConnection.setConnectTimeout(30 * 1000);
@@ -78,7 +77,6 @@ public class ImageUtils
             }
             else
             {
-                // 鏈満鍦板潃
                 String localPath = PlatformConfig.getProfile();
                 String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
                 in = new FileInputStream(downloadPath);
@@ -87,7 +85,7 @@ public class ImageUtils
         }
         catch (Exception e)
         {
-            log.error("鑾峰彇鏂囦欢璺緞寮傚父 {}", e);
+            log.error("读取图片字节失败 {}", e);
             return null;
         }
         finally
@@ -96,4 +94,3 @@ public class ImageUtils
         }
     }
 }
-

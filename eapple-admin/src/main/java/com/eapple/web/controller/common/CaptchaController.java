@@ -21,8 +21,8 @@ import com.eapple.common.utils.uuid.IdUtils;
 import com.eapple.system.service.ISysConfigService;
 
 /**
- * 楠岃瘉鐮佹搷浣滃鐞?
- * 
+ * 验证码生成控制器。
+ *
  * @author Eapp1e
  */
 @RestController
@@ -36,11 +36,12 @@ public class CaptchaController
 
     @Autowired
     private RedisCache redisCache;
-    
+
     @Autowired
     private ISysConfigService configService;
+
     /**
-     * 鐢熸垚楠岃瘉鐮?
+     * 生成验证码。
      */
     @GetMapping("/captchaImage")
     public AjaxResult getCode(HttpServletResponse response) throws IOException
@@ -53,14 +54,13 @@ public class CaptchaController
             return ajax;
         }
 
-        // 淇濆瓨楠岃瘉鐮佷俊鎭?
         String uuid = IdUtils.simpleUUID();
         String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + uuid;
 
-        String capStr = null, code = null;
+        String capStr = null;
+        String code = null;
         BufferedImage image = null;
 
-        // 鐢熸垚楠岃瘉鐮?
         String captchaType = PlatformConfig.getCaptchaType();
         if ("math".equals(captchaType))
         {
@@ -76,7 +76,6 @@ public class CaptchaController
         }
 
         redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
-        // 杞崲娴佷俊鎭啓鍑?
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();
         try
         {
@@ -92,4 +91,3 @@ public class CaptchaController
         return ajax;
     }
 }
-

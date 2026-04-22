@@ -25,8 +25,8 @@ import com.eapple.system.service.ISysConfigService;
 import com.eapple.system.service.ISysMenuService;
 
 /**
- * 鐧诲綍楠岃瘉
- * 
+ * 登录认证控制器。
+ *
  * @author Eapp1e
  */
 @RestController
@@ -48,16 +48,15 @@ public class SysLoginController
     private ISysConfigService configService;
 
     /**
-     * 鐧诲綍鏂规硶
-     * 
-     * @param loginBody 鐧诲綍淇℃伅
-     * @return 缁撴灉
+     * 登录方法。
+     *
+     * @param loginBody 登录信息
+     * @return 登录结果
      */
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody)
     {
         AjaxResult ajax = AjaxResult.success();
-        // 鐢熸垚浠ょ墝
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid(), loginBody.getLoginRole());
         ajax.put(Constants.TOKEN, token);
@@ -65,18 +64,16 @@ public class SysLoginController
     }
 
     /**
-     * 鑾峰彇鐢ㄦ埛淇℃伅
-     * 
-     * @return 鐢ㄦ埛淇℃伅
+     * 获取用户信息。
+     *
+     * @return 用户信息
      */
     @GetMapping("getInfo")
     public AjaxResult getInfo()
     {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         SysUser user = loginUser.getUser();
-        // 瑙掕壊闆嗗悎
         Set<String> roles = permissionService.getRolePermission(user);
-        // 鏉冮檺闆嗗悎
         Set<String> permissions = permissionService.getMenuPermission(user);
         if (!loginUser.getPermissions().equals(permissions))
         {
@@ -93,9 +90,9 @@ public class SysLoginController
     }
 
     /**
-     * 鑾峰彇璺敱淇℃伅
-     * 
-     * @return 璺敱淇℃伅
+     * 获取路由信息。
+     *
+     * @return 路由信息
      */
     @GetMapping("getRouters")
     public AjaxResult getRouters()
@@ -104,15 +101,19 @@ public class SysLoginController
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(userId);
         return AjaxResult.success(menuService.buildMenus(menus));
     }
-    
-    // 妫€鏌ュ垵濮嬪瘑鐮佹槸鍚︽彁閱掍慨鏀?
+
+    /**
+     * 判断初始密码是否已修改。
+     */
     public boolean initPasswordIsModify(Date pwdUpdateDate)
     {
         Integer initPasswordModify = Convert.toInt(configService.selectConfigByKey("sys.account.initPasswordModify"));
         return initPasswordModify != null && initPasswordModify == 1 && pwdUpdateDate == null;
     }
 
-    // 妫€鏌ュ瘑鐮佹槸鍚﹁繃鏈?
+    /**
+     * 判断密码是否过期。
+     */
     public boolean passwordIsExpiration(Date pwdUpdateDate)
     {
         Integer passwordValidateDays = Convert.toInt(configService.selectConfigByKey("sys.account.passwordValidateDays"));
@@ -120,7 +121,6 @@ public class SysLoginController
         {
             if (StringUtils.isNull(pwdUpdateDate))
             {
-                // 濡傛灉浠庢湭淇敼杩囧垵濮嬪瘑鐮侊紝鐩存帴鎻愰啋杩囨湡
                 return true;
             }
             Date nowDate = DateUtils.getNowDate();

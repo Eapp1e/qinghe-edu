@@ -10,8 +10,8 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import com.eapple.common.constant.Constants;
 
 /**
- * 璧勬簮鏂囦欢閰嶇疆鍔犺浇
- * 
+ * 国际化语言配置。
+ *
  * @author Eapp1e
  */
 @Configuration
@@ -21,7 +21,7 @@ public class I18nConfig implements WebMvcConfigurer
     public LocaleResolver localeResolver()
     {
         SessionLocaleResolver slr = new SessionLocaleResolver();
-        // 榛樿璇█
+        // 默认语言
         slr.setDefaultLocale(Constants.DEFAULT_LOCALE);
         return slr;
     }
@@ -30,7 +30,7 @@ public class I18nConfig implements WebMvcConfigurer
     public LocaleChangeInterceptor localeChangeInterceptor()
     {
         LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-        // 鍙傛暟鍚?
+        // 语言参数名
         lci.setParamName("lang");
         return lci;
     }

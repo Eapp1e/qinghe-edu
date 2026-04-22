@@ -23,8 +23,8 @@ import com.eapple.system.domain.SysConfig;
 import com.eapple.system.service.ISysConfigService;
 
 /**
- * 鍙傛暟閰嶇疆 淇℃伅鎿嶄綔澶勭悊
- * 
+ * 参数配置管理控制器。
+ *
  * @author Eapp1e
  */
 @RestController
@@ -35,7 +35,7 @@ public class SysConfigController extends BaseController
     private ISysConfigService configService;
 
     /**
-     * 鑾峰彇鍙傛暟閰嶇疆鍒楄〃
+     * 获取参数配置列表。
      */
     @PreAuthorize("@ss.hasPermi('system:config:list')")
     @GetMapping("/list")
@@ -46,18 +46,18 @@ public class SysConfigController extends BaseController
         return getDataTable(list);
     }
 
-    @Log(title = "鍙傛暟绠＄悊", businessType = BusinessType.EXPORT)
+    @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:config:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysConfig config)
     {
         List<SysConfig> list = configService.selectConfigList(config);
         ExcelUtil<SysConfig> util = new ExcelUtil<SysConfig>(SysConfig.class);
-        util.exportExcel(response, list, "鍙傛暟鏁版嵁");
+        util.exportExcel(response, list, "参数数据");
     }
 
     /**
-     * 鏍规嵁鍙傛暟缂栧彿鑾峰彇璇︾粏淇℃伅
+     * 根据参数编号获取详细信息。
      */
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping(value = "/{configId}")
@@ -67,7 +67,7 @@ public class SysConfigController extends BaseController
     }
 
     /**
-     * 鏍规嵁鍙傛暟閿悕鏌ヨ鍙傛暟鍊?
+     * 根据参数键名查询参数值。
      */
     @GetMapping(value = "/configKey/{configKey}")
     public AjaxResult getConfigKey(@PathVariable String configKey)
@@ -76,42 +76,42 @@ public class SysConfigController extends BaseController
     }
 
     /**
-     * 鏂板鍙傛暟閰嶇疆
+     * 新增参数配置。
      */
     @PreAuthorize("@ss.hasPermi('system:config:add')")
-    @Log(title = "鍙傛暟绠＄悊", businessType = BusinessType.INSERT)
+    @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysConfig config)
     {
         if (!configService.checkConfigKeyUnique(config))
         {
-            return error("鏂板鍙傛暟'" + config.getConfigName() + "'澶辫触锛屽弬鏁伴敭鍚嶅凡瀛樺湪");
+            return error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
         config.setCreateBy(getUsername());
         return toAjax(configService.insertConfig(config));
     }
 
     /**
-     * 淇敼鍙傛暟閰嶇疆
+     * 修改参数配置。
      */
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
-    @Log(title = "鍙傛暟绠＄悊", businessType = BusinessType.UPDATE)
+    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysConfig config)
     {
         if (!configService.checkConfigKeyUnique(config))
         {
-            return error("淇敼鍙傛暟'" + config.getConfigName() + "'澶辫触锛屽弬鏁伴敭鍚嶅凡瀛樺湪");
+            return error("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
         config.setUpdateBy(getUsername());
         return toAjax(configService.updateConfig(config));
     }
 
     /**
-     * 鍒犻櫎鍙傛暟閰嶇疆
+     * 删除参数配置。
      */
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "鍙傛暟绠＄悊", businessType = BusinessType.DELETE)
+    @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public AjaxResult remove(@PathVariable Long[] configIds)
     {
@@ -120,10 +120,10 @@ public class SysConfigController extends BaseController
     }
 
     /**
-     * 鍒锋柊鍙傛暟缂撳瓨
+     * 刷新参数缓存。
      */
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "鍙傛暟绠＄悊", businessType = BusinessType.CLEAN)
+    @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
     public AjaxResult refreshCache()
     {

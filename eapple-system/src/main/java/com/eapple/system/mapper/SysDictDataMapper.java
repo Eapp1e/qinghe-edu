@@ -5,91 +5,91 @@ import org.apache.ibatis.annotations.Param;
 import com.eapple.common.core.domain.entity.SysDictData;
 
 /**
- * 瀛楀吀琛?鏁版嵁灞?
+ * 字典数据数据层。
  * 
  * @author Eapp1e
  */
 public interface SysDictDataMapper
 {
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ瀛楀吀鏁版嵁
+     * 根据条件分页查询字典数据。
      * 
-     * @param dictData 瀛楀吀鏁版嵁淇℃伅
-     * @return 瀛楀吀鏁版嵁闆嗗悎淇℃伅
+     * @param dictData 字典数据信息
+     * @return 字典数据集合
      */
     public List<SysDictData> selectDictDataList(SysDictData dictData);
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鏌ヨ瀛楀吀鏁版嵁
+     * 根据字典类型查询字典数据。
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀鏁版嵁闆嗗悎淇℃伅
+     * @param dictType 字典类型
+     * @return 字典数据集合
      */
     public List<SysDictData> selectDictDataByType(String dictType);
 
     /**
-     * 鏍规嵁瀛楀吀绫诲瀷鍜屽瓧鍏搁敭鍊兼煡璇㈠瓧鍏告暟鎹俊鎭?
+     * 根据字典类型和字典键值查询字典标签。
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @param dictValue 瀛楀吀閿€?
-     * @return 瀛楀吀鏍囩
+     * @param dictType 字典类型
+     * @param dictValue 字典键值
+     * @return 字典标签
      */
     public String selectDictLabel(@Param("dictType") String dictType, @Param("dictValue") String dictValue);
 
     /**
-     * 鏍规嵁瀛楀吀鏁版嵁ID鏌ヨ淇℃伅
+     * 根据字典数据 ID 查询信息。
      * 
-     * @param dictCode 瀛楀吀鏁版嵁ID
-     * @return 瀛楀吀鏁版嵁
+     * @param dictCode 字典数据 ID
+     * @return 字典数据
      */
     public SysDictData selectDictDataById(Long dictCode);
 
     /**
-     * 鏌ヨ瀛楀吀鏁版嵁
+     * 根据字典类型统计数据数量。
      * 
-     * @param dictType 瀛楀吀绫诲瀷
-     * @return 瀛楀吀鏁版嵁
+     * @param dictType 字典类型
+     * @return 结果
      */
     public int countDictDataByType(String dictType);
 
     /**
-     * 閫氳繃瀛楀吀ID鍒犻櫎瀛楀吀鏁版嵁淇℃伅
+     * 通过字典数据 ID 删除字典数据。
      * 
-     * @param dictCode 瀛楀吀鏁版嵁ID
-     * @return 缁撴灉
+     * @param dictCode 字典数据 ID
+     * @return 结果
      */
     public int deleteDictDataById(Long dictCode);
 
     /**
-     * 鎵归噺鍒犻櫎瀛楀吀鏁版嵁淇℃伅
+     * 批量删除字典数据。
      * 
-     * @param dictCodes 闇€瑕佸垹闄ょ殑瀛楀吀鏁版嵁ID
-     * @return 缁撴灉
+     * @param dictCodes 字典数据 ID 数组
+     * @return 结果
      */
     public int deleteDictDataByIds(Long[] dictCodes);
 
     /**
-     * 鏂板瀛楀吀鏁版嵁淇℃伅
+     * 新增字典数据。
      * 
-     * @param dictData 瀛楀吀鏁版嵁淇℃伅
-     * @return 缁撴灉
+     * @param dictData 字典数据信息
+     * @return 结果
      */
     public int insertDictData(SysDictData dictData);
 
     /**
-     * 淇敼瀛楀吀鏁版嵁淇℃伅
+     * 修改字典数据。
      * 
-     * @param dictData 瀛楀吀鏁版嵁淇℃伅
-     * @return 缁撴灉
+     * @param dictData 字典数据信息
+     * @return 结果
      */
     public int updateDictData(SysDictData dictData);
 
     /**
-     * 鍚屾淇敼瀛楀吀绫诲瀷
+     * 修改字典类型。
      * 
-     * @param oldDictType 鏃у瓧鍏哥被鍨?
-     * @param newDictType 鏂版棫瀛楀吀绫诲瀷
-     * @return 缁撴灉
+     * @param oldDictType 旧字典类型
+     * @param newDictType 新字典类型
+     * @return 结果
      */
     public int updateDictDataType(@Param("oldDictType") String oldDictType, @Param("newDictType") String newDictType);
 }

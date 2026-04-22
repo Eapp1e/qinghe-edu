@@ -1,22 +1,22 @@
-﻿package com.eapple.common.utils.file;
+package com.eapple.common.utils.file;
 
 import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 閺傚洣娆㈢猾璇茬€峰銉ュ徔缁?
+ * 文件类型工具类。
  *
  * @author Eapp1e
  */
 public class FileTypeUtils
 {
     /**
-     * 閼惧嘲褰囬弬鍥︽缁鐎?
+     * 获取文件扩展名。
      * <p>
-     * 娓氬顩? qinghe.txt, 鏉╂柨娲? txt
-     * 
-     * @param file 閺傚洣娆㈤崥?
-     * @return 閸氬海绱戦敍鍫滅瑝閸?.")
+     * 例如：qinghe.txt -> txt
+     *
+     * @param file 文件对象
+     * @return 文件扩展名
      */
     public static String getFileType(File file)
     {
@@ -28,12 +28,12 @@ public class FileTypeUtils
     }
 
     /**
-     * 閼惧嘲褰囬弬鍥︽缁鐎?
+     * 获取文件扩展名。
      * <p>
-     * 娓氬顩? qinghe.txt, 鏉╂柨娲? txt
+     * 例如：qinghe.txt -> txt
      *
-     * @param fileName 閺傚洣娆㈤崥?
-     * @return 閸氬海绱戦敍鍫滅瑝閸?.")
+     * @param fileName 文件名
+     * @return 文件扩展名
      */
     public static String getFileType(String fileName)
     {
@@ -46,10 +46,10 @@ public class FileTypeUtils
     }
 
     /**
-     * 閼惧嘲褰囬弬鍥︽缁鐎?
-     * 
-     * @param photoByte 閺傚洣娆㈢€涙濡惍?
-     * @return 閸氬海绱戦敍鍫滅瑝閸?.")
+     * 根据文件字节头判断图片扩展名。
+     *
+     * @param photoByte 图片字节数组
+     * @return 图片扩展名
      */
     public static String getFileExtendName(byte[] photoByte)
     {

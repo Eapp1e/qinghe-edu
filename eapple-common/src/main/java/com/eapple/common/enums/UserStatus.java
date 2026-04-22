@@ -1,13 +1,15 @@
 package com.eapple.common.enums;
 
 /**
- * 鐢ㄦ埛鐘舵€?
- * 
+ * 用户状态。
+ *
  * @author Eapp1e
  */
 public enum UserStatus
 {
-    OK("0", "姝ｅ父"), DISABLE("1", "鍋滅敤"), DELETED("2", "鍒犻櫎");
+    OK("0", "正常"),
+    DISABLE("1", "停用"),
+    DELETED("2", "删除");
 
     private final String code;
     private final String info;

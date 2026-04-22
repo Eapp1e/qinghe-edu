@@ -22,8 +22,8 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.common.utils.sql.SqlUtil;
 
 /**
- * web灞傞€氱敤鏁版嵁澶勭悊
- * 
+ * Web 控制器基类。
+ *
  * @author Eapp1e
  */
 public class BaseController
@@ -31,12 +31,11 @@ public class BaseController
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * 灏嗗墠鍙颁紶閫掕繃鏉ョ殑鏃ユ湡鏍煎紡鐨勫瓧绗︿覆锛岃嚜鍔ㄨ浆鍖栦负Date绫诲瀷
+     * 将日期字符串自动转换为 Date 对象。
      */
     @InitBinder
     public void initBinder(WebDataBinder binder)
     {
-        // Date 绫诲瀷杞崲
         binder.registerCustomEditor(Date.class, new PropertyEditorSupport()
         {
             @Override
@@ -48,7 +47,7 @@ public class BaseController
     }
 
     /**
-     * 璁剧疆璇锋眰鍒嗛〉鏁版嵁
+     * 开启分页。
      */
     protected void startPage()
     {
@@ -56,7 +55,7 @@ public class BaseController
     }
 
     /**
-     * 璁剧疆璇锋眰鎺掑簭鏁版嵁
+     * 开启排序。
      */
     protected void startOrderBy()
     {
@@ -69,7 +68,7 @@ public class BaseController
     }
 
     /**
-     * 娓呯悊鍒嗛〉鐨勭嚎绋嬪彉閲?
+     * 清理分页上下文。
      */
     protected void clearPage()
     {
@@ -77,21 +76,21 @@ public class BaseController
     }
 
     /**
-     * 鍝嶅簲璇锋眰鍒嗛〉鏁版嵁
+     * 封装分页表格数据。
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected TableDataInfo getDataTable(List<?> list)
     {
         TableDataInfo rspData = new TableDataInfo();
         rspData.setCode(HttpStatus.SUCCESS);
-        rspData.setMsg("鏌ヨ鎴愬姛");
+        rspData.setMsg("查询成功");
         rspData.setRows(list);
         rspData.setTotal(new PageInfo(list).getTotal());
         return rspData;
     }
 
     /**
-     * 杩斿洖鎴愬姛
+     * 返回成功结果。
      */
     public AjaxResult success()
     {
@@ -99,7 +98,7 @@ public class BaseController
     }
 
     /**
-     * 杩斿洖澶辫触娑堟伅
+     * 返回失败结果。
      */
     public AjaxResult error()
     {
@@ -107,15 +106,15 @@ public class BaseController
     }
 
     /**
-     * 杩斿洖鎴愬姛娑堟伅
+     * 返回成功结果并携带消息。
      */
     public AjaxResult success(String message)
     {
         return AjaxResult.success(message);
     }
-    
+
     /**
-     * 杩斿洖鎴愬姛娑堟伅
+     * 返回成功结果并携带数据。
      */
     public AjaxResult success(Object data)
     {
@@ -123,7 +122,7 @@ public class BaseController
     }
 
     /**
-     * 杩斿洖澶辫触娑堟伅
+     * 返回失败结果并携带消息。
      */
     public AjaxResult error(String message)
     {
@@ -131,7 +130,7 @@ public class BaseController
     }
 
     /**
-     * 杩斿洖璀﹀憡娑堟伅
+     * 返回警告结果。
      */
     public AjaxResult warn(String message)
     {
@@ -139,10 +138,10 @@ public class BaseController
     }
 
     /**
-     * 鍝嶅簲杩斿洖缁撴灉
-     * 
-     * @param rows 褰卞搷琛屾暟
-     * @return 鎿嶄綔缁撴灉
+     * 根据受影响行数返回执行结果。
+     *
+     * @param rows 受影响行数
+     * @return 执行结果
      */
     protected AjaxResult toAjax(int rows)
     {
@@ -150,10 +149,10 @@ public class BaseController
     }
 
     /**
-     * 鍝嶅簲杩斿洖缁撴灉
-     * 
-     * @param result 缁撴灉
-     * @return 鎿嶄綔缁撴灉
+     * 根据布尔结果返回执行结果。
+     *
+     * @param result 执行结果
+     * @return 响应对象
      */
     protected AjaxResult toAjax(boolean result)
     {
@@ -161,7 +160,7 @@ public class BaseController
     }
 
     /**
-     * 椤甸潰璺宠浆
+     * 返回重定向地址。
      */
     public String redirect(String url)
     {
@@ -169,7 +168,7 @@ public class BaseController
     }
 
     /**
-     * 鑾峰彇鐢ㄦ埛缂撳瓨淇℃伅
+     * 获取当前登录用户。
      */
     public LoginUser getLoginUser()
     {
@@ -177,7 +176,7 @@ public class BaseController
     }
 
     /**
-     * 鑾峰彇鐧诲綍鐢ㄦ埛id
+     * 获取当前登录用户编号。
      */
     public Long getUserId()
     {
@@ -185,7 +184,7 @@ public class BaseController
     }
 
     /**
-     * 鑾峰彇鐧诲綍閮ㄩ棬id
+     * 获取当前登录用户所属部门编号。
      */
     public Long getDeptId()
     {
@@ -193,7 +192,7 @@ public class BaseController
     }
 
     /**
-     * 鑾峰彇鐧诲綍鐢ㄦ埛鍚?
+     * 获取当前登录用户名。
      */
     public String getUsername()
     {

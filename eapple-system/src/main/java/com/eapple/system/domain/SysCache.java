@@ -3,22 +3,22 @@ package com.eapple.system.domain;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 缂撳瓨淇℃伅
+ * 缓存信息对象。
  * 
  * @author Eapp1e
  */
 public class SysCache
 {
-    /** 缂撳瓨鍚嶇О */
+    /** 缓存名称 */
     private String cacheName = "";
 
-    /** 缂撳瓨閿悕 */
+    /** 缓存键名 */
     private String cacheKey = "";
 
-    /** 缂撳瓨鍐呭 */
+    /** 缓存内容 */
     private String cacheValue = "";
 
-    /** 澶囨敞 */
+    /** 备注说明 */
     private String remark = "";
 
     public SysCache()

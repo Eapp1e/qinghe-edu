@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import com.alibaba.druid.pool.DruidDataSource;
 
 /**
- * druid 閰嶇疆灞炴€?
+ * Druid 数据源属性配置。
  * 
  * @author Eapp1e
  */
@@ -53,36 +53,37 @@ public class DruidProperties
 
     public DruidDataSource dataSource(DruidDataSource datasource)
     {
-        /** 閰嶇疆鍒濆鍖栧ぇ灏忋€佹渶灏忋€佹渶澶?*/
+        /** 配置连接池初始化与容量参数 */
         datasource.setInitialSize(initialSize);
         datasource.setMaxActive(maxActive);
         datasource.setMinIdle(minIdle);
 
-        /** 閰嶇疆鑾峰彇杩炴帴绛夊緟瓒呮椂鐨勬椂闂?*/
+        /** 配置获取连接等待超时 */
         datasource.setMaxWait(maxWait);
         
-        /** 閰嶇疆椹卞姩杩炴帴瓒呮椂鏃堕棿锛屾娴嬫暟鎹簱寤虹珛杩炴帴鐨勮秴鏃舵椂闂达紝鍗曚綅鏄绉?*/
+        /** 配置建立连接的超时时间，单位毫秒 */
         datasource.setConnectTimeout(connectTimeout);
         
-        /** 閰嶇疆缃戠粶瓒呮椂鏃堕棿锛岀瓑寰呮暟鎹簱鎿嶄綔瀹屾垚鐨勭綉缁滆秴鏃舵椂闂达紝鍗曚綅鏄绉?*/
+        /** 配置网络读写超时时间，单位毫秒 */
         datasource.setSocketTimeout(socketTimeout);
 
-        /** 閰嶇疆闂撮殧澶氫箙鎵嶈繘琛屼竴娆℃娴嬶紝妫€娴嬮渶瑕佸叧闂殑绌洪棽杩炴帴锛屽崟浣嶆槸姣 */
+        /** 配置空闲连接检测间隔，单位毫秒 */
         datasource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
 
-        /** 閰嶇疆涓€涓繛鎺ュ湪姹犱腑鏈€灏忋€佹渶澶х敓瀛樼殑鏃堕棿锛屽崟浣嶆槸姣 */
+        /** 配置连接最小和最大空闲存活时间，单位毫秒 */
         datasource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
         datasource.setMaxEvictableIdleTimeMillis(maxEvictableIdleTimeMillis);
 
         /**
-         * 鐢ㄦ潵妫€娴嬭繛鎺ユ槸鍚︽湁鏁堢殑sql锛岃姹傛槸涓€涓煡璇㈣鍙ワ紝甯哥敤select 'x'銆傚鏋渧alidationQuery涓簄ull锛宼estOnBorrow銆乼estOnReturn銆乼estWhileIdle閮戒笉浼氳捣浣滅敤銆?
+         * 用于检测连接是否有效的 SQL，通常使用 select 'x'。
+         * 如果 validationQuery 为空，则 testOnBorrow、testOnReturn、testWhileIdle 不会生效。
          */
         datasource.setValidationQuery(validationQuery);
-        /** 寤鸿閰嶇疆涓簍rue锛屼笉褰卞搷鎬ц兘锛屽苟涓斾繚璇佸畨鍏ㄦ€с€傜敵璇疯繛鎺ョ殑鏃跺€欐娴嬶紝濡傛灉绌洪棽鏃堕棿澶т簬timeBetweenEvictionRunsMillis锛屾墽琛寁alidationQuery妫€娴嬭繛鎺ユ槸鍚︽湁鏁堛€?*/
+        /** 建议配置为 true，在空闲检测时校验连接有效性 */
         datasource.setTestWhileIdle(testWhileIdle);
-        /** 鐢宠杩炴帴鏃舵墽琛寁alidationQuery妫€娴嬭繛鎺ユ槸鍚︽湁鏁堬紝鍋氫簡杩欎釜閰嶇疆浼氶檷浣庢€ц兘銆?*/
+        /** 获取连接时是否校验有效性，开启后会略微降低性能 */
         datasource.setTestOnBorrow(testOnBorrow);
-        /** 褰掕繕杩炴帴鏃舵墽琛寁alidationQuery妫€娴嬭繛鎺ユ槸鍚︽湁鏁堬紝鍋氫簡杩欎釜閰嶇疆浼氶檷浣庢€ц兘銆?*/
+        /** 归还连接时是否校验有效性，开启后会略微降低性能 */
         datasource.setTestOnReturn(testOnReturn);
         return datasource;
     }

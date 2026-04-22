@@ -1,35 +1,41 @@
-﻿# 鏁版嵁婧愰厤缃?spring:
+# 数据源配置
+spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
         druid:
-            # 涓诲簱鏁版嵁婧?            master:
+            # 主库数据源
+            master:
                 url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
                 username: root
                 password: 123456
-            # 浠庡簱鏁版嵁婧?            slave:
-                # 浠庢暟鎹簮寮€鍏筹紝榛樿鍏抽棴
+            # 从库数据源
+            slave:
+                # 从数据源开关，默认关闭
                 enabled: false
                 url:
                 username:
                 password:
-            # 鍒濆杩炴帴鏁?            initialSize: 5
-            # 鏈€灏忚繛鎺ユ睜鏁伴噺
+            # 初始连接数
+            initialSize: 5
+            # 最小连接池数量
             minIdle: 10
-            # 鏈€澶ц繛鎺ユ睜鏁伴噺
+            # 最大连接池数量
             maxActive: 20
-            # 鑾峰彇杩炴帴绛夊緟瓒呮椂鏃堕棿
+            # 获取连接等待超时时间
             maxWait: 60000
-            # 杩炴帴瓒呮椂鏃堕棿
+            # 连接超时时间
             connectTimeout: 30000
-            # 缃戠粶瓒呮椂鏃堕棿
+            # 网络超时时间
             socketTimeout: 60000
-            # 妫€娴嬬┖闂茶繛鎺ョ殑鏃堕棿闂撮殧锛屽崟浣嶆绉?            timeBetweenEvictionRunsMillis: 60000
-            # 杩炴帴鍦ㄦ睜涓殑鏈€灏忕敓瀛樻椂闂达紝鍗曚綅姣
+            # 检测空闲连接的时间间隔，单位毫秒
+            timeBetweenEvictionRunsMillis: 60000
+            # 连接在池中的最小生存时间，单位毫秒
             minEvictableIdleTimeMillis: 300000
-            # 杩炴帴鍦ㄦ睜涓殑鏈€澶х敓瀛樻椂闂达紝鍗曚綅姣
+            # 连接在池中的最大生存时间，单位毫秒
             maxEvictableIdleTimeMillis: 900000
-            # 妫€娴嬭繛鎺ユ槸鍚︽湁鏁?            validationQuery: SELECT 1 FROM DUAL
+            # 检测连接是否有效
+            validationQuery: SELECT 1 FROM DUAL
             testWhileIdle: true
             testOnBorrow: false
             testOnReturn: false
@@ -37,15 +43,16 @@
                 enabled: true
             statViewServlet:
                 enabled: true
-                # 鍏佽璁块棶鐨勭櫧鍚嶅崟锛岀暀绌鸿〃绀哄厑璁告墍鏈夊湴鍧€
+                # 允许访问的白名单，留空表示允许所有地址
                 allow:
                 url-pattern: /druid/*
-                # 鎺у埗鍙扮櫥褰曡处鍙峰瘑鐮?                login-username: qinghe
+                # 控制台登录账号密码
+                login-username: qinghe
                 login-password: 123456
             filter:
                 stat:
                     enabled: true
-                    # 鎱?SQL 璁板綍
+                    # 慢 SQL 记录
                     log-slow-sql: true
                     slow-sql-millis: 1000
                     merge-sql: true

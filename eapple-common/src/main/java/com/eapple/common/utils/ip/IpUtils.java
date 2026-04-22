@@ -7,23 +7,23 @@ import com.eapple.common.utils.ServletUtils;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 鑾峰彇IP鏂规硶
- * 
+ * IP 工具类。
+ *
  * @author Eapp1e
  */
 public class IpUtils
 {
     public final static String REGX_0_255 = "(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d)";
-    // 鍖归厤 ip
+    // IPv4 地址
     public final static String REGX_IP = "((" + REGX_0_255 + "\\.){3}" + REGX_0_255 + ")";
     public final static String REGX_IP_WILDCARD = "(((\\*\\.){3}\\*)|(" + REGX_0_255 + "(\\.\\*){3})|(" + REGX_0_255 + "\\." + REGX_0_255 + ")(\\.\\*){2}" + "|((" + REGX_0_255 + "\\.){3}\\*))";
-    // 鍖归厤缃戞
+    // IP 段
     public final static String REGX_IP_SEG = "(" + REGX_IP + "\\-" + REGX_IP + ")";
 
     /**
-     * 鑾峰彇瀹㈡埛绔疘P
-     * 
-     * @return IP鍦板潃
+     * 获取当前请求的 IP 地址。
+     *
+     * @return IP 地址
      */
     public static String getIpAddr()
     {
@@ -31,10 +31,10 @@ public class IpUtils
     }
 
     /**
-     * 鑾峰彇瀹㈡埛绔疘P
-     * 
-     * @param request 璇锋眰瀵硅薄
-     * @return IP鍦板潃
+     * 从请求对象中获取 IP 地址。
+     *
+     * @param request 请求对象
+     * @return IP 地址
      */
     public static String getIpAddr(HttpServletRequest request)
     {
@@ -69,10 +69,10 @@ public class IpUtils
     }
 
     /**
-     * 妫€鏌ユ槸鍚︿负鍐呴儴IP鍦板潃
-     * 
-     * @param ip IP鍦板潃
-     * @return 缁撴灉
+     * 判断是否为内网 IP。
+     *
+     * @param ip IP 地址
+     * @return 判断结果
      */
     public static boolean internalIp(String ip)
     {
@@ -81,10 +81,10 @@ public class IpUtils
     }
 
     /**
-     * 妫€鏌ユ槸鍚︿负鍐呴儴IP鍦板潃
-     * 
-     * @param addr byte鍦板潃
-     * @return 缁撴灉
+     * 判断字节数组形式的 IP 是否为内网地址。
+     *
+     * @param addr 字节数组形式的 IP
+     * @return 判断结果
      */
     private static boolean internalIp(byte[] addr)
     {
@@ -94,13 +94,10 @@ public class IpUtils
         }
         final byte b0 = addr[0];
         final byte b1 = addr[1];
-        // 10.x.x.x/8
         final byte SECTION_1 = 0x0A;
-        // 172.16.x.x/12
         final byte SECTION_2 = (byte) 0xAC;
         final byte SECTION_3 = (byte) 0x10;
         final byte SECTION_4 = (byte) 0x1F;
-        // 192.168.x.x/16
         final byte SECTION_5 = (byte) 0xC0;
         final byte SECTION_6 = (byte) 0xA8;
         switch (b0)
@@ -124,10 +121,10 @@ public class IpUtils
     }
 
     /**
-     * 灏咺Pv4鍦板潃杞崲鎴愬瓧鑺?
-     * 
-     * @param text IPv4鍦板潃
-     * @return byte 瀛楄妭
+     * 将 IPv4 字符串转换为字节数组。
+     *
+     * @param text IPv4 字符串
+     * @return 字节数组
      */
     public static byte[] textToNumericFormatV4(String text)
     {
@@ -212,9 +209,9 @@ public class IpUtils
     }
 
     /**
-     * 鑾峰彇IP鍦板潃
-     * 
-     * @return 鏈湴IP鍦板潃
+     * 获取本机 IP 地址。
+     *
+     * @return 本机 IP
      */
     public static String getHostIp()
     {
@@ -229,9 +226,9 @@ public class IpUtils
     }
 
     /**
-     * 鑾峰彇涓绘満鍚?
-     * 
-     * @return 鏈湴涓绘満鍚?
+     * 获取本机主机名。
+     *
+     * @return 主机名
      */
     public static String getHostName()
     {
@@ -242,24 +239,23 @@ public class IpUtils
         catch (UnknownHostException e)
         {
         }
-        return "鏈煡";
+        return "未知主机";
     }
 
     /**
-     * 浠庡绾у弽鍚戜唬鐞嗕腑鑾峰緱绗竴涓潪unknown IP鍦板潃
+     * 处理多级反向代理后的真实 IP。
      *
-     * @param ip 鑾峰緱鐨処P鍦板潃
-     * @return 绗竴涓潪unknown IP鍦板潃
+     * @param ip 多级代理透传的 IP
+     * @return 第一个非 unknown 的 IP
      */
     public static String getMultistageReverseProxyIp(String ip)
     {
-        // 澶氱骇鍙嶅悜浠ｇ悊妫€娴?
         if (ip != null && ip.indexOf(",") > 0)
         {
             final String[] ips = ip.trim().split(",");
             for (String subIp : ips)
             {
-                if (false == isUnknown(subIp))
+                if (!isUnknown(subIp))
                 {
                     ip = subIp;
                     break;
@@ -270,10 +266,11 @@ public class IpUtils
     }
 
     /**
-     * 妫€娴嬬粰瀹氬瓧绗︿覆鏄惁涓烘湭鐭ワ紝澶氱敤浜庢娴婬TTP璇锋眰鐩稿叧
+     * 判断是否为 unknown。
+     * 常用于 HTTP 请求头中的 IP 判断。
      *
-     * @param checkString 琚娴嬬殑瀛楃涓?
-     * @return 鏄惁鏈煡
+     * @param checkString 待判断字符串
+     * @return 判断结果
      */
     public static boolean isUnknown(String checkString)
     {
@@ -281,7 +278,7 @@ public class IpUtils
     }
 
     /**
-     * 鏄惁涓篒P
+     * 判断是否为 IP 地址。
      */
     public static boolean isIP(String ip)
     {
@@ -289,7 +286,7 @@ public class IpUtils
     }
 
     /**
-     * 鏄惁涓篒P锛屾垨 *涓洪棿闅旂殑閫氶厤绗﹀湴鍧€
+     * 判断是否为带通配符的 IP。
      */
     public static boolean isIpWildCard(String ip)
     {
@@ -297,7 +294,7 @@ public class IpUtils
     }
 
     /**
-     * 妫€娴嬪弬鏁版槸鍚﹀湪ip閫氶厤绗﹂噷
+     * 判断 IP 是否命中通配符规则。
      */
     public static boolean ipIsInWildCardNoCheck(String ipWildCard, String ip)
     {
@@ -316,7 +313,7 @@ public class IpUtils
     }
 
     /**
-     * 鏄惁涓虹壒瀹氭牸寮忓:鈥?0.10.10.1-10.10.10.99鈥濈殑ip娈靛瓧绗︿覆
+     * 判断是否为 IP 段，例如 10.10.10.1-10.10.10.99。
      */
     public static boolean isIPSegment(String ipSeg)
     {
@@ -324,7 +321,7 @@ public class IpUtils
     }
 
     /**
-     * 鍒ゆ柇ip鏄惁鍦ㄦ寚瀹氱綉娈典腑
+     * 判断 IP 是否位于指定 IP 段中。
      */
     public static boolean ipIsInNetNoCheck(String iparea, String ip)
     {
@@ -349,11 +346,11 @@ public class IpUtils
     }
 
     /**
-     * 鏍￠獙ip鏄惁绗﹀悎杩囨护涓茶鍒?
-     * 
-     * @param filter 杩囨护IP鍒楄〃,鏀寔鍚庣紑'*'閫氶厤,鏀寔缃戞濡?`10.10.10.1-10.10.10.99`
-     * @param ip 鏍￠獙IP鍦板潃
-     * @return boolean 缁撴灉
+     * 判断指定 IP 是否命中过滤规则。
+     *
+     * @param filter IP 过滤串，支持单个 IP、通配符和 IP 段
+     * @param ip 待校验 IP
+     * @return 是否命中
      */
     public static boolean isMatchedIp(String filter, String ip)
     {

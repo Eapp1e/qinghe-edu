@@ -1,8 +1,8 @@
 package com.eapple.common.exception;
 
 /**
- * 涓氬姟寮傚父
- * 
+ * 业务服务异常。
+ *
  * @author Eapp1e
  */
 public final class ServiceException extends RuntimeException
@@ -10,24 +10,22 @@ public final class ServiceException extends RuntimeException
     private static final long serialVersionUID = 1L;
 
     /**
-     * 閿欒鐮?
+     * 错误码。
      */
     private Integer code;
 
     /**
-     * 閿欒鎻愮ず
+     * 错误消息。
      */
     private String message;
 
     /**
-     * 閿欒鏄庣粏锛屽唴閮ㄨ皟璇曢敊璇?
-     *
-     * 鍜?{@link CommonResult#getDetailMessage()} 涓€鑷寸殑璁捐
+     * 错误详情，便于内部调试或统一响应封装。
      */
     private String detailMessage;
 
     /**
-     * 绌烘瀯閫犳柟娉曪紝閬垮厤鍙嶅簭鍒楀寲闂
+     * 空构造方法，避免反序列化问题。
      */
     public ServiceException()
     {

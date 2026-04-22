@@ -1,24 +1,24 @@
 package com.eapple.common.enums;
 
 /**
- * 鎿嶄綔浜虹被鍒?
- * 
+ * 操作人类别。
+ *
  * @author Eapp1e
  */
 public enum OperatorType
 {
     /**
-     * 鍏跺畠
+     * 其他。
      */
     OTHER,
 
     /**
-     * 鍚庡彴鐢ㄦ埛
+     * 后台用户。
      */
     MANAGE,
 
     /**
-     * 鎵嬫満绔敤鎴?
+     * 手机端用户。
      */
     MOBILE
 }

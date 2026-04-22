@@ -25,8 +25,8 @@ import org.springframework.util.ClassUtils;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * Mybatis鏀寔*鍖归厤鎵弿鍖?
- * 
+ * MyBatis 配置。
+ *
  * @author Eapp1e
  */
 @Configuration
@@ -39,7 +39,7 @@ public class MyBatisConfig
 
     public static String setTypeAliasesPackage(String typeAliasesPackage)
     {
-        ResourcePatternResolver resolver = (ResourcePatternResolver) new PathMatchingResourcePatternResolver();
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resolver);
         List<String> allResult = new ArrayList<String>();
         try
@@ -77,11 +77,12 @@ public class MyBatisConfig
             }
             if (allResult.size() > 0)
             {
-                typeAliasesPackage = String.join(",", (String[]) allResult.toArray(new String[0]));
+                typeAliasesPackage = String.join(",", allResult.toArray(new String[0]));
             }
             else
             {
-                throw new RuntimeException("mybatis typeAliasesPackage 璺緞鎵弿閿欒,鍙傛暟typeAliasesPackage:" + typeAliasesPackage + "鏈壘鍒颁换浣曞寘");
+                throw new RuntimeException("mybatis typeAliasesPackage 路径扫描错误，参数 typeAliasesPackage:"
+                        + typeAliasesPackage + " 未找到任何包");
             }
         }
         catch (IOException e)

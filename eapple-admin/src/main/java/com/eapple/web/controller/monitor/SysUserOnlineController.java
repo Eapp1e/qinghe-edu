@@ -24,8 +24,8 @@ import com.eapple.system.domain.SysUserOnline;
 import com.eapple.system.service.ISysUserOnlineService;
 
 /**
- * 鍦ㄧ嚎鐢ㄦ埛鐩戞帶
- * 
+ * 在线用户监控控制器。
+ *
  * @author Eapp1e
  */
 @RestController
@@ -70,10 +70,10 @@ public class SysUserOnlineController extends BaseController
     }
 
     /**
-     * 寮洪€€鐢ㄦ埛
+     * 强退用户。
      */
     @PreAuthorize("@ss.hasPermi('monitor:online:forceLogout')")
-    @Log(title = "鍦ㄧ嚎鐢ㄦ埛", businessType = BusinessType.FORCE)
+    @Log(title = "在线用户", businessType = BusinessType.FORCE)
     @DeleteMapping("/{tokenId}")
     public AjaxResult forceLogout(@PathVariable String tokenId)
     {

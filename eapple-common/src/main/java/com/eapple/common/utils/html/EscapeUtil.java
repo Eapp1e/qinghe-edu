@@ -3,8 +3,8 @@ package com.eapple.common.utils.html;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 杞箟鍜屽弽杞箟宸ュ叿绫?
- * 
+ * HTML 转义工具类。
+ *
  * @author Eapp1e
  */
 public class EscapeUtil
@@ -20,19 +20,19 @@ public class EscapeUtil
             TEXT[i] = new char[] { (char) i };
         }
 
-        // special HTML characters
-        TEXT['\''] = "&#039;".toCharArray(); // 鍗曞紩鍙?
-        TEXT['"'] = "&#34;".toCharArray(); // 鍙屽紩鍙?
-        TEXT['&'] = "&#38;".toCharArray(); // &绗?
-        TEXT['<'] = "&#60;".toCharArray(); // 灏忎簬鍙?
-        TEXT['>'] = "&#62;".toCharArray(); // 澶т簬鍙?
+        // 特殊 HTML 字符。
+        TEXT['\''] = "&#039;".toCharArray(); // 单引号
+        TEXT['"'] = "&#34;".toCharArray(); // 双引号
+        TEXT['&'] = "&#38;".toCharArray(); // &
+        TEXT['<'] = "&#60;".toCharArray(); // <
+        TEXT['>'] = "&#62;".toCharArray(); // >
     }
 
     /**
-     * 杞箟鏂囨湰涓殑HTML瀛楃涓哄畨鍏ㄧ殑瀛楃
-     * 
-     * @param text 琚浆涔夌殑鏂囨湰
-     * @return 杞箟鍚庣殑鏂囨湰
+     * 对文本进行转义。
+     *
+     * @param text 原始文本
+     * @return 转义后的文本
      */
     public static String escape(String text)
     {
@@ -40,10 +40,10 @@ public class EscapeUtil
     }
 
     /**
-     * 杩樺師琚浆涔夌殑HTML鐗规畩瀛楃
-     * 
-     * @param content 鍖呭惈杞箟绗︾殑HTML鍐呭
-     * @return 杞崲鍚庣殑瀛楃涓?
+     * 对转义后的文本进行反转义。
+     *
+     * @param content 已转义文本
+     * @return 反转义结果
      */
     public static String unescape(String content)
     {
@@ -51,10 +51,10 @@ public class EscapeUtil
     }
 
     /**
-     * 娓呴櫎鎵€鏈塇TML鏍囩锛屼絾鏄笉鍒犻櫎鏍囩鍐呯殑鍐呭
-     * 
-     * @param content 鏂囨湰
-     * @return 娓呴櫎鏍囩鍚庣殑鏂囨湰
+     * 清理 HTML 中的危险标签和脚本。
+     *
+     * @param content 原始内容
+     * @return 清理后的内容
      */
     public static String clean(String content)
     {
@@ -62,10 +62,10 @@ public class EscapeUtil
     }
 
     /**
-     * Escape缂栫爜
-     * 
-     * @param text 琚紪鐮佺殑鏂囨湰
-     * @return 缂栫爜鍚庣殑瀛楃
+     * Escape 编码。
+     *
+     * @param text 原始文本
+     * @return 编码后的文本
      */
     private static String encode(String text)
     {
@@ -93,7 +93,6 @@ public class EscapeUtil
                 tmp.append("%u");
                 if (c <= 0xfff)
                 {
-                    // issue#I49JU8@Gitee
                     tmp.append("0");
                 }
                 tmp.append(Integer.toString(c, 16));
@@ -103,10 +102,10 @@ public class EscapeUtil
     }
 
     /**
-     * Escape瑙ｇ爜
-     * 
-     * @param content 琚浆涔夌殑鍐呭
-     * @return 瑙ｇ爜鍚庣殑瀛楃涓?
+     * Escape 解码。
+     *
+     * @param content 已编码内容
+     * @return 解码后的文本
      */
     public static String decode(String content)
     {
@@ -116,7 +115,8 @@ public class EscapeUtil
         }
 
         StringBuilder tmp = new StringBuilder(content.length());
-        int lastPos = 0, pos = 0;
+        int lastPos = 0;
+        int pos = 0;
         char ch;
         while (lastPos < content.length())
         {
@@ -157,9 +157,6 @@ public class EscapeUtil
     {
         String html = "<script>alert(1);</script>";
         String escape = EscapeUtil.escape(html);
-        // String html = "<scr<script>ipt>alert(\"XSS\")</scr<script>ipt>";
-        // String html = "<123";
-        // String html = "123>";
         System.out.println("clean: " + EscapeUtil.clean(html));
         System.out.println("escape: " + escape);
         System.out.println("unescape: " + EscapeUtil.unescape(escape));

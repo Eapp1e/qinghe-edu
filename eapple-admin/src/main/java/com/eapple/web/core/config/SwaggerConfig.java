@@ -1,4 +1,4 @@
-﻿package com.eapple.web.core.config;
+package com.eapple.web.core.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,30 +12,30 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
- * Swagger2閻ㄥ嫭甯撮崣锝夊帳缂?
- * 
+ * OpenAPI 文档配置
+ *
  * @author Eapp1e
  */
 @Configuration
 public class SwaggerConfig
 {
-    /** 缁崵绮洪崺铏诡攨闁板秶鐤?*/
+    /** 平台基础配置 */
     @Autowired
     private PlatformConfig platformConfig;
-    
+
     /**
-     * 閼奉亜鐣炬稊澶屾畱 OpenAPI 鐎电钖?
+     * 自定义 OpenAPI 对象
      */
     @Bean
     public OpenAPI customOpenApi()
     {
         return new OpenAPI().components(new Components()
-            // 鐠佸墽鐤嗙拋銈堢槈閻ㄥ嫯顕Ч鍌氥仈
+            // 设置认证请求头
             .addSecuritySchemes("apikey", securityScheme()))
             .addSecurityItem(new SecurityRequirement().addList("apikey"))
             .info(getApiInfo());
     }
-    
+
     @Bean
     public SecurityScheme securityScheme()
     {
@@ -45,23 +45,20 @@ public class SwaggerConfig
             .in(SecurityScheme.In.HEADER)
             .scheme("Bearer");
     }
-    
+
     /**
-     * 濞ｈ濮為幗妯款洣娣団剝浼?
+     * 构建接口文档基础信息
      */
     public Info getApiInfo()
     {
         return new Info()
-            // 鐠佸墽鐤嗛弽鍥暯
-            .title("閺嶅洭顣介敍姘冲娓氭繄顓搁悶鍡欓兇缂佺剤閹恒儱褰涢弬鍥ㄣ€?)
-            // 閹诲繗鍫?
-            .description("閹诲繗鍫敍姘辨暏娴滃海顓搁悶鍡涙肠閸ャ垺妫楁稉瀣彆閸欏摜娈戞禍鍝勬喅娣団剝浼?閸忚渹缍嬮崠鍛XXX,XXX濡€虫健...")
-            // 娴ｆ粏鈧懍淇婇幁?
+            // 文档标题
+            .title("青禾智学课后服务平台接口文档")
+            // 文档描述
+            .description("用于展示青禾智学课后服务平台的后端接口、角色能力与业务数据访问说明。")
+            // 联系信息
             .contact(new Contact().name(platformConfig.getName()))
-            // 閻楀牊婀?
-            .version("閻楀牊婀伴崣?" + platformConfig.getVersion());
+            // 版本号
+            .version("v" + platformConfig.getVersion());
     }
 }
-
-
-

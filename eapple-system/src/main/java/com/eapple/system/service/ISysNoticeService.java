@@ -4,57 +4,57 @@ import java.util.List;
 import com.eapple.system.domain.SysNotice;
 
 /**
- * 鍏憡 鏈嶅姟灞?
+ * 公告服务接口
  * 
  * @author Eapp1e
  */
 public interface ISysNoticeService
 {
     /**
-     * 鏌ヨ鍏憡淇℃伅
+     * 查询公告信息
      * 
-     * @param noticeId 鍏憡ID
-     * @return 鍏憡淇℃伅
+     * @param noticeId 公告 ID
+     * @return 公告信息
      */
     public SysNotice selectNoticeById(Long noticeId);
 
     /**
-     * 鏌ヨ鍏憡鍒楄〃
+     * 查询公告列表
      * 
-     * @param notice 鍏憡淇℃伅
-     * @return 鍏憡闆嗗悎
+     * @param notice 公告信息
+     * @return 公告集合
      */
     public List<SysNotice> selectNoticeList(SysNotice notice);
 
     /**
-     * 鏂板鍏憡
+     * 新增公告
      * 
-     * @param notice 鍏憡淇℃伅
-     * @return 缁撴灉
+     * @param notice 公告信息
+     * @return 结果
      */
     public int insertNotice(SysNotice notice);
 
     /**
-     * 淇敼鍏憡
+     * 修改公告
      * 
-     * @param notice 鍏憡淇℃伅
-     * @return 缁撴灉
+     * @param notice 公告信息
+     * @return 结果
      */
     public int updateNotice(SysNotice notice);
 
     /**
-     * 鍒犻櫎鍏憡淇℃伅
+     * 删除公告信息
      * 
-     * @param noticeId 鍏憡ID
-     * @return 缁撴灉
+     * @param noticeId 公告 ID
+     * @return 结果
      */
     public int deleteNoticeById(Long noticeId);
 
     /**
-     * 鎵归噺鍒犻櫎鍏憡淇℃伅
+     * 批量删除公告信息
      * 
-     * @param noticeIds 闇€瑕佸垹闄ょ殑鍏憡ID
-     * @return 缁撴灉
+     * @param noticeIds 需要删除的公告 ID
+     * @return 结果
      */
     public int deleteNoticeByIds(Long[] noticeIds);
 }

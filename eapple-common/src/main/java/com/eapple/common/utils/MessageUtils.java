@@ -5,18 +5,18 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import com.eapple.common.utils.spring.SpringUtils;
 
 /**
- * 鑾峰彇i18n璧勬簮鏂囦欢
- * 
+ * 国际化消息工具类。
+ *
  * @author Eapp1e
  */
 public class MessageUtils
 {
     /**
-     * 鏍规嵁娑堟伅閿拰鍙傛暟 鑾峰彇娑堟伅 濮旀墭缁檚pring messageSource
+     * 根据消息键和参数获取国际化消息，委托给 Spring MessageSource。
      *
-     * @param code 娑堟伅閿?
-     * @param args 鍙傛暟
-     * @return 鑾峰彇鍥介檯鍖栫炕璇戝€?
+     * @param code 消息键
+     * @param args 参数
+     * @return 国际化消息内容
      */
     public static String message(String code, Object... args)
     {

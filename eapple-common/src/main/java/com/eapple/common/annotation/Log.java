@@ -9,10 +9,9 @@ import com.eapple.common.enums.BusinessType;
 import com.eapple.common.enums.OperatorType;
 
 /**
- * 鑷畾涔夋搷浣滄棩蹇楄褰曟敞瑙?
- * 
- * @author Eapp1e
+ * 操作日志注解。
  *
+ * @author Eapp1e
  */
 @Target({ ElementType.PARAMETER, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
@@ -20,32 +19,32 @@ import com.eapple.common.enums.OperatorType;
 public @interface Log
 {
     /**
-     * 妯″潡
+     * 模块标题。
      */
     public String title() default "";
 
     /**
-     * 鍔熻兘
+     * 业务类型。
      */
     public BusinessType businessType() default BusinessType.OTHER;
 
     /**
-     * 鎿嶄綔浜虹被鍒?
+     * 操作人类别。
      */
     public OperatorType operatorType() default OperatorType.MANAGE;
 
     /**
-     * 鏄惁淇濆瓨璇锋眰鐨勫弬鏁?
+     * 是否保存请求参数。
      */
     public boolean isSaveRequestData() default true;
 
     /**
-     * 鏄惁淇濆瓨鍝嶅簲鐨勫弬鏁?
+     * 是否保存响应数据。
      */
     public boolean isSaveResponseData() default true;
 
     /**
-     * 鎺掗櫎鎸囧畾鐨勮姹傚弬鏁?
+     * 需要排除的请求参数名。
      */
     public String[] excludeParamNames() default {};
 }

@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Excel娉ㄨВ闆?
- * 
+ * Excel 注解集合。
+ *
  * @author Eapp1e
  */
 @Target(ElementType.FIELD)

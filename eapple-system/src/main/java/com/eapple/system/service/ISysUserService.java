@@ -5,213 +5,212 @@ import java.util.List;
 import com.eapple.common.core.domain.entity.SysUser;
 
 /**
- * 鐢ㄦ埛 涓氬姟灞?
+ * 用户服务接口
  * 
  * @author Eapp1e
  */
 public interface ISysUserService
 {
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ鐢ㄦ埛鍒楄〃
+     * 根据条件分页查询用户列表
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 鐢ㄦ埛淇℃伅闆嗗悎淇℃伅
+     * @param user 用户信息
+     * @return 用户信息集合
      */
     public List<SysUser> selectUserList(SysUser user);
 
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ宸插垎閰嶇敤鎴疯鑹插垪琛?
+     * 根据条件分页查询已分配角色的用户列表
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 鐢ㄦ埛淇℃伅闆嗗悎淇℃伅
+     * @param user 用户信息
+     * @return 用户信息集合
      */
     public List<SysUser> selectAllocatedList(SysUser user);
 
     /**
-     * 鏍规嵁鏉′欢鍒嗛〉鏌ヨ鏈垎閰嶇敤鎴疯鑹插垪琛?
+     * 根据条件分页查询未分配角色的用户列表
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 鐢ㄦ埛淇℃伅闆嗗悎淇℃伅
+     * @param user 用户信息
+     * @return 用户信息集合
      */
     public List<SysUser> selectUnallocatedList(SysUser user);
 
     /**
-     * 閫氳繃鐢ㄦ埛鍚嶆煡璇㈢敤鎴?
+     * 通过用户名查询用户
      * 
-     * @param userName 鐢ㄦ埛鍚?
-     * @return 鐢ㄦ埛瀵硅薄淇℃伅
+     * @param userName 用户名
+     * @return 用户对象信息
      */
     public SysUser selectUserByUserName(String userName);
 
     /**
-     * 閫氳繃鐢ㄦ埛ID鏌ヨ鐢ㄦ埛
+     * 通过用户 ID 查询用户
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 鐢ㄦ埛瀵硅薄淇℃伅
+     * @param userId 用户 ID
+     * @return 用户对象信息
      */
     public SysUser selectUserById(Long userId);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ鐢ㄦ埛鎵€灞炶鑹茬粍
+     * 根据用户名查询所属角色组
      * 
-     * @param userName 鐢ㄦ埛鍚?
-     * @return 缁撴灉
+     * @param userName 用户名
+     * @return 结果
      */
     public String selectUserRoleGroup(String userName);
 
     /**
-     * 鏍规嵁鐢ㄦ埛ID鏌ヨ鐢ㄦ埛鎵€灞炲矖浣嶇粍
+     * 根据用户名查询所属岗位组
      * 
-     * @param userName 鐢ㄦ埛鍚?
-     * @return 缁撴灉
+     * @param userName 用户名
+     * @return 结果
      */
     public String selectUserPostGroup(String userName);
 
     /**
-     * 鏍￠獙鐢ㄦ埛鍚嶇О鏄惁鍞竴
+     * 校验用户名是否唯一
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public boolean checkUserNameUnique(SysUser user);
 
     /**
-     * 鏍￠獙鎵嬫満鍙风爜鏄惁鍞竴
+     * 校验手机号是否唯一
      *
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public boolean checkPhoneUnique(SysUser user);
 
     /**
-     * 鏍￠獙email鏄惁鍞竴
+     * 校验邮箱是否唯一
      *
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public boolean checkEmailUnique(SysUser user);
 
     /**
-     * 鏍￠獙鐢ㄦ埛鏄惁鍏佽鎿嶄綔
+     * 校验用户是否允许操作
      * 
-     * @param user 鐢ㄦ埛淇℃伅
+     * @param user 用户信息
      */
     public void checkUserAllowed(SysUser user);
 
     /**
-     * 鏍￠獙鐢ㄦ埛鏄惁鏈夋暟鎹潈闄?
+     * 校验用户是否具备数据权限
      * 
-     * @param userId 鐢ㄦ埛id
+     * @param userId 用户 ID
      */
     public void checkUserDataScope(Long userId);
 
     /**
-     * 鏂板鐢ㄦ埛淇℃伅
+     * 新增用户信息
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public int insertUser(SysUser user);
 
     /**
-     * 娉ㄥ唽鐢ㄦ埛淇℃伅
+     * 注册用户信息
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public boolean registerUser(SysUser user);
 
     /**
-     * 淇敼鐢ㄦ埛淇℃伅
+     * 修改用户信息
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public int updateUser(SysUser user);
 
     /**
-     * 鐢ㄦ埛鎺堟潈瑙掕壊
+     * 用户授权角色
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @param roleIds 瑙掕壊缁?
+     * @param userId 用户 ID
+     * @param roleIds 角色 ID 组
      */
     public void insertUserAuth(Long userId, Long[] roleIds);
 
     /**
-     * 淇敼鐢ㄦ埛鐘舵€?
+     * 修改用户状态
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public int updateUserStatus(SysUser user);
 
     /**
-     * 淇敼鐢ㄦ埛鍩烘湰淇℃伅
+     * 修改用户基本信息
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public int updateUserProfile(SysUser user);
 
     /**
-     * 淇敼鐢ㄦ埛澶村儚
+     * 修改用户头像
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @param avatar 澶村儚鍦板潃
-     * @return 缁撴灉
+     * @param userId 用户 ID
+     * @param avatar 头像地址
+     * @return 结果
      */
     public boolean updateUserAvatar(Long userId, String avatar);
 
     /**
-     * 鏇存柊鐢ㄦ埛鐧诲綍淇℃伅锛圛P鍜岀櫥褰曟椂闂达級
+     * 更新用户登录信息（IP 和登录时间）
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @param loginIp 鐧诲綍IP鍦板潃
-     * @param loginDate 鐧诲綍鏃堕棿
-     * @return 缁撴灉
+     * @param userId 用户 ID
+     * @param loginIp 登录 IP 地址
+     * @param loginDate 登录时间
      */
     public void updateLoginInfo(Long userId, String loginIp, Date loginDate);
 
     /**
-     * 閲嶇疆鐢ㄦ埛瀵嗙爜
+     * 重置密码
      * 
-     * @param user 鐢ㄦ埛淇℃伅
-     * @return 缁撴灉
+     * @param user 用户信息
+     * @return 结果
      */
     public int resetPwd(SysUser user);
 
     /**
-     * 閲嶇疆鐢ㄦ埛瀵嗙爜
+     * 重置用户密码
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @param password 瀵嗙爜
-     * @return 缁撴灉
+     * @param userId 用户 ID
+     * @param password 密码
+     * @return 结果
      */
     public int resetUserPwd(Long userId, String password);
 
     /**
-     * 閫氳繃鐢ㄦ埛ID鍒犻櫎鐢ㄦ埛
+     * 通过用户 ID 删除用户
      * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 缁撴灉
+     * @param userId 用户 ID
+     * @return 结果
      */
     public int deleteUserById(Long userId);
 
     /**
-     * 鎵归噺鍒犻櫎鐢ㄦ埛淇℃伅
+     * 批量删除用户信息
      * 
-     * @param userIds 闇€瑕佸垹闄ょ殑鐢ㄦ埛ID
-     * @return 缁撴灉
+     * @param userIds 需要删除的用户 ID
+     * @return 结果
      */
     public int deleteUserByIds(Long[] userIds);
 
     /**
-     * 瀵煎叆鐢ㄦ埛鏁版嵁
+     * 导入用户数据
      * 
-     * @param userList 鐢ㄦ埛鏁版嵁鍒楄〃
-     * @param isUpdateSupport 鏄惁鏇存柊鏀寔锛屽鏋滃凡瀛樺湪锛屽垯杩涜鏇存柊鏁版嵁
-     * @param operName 鎿嶄綔鐢ㄦ埛
-     * @return 缁撴灉
+     * @param userList 用户数据列表
+     * @param isUpdateSupport 是否支持更新，若已存在则更新数据
+     * @param operName 操作用户
+     * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
 }

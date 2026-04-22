@@ -14,7 +14,7 @@ import com.eapple.common.utils.SecurityUtils;
 import com.eapple.framework.security.context.AuthenticationContextHolder;
 
 /**
- * 鐧诲綍瀵嗙爜鏂规硶
+ * 登录密码校验处理。
  * 
  * @author Eapp1e
  */
@@ -31,10 +31,10 @@ public class SysPasswordService
     private int lockTime;
 
     /**
-     * 鐧诲綍璐︽埛瀵嗙爜閿欒娆℃暟缂撳瓨閿悕
+     * 登录账户密码错误次数缓存键名。
      * 
-     * @param username 鐢ㄦ埛鍚?
-     * @return 缂撳瓨閿甼ey
+     * @param username 用户名
+     * @return 缓存键 Key
      */
     private String getCacheKey(String username)
     {

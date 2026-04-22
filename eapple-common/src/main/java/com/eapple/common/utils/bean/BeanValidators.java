@@ -6,8 +6,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 
 /**
- * bean瀵硅薄灞炴€ч獙璇?
- * 
+ * Bean 校验工具类。
+ *
  * @author Eapp1e
  */
 public class BeanValidators

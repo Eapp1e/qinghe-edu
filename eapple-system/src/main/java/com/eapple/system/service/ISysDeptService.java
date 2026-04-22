@@ -5,128 +5,128 @@ import com.eapple.common.core.domain.TreeSelect;
 import com.eapple.common.core.domain.entity.SysDept;
 
 /**
- * 閮ㄩ棬绠＄悊 鏈嶅姟灞?
- * 
+ * 部门管理服务接口。
+ *
  * @author Eapp1e
  */
 public interface ISysDeptService
 {
     /**
-     * 鏌ヨ閮ㄩ棬绠＄悊鏁版嵁
-     * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 閮ㄩ棬淇℃伅闆嗗悎
+     * 查询部门管理数据。
+     *
+     * @param dept 部门条件
+     * @return 部门集合
      */
     public List<SysDept> selectDeptList(SysDept dept);
 
     /**
-     * 鏌ヨ閮ㄩ棬鏍戠粨鏋勪俊鎭?
-     * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 閮ㄩ棬鏍戜俊鎭泦鍚?
+     * 查询部门树结构信息。
+     *
+     * @param dept 部门条件
+     * @return 部门树列表
      */
     public List<TreeSelect> selectDeptTreeList(SysDept dept);
 
     /**
-     * 鏋勫缓鍓嶇鎵€闇€瑕佹爲缁撴瀯
-     * 
-     * @param depts 閮ㄩ棬鍒楄〃
-     * @return 鏍戠粨鏋勫垪琛?
+     * 构建前端所需的部门树结构。
+     *
+     * @param depts 部门列表
+     * @return 部门树
      */
     public List<SysDept> buildDeptTree(List<SysDept> depts);
 
     /**
-     * 鏋勫缓鍓嶇鎵€闇€瑕佷笅鎷夋爲缁撴瀯
-     * 
-     * @param depts 閮ㄩ棬鍒楄〃
-     * @return 涓嬫媺鏍戠粨鏋勫垪琛?
+     * 构建前端所需的下拉树结构。
+     *
+     * @param depts 部门列表
+     * @return 下拉树列表
      */
     public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts);
 
     /**
-     * 鏍规嵁瑙掕壊ID鏌ヨ閮ㄩ棬鏍戜俊鎭?
-     * 
-     * @param roleId 瑙掕壊ID
-     * @return 閫変腑閮ㄩ棬鍒楄〃
+     * 根据角色 ID 查询部门树信息。
+     *
+     * @param roleId 角色 ID
+     * @return 已选择的部门列表
      */
     public List<Long> selectDeptListByRoleId(Long roleId);
 
     /**
-     * 鏍规嵁閮ㄩ棬ID鏌ヨ淇℃伅
-     * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 閮ㄩ棬淇℃伅
+     * 根据部门 ID 查询信息。
+     *
+     * @param deptId 部门 ID
+     * @return 部门信息
      */
     public SysDept selectDeptById(Long deptId);
 
     /**
-     * 鏍规嵁ID鏌ヨ鎵€鏈夊瓙閮ㄩ棬锛堟甯哥姸鎬侊級
-     * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 瀛愰儴闂ㄦ暟
+     * 根据 ID 查询所有正常子部门数量。
+     *
+     * @param deptId 部门 ID
+     * @return 子部门数量
      */
     public int selectNormalChildrenDeptById(Long deptId);
 
     /**
-     * 鏄惁瀛樺湪閮ㄩ棬瀛愯妭鐐?
-     * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉
+     * 查询部门是否存在子部门。
+     *
+     * @param deptId 部门 ID
+     * @return true 存在，false 不存在
      */
     public boolean hasChildByDeptId(Long deptId);
 
     /**
-     * 鏌ヨ閮ㄩ棬鏄惁瀛樺湪鐢ㄦ埛
-     * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉 true 瀛樺湪 false 涓嶅瓨鍦?
+     * 查询部门是否存在用户。
+     *
+     * @param deptId 部门 ID
+     * @return true 存在，false 不存在
      */
     public boolean checkDeptExistUser(Long deptId);
 
     /**
-     * 鏍￠獙閮ㄩ棬鍚嶇О鏄惁鍞竴
-     * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 缁撴灉
+     * 校验部门名称是否唯一。
+     *
+     * @param dept 部门信息
+     * @return 校验结果
      */
     public boolean checkDeptNameUnique(SysDept dept);
 
     /**
-     * 鏍￠獙閮ㄩ棬鏄惁鏈夋暟鎹潈闄?
-     * 
-     * @param deptId 閮ㄩ棬id
+     * 校验部门数据权限。
+     *
+     * @param deptId 部门 ID
      */
     public void checkDeptDataScope(Long deptId);
 
     /**
-     * 鏂板淇濆瓨閮ㄩ棬淇℃伅
-     * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 缁撴灉
+     * 新增部门信息。
+     *
+     * @param dept 部门信息
+     * @return 结果
      */
     public int insertDept(SysDept dept);
 
     /**
-     * 淇敼淇濆瓨閮ㄩ棬淇℃伅
-     * 
-     * @param dept 閮ㄩ棬淇℃伅
-     * @return 缁撴灉
+     * 修改部门信息。
+     *
+     * @param dept 部门信息
+     * @return 结果
      */
     public int updateDept(SysDept dept);
 
     /**
-     * 淇濆瓨閮ㄩ棬鎺掑簭
+     * 修改部门排序。
      *
-     * @param deptIds 閮ㄩ棬ID鏁扮粍
-     * @param orderNums 鎺掑簭鏁扮粍
+     * @param deptIds 部门 ID 数组
+     * @param orderNums 排序值数组
      */
     public void updateDeptSort(String[] deptIds, String[] orderNums);
 
     /**
-     * 鍒犻櫎閮ㄩ棬绠＄悊淇℃伅
-     * 
-     * @param deptId 閮ㄩ棬ID
-     * @return 缁撴灉
+     * 删除部门信息。
+     *
+     * @param deptId 部门 ID
+     * @return 结果
      */
     public int deleteDeptById(Long deptId);
 }

@@ -5,14 +5,14 @@ import java.io.StringWriter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
- * 閿欒淇℃伅澶勭悊绫汇€?
+ * 异常信息工具类。
  *
  * @author Eapp1e
  */
 public class ExceptionUtil
 {
     /**
-     * 鑾峰彇exception鐨勮缁嗛敊璇俊鎭€?
+     * 获取异常的详细堆栈信息。
      */
     public static String getExceptionMessage(Throwable e)
     {
@@ -21,6 +21,9 @@ public class ExceptionUtil
         return sw.toString();
     }
 
+    /**
+     * 获取异常根因的错误信息。
+     */
     public static String getRootErrorMessage(Exception e)
     {
         Throwable root = ExceptionUtils.getRootCause(e);

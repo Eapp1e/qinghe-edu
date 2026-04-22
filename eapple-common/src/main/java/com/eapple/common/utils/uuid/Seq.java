@@ -5,39 +5,42 @@ import com.eapple.common.utils.DateUtils;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * @author Eapp1e 搴忓垪鐢熸垚绫?
+ * 顺序号生成器。
+ *
+ * @author Eapp1e
  */
 public class Seq
 {
-    // 閫氱敤搴忓垪绫诲瀷
+    /** 通用序列类型 */
     public static final String commSeqType = "COMMON";
 
-    // 涓婁紶搴忓垪绫诲瀷
+    /** 上传序列类型 */
     public static final String uploadSeqType = "UPLOAD";
 
-    // 閫氱敤鎺ュ彛搴忓垪鏁?
+    /** 通用序列计数器 */
     private static AtomicInteger commSeq = new AtomicInteger(1);
 
-    // 涓婁紶鎺ュ彛搴忓垪鏁?
+    /** 上传序列计数器 */
     private static AtomicInteger uploadSeq = new AtomicInteger(1);
 
-    // 鏈哄櫒鏍囪瘑
+    /** 机器标识 */
     private static final String machineCode = "A";
 
     /**
-     * 鑾峰彇閫氱敤搴忓垪鍙?
-     * 
-     * @return 搴忓垪鍊?
+     * 获取默认顺序号。
+     *
+     * @return 顺序号
      */
     public static String getId()
     {
         return getId(commSeqType);
     }
-    
+
     /**
-     * 榛樿16浣嶅簭鍒楀彿 yyMMddHHmmss + 涓€浣嶆満鍣ㄦ爣璇?+ 3闀垮害寰幆閫掑瀛楃涓?
-     * 
-     * @return 搴忓垪鍊?
+     * 生成 16 位顺序号：yyMMddHHmmss + 机器码 + 3 位序号。
+     *
+     * @param type 序列类型
+     * @return 顺序号
      */
     public static String getId(String type)
     {
@@ -50,11 +53,11 @@ public class Seq
     }
 
     /**
-     * 閫氱敤鎺ュ彛搴忓垪鍙?yyMMddHHmmss + 涓€浣嶆満鍣ㄦ爣璇?+ length闀垮害寰幆閫掑瀛楃涓?
-     * 
-     * @param atomicInt 搴忓垪鏁?
-     * @param length 鏁板€奸暱搴?
-     * @return 搴忓垪鍊?
+     * 生成顺序号：yyMMddHHmmss + 机器码 + 指定位数序号。
+     *
+     * @param atomicInt 序列计数器
+     * @param length 序号位数
+     * @return 顺序号
      */
     public static String getId(AtomicInteger atomicInt, int length)
     {
@@ -65,22 +68,20 @@ public class Seq
     }
 
     /**
-     * 搴忓垪寰幆閫掑瀛楃涓瞇1, 10 鐨?(length)骞傛鏂?, 鐢?宸﹁ˉ榻恖ength浣嶆暟
-     * 
-     * @return 搴忓垪鍊?
+     * 生成指定长度的序号。
+     *
+     * @param atomicInt 序列计数器
+     * @param length 序号位数
+     * @return 序号字符串
      */
     private synchronized static String getSeq(AtomicInteger atomicInt, int length)
     {
-        // 鍏堝彇鍊煎啀+1
         int value = atomicInt.getAndIncrement();
-
-        // 濡傛灉鏇存柊鍚庡€?=10 鐨?(length)骞傛鏂瑰垯閲嶇疆涓?
         int maxSeq = (int) Math.pow(10, length);
         if (atomicInt.get() >= maxSeq)
         {
             atomicInt.set(1);
         }
-        // 杞瓧绗︿覆锛岀敤0宸﹁ˉ榻?
         return StringUtils.padl(value, length);
     }
 }

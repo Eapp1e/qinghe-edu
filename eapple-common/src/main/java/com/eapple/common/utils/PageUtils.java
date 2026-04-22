@@ -6,14 +6,14 @@ import com.eapple.common.core.page.TableSupport;
 import com.eapple.common.utils.sql.SqlUtil;
 
 /**
- * 鍒嗛〉宸ュ叿绫?
- * 
+ * 分页工具类。
+ *
  * @author Eapp1e
  */
 public class PageUtils extends PageHelper
 {
     /**
-     * 璁剧疆璇锋眰鍒嗛〉鏁版嵁
+     * 开启分页。
      */
     public static void startPage()
     {
@@ -26,7 +26,7 @@ public class PageUtils extends PageHelper
     }
 
     /**
-     * 娓呯悊鍒嗛〉鐨勭嚎绋嬪彉閲?
+     * 清理分页上下文。
      */
     public static void clearPage()
     {

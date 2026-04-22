@@ -1,20 +1,19 @@
 package com.eapple.common.enums;
 
 /**
- * 闄愭祦绫诲瀷
+ * 限流类型。
  *
  * @author Eapp1e
  */
-
 public enum LimitType
 {
     /**
-     * 榛樿绛栫暐鍏ㄥ眬闄愭祦
+     * 默认策略，按全局维度限流。
      */
     DEFAULT,
 
     /**
-     * 鏍规嵁璇锋眰鑰匢P杩涜闄愭祦
+     * 按请求 IP 维度限流。
      */
     IP
 }

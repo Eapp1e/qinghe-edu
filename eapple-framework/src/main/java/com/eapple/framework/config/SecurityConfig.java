@@ -20,8 +20,8 @@ import com.eapple.framework.security.handle.AuthenticationEntryPointImpl;
 import com.eapple.framework.security.handle.LogoutSuccessHandlerImpl;
 
 /**
- * spring security閰嶇疆
- * 
+ * Spring Security 配置。
+ *
  * @author Eapp1e
  */
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -29,96 +29,95 @@ import com.eapple.framework.security.handle.LogoutSuccessHandlerImpl;
 public class SecurityConfig
 {
     /**
-     * 璁よ瘉澶辫触澶勭悊绫?
+     * 认证失败处理器。
      */
     @Autowired
     private AuthenticationEntryPointImpl unauthorizedHandler;
 
     /**
-     * 閫€鍑哄鐞嗙被
+     * 退出成功处理器。
      */
     @Autowired
     private LogoutSuccessHandlerImpl logoutSuccessHandler;
 
     /**
-     * token璁よ瘉杩囨护鍣?
+     * JWT 认证过滤器。
      */
     @Autowired
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
-    
+
     /**
-     * 璺ㄥ煙杩囨护鍣?
+     * CORS 过滤器。
      */
     @Autowired
     private CorsFilter corsFilter;
 
     /**
-     * 鍏佽鍖垮悕璁块棶鐨勫湴鍧€
+     * 允许匿名访问的地址配置。
      */
     @Autowired
     private PermitAllUrlProperties permitAllUrl;
 
-	/**
-	 * 韬唤楠岃瘉瀹炵幇
-	 */
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception 
-	{
-		return authenticationConfiguration.getAuthenticationManager();
-	}
+    /**
+     * 认证管理器。
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception
+    {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     /**
-     * anyRequest          |   鍖归厤鎵€鏈夎姹傝矾寰?
-     * access              |   SpringEl琛ㄨ揪寮忕粨鏋滀负true鏃跺彲浠ヨ闂?
-     * anonymous           |   鍖垮悕鍙互璁块棶
-     * denyAll             |   鐢ㄦ埛涓嶈兘璁块棶
-     * fullyAuthenticated  |   鐢ㄦ埛瀹屽叏璁よ瘉鍙互璁块棶锛堥潪remember-me涓嬭嚜鍔ㄧ櫥褰曪級
-     * hasAnyAuthority     |   濡傛灉鏈夊弬鏁帮紝鍙傛暟琛ㄧず鏉冮檺锛屽垯鍏朵腑浠讳綍涓€涓潈闄愬彲浠ヨ闂?
-     * hasAnyRole          |   濡傛灉鏈夊弬鏁帮紝鍙傛暟琛ㄧず瑙掕壊锛屽垯鍏朵腑浠讳綍涓€涓鑹插彲浠ヨ闂?
-     * hasAuthority        |   濡傛灉鏈夊弬鏁帮紝鍙傛暟琛ㄧず鏉冮檺锛屽垯鍏舵潈闄愬彲浠ヨ闂?
-     * hasIpAddress        |   濡傛灉鏈夊弬鏁帮紝鍙傛暟琛ㄧずIP鍦板潃锛屽鏋滅敤鎴稩P鍜屽弬鏁板尮閰嶏紝鍒欏彲浠ヨ闂?
-     * hasRole             |   濡傛灉鏈夊弬鏁帮紝鍙傛暟琛ㄧず瑙掕壊锛屽垯鍏惰鑹插彲浠ヨ闂?
-     * permitAll           |   鐢ㄦ埛鍙互浠绘剰璁块棶
-     * rememberMe          |   鍏佽閫氳繃remember-me鐧诲綍鐨勭敤鎴疯闂?
-     * authenticated       |   鐢ㄦ埛鐧诲綍鍚庡彲璁块棶
+     * access              | Spring EL 表达式结果为 true 时允许访问
+     * anonymous           | 匿名用户可访问
+     * denyAll             | 拒绝所有访问
+     * fullyAuthenticated  | 完全认证后可访问，不包含 remember-me 自动登录
+     * hasAnyAuthority     | 拥有任意一个指定权限即可访问
+     * hasAnyRole          | 拥有任意一个指定角色即可访问
+     * hasAuthority        | 拥有指定权限即可访问
+     * hasIpAddress        | 请求 IP 符合配置时允许访问
+     * hasRole             | 拥有指定角色即可访问
+     * permitAll           | 允许任意访问
+     * rememberMe          | 通过 remember-me 登录的用户可访问
+     * authenticated       | 登录后可访问
      */
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception
     {
         return httpSecurity
-            // CSRF绂佺敤锛屽洜涓轰笉浣跨敤session
+            // 禁用 CSRF，因为当前系统不依赖 session
             .csrf(csrf -> csrf.disable())
-            // 绂佺敤HTTP鍝嶅簲鏍囧ご
+            // 允许同源 iframe，并关闭默认缓存控制头
             .headers((headersCustomizer) -> {
                 headersCustomizer.cacheControl(cache -> cache.disable()).frameOptions(options -> options.sameOrigin());
             })
-            // 璁よ瘉澶辫触澶勭悊绫?
+            // 认证失败处理
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-            // 鍩轰簬token锛屾墍浠ヤ笉闇€瑕乻ession
+            // 基于 token，无需创建 session
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 娉ㄨВ鏍囪鍏佽鍖垮悕璁块棶鐨剈rl
+            // 配置请求授权规则
             .authorizeHttpRequests((requests) -> {
                 permitAllUrl.getUrls().forEach(url -> requests.requestMatchers(url).permitAll());
-                // 瀵逛簬鐧诲綍login 娉ㄥ唽register 楠岃瘉鐮乧aptchaImage 鍏佽鍖垮悕璁块棶
+                // 登录、注册、验证码接口允许匿名访问
                 requests.requestMatchers("/login", "/register", "/captchaImage").permitAll()
-                    // 闈欐€佽祫婧愶紝鍙尶鍚嶈闂?
+                    // 静态资源允许匿名访问
                     .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**.html", "/**.css", "/**.js", "/profile/**").permitAll()
                     .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**", "/druid/**").permitAll()
-                    // 闄や笂闈㈠鐨勬墍鏈夎姹傚叏閮ㄩ渶瑕侀壌鏉冭璇?
+                    // 其余请求全部需要认证
                     .anyRequest().authenticated();
             })
-            // 娣诲姞Logout filter
+            // 添加退出过滤器
             .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
-            // 娣诲姞JWT filter
+            // 添加 JWT 过滤器
             .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            // 娣诲姞CORS filter
+            // 添加 CORS 过滤器
             .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
             .addFilterBefore(corsFilter, LogoutFilter.class)
             .build();
     }
 
     /**
-     * 寮烘暎鍒楀搱甯屽姞瀵嗗疄鐜?
+     * 强散列哈希加密实现。
      */
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder()

@@ -1,7 +1,7 @@
 package com.eapple.common.exception.user;
 
 /**
- * 鐢ㄦ埛涓嶅瓨鍦ㄥ紓甯哥被
+ * 用户不存在异常类。
  * 
  * @author Eapp1e
  */

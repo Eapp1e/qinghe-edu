@@ -14,15 +14,14 @@ import com.eapple.common.core.domain.model.LoginUser;
 import com.eapple.common.exception.ServiceException;
 
 /**
- * 瀹夊叏鏈嶅姟宸ュ叿绫?
- * 
+ * 安全工具类。
+ *
  * @author Eapp1e
  */
 public class SecurityUtils
 {
-
     /**
-     * 鐢ㄦ埛ID
+     * 获取当前用户编号。
      **/
     public static Long getUserId()
     {
@@ -32,12 +31,12 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("鑾峰彇鐢ㄦ埛ID寮傚父", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("获取当前用户 ID 失败", HttpStatus.UNAUTHORIZED);
         }
     }
 
     /**
-     * 鑾峰彇閮ㄩ棬ID
+     * 获取当前用户所属部门编号。
      **/
     public static Long getDeptId()
     {
@@ -47,12 +46,12 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("鑾峰彇閮ㄩ棬ID寮傚父", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("获取当前部门 ID 失败", HttpStatus.UNAUTHORIZED);
         }
     }
 
     /**
-     * 鑾峰彇鐢ㄦ埛璐︽埛
+     * 获取当前用户名。
      **/
     public static String getUsername()
     {
@@ -62,12 +61,12 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("鑾峰彇鐢ㄦ埛璐︽埛寮傚父", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("获取当前用户名失败", HttpStatus.UNAUTHORIZED);
         }
     }
 
     /**
-     * 鑾峰彇鐢ㄦ埛
+     * 获取当前登录用户。
      **/
     public static LoginUser getLoginUser()
     {
@@ -77,12 +76,12 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("鑾峰彇鐢ㄦ埛淇℃伅寮傚父", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("获取当前登录用户信息失败", HttpStatus.UNAUTHORIZED);
         }
     }
 
     /**
-     * 鑾峰彇Authentication
+     * 获取当前认证信息。
      */
     public static Authentication getAuthentication()
     {
@@ -90,10 +89,10 @@ public class SecurityUtils
     }
 
     /**
-     * 鐢熸垚BCryptPasswordEncoder瀵嗙爜
+     * 使用 BCrypt 对密码进行加密。
      *
-     * @param password 瀵嗙爜
-     * @return 鍔犲瘑瀛楃涓?
+     * @param password 明文密码
+     * @return 加密后的密码
      */
     public static String encryptPassword(String password)
     {
@@ -102,11 +101,11 @@ public class SecurityUtils
     }
 
     /**
-     * 鍒ゆ柇瀵嗙爜鏄惁鐩稿悓
+     * 校验明文密码与加密密码是否匹配。
      *
-     * @param rawPassword 鐪熷疄瀵嗙爜
-     * @param encodedPassword 鍔犲瘑鍚庡瓧绗?
-     * @return 缁撴灉
+     * @param rawPassword 明文密码
+     * @param encodedPassword 加密后的密码
+     * @return 是否匹配
      */
     public static boolean matchesPassword(String rawPassword, String encodedPassword)
     {
@@ -115,9 +114,9 @@ public class SecurityUtils
     }
 
     /**
-     * 鏄惁涓虹鐞嗗憳
-     * 
-     * @return 缁撴灉
+     * 判断当前用户是否为管理员。
+     *
+     * @return 是否为管理员
      */
     public static boolean isAdmin()
     {
@@ -125,10 +124,10 @@ public class SecurityUtils
     }
 
     /**
-     * 鏄惁涓虹鐞嗗憳
-     * 
-     * @param userId 鐢ㄦ埛ID
-     * @return 缁撴灉
+     * 根据用户编号判断是否为管理员。
+     *
+     * @param userId 用户编号
+     * @return 是否为管理员
      */
     public static boolean isAdmin(Long userId)
     {
@@ -136,10 +135,10 @@ public class SecurityUtils
     }
 
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁鍏峰鏌愭潈闄?
-     * 
-     * @param permission 鏉冮檺瀛楃涓?
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愭潈闄?
+     * 判断当前用户是否具备指定权限。
+     *
+     * @param permission 权限标识
+     * @return 是否具备权限
      */
     public static boolean hasPermi(String permission)
     {
@@ -147,11 +146,11 @@ public class SecurityUtils
     }
 
     /**
-     * 鍒ゆ柇鏄惁鍖呭惈鏉冮檺
-     * 
-     * @param authorities 鏉冮檺鍒楄〃
-     * @param permission 鏉冮檺瀛楃涓?
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愭潈闄?
+     * 判断权限集合中是否包含指定权限。
+     *
+     * @param authorities 权限集合
+     * @param permission 权限标识
+     * @return 是否具备权限
      */
     public static boolean hasPermi(Collection<String> authorities, String permission)
     {
@@ -160,10 +159,10 @@ public class SecurityUtils
     }
 
     /**
-     * 楠岃瘉鐢ㄦ埛鏄惁鎷ユ湁鏌愪釜瑙掕壊
-     * 
-     * @param role 瑙掕壊鏍囪瘑
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愯鑹?
+     * 判断当前用户是否拥有指定角色。
+     *
+     * @param role 角色标识
+     * @return 是否拥有指定角色
      */
     public static boolean hasRole(String role)
     {
@@ -186,11 +185,11 @@ public class SecurityUtils
     }
 
     /**
-     * 鍒ゆ柇鏄惁鍖呭惈瑙掕壊
-     * 
-     * @param roles 瑙掕壊鍒楄〃
-     * @param role 瑙掕壊
-     * @return 鐢ㄦ埛鏄惁鍏峰鏌愯鑹叉潈闄?
+     * 判断角色集合中是否包含指定角色。
+     *
+     * @param roles 角色集合
+     * @param role 角色标识
+     * @return 是否拥有指定角色
      */
     public static boolean hasRole(Collection<String> roles, String role)
     {
@@ -210,5 +209,4 @@ public class SecurityUtils
         return roles.stream().filter(StringUtils::hasText)
                 .anyMatch(x -> PatternMatchUtils.simpleMatch(x, role));
     }
-
 }

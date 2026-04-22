@@ -10,26 +10,25 @@ import com.eapple.common.utils.StringUtils;
 import com.eapple.common.utils.http.HttpUtils;
 
 /**
- * 鑾峰彇鍦板潃绫?
- * 
+ * IP 地址解析工具类。
+ *
  * @author Eapp1e
  */
 public class AddressUtils
 {
     private static final Logger log = LoggerFactory.getLogger(AddressUtils.class);
 
-    // IP鍦板潃鏌ヨ
+    /** IP 地址查询接口 */
     public static final String IP_URL = "https://whois.pconline.com.cn/ipJson.jsp";
 
-    // 鏈煡鍦板潃
+    /** 未知地址 */
     public static final String UNKNOWN = "XX XX";
 
     public static String getRealAddressByIP(String ip)
     {
-        // 鍐呯綉涓嶆煡璇?
         if (IpUtils.internalIp(ip))
         {
-            return "鍐呯綉IP";
+            return "内网 IP";
         }
         if (PlatformConfig.isAddressEnabled())
         {
@@ -38,7 +37,7 @@ public class AddressUtils
                 String rspStr = HttpUtils.sendGet(IP_URL, "ip=" + ip + "&json=true", Constants.GBK);
                 if (StringUtils.isEmpty(rspStr))
                 {
-                    log.error("鑾峰彇鍦扮悊浣嶇疆寮傚父 {}", ip);
+                    log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;
                 }
                 JSONObject obj = JSON.parseObject(rspStr);
@@ -48,10 +47,9 @@ public class AddressUtils
             }
             catch (Exception e)
             {
-                log.error("鑾峰彇鍦扮悊浣嶇疆寮傚父 {}", ip);
+                log.error("获取地理位置异常 {}", ip);
             }
         }
         return UNKNOWN;
     }
 }
-

@@ -5,8 +5,8 @@ import java.nio.charset.StandardCharsets;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * 瀛楃闆嗗伐鍏风被
- * 
+ * 字符集工具类。
+ *
  * @author Eapp1e
  */
 public class CharsetKit
@@ -26,9 +26,9 @@ public class CharsetKit
     public static final Charset CHARSET_GBK = Charset.forName(GBK);
 
     /**
-     * 杞崲涓篊harset瀵硅薄
-     * 
-     * @param charset 瀛楃闆嗭紝涓虹┖鍒欒繑鍥為粯璁ゅ瓧绗﹂泦
+     * 转换为 Charset 对象。
+     *
+     * @param charset 字符集名称，空时返回系统默认字符集
      * @return Charset
      */
     public static Charset charset(String charset)
@@ -37,12 +37,12 @@ public class CharsetKit
     }
 
     /**
-     * 杞崲瀛楃涓茬殑瀛楃闆嗙紪鐮?
-     * 
-     * @param source 瀛楃涓?
-     * @param srcCharset 婧愬瓧绗﹂泦锛岄粯璁SO-8859-1
-     * @param destCharset 鐩爣瀛楃闆嗭紝榛樿UTF-8
-     * @return 杞崲鍚庣殑瀛楃闆?
+     * 将字符串从源字符集转换为目标字符集。
+     *
+     * @param source 原始字符串
+     * @param srcCharset 源字符集，默认 ISO-8859-1
+     * @param destCharset 目标字符集，默认 UTF-8
+     * @return 转换后的字符串
      */
     public static String convert(String source, String srcCharset, String destCharset)
     {
@@ -50,12 +50,12 @@ public class CharsetKit
     }
 
     /**
-     * 杞崲瀛楃涓茬殑瀛楃闆嗙紪鐮?
-     * 
-     * @param source 瀛楃涓?
-     * @param srcCharset 婧愬瓧绗﹂泦锛岄粯璁SO-8859-1
-     * @param destCharset 鐩爣瀛楃闆嗭紝榛樿UTF-8
-     * @return 杞崲鍚庣殑瀛楃闆?
+     * 将字符串从源字符集转换为目标字符集。
+     *
+     * @param source 原始字符串
+     * @param srcCharset 源字符集，默认 ISO-8859-1
+     * @param destCharset 目标字符集，默认 UTF-8
+     * @return 转换后的字符串
      */
     public static String convert(String source, Charset srcCharset, Charset destCharset)
     {
@@ -77,7 +77,7 @@ public class CharsetKit
     }
 
     /**
-     * @return 绯荤粺瀛楃闆嗙紪鐮?
+     * 获取系统默认字符集编码。
      */
     public static String systemCharset()
     {

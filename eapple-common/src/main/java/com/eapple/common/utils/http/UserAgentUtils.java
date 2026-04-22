@@ -7,15 +7,15 @@ import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 /**
- * UserAgent瑙ｆ瀽宸ュ叿绫?
- * 
+ * User-Agent 解析工具类。
+ *
  * @author Eapp1e
  */
 public class UserAgentUtils
 {
     public static final String UNKNOWN = "";
 
-    // 娴忚鍣ㄦ鍒欒〃杈惧紡妯″紡
+    // 浏览器匹配规则。
     private static final Pattern CHROME_PATTERN = Pattern.compile("Chrome/(\\d+)(?:\\.\\d+)*");
     private static final Pattern FIREFOX_PATTERN = Pattern.compile("Firefox/(\\d+)(?:\\.\\d+)*");
     private static final Pattern EDGE_PATTERN = Pattern.compile("Edg(?:e)?/(\\d+)(?:\\.\\d+)*");
@@ -28,7 +28,7 @@ public class UserAgentUtils
     private static final Pattern WECHAT_PATTERN = Pattern.compile("MicroMessenger/(\\d+)(?:\\.\\d+)*");
     private static final Pattern BAIDU_PATTERN = Pattern.compile("baidubrowser/(\\d+)(?:\\.\\d+)*");
 
-    // 鎿嶄綔绯荤粺姝ｅ垯琛ㄨ揪寮忔ā寮?
+    // 操作系统匹配规则。
     private static final Pattern WINDOWS_PATTERN = Pattern.compile("Windows NT (\\d+\\.\\d+)");
     private static final Pattern MACOS_PATTERN = Pattern.compile("Mac OS X (\\d+[_\\d]*)");
     private static final Pattern ANDROID_PATTERN = Pattern.compile("Android (\\d+)(?:\\.\\d+)*");
@@ -45,7 +45,7 @@ public class UserAgentUtils
             .build();
 
     /**
-     * 鑾峰彇瀹㈡埛绔祻瑙堝櫒
+     * 获取浏览器名称与版本。
      */
     public static String getBrowser(String userAgent)
     {
@@ -59,7 +59,7 @@ public class UserAgentUtils
     }
 
     /**
-     * 鑾峰彇瀹㈡埛绔搷浣滅郴缁?
+     * 获取操作系统名称与版本。
      */
     public static String getOperatingSystem(String userAgent)
     {
@@ -73,71 +73,60 @@ public class UserAgentUtils
     }
 
     /**
-     * 鍏ㄩ潰娴忚鍣ㄦ娴?
+     * 手动格式化浏览器信息。
      */
     private static String formatBrowser(String browser)
     {
-        // Chrome绯诲垪娴忚鍣?
         Matcher chromeMatcher = CHROME_PATTERN.matcher(browser);
         if (chromeMatcher.find() && (browser.contains("Chrome") || browser.contains("CriOS")))
         {
             return "Chrome" + chromeMatcher.group(1);
         }
-        // Firefox
         Matcher firefoxMatcher = FIREFOX_PATTERN.matcher(browser);
         if (firefoxMatcher.find())
         {
             return "Firefox" + firefoxMatcher.group(1);
         }
-        // Edge娴忚鍣?
         Matcher edgeMatcher = EDGE_PATTERN.matcher(browser);
         if (edgeMatcher.find())
         {
             return "Edge" + edgeMatcher.group(1);
         }
-        // Safari娴忚鍣紙闇€鎺掗櫎Chrome锛?
         Matcher safariMatcher = SAFARI_PATTERN.matcher(browser);
         if (safariMatcher.find() && !browser.contains("Chrome"))
         {
             return "Safari" + safariMatcher.group(1);
         }
-        // 寰俊鍐呯疆娴忚鍣?
         Matcher wechatMatcher = WECHAT_PATTERN.matcher(browser);
         if (wechatMatcher.find())
         {
             return "WeChat" + wechatMatcher.group(1);
         }
-        // UC娴忚鍣?
         Matcher ucMatcher = UC_PATTERN.matcher(browser);
         if (ucMatcher.find())
         {
             return "UC Browser" + ucMatcher.group(1);
         }
-        // QQ娴忚鍣?
         Matcher qqMatcher = QQ_PATTERN.matcher(browser);
         if (qqMatcher.find())
         {
             return "QQ Browser" + qqMatcher.group(1);
         }
-        // 鐧惧害娴忚鍣?
         Matcher baiduMatcher = BAIDU_PATTERN.matcher(browser);
         if (baiduMatcher.find())
         {
             return "Baidu Browser" + baiduMatcher.group(1);
         }
-        // Samsung娴忚鍣?
         Matcher samsungMatcher = SAMSUNG_PATTERN.matcher(browser);
         if (samsungMatcher.find())
         {
             return "Samsung Browser" + samsungMatcher.group(1);
         }
-        // Opera娴忚鍣?
         Matcher operaMatcher = OPERA_PATTERN.matcher(browser);
         if (operaMatcher.find())
         {
             return "Opera" + operaMatcher.group(1);
         }
-        // IE娴忚鍣?
         Matcher ieMatcher = IE_PATTERN.matcher(browser);
         if (ieMatcher.find())
         {
@@ -147,41 +136,35 @@ public class UserAgentUtils
     }
 
     /**
-     * 妫€娴嬫搷浣滅郴缁?
+     * 手动格式化操作系统信息。
      */
     private static String formatOperatingSystem(String operatingSystem)
     {
-        // Windows绯荤粺
         Matcher windowsMatcher = WINDOWS_PATTERN.matcher(operatingSystem);
         if (windowsMatcher.find())
         {
             return "Windows" + getWindowsVersionDisplay(windowsMatcher.group(1));
         }
-        // macOS绯荤粺
         Matcher macMatcher = MACOS_PATTERN.matcher(operatingSystem);
         if (macMatcher.find())
         {
             String version = macMatcher.group(1).replace("_", ".");
             return "macOS" + extractMajorVersion(version);
         }
-        // Android绯荤粺
         Matcher androidMatcher = ANDROID_PATTERN.matcher(operatingSystem);
         if (androidMatcher.find())
         {
             return "Android" + extractMajorVersion(androidMatcher.group(1));
         }
-        // iOS绯荤粺
         Matcher iosMatcher = IOS_PATTERN.matcher(operatingSystem);
         if (iosMatcher.find() && (operatingSystem.contains("iPhone") || operatingSystem.contains("iPad")))
         {
             return "iOS" + extractMajorVersion(iosMatcher.group(1));
         }
-        // Linux绯荤粺
         if (LINUX_PATTERN.matcher(operatingSystem).find() && !operatingSystem.contains("Android"))
         {
             return "Linux";
         }
-        // Chrome OS
         if (CHROMEOS_PATTERN.matcher(operatingSystem).find())
         {
             return "Chrome OS";
@@ -190,7 +173,7 @@ public class UserAgentUtils
     }
 
     /**
-     * 鎻愬彇浼樺寲鐨勪富鐗堟湰鍙?
+     * 提取主版本号。
      */
     private static String extractMajorVersion(String fullVersion)
     {
@@ -200,7 +183,6 @@ public class UserAgentUtils
         }
         try
         {
-            // 娓呯悊鐗堟湰鍙蜂腑鐨勯潪鏁板瓧瀛楃
             String cleanVersion = fullVersion.replaceAll("[^0-9.]", "");
             String[] parts = cleanVersion.split("\\.");
             if (parts.length > 0)
@@ -209,8 +191,6 @@ public class UserAgentUtils
                 if (firstPart.matches("\\d+"))
                 {
                     int version = Integer.parseInt(firstPart);
-
-                    // 澶勭悊涓変綅鏁扮増鏈彿锛堝142 -> 14锛?
                     if (version >= 100)
                     {
                         return String.valueOf(version / 10);
@@ -221,13 +201,13 @@ public class UserAgentUtils
         }
         catch (NumberFormatException e)
         {
-            // 鐗堟湰鍙疯В鏋愬け璐ワ紝杩斿洖鍘熷鍊?
+            // 版本号异常时返回原值。
         }
         return fullVersion;
     }
 
     /**
-     * Windows鐗堟湰鍙锋樉绀轰紭鍖?
+     * 将 Windows 内部版本号转换为显示版本。
      */
     private static String getWindowsVersionDisplay(String version)
     {

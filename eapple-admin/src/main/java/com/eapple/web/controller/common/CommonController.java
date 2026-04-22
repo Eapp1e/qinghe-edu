@@ -21,8 +21,8 @@ import com.eapple.common.utils.file.FileUtils;
 import com.eapple.framework.config.ServerConfig;
 
 /**
- * 閫氱敤璇锋眰澶勭悊
- * 
+ * 通用请求处理控制器。
+ *
  * @author Eapp1e
  */
 @RestController
@@ -37,10 +37,10 @@ public class CommonController
     private static final String FILE_DELIMITER = ",";
 
     /**
-     * 閫氱敤涓嬭浇璇锋眰
-     * 
-     * @param fileName 鏂囦欢鍚嶇О
-     * @param delete 鏄惁鍒犻櫎
+     * 通用下载请求。
+     *
+     * @param fileName 文件名称
+     * @param delete 下载后是否删除源文件
      */
     @GetMapping("/download")
     public void fileDownload(String fileName, Boolean delete, HttpServletResponse response, HttpServletRequest request)
@@ -49,7 +49,7 @@ public class CommonController
         {
             if (!FileUtils.checkAllowDownload(fileName))
             {
-                throw new Exception(StringUtils.format("鏂囦欢鍚嶇О({})闈炴硶锛屼笉鍏佽涓嬭浇銆?", fileName));
+                throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。", fileName));
             }
             String realFileName = System.currentTimeMillis() + fileName.substring(fileName.indexOf("_") + 1);
             String filePath = PlatformConfig.getDownloadPath() + fileName;
@@ -64,21 +64,19 @@ public class CommonController
         }
         catch (Exception e)
         {
-            log.error("涓嬭浇鏂囦欢澶辫触", e);
+            log.error("下载文件失败", e);
         }
     }
 
     /**
-     * 閫氱敤涓婁紶璇锋眰锛堝崟涓級
+     * 通用上传请求（单个）。
      */
     @PostMapping("/upload")
     public AjaxResult uploadFile(MultipartFile file) throws Exception
     {
         try
         {
-            // 涓婁紶鏂囦欢璺緞
             String filePath = PlatformConfig.getUploadPath();
-            // 涓婁紶骞惰繑鍥炴柊鏂囦欢鍚嶇О
             String fileName = FileUploadUtils.upload(filePath, file);
             String url = serverConfig.getUrl() + fileName;
             AjaxResult ajax = AjaxResult.success();
@@ -95,14 +93,13 @@ public class CommonController
     }
 
     /**
-     * 閫氱敤涓婁紶璇锋眰锛堝涓級
+     * 通用上传请求（多个）。
      */
     @PostMapping("/uploads")
     public AjaxResult uploadFiles(List<MultipartFile> files) throws Exception
     {
         try
         {
-            // 涓婁紶鏂囦欢璺緞
             String filePath = PlatformConfig.getUploadPath();
             List<String> urls = new ArrayList<String>();
             List<String> fileNames = new ArrayList<String>();
@@ -110,7 +107,6 @@ public class CommonController
             List<String> originalFilenames = new ArrayList<String>();
             for (MultipartFile file : files)
             {
-                // 涓婁紶骞惰繑鍥炴柊鏂囦欢鍚嶇О
                 String fileName = FileUploadUtils.upload(filePath, file);
                 String url = serverConfig.getUrl() + fileName;
                 urls.add(url);
@@ -132,7 +128,7 @@ public class CommonController
     }
 
     /**
-     * 鏈湴璧勬簮閫氱敤涓嬭浇
+     * 本地资源下载请求。
      */
     @GetMapping("/download/resource")
     public void resourceDownload(String resource, HttpServletRequest request, HttpServletResponse response)
@@ -142,13 +138,10 @@ public class CommonController
         {
             if (!FileUtils.checkAllowDownload(resource))
             {
-                throw new Exception(StringUtils.format("璧勬簮鏂囦欢({})闈炴硶锛屼笉鍏佽涓嬭浇銆?", resource));
+                throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。", resource));
             }
-            // 鏈湴璧勬簮璺緞
             String localPath = PlatformConfig.getProfile();
-            // 鏁版嵁搴撹祫婧愬湴鍧€
             String downloadPath = localPath + FileUtils.stripPrefix(resource);
-            // 涓嬭浇鍚嶇О
             String downloadName = StringUtils.substringAfterLast(downloadPath, "/");
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, downloadName);
@@ -156,8 +149,7 @@ public class CommonController
         }
         catch (Exception e)
         {
-            log.error("涓嬭浇鏂囦欢澶辫触", e);
+            log.error("下载资源文件失败", e);
         }
     }
 }
-

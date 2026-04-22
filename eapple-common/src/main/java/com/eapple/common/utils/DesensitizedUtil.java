@@ -1,17 +1,17 @@
 package com.eapple.common.utils;
 
 /**
- * 鑴辨晱宸ュ叿绫?
+ * 脱敏工具类。
  *
  * @author Eapp1e
  */
 public class DesensitizedUtil
 {
     /**
-     * 瀵嗙爜鐨勫叏閮ㄥ瓧绗﹂兘鐢?浠ｆ浛锛屾瘮濡傦細******
+     * 密码脱敏，全部替换为星号。
      *
-     * @param password 瀵嗙爜
-     * @return 鑴辨晱鍚庣殑瀵嗙爜
+     * @param password 原始密码
+     * @return 脱敏后的密码
      */
     public static String password(String password)
     {
@@ -23,10 +23,11 @@ public class DesensitizedUtil
     }
 
     /**
-     * 杞︾墝涓棿鐢?浠ｆ浛锛屽鏋滄槸閿欒鐨勮溅鐗岋紝涓嶅鐞?
+     * 车牌号脱敏。
+     * 常规车牌保留前三位，新能源车牌适当多保留一位。
      *
-     * @param carLicense 瀹屾暣鐨勮溅鐗屽彿
-     * @return 鑴辨晱鍚庣殑杞︾墝
+     * @param carLicense 原始车牌号
+     * @return 脱敏后的车牌号
      */
     public static String carLicense(String carLicense)
     {
@@ -34,14 +35,12 @@ public class DesensitizedUtil
         {
             return StringUtils.EMPTY;
         }
-        // 鏅€氳溅鐗?
         if (carLicense.length() == 7)
         {
             carLicense = StringUtils.hide(carLicense, 3, 6);
         }
         else if (carLicense.length() == 8)
         {
-            // 鏂拌兘婧愯溅鐗?
             carLicense = StringUtils.hide(carLicense, 3, 7);
         }
         return carLicense;

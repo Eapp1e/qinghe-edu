@@ -9,11 +9,11 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import com.eapple.common.utils.http.HttpHelper;
 import com.eapple.common.constant.Constants;
+import com.eapple.common.utils.http.HttpHelper;
 
 /**
- * 鏋勫缓鍙噸澶嶈鍙杋nputStream鐨剅equest
+ * 构建可重复读取 InputStream 的请求包装类
  * 
  * @author Eapp1e
  */

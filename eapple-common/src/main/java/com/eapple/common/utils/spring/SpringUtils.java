@@ -12,37 +12,37 @@ import org.springframework.stereotype.Component;
 import com.eapple.common.utils.StringUtils;
 
 /**
- * spring宸ュ叿绫?鏂逛究鍦ㄩ潪spring绠＄悊鐜涓幏鍙朾ean
- * 
+ * Spring 容器工具类，可在非 Spring 管理对象中获取 Bean。
+ *
  * @author Eapp1e
  */
 @Component
-public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware 
+public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware
 {
-    /** Spring搴旂敤涓婁笅鏂囩幆澧?*/
+    /** Spring BeanFactory 容器 */
     private static ConfigurableListableBeanFactory beanFactory;
 
+    /** Spring 应用上下文 */
     private static ApplicationContext applicationContext;
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException 
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
         SpringUtils.beanFactory = beanFactory;
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException 
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         SpringUtils.applicationContext = applicationContext;
     }
 
     /**
-     * 鑾峰彇瀵硅薄
+     * 根据名称获取 Bean。
      *
-     * @param name
-     * @return Object 涓€涓互鎵€缁欏悕瀛楁敞鍐岀殑bean鐨勫疄渚?
-     * @throws org.springframework.beans.BeansException
-     *
+     * @param name Bean 名称
+     * @return Bean 实例
+     * @throws BeansException 获取失败时抛出
      */
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) throws BeansException
@@ -51,24 +51,22 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 鑾峰彇绫诲瀷涓簉equiredType鐨勫璞?
+     * 根据类型获取 Bean。
      *
-     * @param clz
-     * @return
-     * @throws org.springframework.beans.BeansException
-     *
+     * @param clz Bean 类型
+     * @return Bean 实例
+     * @throws BeansException 获取失败时抛出
      */
     public static <T> T getBean(Class<T> clz) throws BeansException
     {
-        T result = (T) beanFactory.getBean(clz);
-        return result;
+        return beanFactory.getBean(clz);
     }
 
     /**
-     * 濡傛灉BeanFactory鍖呭惈涓€涓笌鎵€缁欏悕绉板尮閰嶇殑bean瀹氫箟锛屽垯杩斿洖true
+     * 判断容器中是否包含指定 Bean。
      *
-     * @param name
-     * @return boolean
+     * @param name Bean 名称
+     * @return 是否存在
      */
     public static boolean containsBean(String name)
     {
@@ -76,12 +74,11 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 鍒ゆ柇浠ョ粰瀹氬悕瀛楁敞鍐岀殑bean瀹氫箟鏄竴涓猻ingleton杩樻槸涓€涓猵rototype銆?濡傛灉涓庣粰瀹氬悕瀛楃浉搴旂殑bean瀹氫箟娌℃湁琚壘鍒帮紝灏嗕細鎶涘嚭涓€涓紓甯革紙NoSuchBeanDefinitionException锛?
+     * 判断指定 Bean 是否为单例。
      *
-     * @param name
-     * @return boolean
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
-     *
+     * @param name Bean 名称
+     * @return 是否为单例
+     * @throws NoSuchBeanDefinitionException Bean 不存在时抛出
      */
     public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException
     {
@@ -89,10 +86,11 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * @param name
-     * @return Class 娉ㄥ唽瀵硅薄鐨勭被鍨?
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * 获取指定 Bean 的类型。
      *
+     * @param name Bean 名称
+     * @return Bean 类型
+     * @throws NoSuchBeanDefinitionException Bean 不存在时抛出
      */
     public static Class<?> getType(String name) throws NoSuchBeanDefinitionException
     {
@@ -100,12 +98,11 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 濡傛灉缁欏畾鐨刡ean鍚嶅瓧鍦╞ean瀹氫箟涓湁鍒悕锛屽垯杩斿洖杩欎簺鍒悕
+     * 获取指定 Bean 的别名。
      *
-     * @param name
-     * @return
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
-     *
+     * @param name Bean 名称
+     * @return Bean 别名数组
+     * @throws NoSuchBeanDefinitionException Bean 不存在时抛出
      */
     public static String[] getAliases(String name) throws NoSuchBeanDefinitionException
     {
@@ -113,10 +110,10 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 鑾峰彇aop浠ｇ悊瀵硅薄
-     * 
-     * @param invoker
-     * @return
+     * 获取当前 AOP 代理对象。
+     *
+     * @param invoker 原始对象
+     * @return 代理对象或原始对象
      */
     @SuppressWarnings("unchecked")
     public static <T> T getAopProxy(T invoker)
@@ -130,9 +127,9 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 鑾峰彇褰撳墠鐨勭幆澧冮厤缃紝鏃犻厤缃繑鍥瀗ull
+     * 获取当前激活的环境配置。
      *
-     * @return 褰撳墠鐨勭幆澧冮厤缃?
+     * @return 激活的环境数组
      */
     public static String[] getActiveProfiles()
     {
@@ -140,9 +137,9 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 鑾峰彇褰撳墠鐨勭幆澧冮厤缃紝褰撴湁澶氫釜鐜閰嶇疆鏃讹紝鍙幏鍙栫涓€涓?
+     * 获取当前首个激活环境。
      *
-     * @return 褰撳墠鐨勭幆澧冮厤缃?
+     * @return 当前激活环境
      */
     public static String getActiveProfile()
     {
@@ -151,11 +148,10 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     }
 
     /**
-     * 鑾峰彇閰嶇疆鏂囦欢涓殑鍊?
+     * 获取环境中的必需配置项。
      *
-     * @param key 閰嶇疆鏂囦欢鐨刱ey
-     * @return 褰撳墠鐨勯厤缃枃浠剁殑鍊?
-     *
+     * @param key 配置键
+     * @return 配置值
      */
     public static String getRequiredProperty(String key)
     {

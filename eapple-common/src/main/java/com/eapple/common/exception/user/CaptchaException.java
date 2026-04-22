@@ -1,7 +1,7 @@
 package com.eapple.common.exception.user;
 
 /**
- * 楠岃瘉鐮侀敊璇紓甯哥被
+ * 验证码错误异常类。
  * 
  * @author Eapp1e
  */
