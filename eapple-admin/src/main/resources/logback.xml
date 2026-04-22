@@ -1,93 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 鏃ュ織瀛樻斁璺緞 -->
-	<property name="log.path" value="D:/Progects/Codex/bishe/runtime/logs" />
-    <!-- 鏃ュ織杈撳嚭鏍煎紡 -->
-	<property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
+    <!-- 日志输出目录 -->
+    <property name="log.path" value="D:/Progects/Codex/bishe/runtime/logs" />
+    <!-- 日志输出格式 -->
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
 
-	<!-- 鎺у埗鍙拌緭鍑?-->
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>${log.pattern}</pattern>
-		</encoder>
-	</appender>
-	
-	<!-- 绯荤粺鏃ュ織杈撳嚭 -->
-	<appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${log.path}/sys-info.log</file>
-        <!-- 寰幆鏀跨瓥锛氬熀浜庢椂闂村垱寤烘棩蹇楁枃浠?-->
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 鏃ュ織鏂囦欢鍚嶆牸寮?-->
-			<fileNamePattern>${log.path}/sys-info.%d{yyyy-MM-dd}.log</fileNamePattern>
-			<!-- 鏃ュ織鏈€澶х殑鍘嗗彶 60澶?-->
-			<maxHistory>60</maxHistory>
-		</rollingPolicy>
-		<encoder>
-			<pattern>${log.pattern}</pattern>
-		</encoder>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <!-- 杩囨护鐨勭骇鍒?-->
-            <level>INFO</level>
-            <!-- 鍖归厤鏃剁殑鎿嶄綔锛氭帴鏀讹紙璁板綍锛?-->
-            <onMatch>ACCEPT</onMatch>
-            <!-- 涓嶅尮閰嶆椂鐨勬搷浣滐細鎷掔粷锛堜笉璁板綍锛?-->
-            <onMismatch>DENY</onMismatch>
-        </filter>
-	</appender>
-	
-	<appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${log.path}/sys-error.log</file>
-        <!-- 寰幆鏀跨瓥锛氬熀浜庢椂闂村垱寤烘棩蹇楁枃浠?-->
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 普通日志文件 -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/sys-info.log</file>
+        <!-- 按天滚动 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 鏃ュ織鏂囦欢鍚嶆牸寮?-->
-            <fileNamePattern>${log.path}/sys-error.%d{yyyy-MM-dd}.log</fileNamePattern>
-			<!-- 鏃ュ織鏈€澶х殑鍘嗗彶 60澶?-->
-			<maxHistory>60</maxHistory>
+            <!-- 日志文件命名规则 -->
+            <fileNamePattern>${log.path}/sys-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 最多保留 60 天 -->
+            <maxHistory>60</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <!-- 杩囨护鐨勭骇鍒?-->
-            <level>ERROR</level>
-			<!-- 鍖归厤鏃剁殑鎿嶄綔锛氭帴鏀讹紙璁板綍锛?-->
+            <!-- 仅记录 INFO -->
+            <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
-			<!-- 涓嶅尮閰嶆椂鐨勬搷浣滐細鎷掔粷锛堜笉璁板綍锛?-->
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
-	
-	<!-- 鐢ㄦ埛璁块棶鏃ュ織杈撳嚭  -->
-    <appender name="sys-user" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${log.path}/sys-user.log</file>
+
+    <!-- 错误日志文件 -->
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/sys-error.log</file>
+        <!-- 按天滚动 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 鎸夊ぉ鍥炴粴 daily -->
+            <!-- 日志文件命名规则 -->
+            <fileNamePattern>${log.path}/sys-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 最多保留 60 天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 仅记录 ERROR -->
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 用户操作日志 -->
+    <appender name="sys-user" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/sys-user.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天切分 -->
             <fileNamePattern>${log.path}/sys-user.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <!-- 鏃ュ織鏈€澶х殑鍘嗗彶 60澶?-->
+            <!-- 最多保留 60 天 -->
             <maxHistory>60</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
         </encoder>
     </appender>
-	
-	<!-- 绯荤粺妯″潡鏃ュ織绾у埆鎺у埗  -->
-	<logger name="com.eapple" level="info" />
-	<!-- Spring鏃ュ織绾у埆鎺у埗  -->
-	<logger name="org.springframework" level="warn" />
 
-	<root level="info">
-		<appender-ref ref="console" />
-	</root>
-	
-	<!--绯荤粺鎿嶄綔鏃ュ織-->
+    <!-- 业务日志等级 -->
+    <logger name="com.eapple" level="info" />
+    <!-- Spring 日志等级 -->
+    <logger name="org.springframework" level="warn" />
+
+    <root level="info">
+        <appender-ref ref="console" />
+    </root>
+
+    <!-- 写入系统日志文件 -->
     <root level="info">
         <appender-ref ref="file_info" />
         <appender-ref ref="file_error" />
     </root>
-	
-	<!--绯荤粺鐢ㄦ埛鎿嶄綔鏃ュ織-->
+
+    <!-- 写入用户操作日志 -->
     <logger name="sys-user" level="info">
         <appender-ref ref="sys-user"/>
     </logger>
-</configuration> 
+</configuration>

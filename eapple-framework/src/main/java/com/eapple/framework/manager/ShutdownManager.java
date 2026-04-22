@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PreDestroy;
 
 /**
- * 纭繚搴旂敤閫€鍑烘椂鑳藉叧闂悗鍙扮嚎绋?
+ * 确保应用退出时能够关闭后台异步任务
  *
  * @author Eapp1e
  */
@@ -22,13 +22,13 @@ public class ShutdownManager
     }
 
     /**
-     * 鍋滄寮傛鎵ц浠诲姟
+     * 关闭异步任务管理器
      */
     private void shutdownAsyncManager()
     {
         try
         {
-            logger.info("====鍏抽棴鍚庡彴浠诲姟浠诲姟绾跨▼姹?===");
+            logger.info("====关闭后台异步任务线程池====");
             AsyncManager.me().shutdown();
         }
         catch (Exception e)

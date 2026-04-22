@@ -17,8 +17,8 @@ import com.eapple.system.service.ISysLogininforService;
 import com.eapple.system.service.ISysOperLogService;
 
 /**
- * 寮傛宸ュ巶锛堜骇鐢熶换鍔＄敤锛?
- * 
+ * 异步任务工厂
+ *
  * @author Eapp1e
  */
 public class AsyncFactory
@@ -26,13 +26,13 @@ public class AsyncFactory
     private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");
 
     /**
-     * 璁板綍鐧诲綍淇℃伅
-     * 
-     * @param username 鐢ㄦ埛鍚?
-     * @param status 鐘舵€?
-     * @param message 娑堟伅
-     * @param args 鍒楄〃
-     * @return 浠诲姟task
+     * 记录登录信息
+     *
+     * @param username 用户名
+     * @param status 登录状态
+     * @param message 日志信息
+     * @param args 参数
+     * @return 异步任务
      */
     public static TimerTask recordLogininfor(final String username, final String status, final String message,
             final Object... args)
@@ -51,13 +51,13 @@ public class AsyncFactory
                 s.append(LogUtils.getBlock(username));
                 s.append(LogUtils.getBlock(status));
                 s.append(LogUtils.getBlock(message));
-                // 鎵撳嵃淇℃伅鍒版棩蹇?
+                // 写入登录日志
                 sys_user_logger.info(s.toString(), args);
-                // 鑾峰彇瀹㈡埛绔搷浣滅郴缁?
+                // 获取客户端操作系统
                 String os = UserAgentUtils.getOperatingSystem(userAgent);
-                // 鑾峰彇瀹㈡埛绔祻瑙堝櫒
+                // 获取客户端浏览器
                 String browser = UserAgentUtils.getBrowser(userAgent);
-                // 灏佽瀵硅薄
+                // 封装登录信息对象
                 SysLogininfor logininfor = new SysLogininfor();
                 logininfor.setUserName(username);
                 logininfor.setIpaddr(ip);
@@ -65,7 +65,7 @@ public class AsyncFactory
                 logininfor.setBrowser(browser);
                 logininfor.setOs(os);
                 logininfor.setMsg(message);
-                // 鏃ュ織鐘舵€?
+                // 设置日志状态
                 if (StringUtils.equalsAny(status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER))
                 {
                     logininfor.setStatus(Constants.SUCCESS);
@@ -74,17 +74,17 @@ public class AsyncFactory
                 {
                     logininfor.setStatus(Constants.FAIL);
                 }
-                // 鎻掑叆鏁版嵁
+                // 保存登录日志
                 SpringUtils.getBean(ISysLogininforService.class).insertLogininfor(logininfor);
             }
         };
     }
 
     /**
-     * 鎿嶄綔鏃ュ織璁板綍
-     * 
-     * @param operLog 鎿嶄綔鏃ュ織淇℃伅
-     * @return 浠诲姟task
+     * 记录操作日志
+     *
+     * @param operLog 操作日志对象
+     * @return 异步任务
      */
     public static TimerTask recordOper(final SysOperLog operLog)
     {
@@ -93,7 +93,7 @@ public class AsyncFactory
             @Override
             public void run()
             {
-                // 杩滅▼鏌ヨ鎿嶄綔鍦扮偣
+                // 查询操作所在地
                 operLog.setOperLocation(AddressUtils.getRealAddressByIP(operLog.getOperIp()));
                 SpringUtils.getBean(ISysOperLogService.class).insertOperlog(operLog);
             }

@@ -2,11 +2,11 @@ import { mergeRecursive } from "@/utils/eapple"
 import DictOptions from './DictOptions'
 
 /**
- * @classdesc 瀛楀吀鍏冩暟鎹?
- * @property {String} type 绫诲瀷
- * @property {Function} request 璇锋眰
- * @property {String} label 鏍囩瀛楁
- * @property {String} value 鍊煎瓧娈?
+ * @classdesc 字典元数据
+ * @property {String} type 字典类型
+ * @property {Function} request 请求方法
+ * @property {String} labelField 标签字段名
+ * @property {String} valueField 值字段名
  */
 export default class DictMeta {
   constructor(options) {
@@ -19,10 +19,9 @@ export default class DictMeta {
   }
 }
 
-
 /**
- * 瑙ｆ瀽瀛楀吀鍏冩暟鎹?
- * @param {Object} options
+ * 解析字典元数据配置
+ * @param {Object|string} options 配置项或字典类型
  * @returns {DictMeta}
  */
 DictMeta.parse= function(options) {

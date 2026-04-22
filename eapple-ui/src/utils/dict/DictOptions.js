@@ -5,14 +5,14 @@ export const options = {
   metas: {
     '*': {
       /**
-       * 瀛楀吀璇锋眰锛屾柟娉曠鍚嶄负function(dictMeta: DictMeta): Promise
+       * 字典请求方法，返回 Promise
        */
       request: (dictMeta) => {
         console.log(`load dict ${dictMeta.type}`)
         return Promise.resolve([])
       },
       /**
-       * 瀛楀吀鍝嶅簲鏁版嵁杞崲鍣紝鏂规硶绛惧悕涓篺unction(response: Object, dictMeta: DictMeta): DictData
+       * 字典响应转换器，将响应内容转换为 DictData 列表
        */
       responseConverter,
       labelField: 'label',
@@ -20,20 +20,20 @@ export const options = {
     },
   },
   /**
-   * 榛樿鏍囩瀛楁
+   * 默认标签字段候选
    */
   DEFAULT_LABEL_FIELDS: ['label', 'name', 'title'],
   /**
-   * 榛樿鍊煎瓧娈?
+   * 默认值字段候选
    */
   DEFAULT_VALUE_FIELDS: ['value', 'id', 'uid', 'key'],
 }
 
 /**
- * 鏄犲皠瀛楀吀
- * @param {Object} response 瀛楀吀鏁版嵁
- * @param {DictMeta} dictMeta 瀛楀吀鍏冩暟鎹?
- * @returns {DictData}
+ * 默认字典响应转换函数
+ * @param {Object} response 字典响应内容
+ * @param {DictMeta} dictMeta 字典元数据
+ * @returns {DictData[]}
  */
 function responseConverter(response, dictMeta) {
   const dicts = response.content instanceof Array ? response.content : response

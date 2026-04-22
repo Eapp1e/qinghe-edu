@@ -1,9 +1,9 @@
-﻿/**
-* 閫氱敤css鏍峰紡甯冨眬澶勭悊
+/**
+* 通用 CSS 样式与布局处理
 * Copyright (c) 2026 Eapp1e
 */
 
-/** 鍩虹閫氱敤 **/
+/** 基础通用 */
 .pt5 {
   padding-top: 5px;
 }
@@ -110,7 +110,7 @@
   }
 }
 
-/** 琛ㄥ崟甯冨眬 **/
+/** 表单布局 */
 .form-header {
   font-size: 15px;
   color: #6379bb;
@@ -119,7 +119,7 @@
   padding-bottom: 5px
 }
 
-/** 琛ㄦ牸甯冨眬 **/
+/** 表格布局 */
 .pagination-container {
   display: flex;
   justify-content: flex-end;
@@ -159,7 +159,7 @@
   width: inherit;
 }
 
-/** 琛ㄦ牸鏇村鎿嶄綔涓嬫媺鏍峰紡 */
+/** 表格更多操作下拉样式 */
 .el-table .el-dropdown-link,.el-table .el-dropdown-selfdefine {
 	cursor: pointer;
 	margin-left: 5px;
@@ -232,7 +232,7 @@
   color: #FFFFFF;
 }
 
-/** 璇︾粏鍗＄墖鏍峰紡 */
+/** 详情卡片样式 */
 .detail-drawer {
   .el-drawer__header {
     margin-bottom: 6px;
@@ -468,7 +468,7 @@
   overflow: hidden;
 }
 
-/* 鎷栨嫿鍒楁牱寮?*/
+/* 拖拽列样式 */
 .allowDrag { cursor: grab; }
 .allowDrag:active { cursor: grabbing; }
 
@@ -482,4 +482,3 @@
   position: relative;
   float: right;
 }
-

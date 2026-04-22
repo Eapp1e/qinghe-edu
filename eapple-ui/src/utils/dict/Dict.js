@@ -8,10 +8,10 @@ const DEFAULT_DICT_OPTIONS = {
 }
 
 /**
- * @classdesc 瀛楀吀
- * @property {Object} label 鏍囩瀵硅薄锛屽唴閮ㄥ睘鎬у悕涓哄瓧鍏哥被鍨嬪悕绉?
- * @property {Object} dict 瀛楁鏁扮粍锛屽唴閮ㄥ睘鎬у悕涓哄瓧鍏哥被鍨嬪悕绉?
- * @property {Array.<DictMeta>} _dictMetas 瀛楀吀鍏冩暟鎹暟缁?
+ * @classdesc 字典管理器
+ * @property {Object} label 按字典类型缓存标签映射
+ * @property {Object} type 按字典类型缓存原始字典项
+ * @property {Array.<DictMeta>} _dictMetas 字典元数据列表
  */
 export default class Dict {
   constructor() {
@@ -43,8 +43,8 @@ export default class Dict {
   }
 
   /**
-   * 閲嶆柊鍔犺浇瀛楀吀
-   * @param {String} type 瀛楀吀绫诲瀷
+   * 重新加载指定字典
+   * @param {String} type 字典类型
    */
   reloadDict(type) {
     const dictMeta = this._dictMetas.find(e => e.type === type)
@@ -56,9 +56,9 @@ export default class Dict {
 }
 
 /**
- * 鍔犺浇瀛楀吀
- * @param {Dict} dict 瀛楀吀
- * @param {DictMeta} dictMeta 瀛楀吀鍏冩暟鎹?
+ * 加载字典数据
+ * @param {Dict} dict 字典实例
+ * @param {DictMeta} dictMeta 字典元数据
  * @returns {Promise}
  */
 function loadDict(dict, dictMeta) {

@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import { parseStrEmpty } from "@/utils/eapple"
 
-// 鏌ヨ鐢ㄦ埛鍒楄〃
+// 查询用户列表
 export function listUser(query) {
   return request({
     url: '/system/user/list',
@@ -10,7 +10,7 @@ export function listUser(query) {
   })
 }
 
-// 鏌ヨ鐢ㄦ埛璇︾粏
+// 查询用户详情
 export function getUser(userId) {
   return request({
     url: '/system/user/' + parseStrEmpty(userId),
@@ -18,7 +18,7 @@ export function getUser(userId) {
   })
 }
 
-// 鏂板鐢ㄦ埛
+// 新增用户
 export function addUser(data) {
   return request({
     url: '/system/user',
@@ -27,7 +27,7 @@ export function addUser(data) {
   })
 }
 
-// 淇敼鐢ㄦ埛
+// 修改用户
 export function updateUser(data) {
   return request({
     url: '/system/user',
@@ -36,7 +36,7 @@ export function updateUser(data) {
   })
 }
 
-// 鍒犻櫎鐢ㄦ埛
+// 删除用户
 export function delUser(userId) {
   return request({
     url: '/system/user/' + userId,
@@ -44,7 +44,7 @@ export function delUser(userId) {
   })
 }
 
-// 鐢ㄦ埛瀵嗙爜閲嶇疆
+// 重置用户密码
 export function resetUserPwd(userId, password) {
   const data = {
     userId,
@@ -57,7 +57,7 @@ export function resetUserPwd(userId, password) {
   })
 }
 
-// 鐢ㄦ埛鐘舵€佷慨鏀?
+// 修改用户状态
 export function changeUserStatus(userId, status) {
   const data = {
     userId,
@@ -70,7 +70,7 @@ export function changeUserStatus(userId, status) {
   })
 }
 
-// 鏌ヨ鐢ㄦ埛涓汉淇℃伅
+// 查询当前用户资料
 export function getUserProfile() {
   return request({
     url: '/system/user/profile',
@@ -78,7 +78,7 @@ export function getUserProfile() {
   })
 }
 
-// 淇敼鐢ㄦ埛涓汉淇℃伅
+// 修改当前用户资料
 export function updateUserProfile(data) {
   return request({
     url: '/system/user/profile',
@@ -87,7 +87,7 @@ export function updateUserProfile(data) {
   })
 }
 
-// 鐢ㄦ埛瀵嗙爜閲嶇疆
+// 修改当前用户密码
 export function updateUserPwd(oldPassword, newPassword) {
   const data = {
     oldPassword,
@@ -100,7 +100,7 @@ export function updateUserPwd(oldPassword, newPassword) {
   })
 }
 
-// 鐢ㄦ埛澶村儚涓婁紶
+// 上传头像
 export function uploadAvatar(data) {
   return request({
     url: '/system/user/profile/avatar',
@@ -110,7 +110,7 @@ export function uploadAvatar(data) {
   })
 }
 
-// 鏌ヨ鎺堟潈瑙掕壊
+// 查询用户角色
 export function getAuthRole(userId) {
   return request({
     url: '/system/user/authRole/' + userId,
@@ -118,7 +118,7 @@ export function getAuthRole(userId) {
   })
 }
 
-// 淇濆瓨鎺堟潈瑙掕壊
+// 修改用户角色
 export function updateAuthRole(data) {
   return request({
     url: '/system/user/authRole',
@@ -127,7 +127,7 @@ export function updateAuthRole(data) {
   })
 }
 
-// 鏌ヨ閮ㄩ棬涓嬫媺鏍戠粨鏋?
+// 查询部门树
 export function deptTreeSelect() {
   return request({
     url: '/system/user/deptTree',
