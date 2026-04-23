@@ -1,18 +1,13 @@
 Application Name: QINGHE After-school Service Platform
 Application Version: ${platform.version}
 Spring Boot Version: ${spring-boot.version}
-Copyright: EAPPLE
-GitHub: @Eapp1e
-
 ============================================================
 
-  EEEEE     A     PPPP   PPPP   L       EEEEE
-  E        A A    P   P  P   P  L       E
-  EEEE    AAAAA   PPPP   PPPP   L       EEEE
-  E       A   A   P      P      L       E
-  EEEEE   A   A   P      P      LLLLL   EEEEE
+  EEEEE      A      PPPP   PPPP   L      EEEEE
+  E         A A     P   P  P   P  L      E
+  EEEE     AAAAA    PPPP   PPPP   L      EEEE
+  E       A     A   P      P      L      E
+  EEEEE  A       A  P      P      LLLLL  EEEEE
 
-============================================================
-  QINGHE After-school Service Platform v${platform.version}
-  Official identity: @Eapp1e
+  GitHub: @Eapp1e
 ============================================================

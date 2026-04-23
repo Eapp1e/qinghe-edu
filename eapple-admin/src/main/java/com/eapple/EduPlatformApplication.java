@@ -17,13 +17,12 @@ public class EduPlatformApplication
         SpringApplication.run(EduPlatformApplication.class, args);
         System.out.println(
                 "\n" +
-                "      ______      ______      ______      ______      ______      ______\n" +
-                "     /\\  __ \\    /\\  __ \\    /\\  __ \\    /\\  ___\\    /\\  __ \\    /\\  ___\\\n" +
-                "     \\ \\ \\/\\_\\   \\ \\  __ \\   \\ \\  __ \\   \\ \\ \\__ \\   \\ \\ \\_\\ \\   \\ \\  __\\\n" +
-                "      \\ \\___\\_\\   \\ \\_\\ \\_\\   \\ \\_\\ \\_\\   \\ \\_____\\   \\ \\_____\\   \\ \\_____\\\n" +
-                "       \\/___/_/    \\/_/\\/_/    \\/_/\\/_/    \\/_____/    \\/_____/    \\/_____/\n" +
+                "   ____    ___   _   _   ____   _   _   _____\n" +
+                "  / __ \\  |_ _| | \\ | | / ___| | | | | | ____|\n" +
+                " | |  | |  | |  |  \\| || |  _  | |_| | |  _|\n" +
+                " | |__| |  | |  | |\\  || |_| | |  _  | | |___\n" +
+                "  \\___\\_\\ |___| |_| \\_| \\____| |_| |_| |_____|\n" +
                 "\n" +
-                "  QINGHE After-school Service Platform started successfully.\n" +
-                "  GitHub: @Eapp1e\n");
+                "  QINGHE After-school Service Platform started successfully.\n");
     }
 }

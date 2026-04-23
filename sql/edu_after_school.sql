@@ -1,4 +1,6 @@
--- 中小学智能课后服务平台初始化脚本
+-- 青禾智学课后服务平台初始化脚本
+create database if not exists qinghe_edu default character set utf8mb4 collate utf8mb4_general_ci;
+use qinghe_edu;
 
 drop table if exists edu_ai_log;
 drop table if exists edu_homework_question;

@@ -1,15 +1,16 @@
--- 中小学智能课后服务平台演示数据
--- 请先执行：sql/ry_20260321.sql 与 sql/edu_after_school.sql
+-- 青禾智学课后服务平台演示数据
+-- 请先执行：sql/qinghe_system_base.sql 与 sql/edu_after_school.sql
+use qinghe_edu;
 
 -- 清理旧演示数据
 delete from sys_user_role where user_id in (110,111,112,113);
 delete from sys_user where user_id in (110,111,112,113);
 
 delete from edu_ai_log where user_id in (110,111,112,113);
-delete from edu_homework_question where student_user_id in (113) or parent_user_id in (112) or teacher_user_id in (111);
-delete from edu_course_enrollment where student_user_id in (113) or parent_user_id in (112) or teacher_user_id in (111);
-delete from edu_course where teacher_user_id in (111);
-delete from edu_student_profile where student_user_id in (113);
+delete from edu_homework_question where question_id in (1,2) or student_user_id in (113) or parent_user_id in (112) or teacher_user_id in (111);
+delete from edu_course_enrollment where enrollment_id in (1,2) or course_id in (1,2,3) or student_user_id in (113) or parent_user_id in (112) or teacher_user_id in (111);
+delete from edu_course where course_id in (1,2,3) or teacher_user_id in (111);
+delete from edu_student_profile where profile_id in (1) or student_user_id in (113);
 
 delete from sys_role_menu where role_id in (100,101,102,103);
 insert into sys_role_menu select * from (

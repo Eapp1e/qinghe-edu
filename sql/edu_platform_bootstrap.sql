@@ -116,12 +116,12 @@ insert ignore into sys_user (user_id, dept_id, user_name, nick_name, user_type, 
 (112, 103, 'edu_parent', '王家长', '00', 'edu_parent@example.com', '13800000012', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台家长'),
 (113, 103, 'edu_student', '王小明', '00', 'edu_student@example.com', '13800000013', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台学生');
 
-delete from sys_user_role where user_id in (110, 111, 112, 113) and role_id in (101, 102, 103, 104);
-insert into sys_user_role (user_id, role_id) values
-(110, 101),
-(111, 102),
-(112, 103),
-(113, 104);
+delete from sys_user_role where user_id in (110, 111, 112, 113) and role_id in (100, 101, 102, 103, 104);
+insert ignore into sys_user_role (user_id, role_id) values
+(110, 100),
+(111, 101),
+(112, 102),
+(113, 103);
 
 insert ignore into edu_student_profile (profile_id, student_user_id, student_name, parent_user_id, parent_name, grade_name, class_name, gender, interest_tags, status, remark, create_by, create_time) values
 (1, 113, '王小明', 112, '王家长', '五年级', '2班', '男', '篮球,编程,书法', '0', '演示学生档案', 'admin', sysdate());
