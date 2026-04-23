@@ -1,9 +1,9 @@
 package com.eapple.common.utils.file;
 
 /**
- * 濯掍綋绫诲瀷宸ュ叿绫?
- * 
- * @author Eapp1e
+ * MIME type constants and extension helpers.
+ *
+ * @author EAPPLE
  */
 public class MimeTypeUtils
 {
@@ -16,7 +16,7 @@ public class MimeTypeUtils
     public static final String IMAGE_BMP = "image/bmp";
 
     public static final String IMAGE_GIF = "image/gif";
-    
+
     public static final String[] IMAGE_EXTENSION = { "bmp", "gif", "jpg", "jpeg", "png" };
 
     public static final String[] FLASH_EXTENSION = { "swf", "flv" };
@@ -27,13 +27,13 @@ public class MimeTypeUtils
     public static final String[] VIDEO_EXTENSION = { "mp4", "avi", "rmvb" };
 
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
-            // 鍥剧墖
+            // images
             "bmp", "gif", "jpg", "jpeg", "png",
             // word excel powerpoint
             "doc", "docx", "xls", "xlsx", "ppt", "pptx", "html", "htm", "txt",
-            // 鍘嬬缉鏂囦欢
+            // archives
             "rar", "zip", "gz", "bz2",
-            // 瑙嗛鏍煎紡
+            // videos
             "mp4", "avi", "rmvb",
             // pdf
             "pdf" };

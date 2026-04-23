@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Md5鍔犲瘑鏂规硶
- * 
- * @author Eapp1e
+ * MD5 utility methods.
+ *
+ * @author EAPPLE
  */
 public class Md5Utils
 {
@@ -22,8 +22,7 @@ public class Md5Utils
             algorithm = MessageDigest.getInstance("MD5");
             algorithm.reset();
             algorithm.update(s.getBytes("UTF-8"));
-            byte[] messageDigest = algorithm.digest();
-            return messageDigest;
+            return algorithm.digest();
         }
         catch (Exception e)
         {
@@ -32,22 +31,20 @@ public class Md5Utils
         return null;
     }
 
-    private static final String toHex(byte hash[])
+    private static final String toHex(byte[] hash)
     {
         if (hash == null)
         {
             return null;
         }
-        StringBuffer buf = new StringBuffer(hash.length * 2);
-        int i;
-
-        for (i = 0; i < hash.length; i++)
+        StringBuilder buf = new StringBuilder(hash.length * 2);
+        for (byte b : hash)
         {
-            if ((hash[i] & 0xff) < 0x10)
+            if ((b & 0xff) < 0x10)
             {
                 buf.append("0");
             }
-            buf.append(Long.toString(hash[i] & 0xff, 16));
+            buf.append(Long.toString(b & 0xff, 16));
         }
         return buf.toString();
     }

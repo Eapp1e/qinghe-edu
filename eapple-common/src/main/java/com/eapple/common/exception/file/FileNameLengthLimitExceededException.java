@@ -1,9 +1,9 @@
 package com.eapple.common.exception.file;
 
 /**
- * 鏂囦欢鍚嶇О瓒呴暱闄愬埗寮傚父绫?
- * 
- * @author Eapp1e
+ * File name length limit exceeded exception.
+ *
+ * @author EAPPLE
  */
 public class FileNameLengthLimitExceededException extends FileException
 {

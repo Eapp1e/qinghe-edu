@@ -4,30 +4,36 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 平台基础配置。
+ * Platform base configuration.
  *
- * @author Eapp1e
+ * @author EAPPLE
  */
 @Component
 @ConfigurationProperties(prefix = "platform")
 public class PlatformConfig
 {
-    /** 平台名称 */
+    /** Platform name. */
     private String name;
 
-    /** 平台版本 */
+    /** Platform version. */
     private String version;
 
-    /** 版权年份 */
+    /** Copyright owner. */
+    private String owner;
+
+    /** Copyright year. */
     private String copyrightYear;
 
-    /** 文件上传根目录 */
+    /** GitHub identity. */
+    private String github;
+
+    /** Upload root path. */
     private static String profile;
 
-    /** 是否开启地址解析 */
+    /** Whether address lookup is enabled. */
     private static boolean addressEnabled;
 
-    /** 验证码类型 */
+    /** Captcha type. */
     private static String captchaType;
 
     public String getName()
@@ -50,6 +56,16 @@ public class PlatformConfig
         this.version = version;
     }
 
+    public String getOwner()
+    {
+        return owner;
+    }
+
+    public void setOwner(String owner)
+    {
+        this.owner = owner;
+    }
+
     public String getCopyrightYear()
     {
         return copyrightYear;
@@ -58,6 +74,16 @@ public class PlatformConfig
     public void setCopyrightYear(String copyrightYear)
     {
         this.copyrightYear = copyrightYear;
+    }
+
+    public String getGithub()
+    {
+        return github;
+    }
+
+    public void setGithub(String github)
+    {
+        this.github = github;
     }
 
     public static String getProfile()
@@ -91,7 +117,7 @@ public class PlatformConfig
     }
 
     /**
-     * 获取导入文件目录。
+     * Gets import file directory.
      */
     public static String getImportPath()
     {
@@ -99,7 +125,7 @@ public class PlatformConfig
     }
 
     /**
-     * 获取头像上传目录。
+     * Gets avatar upload directory.
      */
     public static String getAvatarPath()
     {
@@ -107,7 +133,7 @@ public class PlatformConfig
     }
 
     /**
-     * 获取下载目录。
+     * Gets download directory.
      */
     public static String getDownloadPath()
     {
@@ -115,7 +141,7 @@ public class PlatformConfig
     }
 
     /**
-     * 获取上传目录。
+     * Gets upload directory.
      */
     public static String getUploadPath()
     {

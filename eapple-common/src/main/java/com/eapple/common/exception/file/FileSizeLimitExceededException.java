@@ -1,9 +1,9 @@
 package com.eapple.common.exception.file;
 
 /**
- * 鏂囦欢鍚嶅ぇ灏忛檺鍒跺紓甯哥被
- * 
- * @author Eapp1e
+ * File size limit exceeded exception.
+ *
+ * @author EAPPLE
  */
 public class FileSizeLimitExceededException extends FileException
 {

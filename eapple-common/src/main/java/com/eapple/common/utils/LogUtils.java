@@ -1,9 +1,9 @@
 package com.eapple.common.utils;
 
 /**
- * 澶勭悊骞惰褰曟棩蹇楁枃浠?
- * 
- * @author Eapp1e
+ * Log formatting helpers.
+ *
+ * @author EAPPLE
  */
 public class LogUtils
 {

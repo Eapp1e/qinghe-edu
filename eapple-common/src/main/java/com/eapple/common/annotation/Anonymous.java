@@ -7,9 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 鍖垮悕璁块棶涓嶉壌鏉冩敞瑙?
- * 
- * @author Eapp1e
+ * Allows anonymous access without authentication.
+ *
+ * @author EAPPLE
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)

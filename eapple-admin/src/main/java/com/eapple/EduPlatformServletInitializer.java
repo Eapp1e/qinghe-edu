@@ -4,9 +4,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
- * web瀹瑰櫒涓繘琛岄儴缃?
- * 
- * @author Eapp1e
+ * Servlet container initializer.
+ *
+ * @author EAPPLE
  */
 public class EduPlatformServletInitializer extends SpringBootServletInitializer
 {
@@ -16,4 +16,3 @@ public class EduPlatformServletInitializer extends SpringBootServletInitializer
         return application.sources(EduPlatformApplication.class);
     }
 }
-

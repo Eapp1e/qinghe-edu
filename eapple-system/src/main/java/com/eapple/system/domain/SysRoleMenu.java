@@ -4,16 +4,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
- * 瑙掕壊鍜岃彍鍗曞叧鑱?sys_role_menu
- * 
- * @author Eapp1e
+ * Role and menu relation entity, mapped to sys_role_menu.
+ *
+ * @author EAPPLE
  */
 public class SysRoleMenu
 {
-    /** 瑙掕壊ID */
+    /** Role ID. */
     private Long roleId;
-    
-    /** 鑿滃崟ID */
+
+    /** Menu ID. */
     private Long menuId;
 
     public Long getRoleId()
@@ -37,8 +37,9 @@ public class SysRoleMenu
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+    public String toString()
+    {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("roleId", getRoleId())
             .append("menuId", getMenuId())
             .toString();

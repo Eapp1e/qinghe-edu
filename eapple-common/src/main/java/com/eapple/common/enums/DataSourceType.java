@@ -1,19 +1,19 @@
 package com.eapple.common.enums;
 
 /**
- * 鏁版嵁婧?
- * 
- * @author Eapp1e
+ * Data source type.
+ *
+ * @author EAPPLE
  */
 public enum DataSourceType
 {
     /**
-     * 涓诲簱
+     * Primary data source.
      */
     MASTER,
 
     /**
-     * 浠庡簱
+     * Secondary data source.
      */
     SLAVE
 }

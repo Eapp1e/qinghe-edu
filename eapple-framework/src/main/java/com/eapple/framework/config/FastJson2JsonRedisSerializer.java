@@ -10,9 +10,9 @@ import com.alibaba.fastjson2.filter.Filter;
 import com.eapple.common.constant.Constants;
 
 /**
- * Redis浣跨敤FastJson搴忓垪鍖?
- * 
- * @author Eapp1e
+ * Redis serializer based on Fastjson2.
+ *
+ * @author EAPPLE
  */
 public class FastJson2JsonRedisSerializer<T> implements RedisSerializer<T>
 {

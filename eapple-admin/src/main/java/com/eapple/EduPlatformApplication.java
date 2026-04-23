@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 
 /**
- * EAPPLE education platform launcher.
+ * QINGHE After-school Service Platform launcher.
+ *
+ * @author EAPPLE
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class EduPlatformApplication
@@ -15,12 +17,13 @@ public class EduPlatformApplication
         SpringApplication.run(EduPlatformApplication.class, args);
         System.out.println(
                 "\n" +
-                "  EEEEE    A    PPPP   PPPP   L      EEEEE\n" +
-                "  E       A A   P   P  P   P  L      E    \n" +
-                "  EEEE   AAAAA  PPPP   PPPP   L      EEEE \n" +
-                "  E      A   A  P      P      L      E    \n" +
-                "  EEEEE  A   A  P      P      LLLLL  EEEEE\n" +
+                "      ______      ______      ______      ______      ______      ______\n" +
+                "     /\\  __ \\    /\\  __ \\    /\\  __ \\    /\\  ___\\    /\\  __ \\    /\\  ___\\\n" +
+                "     \\ \\ \\/\\_\\   \\ \\  __ \\   \\ \\  __ \\   \\ \\ \\__ \\   \\ \\ \\_\\ \\   \\ \\  __\\\n" +
+                "      \\ \\___\\_\\   \\ \\_\\ \\_\\   \\ \\_\\ \\_\\   \\ \\_____\\   \\ \\_____\\   \\ \\_____\\\n" +
+                "       \\/___/_/    \\/_/\\/_/    \\/_/\\/_/    \\/_____/    \\/_____/    \\/_____/\n" +
                 "\n" +
-                "  platform started successfully.\n");
+                "  QINGHE After-school Service Platform started successfully.\n" +
+                "  GitHub: @Eapp1e\n");
     }
 }

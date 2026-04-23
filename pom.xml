@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.eapple</groupId>
-    <artifactId>eapple-after-school-platform</artifactId>
-    <version>1.0.0</version>
+    <artifactId>qinghe-after-school-service-platform</artifactId>
+    <version>1.0</version>
 
-    <name>eapple-after-school-platform</name>
-    <url>https://gitee.com/eapp1e/edu-after-school</url>
-    <description>中小学智能课后服务平台</description>
+    <name>QINGHE After-school Service Platform</name>
+    <url>https://github.com/Eapp1e/qinghe-edu</url>
+    <description>QINGHE After-school Service Platform</description>
 
     <properties>
-        <platform.version>1.0.0</platform.version>
+        <platform.version>1.0</platform.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
