@@ -1,4 +1,4 @@
-﻿package com.eapple.common.utils;
+package com.eapple.common.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

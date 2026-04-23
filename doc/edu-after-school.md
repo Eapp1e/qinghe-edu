@@ -1,173 +1,191 @@
-# 中小学智能课后服务平台说明文档
+# 青禾智学课后服务平台开发环境搭建手册
 
-## 1. 项目定位
+本文档用于说明 QINGHE After-school Service Platform 的本地开发环境、数据库初始化、前后端启动和常见问题处理。项目功能介绍以根目录 `README.md` 为准，本文件只保留开发和运行相关内容。
 
-中小学智能课后服务平台面向学校课后延时服务场景，围绕学生、家长、教师和管理员四类角色，构建课程管理、报名管理、作业问答、AI 辅助生成和平台运营管理能力。
+## 1. 环境要求
 
-项目目标包括：
+后端环境：
 
-- 提升课后课程组织与报名管理效率
-- 方便家长及时了解孩子的学习情况
-- 帮助教师借助 AI 完成课程通知和教学建议生成
-- 为管理员提供统一的平台管理与数据统计能力
+- JDK 17 或更高版本
+- Maven 3.8.x 或更高版本
+- MySQL 8.x
+- IDEA 2023+ 或其他支持 Maven 多模块项目的 IDE
 
-## 2. 功能模块
+前端环境：
 
-### 2.1 平台首页
+- Node.js 16.x
+- npm 8.x 左右版本
+- Chrome / Edge 最新稳定版
 
-- 展示平台总体统计数据
-- 展示热门选课排行
-- 展示业务图表与运营概览
+编码要求：
 
-### 2.2 课程中心
+- IDEA File Encoding 统一设置为 UTF-8
+- Maven 运行 JDK 指向 JDK 17
+- PowerShell 或终端建议使用 UTF-8 输出，避免中文日志显示异常
 
-- 查看课程列表
-- 发布课程
-- 编辑课程
-- 报名课程
-- 取消报名
-- 生成 AI 通知与教学建议
+## 2. Maven 与 JDK 配置
 
-### 2.3 学生档案
+在命令行检查 Maven 当前使用的 JDK：
 
-- 查看学生档案
-- 家长维护孩子档案
-- 管理员查看学生基础信息
+```powershell
+mvn -v
+```
 
-### 2.4 报名记录
+正确结果应包含类似内容：
 
-- 查看课程报名记录
-- 查看学生、家长、教师对应的报名情况
+```text
+Java version: 17
+```
 
-### 2.5 作业问答
+如果仍显示 JDK 1.8，需要将系统环境变量 `JAVA_HOME` 指向 JDK 17，例如：
 
-- 学生提交作业问题
-- 调用 AI 生成解答
-- 查看问答记录
+```text
+D:\java\jdk\jdk17
+```
 
-### 2.6 AI 日志
+IDEA 中同步检查：
 
-- 记录 AI 调用类型
-- 记录调用状态与返回结果
-- 便于管理员查看平台智能能力使用情况
+- `File > Project Structure > Project SDK` 选择 JDK 17
+- `Settings > Build Tools > Maven > Runner` 的 JRE 选择 JDK 17
+- Maven home 选择本地 Maven 3.8.x 或更高版本
 
-### 2.7 平台用户
+## 3. 数据库初始化
 
-- 管理平台账号
-- 维护角色权限
-- 支持四类角色统一管理
+默认数据库名为：
 
-### 2.8 平台公告
+```text
+qinghe_edu
+```
 
-- 发布平台通知
-- 维护公告内容
-- 查看公告状态
+后端连接配置位于：
 
-## 3. 技术方案
+```text
+eapple-admin/src/main/resources/application-druid.yml
+```
 
-### 后端技术
+默认 JDBC URL 已带 `createDatabaseIfNotExist=true`，如果 MySQL 账号有建库权限，启动时会自动创建 `qinghe_edu`。首次运行仍需要导入表结构和演示数据。
 
-- Spring Boot
-- Spring Security
-- MyBatis
-- JWT
-- MySQL
+推荐按以下顺序执行 SQL：
 
-### 前端技术
+```text
+sql/qinghe_system_base.sql
+sql/edu_after_school.sql
+sql/edu_platform_bootstrap.sql
+sql/edu_platform_upgrade.sql
+sql/edu_demo_data.sql
+sql/edu_demo_course_expansion.sql
+sql/edu_demo_family_expansion.sql
+sql/edu_demo_question_expansion.sql
+sql/edu_notice_refresh.sql
+```
 
-- Vue 2
-- Element UI
-- Vuex
-- Vue Router
-- ECharts
+如果你本机已有旧库，不建议继续使用旧库名。更规范的做法是新建或迁移到 `qinghe_edu`，这样项目配置、文档和展示名称保持一致。
 
-### 智能能力
+## 4. 后端启动
 
-- 大模型 API 接入
-- AI 问答
-- AI 通知生成
-- AI 教学建议生成
-- AI 调用日志记录
+在项目根目录执行编译：
 
-## 4. 数据库脚本
+```powershell
+mvn clean compile -DskipTests
+```
 
-数据库初始化建议按顺序执行：
+后端启动类：
 
-1. `sql/ry_20260321.sql`
-2. `sql/edu_after_school.sql`
-3. `sql/edu_demo_data.sql`
+```text
+eapple-admin/src/main/java/com/eapple/EduPlatformApplication.java
+```
 
-其中：
+启动成功后默认访问：
 
-- `ry_20260321.sql` 为基础系统表
-- `edu_after_school.sql` 为教育业务表
-- `edu_demo_data.sql` 为演示数据
+```text
+http://localhost:8080/
+```
 
-## 5. 默认账号
+如果启动时报 `Unknown database 'qinghe_edu'`：
 
-默认账号密码如下，密码统一为 `admin123`：
+- 确认 MySQL 已启动
+- 确认 `root / 123456` 账号密码与本地一致
+- 确认该账号有创建数据库权限
+- 手动执行 `create database if not exists qinghe_edu default character set utf8mb4 collate utf8mb4_general_ci;`
+- 重新导入上述 SQL 脚本
 
-- 管理员：`edu_admin`
-- 教师：`edu_teacher`
-- 家长：`edu_parent`
-- 学生：`edu_student`
+## 5. 前端启动
 
-## 6. 启动方式
+进入前端目录：
 
-### 后端
+```powershell
+cd eapple-ui
+```
 
-启动主类：
-
-- `eapple-admin/src/main/java/com/eapple/EduPlatformApplication.java`
-
-默认地址：
-
-- [http://localhost:8080/](http://localhost:8080/)
-
-### 前端
-
-进入 `eapple-ui` 目录后执行：
+安装依赖：
 
 ```powershell
 npm install
+```
+
+启动开发服务：
+
+```powershell
 npm run dev
 ```
 
-默认地址：
+默认访问地址：
 
-- [http://localhost:80/](http://localhost:80/)
+```text
+http://localhost/
+```
 
-## 7. AI 配置
+## 6. AI 配置
 
 AI 配置位于：
 
-- [eapple-admin/src/main/resources/application.yml](/D:/Progects/Codex/bishe/eapple-admin/src/main/resources/application.yml:1)
+```text
+eapple-admin/src/main/resources/application.yml
+```
 
-如果需要使用真实模型接口，可补充：
+建议使用环境变量配置密钥：
 
-- `enabled`
-- `baseUrl`
-- `apiKey`
-- `model`
+```text
+SILICONFLOW_API_KEY
+```
 
-若仅用于本地演示，可保留 Mock 配置。
+不要把真实 API Key 写入 Git 仓库。提交前可用以下命令检查：
 
-## 8. 适用场景
+```powershell
+rg -n "sk-[a-zA-Z0-9]" .
+```
 
-本项目适用于：
+## 7. 常见问题
 
-- 毕业设计系统实现
-- 课程设计项目展示
-- 中小学课后服务管理原型
-- 教育信息化平台原型开发
+### 后端提示无效目标发行版 17
 
-## 9. 当前说明
+原因是 Maven 或 IDEA 实际运行的 JDK 仍是 1.8。将 `JAVA_HOME`、IDEA Project SDK 和 Maven Runner JRE 都切换为 JDK 17 后重新导入 Maven 项目。
 
-当前版本已经完成：
+### 前端依赖安装慢
 
-- 平台整体前后端改造
-- 角色化登录
-- 教育业务模块实现
-- 课程报名与取消报名
-- AI 日志与可视化看板
-- 平台 UI 统一优化
+可以临时切换 npm 镜像：
+
+```powershell
+npm config set registry https://registry.npmmirror.com
+```
+
+### 中文显示乱码
+
+优先检查文件是否为 UTF-8 编码；如果文件正常但 PowerShell 显示乱码，可使用：
+
+```powershell
+chcp 65001
+```
+
+### 数据库表不存在
+
+通常是 SQL 导入顺序不完整。先导入 `qinghe_system_base.sql`，再导入教育业务表和演示数据脚本。
+
+## 8. 建议开发流程
+
+1. 启动 MySQL。
+2. 导入数据库脚本。
+3. 使用 JDK 17 执行 `mvn clean compile -DskipTests`。
+4. 启动 `EduPlatformApplication`。
+5. 进入 `eapple-ui` 执行 `npm run dev`。
+6. 浏览器访问 `http://localhost/`。

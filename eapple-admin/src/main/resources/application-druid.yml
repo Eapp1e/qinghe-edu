@@ -1,40 +1,39 @@
-# 数据源配置
+# Data source configuration.
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
         druid:
-            # 主库数据源
+            # Primary database.
             master:
-                url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+                url: jdbc:mysql://localhost:3306/${MYSQL_DATABASE:qinghe_edu}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
                 username: root
                 password: 123456
-            # 从库数据源
+            # Secondary database, disabled by default.
             slave:
-                # 从数据源开关，默认关闭
                 enabled: false
                 url:
                 username:
                 password:
-            # 初始连接数
+            # Initial connection count.
             initialSize: 5
-            # 最小连接池数量
+            # Minimum idle connections.
             minIdle: 10
-            # 最大连接池数量
+            # Maximum active connections.
             maxActive: 20
-            # 获取连接等待超时时间
+            # Max wait time for acquiring a connection.
             maxWait: 60000
-            # 连接超时时间
+            # Connection timeout.
             connectTimeout: 30000
-            # 网络超时时间
+            # Socket timeout.
             socketTimeout: 60000
-            # 检测空闲连接的时间间隔，单位毫秒
+            # Idle connection validation interval.
             timeBetweenEvictionRunsMillis: 60000
-            # 连接在池中的最小生存时间，单位毫秒
+            # Minimum idle lifetime.
             minEvictableIdleTimeMillis: 300000
-            # 连接在池中的最大生存时间，单位毫秒
+            # Maximum idle lifetime.
             maxEvictableIdleTimeMillis: 900000
-            # 检测连接是否有效
+            # Connection validation query.
             validationQuery: SELECT 1 FROM DUAL
             testWhileIdle: true
             testOnBorrow: false
@@ -43,16 +42,16 @@ spring:
                 enabled: true
             statViewServlet:
                 enabled: true
-                # 允许访问的白名单，留空表示允许所有地址
+                # Empty allow list means all addresses are allowed.
                 allow:
                 url-pattern: /druid/*
-                # 控制台登录账号密码
+                # Druid console account.
                 login-username: qinghe
                 login-password: 123456
             filter:
                 stat:
                     enabled: true
-                    # 慢 SQL 记录
+                    # Slow SQL logging.
                     log-slow-sql: true
                     slow-sql-millis: 1000
                     merge-sql: true

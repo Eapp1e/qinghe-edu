@@ -2,7 +2,7 @@ set names utf8mb4;
 
 -- 作业问答扩展示例数据
 -- 执行前请先完成：
--- 1. sql/ry_20260321.sql
+-- 1. sql/qinghe_system_base.sql
 -- 2. sql/edu_platform_upgrade.sql
 -- 3. sql/edu_demo_course_expansion.sql
 -- 4. sql/edu_demo_family_expansion.sql

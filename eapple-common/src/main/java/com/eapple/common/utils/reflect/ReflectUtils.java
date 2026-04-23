@@ -1,4 +1,4 @@
-﻿package com.eapple.common.utils.reflect;
+package com.eapple.common.utils.reflect;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

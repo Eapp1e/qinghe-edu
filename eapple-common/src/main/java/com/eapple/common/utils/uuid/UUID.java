@@ -1,4 +1,4 @@
-﻿package com.eapple.common.utils.uuid;
+package com.eapple.common.utils.uuid;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

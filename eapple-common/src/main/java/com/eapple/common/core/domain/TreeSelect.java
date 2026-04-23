@@ -3,31 +3,31 @@ package com.eapple.common.core.domain;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.eapple.common.constant.UserConstants;
 import com.eapple.common.core.domain.entity.SysDept;
 import com.eapple.common.core.domain.entity.SysMenu;
 import com.eapple.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Treeselect鏍戠粨鏋勫疄浣撶被
- * 
- * @author Eapp1e
+ * Tree select node.
+ *
+ * @author EAPPLE
  */
 public class TreeSelect implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    /** 鑺傜偣ID */
+    /** Node ID. */
     private Long id;
 
-    /** 鑺傜偣鍚嶇О */
+    /** Node label. */
     private String label;
 
-    /** 鑺傜偣绂佺敤 */
+    /** Whether the node is disabled. */
     private boolean disabled = false;
 
-    /** 瀛愯妭鐐?*/
+    /** Child nodes. */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<TreeSelect> children;
 

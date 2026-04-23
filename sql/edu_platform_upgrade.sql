@@ -1,4 +1,4 @@
--- 中小学智能课后服务平台菜单重构脚本
+-- 青禾智学课后服务平台菜单重构脚本
 -- 用途：
 -- 1. 在保留基础系统能力的前提下，隐藏与课题无关的默认菜单
 -- 2. 新增教育平台专属菜单与角色
@@ -12,13 +12,13 @@ where menu_id in (1, 2, 3, 4, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 
 -- 新增教育平台角色
 insert into sys_role (role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, del_flag, create_by, create_time, update_by, update_time, remark)
 select * from (
-  select 101 as role_id, '课后服务管理员' as role_name, 'edu_admin' as role_key, 101 as role_sort, 1 as data_scope, 1 as menu_check_strictly, 1 as dept_check_strictly, '0' as status, '0' as del_flag, 'edu_platform' as create_by, sysdate() as create_time, '' as update_by, null as update_time, '中小学智能课后服务平台管理员' as remark
+  select 100 as role_id, '课后服务管理员' as role_name, 'edu_admin' as role_key, 100 as role_sort, 1 as data_scope, 1 as menu_check_strictly, 1 as dept_check_strictly, '0' as status, '0' as del_flag, 'edu_platform' as create_by, sysdate() as create_time, '' as update_by, null as update_time, '青禾智学课后服务平台管理员' as remark
   union all
-  select 102, '课后服务教师', 'edu_teacher', 102, 2, 1, 1, '0', '0', 'edu_platform', sysdate(), '', null, '中小学智能课后服务平台教师'
+  select 101, '课后服务教师', 'edu_teacher', 101, 2, 1, 1, '0', '0', 'edu_platform', sysdate(), '', null, '青禾智学课后服务平台教师'
   union all
-  select 103, '课后服务家长', 'edu_parent', 103, 2, 1, 1, '0', '0', 'edu_platform', sysdate(), '', null, '中小学智能课后服务平台家长'
+  select 102, '课后服务家长', 'edu_parent', 102, 2, 1, 1, '0', '0', 'edu_platform', sysdate(), '', null, '青禾智学课后服务平台家长'
   union all
-  select 104, '课后服务学生', 'edu_student', 104, 2, 1, 1, '0', '0', 'edu_platform', sysdate(), '', null, '中小学智能课后服务平台学生'
+  select 103, '课后服务学生', 'edu_student', 103, 2, 1, 1, '0', '0', 'edu_platform', sysdate(), '', null, '青禾智学课后服务平台学生'
 ) t
 where not exists (select 1 from sys_role r where r.role_id = t.role_id or r.role_key = t.role_key);
 
@@ -74,9 +74,9 @@ select * from (
 where not exists (select 1 from sys_menu m where m.menu_id = t.menu_id);
 
 -- 重置教育角色菜单授权
-delete from sys_role_menu where role_id in (101, 102, 103, 104);
+delete from sys_role_menu where role_id in (100, 101, 102, 103, 104);
 
-insert into sys_role_menu (role_id, menu_id)
+insert ignore into sys_role_menu (role_id, menu_id)
 select * from (
   select 1, 3000 union all
   select 1, 3001 union all
@@ -101,36 +101,49 @@ select * from (
   select 1, 3041 union all
   select 1, 3042 union all
   select 1, 3043 union all
+  select 100, 3000 union all
+  select 100, 3001 union all
+  select 100, 3002 union all
+  select 100, 3003 union all
+  select 100, 3004 union all
+  select 100, 3005 union all
+  select 100, 3006 union all
+  select 100, 3007 union all
+  select 100, 3008 union all
+  select 100, 1000 union all
+  select 100, 1001 union all
+  select 100, 1002 union all
+  select 100, 1003 union all
+  select 100, 1006 union all
+  select 100, 101 union all
+  select 100, 1007 union all
+  select 100, 3010 union all
+  select 100, 3011 union all
+  select 100, 3012 union all
+  select 100, 3013 union all
+  select 100, 3014 union all
+  select 100, 3020 union all
+  select 100, 3021 union all
+  select 100, 3022 union all
+  select 100, 3023 union all
+  select 100, 3030 union all
+  select 100, 3040 union all
+  select 100, 3041 union all
+  select 100, 3042 union all
+  select 100, 3043 union all
   select 101, 3000 union all
   select 101, 3001 union all
   select 101, 3002 union all
-  select 101, 3003 union all
   select 101, 3004 union all
   select 101, 3005 union all
   select 101, 3006 union all
-  select 101, 3007 union all
-  select 101, 3008 union all
-  select 101, 1000 union all
-  select 101, 1001 union all
-  select 101, 1002 union all
-  select 101, 1003 union all
-  select 101, 1006 union all
-  select 101, 101 union all
-  select 101, 1007 union all
   select 101, 3010 union all
   select 101, 3011 union all
   select 101, 3012 union all
-  select 101, 3013 union all
   select 101, 3014 union all
-  select 101, 3020 union all
-  select 101, 3021 union all
-  select 101, 3022 union all
-  select 101, 3023 union all
   select 101, 3030 union all
   select 101, 3040 union all
   select 101, 3041 union all
-  select 101, 3042 union all
-  select 101, 3043 union all
   select 102, 3000 union all
   select 102, 3001 union all
   select 102, 3002 union all
@@ -138,34 +151,21 @@ select * from (
   select 102, 3005 union all
   select 102, 3006 union all
   select 102, 3010 union all
-  select 102, 3011 union all
-  select 102, 3012 union all
   select 102, 3014 union all
-  select 102, 3030 union all
   select 102, 3040 union all
   select 102, 3041 union all
   select 103, 3000 union all
   select 103, 3001 union all
   select 103, 3002 union all
+  select 103, 3003 union all
   select 103, 3004 union all
   select 103, 3005 union all
   select 103, 3006 union all
   select 103, 3010 union all
   select 103, 3014 union all
+  select 103, 3020 union all
   select 103, 3040 union all
-  select 103, 3041 union all
-  select 104, 3000 union all
-  select 104, 3001 union all
-  select 104, 3002 union all
-  select 104, 3003 union all
-  select 104, 3004 union all
-  select 104, 3005 union all
-  select 104, 3006 union all
-  select 104, 3010 union all
-  select 104, 3014 union all
-  select 104, 3020 union all
-  select 104, 3040 union all
-  select 104, 3041
+  select 103, 3041
 ) t;
 
 -- 如存在演示账号，则绑定教育角色
@@ -173,7 +173,7 @@ delete ur
 from sys_user_role ur
 inner join sys_user u on ur.user_id = u.user_id
 where u.user_name in ('edu_admin', 'edu_teacher', 'edu_parent', 'edu_student')
-  and ur.role_id in (101, 102, 103, 104);
+  and ur.role_id in (100, 101, 102, 103, 104);
 
 insert into sys_user_role (user_id, role_id)
 select u.user_id, r.role_id
@@ -198,13 +198,13 @@ update sys_menu set menu_name = 'AI中心', parent_id = 0, order_num = 6, path =
 update sys_menu set parent_id = 0, order_num = 7, path = 'edu/platform-user', route_name = 'EduPlatformUser', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3007;
 update sys_menu set parent_id = 0, order_num = 8, path = 'edu/platform-notice', route_name = 'EduPlatformNotice', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3008;
 
+insert ignore into sys_role_menu(role_id, menu_id) values (101, 3008);
 insert ignore into sys_role_menu(role_id, menu_id) values (102, 3008);
 insert ignore into sys_role_menu(role_id, menu_id) values (103, 3008);
-insert ignore into sys_role_menu(role_id, menu_id) values (104, 3008);
+insert ignore into sys_role_menu(role_id, menu_id) values (101, 3003);
+insert ignore into sys_role_menu(role_id, menu_id) values (101, 3020);
 insert ignore into sys_role_menu(role_id, menu_id) values (102, 3003);
 insert ignore into sys_role_menu(role_id, menu_id) values (102, 3020);
-insert ignore into sys_role_menu(role_id, menu_id) values (103, 3003);
-insert ignore into sys_role_menu(role_id, menu_id) values (103, 3020);
 update sys_menu set icon = 'chart', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3001;
 update sys_menu set icon = 'education', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3002;
 update sys_menu set icon = 'user', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3003;
@@ -220,5 +220,5 @@ delete from sys_menu where menu_id = 3000;
 insert ignore into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, `query`, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
 values (3009, '网课中心', 0, 4, 'edu/online-course', 'edu/onlineCourse/index', '', 'EduOnlineCourse', 1, 0, 'C', '0', '0', '', 'online', 'edu_platform', sysdate(), '', null, '学生端网课学习资源入口');
 
-insert ignore into sys_role_menu(role_id, menu_id) values (104, 3009);
+insert ignore into sys_role_menu(role_id, menu_id) values (103, 3009);
 update sys_menu set icon = 'online', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3009;

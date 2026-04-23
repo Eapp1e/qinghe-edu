@@ -4,9 +4,9 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
- * 鏂囦欢涓婁紶寮傚父绫?
- * 
- * @author Eapp1e
+ * File upload exception.
+ *
+ * @author EAPPLE
  */
 public class FileUploadException extends Exception
 {
