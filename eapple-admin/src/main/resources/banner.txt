@@ -1,4 +1,4 @@
-﻿Application Version: ${platform.version}
+Application Version: ${platform.version}
 Spring Boot Version: ${spring-boot.version}
 ////////////////////////////////////////////////////////////////////
 //                          _ooOoo_                               //
