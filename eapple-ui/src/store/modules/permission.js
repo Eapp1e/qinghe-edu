@@ -53,10 +53,7 @@ const permission = {
 
 function appendRoleRoutes(routes) {
   const result = Array.isArray(routes) ? routes.slice() : []
-  const hasOnlineCourse = result.some(route => {
-    const routePath = route.path || ''
-    return routePath === 'edu/online-course' || routePath === '/edu/online-course'
-  })
+  const hasOnlineCourse = result.some(route => hasRoutePath(route, 'edu/online-course'))
   if (!hasOnlineCourse && (auth.hasRole('edu_student') || auth.hasRole('admin') || auth.hasRole('edu_admin'))) {
     result.splice(2, 0, {
       name: '',
@@ -71,7 +68,7 @@ function appendRoleRoutes(routes) {
           name: 'EduOnlineCourse',
           meta: {
             title: '网课中心',
-            icon: 'guide'
+            icon: 'online'
           }
         }
       ]
@@ -80,12 +77,30 @@ function appendRoleRoutes(routes) {
   return result
 }
 
+function hasRoutePath(route, targetPath) {
+  if (!route) {
+    return false
+  }
+  const routePath = normalizePath(route.path)
+  if (routePath === normalizePath(targetPath)) {
+    return true
+  }
+  return Array.isArray(route.children) && route.children.some(child => hasRoutePath(child, targetPath))
+}
+
+function normalizePath(path) {
+  return (path || '').toString().replace(/^\/+/, '')
+}
+
 function getSidebarSortMode() {
   try {
+    const roleSetting = JSON.parse(localStorage.getItem(getSidebarSortStorageKey()) || '{}')
     const layoutSetting = JSON.parse(localStorage.getItem('layout-setting') || '{}')
     return {
-      mode: layoutSetting.sidebarSortMode || 'default',
-      order: Array.isArray(layoutSetting.sidebarCustomOrder) ? layoutSetting.sidebarCustomOrder : []
+      mode: roleSetting.sidebarSortMode || layoutSetting.sidebarSortMode || 'default',
+      order: Array.isArray(roleSetting.sidebarCustomOrder)
+        ? roleSetting.sidebarCustomOrder
+        : (Array.isArray(layoutSetting.sidebarCustomOrder) ? layoutSetting.sidebarCustomOrder : [])
     }
   } catch (error) {
     return {
@@ -93,6 +108,19 @@ function getSidebarSortMode() {
       order: []
     }
   }
+}
+
+function getSidebarSortStorageKey() {
+  if (auth.hasRole('edu_teacher')) {
+    return 'layout-setting-sidebar-sort-teacher'
+  }
+  if (auth.hasRole('edu_parent')) {
+    return 'layout-setting-sidebar-sort-parent'
+  }
+  if (auth.hasRole('edu_student')) {
+    return 'layout-setting-sidebar-sort-student'
+  }
+  return 'layout-setting-sidebar-sort-admin'
 }
 
 function applySidebarOrder(routes) {
@@ -152,7 +180,7 @@ function getRouteDisplayInfo(route) {
       path: ''
     }
   }
-  const title = (((route || {}).meta || {}).title || '').toString()
+  const title = normalizeRouteTitle((((route || {}).meta || {}).title || '').toString())
   const path = ((route || {}).path || '').toString()
   if (title) {
     return { title, path }
@@ -165,6 +193,13 @@ function getRouteDisplayInfo(route) {
     title: '',
     path
   }
+}
+
+function normalizeRouteTitle(title) {
+  if (title === '报名记录' && (auth.hasRole('edu_student') || auth.hasRole('edu_parent'))) {
+    return '学习记录'
+  }
+  return title
 }
 
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
