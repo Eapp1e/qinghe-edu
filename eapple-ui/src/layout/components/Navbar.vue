@@ -15,6 +15,7 @@
         </button>
         <el-dropdown-menu slot="dropdown" class="settings-dropdown">
           <el-dropdown-item command="background">切换背景色</el-dropdown-item>
+          <el-dropdown-item command="sidebarColor">切换侧栏颜色</el-dropdown-item>
           <el-dropdown-item command="sidebarSort">侧栏排序</el-dropdown-item>
           <el-dropdown-item command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
@@ -102,6 +103,9 @@ export default {
     backgroundMode() {
       return this.$store.state.settings.backgroundMode || 'warm'
     },
+    sidebarColorMode() {
+      return this.$store.state.settings.sidebarColorMode || 'emerald'
+    },
     sidebarSortMode() {
       return this.getSidebarSortSetting().sidebarSortMode || 'default'
     },
@@ -125,6 +129,15 @@ export default {
           key: 'backgroundMode',
           value: nextMode
         })
+        return
+      }
+      if (command === 'sidebarColor') {
+        const nextMode = this.sidebarColorMode === 'classic' ? 'emerald' : 'classic'
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'sidebarColorMode',
+          value: nextMode
+        })
+        this.$message.success(nextMode === 'classic' ? '已切换为经典侧栏色' : '已切换为青禾侧栏色')
         return
       }
       if (command === 'sidebarSort') {

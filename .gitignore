@@ -43,6 +43,7 @@ nbdist/
 *.swp
 eapple-admin/src/main/resources/application-private.yml
 runtime/
+eapple-ui/dist-stage-check/
 
 !*/build/*.java
 !*/build/*.html

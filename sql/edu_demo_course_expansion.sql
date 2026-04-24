@@ -14,12 +14,12 @@ insert into sys_user values
 (125, 103, 'edu_teacher_labor', '何老师', '00', 'edu_teacher_labor@example.com', '13800000025', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台综合实践教师');
 
 insert into sys_user_role values
-(120, 102),
-(121, 102),
-(122, 102),
-(123, 102),
-(124, 102),
-(125, 102);
+(120, 101),
+(121, 101),
+(122, 101),
+(123, 101),
+(124, 101),
+(125, 101);
 
 insert into edu_course (
   course_id, course_name, category, teacher_user_id, teacher_name, campus, week_day, start_time, end_time,

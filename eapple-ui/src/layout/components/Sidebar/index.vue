@@ -1,11 +1,11 @@
 ﻿<template>
-  <div :class="['sidebar-theme-wrapper', { 'has-logo': showLogo }, settings.sideTheme]" :style="{ backgroundColor: settings.sideTheme === 'theme-dark' ? variables.menuBackground : variables.menuLightBackground }">
-    <logo v-if="showLogo" :collapse="isCollapse" />
+  <div :class="['sidebar-theme-wrapper', { 'has-logo': showLogo }, settings.sideTheme, `sidebar-palette-${sidebarColorMode}`]" :style="{ backgroundColor: sidebarBackgroundColor }">
+    <logo v-if="showLogo" :collapse="isCollapse" :palette-mode="sidebarColorMode" />
     <el-scrollbar :class="settings.sideTheme" wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
-        :background-color="settings.sideTheme === 'theme-dark' ? variables.menuBackground : variables.menuLightBackground"
+        :background-color="sidebarMenuBackgroundColor"
         :text-color="settings.sideTheme === 'theme-dark' ? variables.menuColor : variables.menuLightColor"
         :unique-opened="true"
         :active-text-color="settings.theme"
@@ -45,8 +45,23 @@ export default {
     showLogo() {
       return this.$store.state.settings.sidebarLogo
     },
+    sidebarColorMode() {
+      return this.$store.state.settings.sidebarColorMode || 'emerald'
+    },
     variables() {
       return variables
+    },
+    sidebarBackgroundColor() {
+      if (this.settings.sideTheme !== 'theme-dark') {
+        return this.variables.menuLightBackground
+      }
+      return this.sidebarColorMode === 'classic' ? '#1f2b23' : '#17372f'
+    },
+    sidebarMenuBackgroundColor() {
+      if (this.settings.sideTheme !== 'theme-dark') {
+        return this.variables.menuLightBackground
+      }
+      return this.sidebarColorMode === 'classic' ? '#1f2b23' : '#17372f'
     },
     isCollapse() {
       return !this.sidebar.opened

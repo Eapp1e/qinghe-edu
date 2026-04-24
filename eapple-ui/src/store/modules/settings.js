@@ -1,7 +1,7 @@
 import defaultSettings from '@/settings'
 import { useDynamicTitle } from '@/utils/dynamicTitle'
 
-const { sideTheme, backgroundMode, showSettings, navType, sidebarSortMode, sidebarCustomOrder, tagsView, tagsViewPersist, tagsIcon, tagsViewStyle, fixedHeader, sidebarLogo, dynamicTitle, footerVisible, footerContent } = defaultSettings
+const { sideTheme, backgroundMode, sidebarColorMode, showSettings, navType, sidebarSortMode, sidebarCustomOrder, tagsView, tagsViewPersist, tagsIcon, tagsViewStyle, fixedHeader, sidebarLogo, dynamicTitle, footerVisible, footerContent } = defaultSettings
 
 const storageSetting = JSON.parse(localStorage.getItem('layout-setting')) || ''
 const state = {
@@ -9,6 +9,7 @@ const state = {
   theme: storageSetting.theme || '#409EFF',
   sideTheme: storageSetting.sideTheme || sideTheme,
   backgroundMode: storageSetting.backgroundMode || backgroundMode,
+  sidebarColorMode: storageSetting.sidebarColorMode || sidebarColorMode,
   showSettings: showSettings,
   navType: storageSetting.navType === undefined ? navType : storageSetting.navType,
   sidebarSortMode: storageSetting.sidebarSortMode || sidebarSortMode,

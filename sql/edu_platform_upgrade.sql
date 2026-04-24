@@ -218,7 +218,26 @@ delete from sys_menu where menu_id = 3000;
 
 -- 学生端新增网课中心菜单
 insert ignore into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, `query`, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
-values (3009, '网课中心', 0, 4, 'edu/online-course', 'edu/onlineCourse/index', '', 'EduOnlineCourse', 1, 0, 'C', '0', '0', '', 'online', 'edu_platform', sysdate(), '', null, '学生端网课学习资源入口');
+values (3009, '网课中心', 0, 4, 'edu/online-course', 'edu/onlineCourse/index', '', 'EduOnlineCourse', 1, 0, 'C', '0', '0', '', 'monitor', 'edu_platform', sysdate(), '', null, '学生端网课学习资源入口');
 
 insert ignore into sys_role_menu(role_id, menu_id) values (103, 3009);
-update sys_menu set icon = 'online', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3009;
+update sys_menu set icon = 'monitor', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3009;
+
+-- 家长端新增家庭陪学菜单
+insert ignore into sys_menu (menu_id, menu_name, parent_id, order_num, path, component, `query`, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values (3091, '家庭陪学', 0, 4, 'edu/parent-companion', 'edu/parentCompanion/index', '', 'EduParentCompanion', 1, 0, 'C', '0', '0', '', 'peoples', 'edu_platform', sysdate(), '', null, '家长端陪学总览入口');
+
+insert ignore into sys_role_menu(role_id, menu_id) values (102, 3091);
+
+-- 演示账号角色归一化，避免教师/家长/学生账号误绑角色
+delete from sys_user_role where user_id between 120 and 125;
+insert ignore into sys_user_role (user_id, role_id) values
+(120, 101), (121, 101), (122, 101), (123, 101), (124, 101), (125, 101);
+
+delete from sys_user_role where user_id between 130 and 135;
+insert ignore into sys_user_role (user_id, role_id) values
+(130, 102), (131, 102), (132, 102), (133, 102), (134, 102), (135, 102);
+
+delete from sys_user_role where user_id between 136 and 144;
+insert ignore into sys_user_role (user_id, role_id) values
+(136, 103), (137, 103), (138, 103), (139, 103), (140, 103), (141, 103), (142, 103), (143, 103), (144, 103);

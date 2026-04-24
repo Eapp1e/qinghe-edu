@@ -21,9 +21,9 @@
     width: $base-sidebar-width !important;
     font-size: 0;
     background:
-      radial-gradient(circle at top left, rgba(202, 225, 162, 0.12), transparent 32%),
-      linear-gradient(180deg, #1f2c24 0%, #1a241d 100%);
-    box-shadow: 18px 0 38px rgba(24, 33, 27, 0.2);
+      radial-gradient(circle at top left, rgba(186, 219, 157, 0.1), transparent 34%),
+      linear-gradient(180deg, #17372f 0%, #133027 100%);
+    box-shadow: 18px 0 38px rgba(18, 42, 35, 0.24);
     transition: width .28s;
 
     .horizontal-collapse-transition {
@@ -101,14 +101,14 @@
 
     .submenu-title-noDropdown:hover,
     .el-submenu__title:hover {
-      background-color: rgba(202, 225, 162, 0.08) !important;
+      background-color: rgba(196, 223, 167, 0.08) !important;
     }
 
     &.theme-dark {
       .el-menu-item.is-active {
-        background: linear-gradient(90deg, rgba(117, 165, 91, 0.26), rgba(188, 217, 145, 0.08)) !important;
+        background: linear-gradient(90deg, rgba(134, 176, 96, 0.24), rgba(188, 217, 145, 0.08)) !important;
         color: #fff !important;
-        box-shadow: inset 4px 0 0 rgba(199, 224, 143, 0.95);
+        box-shadow: inset 4px 0 0 rgba(206, 230, 154, 0.94);
       }
 
       .el-submenu.is-active > .el-submenu__title {
@@ -117,12 +117,47 @@
 
       .nest-menu .el-submenu > .el-submenu__title,
       .el-submenu .el-menu-item {
-        background-color: rgba(13, 18, 15, 0.16) !important;
+        background-color: rgba(10, 24, 19, 0.18) !important;
 
         &:hover {
           background-color: rgba(194, 220, 159, 0.12) !important;
         }
       }
+    }
+
+    &.sidebar-palette-classic {
+      background:
+        radial-gradient(circle at top left, rgba(165, 194, 149, 0.08), transparent 34%),
+        linear-gradient(180deg, #223127 0%, #1b2820 100%);
+      box-shadow: 18px 0 38px rgba(16, 28, 23, 0.22);
+
+      &.theme-dark {
+        .submenu-title-noDropdown:hover,
+        .el-submenu__title:hover {
+          background-color: rgba(188, 215, 165, 0.07) !important;
+        }
+
+        .el-menu-item.is-active {
+          background: linear-gradient(90deg, rgba(124, 155, 96, 0.26), rgba(193, 218, 151, 0.08)) !important;
+          box-shadow: inset 4px 0 0 rgba(206, 230, 154, 0.92);
+        }
+
+        .nest-menu .el-submenu > .el-submenu__title,
+        .el-submenu .el-menu-item {
+          background-color: rgba(11, 20, 16, 0.16) !important;
+
+          &:hover {
+            background-color: rgba(193, 218, 151, 0.1) !important;
+          }
+        }
+      }
+    }
+
+    &.sidebar-palette-emerald {
+      background:
+        radial-gradient(circle at top left, rgba(186, 219, 157, 0.1), transparent 34%),
+        linear-gradient(180deg, #17372f 0%, #133027 100%);
+      box-shadow: 18px 0 38px rgba(18, 42, 35, 0.24);
     }
 
     &.theme-light {
