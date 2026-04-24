@@ -45,8 +45,8 @@ insert into sys_user (
  '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台学生演示账号');
 
 insert into sys_user_role (user_id, role_id) values
-(130, 103), (131, 103), (132, 103), (133, 103), (134, 103), (135, 103),
-(136, 104), (137, 104), (138, 104), (139, 104), (140, 104), (141, 104), (142, 104), (143, 104), (144, 104);
+(130, 102), (131, 102), (132, 102), (133, 102), (134, 102), (135, 102),
+(136, 103), (137, 103), (138, 103), (139, 103), (140, 103), (141, 103), (142, 103), (143, 103), (144, 103);
 
 insert into edu_student_profile (
   profile_id, student_user_id, student_name, parent_user_id, parent_name, grade_name, class_name,

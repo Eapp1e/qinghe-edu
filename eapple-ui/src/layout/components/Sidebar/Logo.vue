@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
+  <div class="sidebar-logo-container" :class="[{ collapse: collapse }, `palette-${paletteMode}`]">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
         <span class="sidebar-title only-text">&#38738;</span>
@@ -18,6 +18,10 @@ export default {
     collapse: {
       type: Boolean,
       required: true
+    },
+    paletteMode: {
+      type: String,
+      default: 'emerald'
     }
   }
 }
@@ -43,8 +47,8 @@ export default {
   overflow: hidden;
   border-bottom: 1px solid rgba(95, 222, 214, 0.12);
   background:
-    radial-gradient(circle at top left, rgba(31, 228, 190, 0.08), transparent 34%),
-    linear-gradient(180deg, #26352d 0%, #223028 100%);
+    radial-gradient(circle at top left, rgba(186, 219, 157, 0.08), transparent 34%),
+    linear-gradient(180deg, #193930 0%, #153229 100%);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.03);
 
   .sidebar-logo-link {
@@ -96,7 +100,21 @@ export default {
       padding: 0;
       border-radius: 10px;
       border: 1px solid rgba(95, 222, 214, 0.16);
-      background: linear-gradient(180deg, rgba(44, 60, 52, 0.96), rgba(35, 48, 41, 0.94));
+      background: linear-gradient(180deg, rgba(28, 60, 49, 0.96), rgba(22, 47, 39, 0.94));
+    }
+  }
+
+  &.palette-classic {
+    border-bottom-color: rgba(132, 170, 144, 0.14);
+    background:
+      radial-gradient(circle at top left, rgba(158, 191, 143, 0.08), transparent 34%),
+      linear-gradient(180deg, #233128 0%, #1d2821 100%);
+
+    &.collapse {
+      .sidebar-logo-link {
+        border-color: rgba(142, 180, 153, 0.16);
+        background: linear-gradient(180deg, rgba(39, 54, 44, 0.96), rgba(30, 41, 34, 0.94));
+      }
     }
   }
 }

@@ -52,7 +52,9 @@ const permission = {
 }
 
 function appendRoleRoutes(routes) {
-  const result = Array.isArray(routes) ? routes.slice() : []
+  const result = Array.isArray(routes)
+    ? removeRoutePath(removeRoutePath(routes.slice(), 'edu/online-course'), 'edu/parent-companion')
+    : []
   const hasOnlineCourse = result.some(route => hasRoutePath(route, 'edu/online-course'))
   if (!hasOnlineCourse && (auth.hasRole('edu_student') || auth.hasRole('admin') || auth.hasRole('edu_admin'))) {
     result.splice(2, 0, {
@@ -68,13 +70,32 @@ function appendRoleRoutes(routes) {
           name: 'EduOnlineCourse',
           meta: {
             title: '网课中心',
-            icon: 'online'
+            icon: 'monitor'
           }
         }
       ]
     })
   }
   return result
+}
+
+function removeRoutePath(routes, targetPath) {
+  return routes
+    .map(route => {
+      if (!route) {
+        return null
+      }
+      const routePath = normalizePath(route.path)
+      if (routePath === normalizePath(targetPath)) {
+        return null
+      }
+      const nextRoute = { ...route }
+      if (Array.isArray(route.children) && route.children.length) {
+        nextRoute.children = removeRoutePath(route.children, targetPath)
+      }
+      return nextRoute
+    })
+    .filter(Boolean)
 }
 
 function hasRoutePath(route, targetPath) {
