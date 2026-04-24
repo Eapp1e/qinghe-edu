@@ -42,6 +42,7 @@ nbdist/
 *.xml.versionsBackup
 *.swp
 eapple-admin/src/main/resources/application-private.yml
+runtime/
 
 !*/build/*.java
 !*/build/*.html

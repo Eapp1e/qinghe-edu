@@ -36,7 +36,7 @@
       </div>
 
       <p class="sort-tip">
-        {{ sidebarSortForm.mode === 'custom' ? '拖动下面的模块卡片，调整侧栏展示顺序。' : '使用系统当前默认的侧栏顺序。' }}
+        {{ sidebarSortForm.mode === 'custom' ? '拖动下面的模块卡片，调整侧栏显示顺序。' : '使用系统当前默认的侧栏顺序。' }}
       </p>
 
       <draggable
@@ -88,7 +88,8 @@ export default {
         mode: 'default'
       },
       sidebarSortItems: [],
-      defaultSidebarItems: []
+      defaultSidebarItems: [],
+      currentSidebarItems: []
     }
   },
   computed: {
@@ -102,10 +103,10 @@ export default {
       return this.$store.state.settings.backgroundMode || 'warm'
     },
     sidebarSortMode() {
-      return this.$store.state.settings.sidebarSortMode || 'default'
+      return this.getSidebarSortSetting().sidebarSortMode || 'default'
     },
     sidebarCustomOrder() {
-      return this.$store.state.settings.sidebarCustomOrder || []
+      return this.getSidebarSortSetting().sidebarCustomOrder || []
     }
   },
   watch: {
@@ -137,18 +138,62 @@ export default {
     openSidebarSortDialog() {
       this.sidebarSortForm.mode = this.sidebarSortMode
       this.defaultSidebarItems = this.extractSidebarModules(this.$store.state.permission.defaultRoutes || [])
+      this.currentSidebarItems = this.extractSidebarModules(this.$store.getters.sidebarRouters || [])
       this.sidebarSortItems = this.getDialogSidebarItems(this.sidebarSortForm.mode)
       this.sidebarSortDialogVisible = true
     },
     getDialogSidebarItems(mode) {
-      const modules = this.defaultSidebarItems.slice()
       if (mode !== 'custom') {
-        return modules
+        return this.defaultSidebarItems.slice()
       }
+      if (this.currentSidebarItems.length) {
+        return this.currentSidebarItems.slice()
+      }
+      const modules = this.defaultSidebarItems.slice()
       const orderMap = new Map(modules.map(item => [item.key, item]))
       const ordered = this.sidebarCustomOrder.map(key => orderMap.get(key)).filter(Boolean)
       const remainder = modules.filter(item => !this.sidebarCustomOrder.includes(item.key))
       return ordered.concat(remainder)
+    },
+    getSidebarSortStorageKey() {
+      if (this.$auth.hasRole('edu_teacher')) {
+        return 'layout-setting-sidebar-sort-teacher'
+      }
+      if (this.$auth.hasRole('edu_parent')) {
+        return 'layout-setting-sidebar-sort-parent'
+      }
+      if (this.$auth.hasRole('edu_student')) {
+        return 'layout-setting-sidebar-sort-student'
+      }
+      return 'layout-setting-sidebar-sort-admin'
+    },
+    getSidebarSortSetting() {
+      try {
+        const setting = JSON.parse(localStorage.getItem(this.getSidebarSortStorageKey()) || '{}')
+        return {
+          sidebarSortMode: setting.sidebarSortMode || 'default',
+          sidebarCustomOrder: Array.isArray(setting.sidebarCustomOrder) ? setting.sidebarCustomOrder : []
+        }
+      } catch (error) {
+        return {
+          sidebarSortMode: 'default',
+          sidebarCustomOrder: []
+        }
+      }
+    },
+    saveSidebarSortSetting(mode, order) {
+      localStorage.setItem(this.getSidebarSortStorageKey(), JSON.stringify({
+        sidebarSortMode: mode,
+        sidebarCustomOrder: Array.isArray(order) ? order : []
+      }))
+      this.$store.commit('settings/CHANGE_SETTING', {
+        key: 'sidebarSortMode',
+        value: mode
+      })
+      this.$store.commit('settings/CHANGE_SETTING', {
+        key: 'sidebarCustomOrder',
+        value: Array.isArray(order) ? order : []
+      })
     },
     extractSidebarModules(routes = []) {
       const modules = []
@@ -209,16 +254,10 @@ export default {
     saveSidebarSort() {
       const order = this.sidebarSortForm.mode === 'custom'
         ? this.sidebarSortItems.map(item => item.key)
-        : this.sidebarCustomOrder
-      this.$store.dispatch('settings/changeSetting', {
-        key: 'sidebarSortMode',
-        value: this.sidebarSortForm.mode
-      })
-      this.$store.dispatch('settings/changeSetting', {
-        key: 'sidebarCustomOrder',
-        value: order
-      })
+        : []
+      this.saveSidebarSortSetting(this.sidebarSortForm.mode, order)
       this.$store.commit('SET_SIDEBAR_ROUTERS', this.$store.state.permission.defaultRoutes)
+      this.currentSidebarItems = this.extractSidebarModules(this.$store.getters.sidebarRouters || [])
       this.sidebarSortDialogVisible = false
       this.$message.success('侧栏排序已更新')
     },
