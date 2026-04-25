@@ -58,6 +58,7 @@
       </div>
     </section>
 
+    <section class="table-section-card">
     <el-table v-loading="loading" :data="userList" class="content-table">
       <el-table-column label="账号" prop="userName" min-width="140" />
       <el-table-column label="姓名" min-width="120">
@@ -100,6 +101,7 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+    </section>
 
     <el-dialog :title="dialogTitle" :visible.sync="open" width="620px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
@@ -556,9 +558,16 @@ export default {
 .stat-card,
 .guide-item {
   padding: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
   border: 1px solid rgba(129, 224, 224, 0.14);
   box-shadow: 0 16px 28px rgba(11, 32, 40, 0.16);
+}
+
+.stat-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+}
+
+.guide-item {
+  background: #ffffff;
 }
 
 .stat-card span {
@@ -589,11 +598,11 @@ export default {
 .guide-item strong {
   display: block;
   margin-bottom: 8px;
-  color: #1c4150;
+  color: #2d3b33;
 }
 
 .guide-item span {
-  color: #688090;
+  color: #6c776f;
   line-height: 1.8;
   font-size: 14px;
 }
@@ -641,9 +650,9 @@ export default {
 ::v-deep .el-select .el-input__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .el-input__inner:focus,
@@ -686,8 +695,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -700,7 +709,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #eef1f4 !important;
+  background: #f2f4ef !important;
 }
 
 ::v-deep .el-dialog {

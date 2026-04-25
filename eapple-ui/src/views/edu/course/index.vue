@@ -71,6 +71,7 @@
       </div>
     </section>
 
+    <section class="table-section-card">
     <el-table v-loading="loading" :data="courseList" class="content-table">
       <el-table-column label="课程" min-width="180">
         <template slot-scope="scope">
@@ -80,23 +81,23 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="分类" prop="category" width="120" />
-      <el-table-column label="教师" prop="teacherName" width="120" />
-      <el-table-column label="上课时间" width="180">
+      <el-table-column label="分类" prop="category" min-width="120" align="center" show-overflow-tooltip />
+      <el-table-column label="教师" prop="teacherName" min-width="130" align="center" show-overflow-tooltip />
+      <el-table-column label="上课时间" min-width="180" align="center">
         <template slot-scope="scope">{{ scope.row.weekDay }} {{ scope.row.startTime }}-{{ scope.row.endTime }}</template>
       </el-table-column>
-      <el-table-column label="地点" prop="campus" width="140" />
-      <el-table-column label="容量" width="100">
+      <el-table-column label="地点" prop="campus" min-width="140" align="center" show-overflow-tooltip />
+      <el-table-column label="容量" width="110" align="center">
         <template slot-scope="scope">{{ scope.row.currentCapacity }}/{{ scope.row.maxCapacity }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="110">
+      <el-table-column label="状态" width="110" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">
             {{ scope.row.status === '0' ? (isTeacherView ? '已启用' : '开放中') : (isTeacherView ? '已停开' : '已关闭') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="isTeacherView ? '教师操作' : '操作'" min-width="320" fixed="right">
+      <el-table-column :label="isTeacherView ? '教师操作' : '操作'" min-width="290" fixed="right" align="center">
         <template slot-scope="scope">
           <template v-if="canEnrollCourse">
             <el-button size="mini" type="text" @click="handleEnroll(scope.row)">
@@ -133,6 +134,7 @@
     </el-table>
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    </section>
 
     <el-dialog :title="title" :visible.sync="open" width="760px">
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
@@ -742,9 +744,9 @@ export default {
 ::v-deep .el-textarea__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .el-input__inner:focus,
@@ -781,8 +783,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -794,8 +796,26 @@ export default {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
+::v-deep .el-table .el-table__body tr > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr > td {
+  background: #ffffff !important;
+}
+
+::v-deep .el-table .el-table__body tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td,
+::v-deep .el-table .el-table__body tr.current-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.current-row > td {
+  background: #ffffff !important;
+}
+
+::v-deep .el-table .el-table__body tr.hover-row:hover > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row:hover > td,
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #eef1f4 !important;
+  background: #f2f4ef !important;
+}
+
+::v-deep .el-table--enable-row-hover .el-table__fixed-body-wrapper tr:hover > td {
+  background: #f2f4ef !important;
 }
 
 ::v-deep .el-dialog {

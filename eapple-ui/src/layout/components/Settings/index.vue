@@ -357,6 +357,7 @@ export default {
             "footerVisible":${this.footerVisible},
             "sideTheme":"${this.sideTheme}",
             "backgroundMode":"${this.$store.state.settings.backgroundMode || 'warm'}",
+            "tableHeaderColor":"${this.$store.state.settings.tableHeaderColor || '#d6dbd4'}",
             "theme":"${this.theme}"
           }`
       )

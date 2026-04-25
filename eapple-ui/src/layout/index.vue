@@ -32,6 +32,7 @@ export default {
       theme: state => state.settings.theme,
       sideTheme: state => state.settings.sideTheme,
       backgroundMode: state => state.settings.backgroundMode,
+      tableHeaderColor: state => state.settings.tableHeaderColor,
       sidebar: state => state.app.sidebar,
       device: state => state.app.device,
       fixedHeader: state => state.settings.fixedHeader
@@ -60,11 +61,32 @@ export default {
         '--shell-bg': isWarm ? warmShell : classicShell,
         '--surface-bg': isWarm ? warmSurface : classicSurface,
         '--nav-bg': isWarm ? warmSurface : '#ffffff',
-        '--tags-bg': isWarm ? warmSurface : '#ffffff'
+        '--tags-bg': isWarm ? warmSurface : '#ffffff',
+        '--table-header-bg': this.tableHeaderColor || '#d6dbd4',
+        '--table-header-text': '#3f4a42',
+        '--table-header-border': this.toHeaderBorderColor(this.tableHeaderColor || '#d6dbd4')
       }
     }
   },
   methods: {
+    toHeaderBorderColor(hex) {
+      const rgb = this.hexToRgb(hex)
+      if (!rgb) {
+        return '#c2c8c0'
+      }
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.82)`
+    },
+    hexToRgb(hex) {
+      const value = (hex || '').replace('#', '').trim()
+      if (!/^[0-9a-fA-F]{6}$/.test(value)) {
+        return null
+      }
+      return {
+        r: parseInt(value.slice(0, 2), 16),
+        g: parseInt(value.slice(2, 4), 16),
+        b: parseInt(value.slice(4, 6), 16)
+      }
+    },
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
     },

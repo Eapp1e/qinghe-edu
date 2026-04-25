@@ -415,11 +415,7 @@ export default {
 
 .ai-center-page::before,
 .ai-center-page::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(8px);
-  pointer-events: none;
+  display: none;
 }
 
 .ai-center-page::before {
@@ -503,8 +499,8 @@ export default {
 .log-panel {
   border: 1px solid rgba(105, 214, 220, 0.18);
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 252, 255, 0.92));
-  box-shadow: 0 22px 38px rgba(41, 130, 141, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  background: #fffdfa;
+  box-shadow: 0 18px 32px rgba(41, 130, 141, 0.08);
 }
 
 .stat-card {
@@ -551,7 +547,11 @@ export default {
   padding: 12px 14px;
   border: 1px solid rgba(109, 210, 219, 0.16);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(251, 255, 255, 0.96), rgba(242, 251, 255, 0.88));
+  background: #ffffff;
+}
+
+::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
+  background: var(--table-row-hover-bg, #edf4e8) !important;
 }
 
 .response-preview {
@@ -589,7 +589,7 @@ export default {
   padding: 18px 20px;
   border: 1px solid rgba(108, 208, 219, 0.16);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(251, 255, 255, 0.96), rgba(241, 250, 255, 0.9));
+  background: #ffffff;
   color: #314c5d;
   line-height: 1.9;
 }
@@ -639,9 +639,7 @@ export default {
 }
 
 .accent-card {
-  background:
-    radial-gradient(circle at top right, rgba(61, 229, 191, 0.14), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 252, 255, 0.92));
+  background: #fffdfa;
 }
 
 .card-head h3,
@@ -716,9 +714,9 @@ export default {
 }
 
 .model-tag.active {
-  background: linear-gradient(135deg, rgba(18, 224, 169, 0.18), rgba(42, 152, 255, 0.14));
-  border-color: rgba(37, 221, 191, 0.36);
-  color: #106f79;
+  background: linear-gradient(135deg, rgba(95, 143, 78, 0.16), rgba(131, 176, 118, 0.12));
+  border-color: rgba(95, 143, 78, 0.34);
+  color: #4d6852;
 }
 
 .mini-stats {
@@ -768,8 +766,8 @@ export default {
   height: 10px;
   flex: 0 0 10px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #12d8b0 0%, #2a98ff 100%);
-  box-shadow: 0 0 0 3px rgba(18, 216, 176, 0.14);
+  background: linear-gradient(135deg, #5fa16a 0%, #89b07a 100%);
+  box-shadow: 0 0 0 3px rgba(95, 161, 106, 0.14);
 }
 
 .feature-label {
@@ -777,7 +775,7 @@ export default {
 }
 
 .feature-list li i {
-  color: #7aa2b5;
+  color: #88a28e;
   font-size: 14px;
 }
 
@@ -787,13 +785,13 @@ export default {
 
 .feature-list li.clickable:hover {
   transform: translateY(-1px);
-  border-color: rgba(48, 208, 190, 0.34);
+  border-color: rgba(95, 143, 78, 0.34);
   box-shadow: 0 14px 26px rgba(33, 145, 155, 0.1);
 }
 
 .feature-list li.clickable:hover i,
 .feature-list li.clickable:hover span {
-  color: #17707a;
+  color: #4d6852;
 }
 
 .log-panel {
@@ -809,14 +807,14 @@ export default {
 }
 
 .content-table {
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 
 ::v-deep .el-input__inner,
 ::v-deep .el-select .el-input__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
 }
 
@@ -835,8 +833,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
 }
 
 @media (max-width: 1100px) {

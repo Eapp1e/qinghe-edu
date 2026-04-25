@@ -96,8 +96,8 @@
   .el-table__header-wrapper, .el-table__fixed-header-wrapper {
     th {
       word-break: break-word;
-      background-color: #f8f8f9;
-      color: #515a6e;
+      background-color: var(--table-header-bg, #d6dbd4);
+      color: var(--table-header-text, #3f4a42);
       height: 40px;
       font-size: 13px;
     }

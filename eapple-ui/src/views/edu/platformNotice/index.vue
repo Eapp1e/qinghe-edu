@@ -54,6 +54,7 @@
       </div>
     </section>
 
+    <section class="table-section-card">
     <el-table v-loading="loading" :data="noticeList" class="content-table">
       <el-table-column label="通知标题" min-width="240" show-overflow-tooltip>
         <template slot-scope="scope">
@@ -95,6 +96,7 @@
       :total="total"
       @pagination="getList"
     />
+    </section>
 
     <el-dialog :title="title" :visible.sync="open" width="820px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="88px">
@@ -513,9 +515,9 @@ export default {
 ::v-deep .el-textarea__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .el-input__inner:focus,
@@ -558,8 +560,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -571,8 +573,15 @@ export default {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
+::v-deep .el-table .el-table__body tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td {
+  background: #ffffff !important;
+}
+
+::v-deep .el-table .el-table__body tr.hover-row:hover > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row:hover > td,
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #eef1f4 !important;
+  background: var(--table-row-hover-bg, #f2f4ef) !important;
 }
 
 ::v-deep .el-dialog {

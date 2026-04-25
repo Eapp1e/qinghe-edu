@@ -16,6 +16,7 @@
   --edu-text-secondary: #67736a;
   --edu-primary: #5f8f4e;
   --edu-primary-deep: #3f6c37;
+  --table-row-hover-bg: #f2f4ef;
 }
 
 html {
@@ -289,12 +290,14 @@ aside {
 .el-textarea__inner {
   border-radius: 14px;
   border-color: rgba(130, 112, 82, 0.18);
-  background: rgba(255, 253, 248, 0.9);
+  background: #ffffff;
+  box-shadow: none;
 }
 
 .el-input__inner:focus,
 .el-textarea__inner:focus {
   border-color: #8aae65;
+  box-shadow: 0 0 0 3px rgba(138, 174, 101, 0.12);
 }
 
 .el-table {
@@ -305,9 +308,9 @@ aside {
 
 .app-container .el-table th.el-table__cell,
 .app-container ::v-deep .el-table th.el-table__cell {
-  background: #d1d5db !important;
-  color: #374151 !important;
-  border-bottom: 2px solid #bcc3cc !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
+  border-bottom: 2px solid var(--table-header-border, #c2c8c0) !important;
   box-shadow: none !important;
   font-weight: 700;
 }
@@ -317,9 +320,65 @@ aside {
   background: #ffffff !important;
 }
 
+.app-container .el-table .el-table__body tr.current-row > td.el-table__cell,
+.app-container ::v-deep .el-table .el-table__body tr.current-row > td.el-table__cell,
+.app-container .el-table .el-table__fixed-body-wrapper tr.current-row > td.el-table__cell,
+.app-container ::v-deep .el-table .el-table__fixed-body-wrapper tr.current-row > td.el-table__cell {
+  background: #ffffff !important;
+}
+
+.app-container .el-table .el-table__body tr.hover-row > td.el-table__cell,
+.app-container ::v-deep .el-table .el-table__body tr.hover-row > td.el-table__cell,
+.app-container .el-table .el-table__fixed-body-wrapper tr.hover-row > td.el-table__cell,
+.app-container ::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td.el-table__cell {
+  background: #ffffff !important;
+}
+
+.app-container .el-table .el-table__body tr.hover-row:hover > td.el-table__cell,
+.app-container ::v-deep .el-table .el-table__body tr.hover-row:hover > td.el-table__cell,
+.app-container .el-table .el-table__fixed-body-wrapper tr.hover-row:hover > td.el-table__cell,
+.app-container ::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row:hover > td.el-table__cell,
 .app-container .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell,
-.app-container ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
-  background: #eef1f4 !important;
+.app-container ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell,
+.app-container .el-table--enable-row-hover .el-table__fixed-body-wrapper tr:hover > td.el-table__cell,
+.app-container ::v-deep .el-table--enable-row-hover .el-table__fixed-body-wrapper tr:hover > td.el-table__cell {
+  background: var(--table-row-hover-bg, #f2f4ef) !important;
+}
+
+.table-section-card {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  margin-top: 16px;
+  border: 1px solid rgba(130, 112, 82, 0.14);
+  border-radius: 22px;
+  background: #fffdfa;
+  box-shadow: var(--edu-shadow-soft);
+}
+
+.table-section-card .content-table {
+  margin-bottom: 0 !important;
+  border-radius: 0;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.table-section-card .pagination-container,
+.list-panel .pagination-container,
+.log-panel .pagination-container {
+  margin-top: 0;
+  padding: 14px 18px 6px;
+  border-top: 1px solid rgba(130, 112, 82, 0.12);
+  background: #fffdfa;
+}
+
+.table-section-card .pagination-container .el-pagination,
+.list-panel .pagination-container .el-pagination,
+.log-panel .pagination-container .el-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
 }
 
 .el-dialog {

@@ -43,6 +43,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
     </section>
 
+    <section class="table-section-card">
     <el-table v-loading="loading" :data="aiLogList" class="content-table">
       <el-table-column label="业务类型" prop="businessType" width="160" />
       <el-table-column label="用户" prop="userName" width="120" />
@@ -65,6 +66,7 @@
     </el-table>
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    </section>
   </div>
 </template>
 
@@ -262,9 +264,9 @@ export default {
 ::v-deep .el-select .el-input__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .el-input__inner:focus {
@@ -295,8 +297,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
 }
 
 ::v-deep .el-table tr {
@@ -304,7 +306,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #eef1f4 !important;
+  background: #f2f4ef !important;
 }
 
 ::v-deep .el-pagination .btn-next,
