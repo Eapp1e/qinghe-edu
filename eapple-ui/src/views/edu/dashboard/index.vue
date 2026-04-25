@@ -569,13 +569,8 @@ export default {
 .info-panel {
   border: 1px solid rgba(61, 136, 160, 0.34);
   border-radius: 24px;
-  background:
-    radial-gradient(circle at bottom right, rgba(32, 224, 182, 0.08), transparent 28%),
-    linear-gradient(180deg, rgba(237, 251, 252, 0.96), rgba(246, 250, 253, 0.98));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 18px 36px rgba(31, 107, 127, 0.08);
+  background: #ffffff;
+  box-shadow: 0 18px 36px rgba(31, 107, 127, 0.08);
 }
 
 .timeline-panel {
@@ -597,7 +592,7 @@ export default {
 
 .timeline-scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(76, 149, 255, 0.25);
+  background: rgba(95, 143, 78, 0.22);
 }
 
 .panel-head {
@@ -644,11 +639,9 @@ export default {
   align-items: flex-start;
   padding: 18px 20px;
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 255, 0.96));
+  background: #ffffff;
   border: 1px solid rgba(61, 136, 160, 0.26);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
-    0 10px 24px rgba(34, 93, 108, 0.06);
+  box-shadow: 0 10px 24px rgba(34, 93, 108, 0.06);
 }
 
 .mini-main strong {
@@ -667,7 +660,7 @@ export default {
 
 .mini-item span {
   flex-shrink: 0;
-  color: #3794e0;
+  color: #4f7867;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.5;
@@ -694,7 +687,7 @@ export default {
 .timeline-panel ::v-deep .el-timeline-item__node {
   width: 14px;
   height: 14px;
-  background: linear-gradient(180deg, #20d9b7, #57a6ff);
+  background: linear-gradient(180deg, #5ebf8e, #7fb08e);
   border: 2px solid #f4fbfb;
   box-shadow: 0 0 0 7px rgba(32, 224, 182, 0.16);
 }
@@ -711,11 +704,9 @@ export default {
 .timeline-card {
   padding: 14px 16px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 254, 0.96));
+  background: #ffffff;
   border: 1px solid rgba(61, 136, 160, 0.26);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
-    0 10px 22px rgba(34, 93, 108, 0.05);
+  box-shadow: 0 10px 22px rgba(34, 93, 108, 0.05);
 }
 
 .timeline-card strong {

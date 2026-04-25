@@ -571,12 +571,7 @@ export default {
 }
 
 .login-shell::after {
-  content: '';
-  position: absolute;
-  inset: 14px;
-  border-radius: 24px;
-  border: 1px solid rgba(116, 213, 214, 0.26);
-  pointer-events: none;
+  display: none;
 }
 
 .login-shell .shell-topline {
@@ -1280,12 +1275,11 @@ export default {
   height: 50px;
   border: 1px solid rgba(144, 214, 221, 0.52);
   border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(237, 249, 255, 0.94));
+  background: #ffffff;
   color: #355162;
   font-size: 15px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .el-input__inner:focus {

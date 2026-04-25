@@ -93,6 +93,7 @@
       </div>
     </section>
 
+    <section class="table-section-card">
     <el-table v-loading="loading" :data="questionList" class="content-table">
       <el-table-column label="课程" prop="courseName" width="150" />
       <el-table-column label="学生" prop="studentName" width="120" />
@@ -121,6 +122,7 @@
     </el-table>
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    </section>
 
     <el-dialog title="提交作业问题" :visible.sync="open" width="700px">
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
@@ -415,14 +417,9 @@ export default {
   padding: 18px 20px 4px;
   border: 1px solid rgba(157, 232, 233, 0.42);
   border-radius: 22px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
-    rgba(255, 255, 255, 0.26);
+  background: #f8fbf9;
   box-shadow:
-    0 22px 40px rgba(41, 130, 141, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+    0 18px 34px rgba(41, 130, 141, 0.08);
 }
 
 .search-toolbar {
@@ -574,9 +571,9 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
-  border-bottom: 2px solid #bcc3cc !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
+  border-bottom: 2px solid var(--table-header-border, #c2c8c0) !important;
   box-shadow: none !important;
 }
 
@@ -584,8 +581,15 @@ export default {
   background-color: #ffffff !important;
 }
 
+::v-deep .el-table .el-table__body tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td {
+  background: #ffffff !important;
+}
+
+::v-deep .el-table .el-table__body tr.hover-row:hover > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row:hover > td,
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #eef1f4 !important;
+  background: var(--table-row-hover-bg, #f2f4ef) !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -602,16 +606,14 @@ export default {
 ::v-deep .toolbar-card .el-select .el-input__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .toolbar-card .el-input__inner:focus {
   border-color: #25ddbf;
-  box-shadow:
-    0 0 0 4px rgba(37, 221, 191, 0.12),
-    0 12px 22px rgba(39, 182, 194, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 221, 191, 0.12);
 }
 
 ::v-deep .toolbar-card .el-button--primary {

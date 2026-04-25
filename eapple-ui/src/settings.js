@@ -3,6 +3,7 @@ module.exports = {
   sideTheme: 'theme-dark',
   backgroundMode: 'warm',
   sidebarColorMode: 'emerald',
+  tableHeaderColor: '#d6dbd4',
   showSettings: true,
   navType: 1,
   sidebarSortMode: 'default',

@@ -53,6 +53,7 @@
       </div>
     </section>
 
+    <section class="table-section-card">
     <el-table v-loading="loading" :data="enrollmentList" class="content-table">
       <el-table-column :label="'\u8bfe\u7a0b'" prop="courseName" min-width="150" />
       <el-table-column :label="'\u5b66\u751f'" prop="studentName" width="120" />
@@ -72,6 +73,7 @@
     </el-table>
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+    </section>
 
     <el-dialog :title="dialogTitle" :visible.sync="open" width="620px">
       <el-form :model="form" label-width="90px">
@@ -361,9 +363,9 @@ export default {
 ::v-deep .el-select .el-input__inner {
   border-color: rgba(134, 214, 222, 0.42);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 249, 255, 0.94));
+  background: #ffffff;
   color: #355161;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  box-shadow: none;
 }
 
 ::v-deep .el-input__inner:focus,
@@ -395,8 +397,8 @@ export default {
 }
 
 ::v-deep .el-table th {
-  background: #d1d5db !important;
-  color: #374151 !important;
+  background: var(--table-header-bg, #d6dbd4) !important;
+  color: var(--table-header-text, #3f4a42) !important;
 }
 
 ::v-deep .el-table th:first-child .cell,
@@ -409,7 +411,7 @@ export default {
 }
 
 ::v-deep .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #eef1f4 !important;
+  background: #f2f4ef !important;
 }
 
 ::v-deep .el-dialog {
