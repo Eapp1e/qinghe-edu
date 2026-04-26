@@ -94,45 +94,49 @@
         </el-tooltip>
       </div>
 
-      <el-table v-loading="loading" :data="aiLogList" class="content-table">
-        <el-table-column label="业务类型" min-width="150">
-          <template slot-scope="scope">
-            <div class="biz-type-cell">
-              <span class="biz-type-tag">{{ formatBusinessType(scope.row.businessType) }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="模型" prop="modelName" min-width="180" show-overflow-tooltip />
-        <el-table-column label="状态" width="100">
-          <template slot-scope="scope">
-            <el-tag size="small" :type="statusTagType(scope.row.status)">{{ formatStatus(scope.row.status) }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column v-if="showRoleColumn" label="角色" prop="roleType" width="100" />
-        <el-table-column label="返回内容" min-width="320">
-          <template slot-scope="scope">
-            <div class="response-card">
-              <p class="response-preview">{{ getResponsePreview(scope.row.responseContent, scope.row.errorMessage) }}</p>
-              <el-button
-                v-if="hasResponseDetail(scope.row.responseContent, scope.row.errorMessage)"
-                type="text"
-                size="mini"
-                @click="showResponseDetail(scope.row)"
-              >
-                查看完整内容
-              </el-button>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+      <section class="table-section-card">
+        <el-table v-loading="loading" :data="aiLogList" class="content-table">
+          <el-table-column label="业务类型" min-width="150">
+            <template slot-scope="scope">
+              <div class="biz-type-cell">
+                <span class="biz-type-tag">{{ formatBusinessType(scope.row.businessType) }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="模型" prop="modelName" min-width="180" show-overflow-tooltip />
+          <el-table-column label="状态" width="100">
+            <template slot-scope="scope">
+              <el-tag size="small" :type="statusTagType(scope.row.status)">{{ formatStatus(scope.row.status) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="showRoleColumn" label="角色" width="100">
+            <template slot-scope="scope">{{ formatRoleType(scope.row.roleType) }}</template>
+          </el-table-column>
+          <el-table-column label="返回内容" min-width="320">
+            <template slot-scope="scope">
+              <div class="response-card">
+                <p class="response-preview">{{ getResponsePreview(scope.row.responseContent, scope.row.errorMessage) }}</p>
+                <el-button
+                  v-if="hasResponseDetail(scope.row.responseContent, scope.row.errorMessage)"
+                  type="text"
+                  size="mini"
+                  @click="showResponseDetail(scope.row)"
+                >
+                  查看完整内容
+                </el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
 
-      <pagination
-        v-show="total > 0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getLogList"
-      />
+        <pagination
+          v-show="total > 0"
+          :total="total"
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getLogList"
+        />
+      </section>
     </section>
 
     <el-dialog :title="responseDialogTitle" :visible.sync="responseDialogOpen" width="720px" append-to-body>
@@ -249,14 +253,15 @@ export default {
       }
       if (this.isParentView) {
         return {
-          title: '陪学AI中心',
+          title: '家长AI中心',
           description: '为家长提供更合适的 AI 模型选择，支持查看陪学问答与课程推荐相关的 AI 使用记录。',
           modelTip: '家长侧的 AI 互动、课程推荐理由等内容会优先使用这里选中的模型。',
           snapshotTitle: '陪学使用概览',
           snapshotTip: '推荐优先选择响应更快、表达更稳定的模型，方便日常陪学与课程参考。',
           featureTitle: '家长常用能力',
           features: [
-            { label: '陪学问答支持', path: '/edu/question' },
+            { label: 'AI 诊断建议', path: '/edu/parent-companion' },
+            { label: '亲子任务约定', path: '/edu/family-task' },
             { label: '孩子课程推荐', path: '/edu/student' }
           ],
           logTitle: '我的最近 AI 互动',
@@ -354,7 +359,7 @@ export default {
     },
     statusTagType(status) {
       if (status === 'success') return 'success'
-      if (status === 'mock') return 'warning'
+      if (status === 'mock') return 'success'
       if (status === 'failed') return 'danger'
       return 'info'
     },
@@ -362,7 +367,7 @@ export default {
       const map = {
         success: '成功',
         failed: '失败',
-        mock: '模拟'
+        mock: '成功'
       }
       return map[status] || '未知'
     },
@@ -375,9 +380,23 @@ export default {
         online_resource_recommendation: '网课推荐',
         learning_guidance: '学习辅导',
         parent_support: '家长陪学',
+        parent_diagnosis: '家长诊断建议',
         ai_chat: '智能对话'
       }
       return map[type] || type || '未分类'
+    },
+    formatRoleType(roleType) {
+      const map = {
+        admin: '管理员',
+        edu_admin: '教务管理员',
+        teacher: '教师',
+        edu_teacher: '教师',
+        parent: '家长',
+        edu_parent: '家长',
+        student: '学生',
+        edu_student: '学生'
+      }
+      return map[roleType] || roleType || '未分类'
     },
     sanitizeResponseContent(content) {
       return sanitizeAiDisplayContent(content)
@@ -798,6 +817,14 @@ export default {
   padding: 22px;
 }
 
+.table-section-card {
+  overflow: hidden;
+  border: 1px solid rgba(106, 216, 218, 0.18);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 22px 38px rgba(41, 130, 141, 0.08);
+}
+
 .panel-head {
   display: flex;
   align-items: flex-start;
@@ -826,10 +853,19 @@ export default {
 
 ::v-deep .el-table {
   overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid rgba(106, 216, 218, 0.18);
+  border-radius: 0;
+  border: none;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 22px 38px rgba(41, 130, 141, 0.08);
+  box-shadow: none;
+}
+
+.log-panel :deep(.pagination-container) {
+  margin: 0;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(106, 216, 218, 0.18);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: none;
 }
 
 ::v-deep .el-table th {

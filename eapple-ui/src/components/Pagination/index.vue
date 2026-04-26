@@ -5,7 +5,7 @@
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
       :layout="layout"
-      :page-sizes="pageSizes"
+      :page-sizes="normalizedPageSizes"
       :pager-count="pagerCount"
       :total="total"
       v-bind="$attrs"
@@ -81,6 +81,13 @@ export default {
       set(val) {
         this.$emit('update:limit', val)
       }
+    },
+    normalizedPageSizes() {
+      const sizes = Array.isArray(this.pageSizes) ? this.pageSizes.slice() : []
+      if (!sizes.includes(this.limit)) {
+        sizes.unshift(this.limit)
+      }
+      return sizes.filter(size => Number(size) > 0)
     }
   },
   methods: {

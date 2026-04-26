@@ -110,6 +110,32 @@ create table if not exists edu_ai_log (
   primary key (log_id)
 ) engine=innodb default charset=utf8mb4 comment='AI调用日志表';
 
+create table if not exists edu_family_task (
+  task_id bigint(20) not null auto_increment comment '任务ID',
+  parent_user_id bigint(20) not null comment '家长用户ID',
+  parent_name varchar(64) default '' comment '家长姓名',
+  student_user_id bigint(20) not null comment '学生用户ID',
+  student_name varchar(64) default '' comment '学生姓名',
+  task_title varchar(120) not null comment '任务标题',
+  task_type varchar(30) default 'habit' comment '任务类型',
+  task_content varchar(1000) default '' comment '任务说明',
+  reward_points int(11) default 0 comment '积分奖励',
+  reward_text varchar(255) default '' comment '现实奖励',
+  due_date varchar(20) default '' comment '截止日期',
+  proof_images varchar(1000) default '' comment '完成图片',
+  student_feedback varchar(1000) default '' comment '学生反馈',
+  parent_comment varchar(1000) default '' comment '家长评语',
+  status char(1) default '0' comment '状态 0待完成 1待确认 2已完成 3已退回',
+  remark varchar(500) default '' comment '备注',
+  create_by varchar(64) default '' comment '创建者',
+  create_time datetime comment '创建时间',
+  update_by varchar(64) default '' comment '更新者',
+  update_time datetime comment '更新时间',
+  primary key (task_id),
+  key idx_family_task_parent (parent_user_id),
+  key idx_family_task_student (student_user_id)
+) engine=innodb default charset=utf8mb4 comment='家庭任务表';
+
 insert ignore into sys_user (user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, pwd_update_date, create_by, create_time, update_by, update_time, remark) values
 (110, 103, 'edu_admin', '平台管理员', '00', 'edu_admin@example.com', '13800000010', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台管理员'),
 (111, 103, 'edu_teacher', '李老师', '00', 'edu_teacher@example.com', '13800000011', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台教师'),

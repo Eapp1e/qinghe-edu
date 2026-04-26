@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <!-- 日志输出目录 -->
-    <property name="log.path" value="D:/Progects/Codex/bishe/runtime/logs" />
+    <property name="log.path" value="D:/Progects/Codex/qinghe-edu/runtime/logs" />
     <!-- 日志输出格式 -->
     <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
 

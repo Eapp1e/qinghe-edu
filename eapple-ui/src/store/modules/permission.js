@@ -53,7 +53,7 @@ const permission = {
 
 function appendRoleRoutes(routes) {
   const result = Array.isArray(routes)
-    ? removeRoutePath(removeRoutePath(routes.slice(), 'edu/online-course'), 'edu/parent-companion')
+    ? removeRoutePath(removeRoutePath(removeRoutePath(routes.slice(), 'edu/online-course'), 'edu/parent-companion'), 'edu/family-task')
     : []
   const hasOnlineCourse = result.some(route => hasRoutePath(route, 'edu/online-course'))
   if (!hasOnlineCourse && (auth.hasRole('edu_student') || auth.hasRole('admin') || auth.hasRole('edu_admin'))) {
@@ -76,7 +76,34 @@ function appendRoleRoutes(routes) {
       ]
     })
   }
+  if (auth.hasRole('edu_parent') || auth.hasRole('admin') || auth.hasRole('edu_admin')) {
+    result.splice(2, 0, buildSinglePageRoute('edu/parent-companion', 'edu/parentCompanion/index', 'EduParentCompanion', '家长陪学', 'guide'))
+  }
+  if (auth.hasRole('edu_parent') || auth.hasRole('edu_student') || auth.hasRole('admin') || auth.hasRole('edu_admin')) {
+    result.splice(3, 0, buildSinglePageRoute('edu/family-task', 'edu/familyTask/index', 'EduFamilyTask', '亲子任务', 'form'))
+  }
   return result
+}
+
+function buildSinglePageRoute(path, component, name, title, icon) {
+  return {
+    name: '',
+    path: '/',
+    component: 'Layout',
+    hidden: false,
+    meta: null,
+    children: [
+      {
+        path,
+        component,
+        name,
+        meta: {
+          title,
+          icon
+        }
+      }
+    ]
+  }
 }
 
 function removeRoutePath(routes, targetPath) {
@@ -219,6 +246,12 @@ function getRouteDisplayInfo(route) {
 function normalizeRouteTitle(title) {
   if (title === '报名记录' && (auth.hasRole('edu_student') || auth.hasRole('edu_parent'))) {
     return '学习记录'
+  }
+  if (title === '家庭陪学') {
+    return '家长陪学'
+  }
+  if (title === '家庭任务') {
+    return '亲子任务'
   }
   return title
 }

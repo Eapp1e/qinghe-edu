@@ -23,7 +23,13 @@ import com.eapple.common.enums.BusinessType;
 import com.eapple.common.exception.ServiceException;
 import com.eapple.common.utils.SecurityUtils;
 import com.eapple.common.utils.StringUtils;
+import com.eapple.system.domain.edu.EduCourseEnrollment;
+import com.eapple.system.domain.edu.EduHomeworkQuestion;
+import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.service.edu.IEduAiService;
+import com.eapple.system.service.edu.IEduEnrollmentService;
+import com.eapple.system.service.edu.IEduHomeworkQuestionService;
+import com.eapple.system.service.edu.IEduStudentProfileService;
 
 @RestController
 @RequestMapping("/edu/ai")
@@ -31,6 +37,15 @@ public class EduAiController extends BaseController
 {
     @Autowired
     private IEduAiService aiService;
+
+    @Autowired
+    private IEduStudentProfileService profileService;
+
+    @Autowired
+    private IEduEnrollmentService enrollmentService;
+
+    @Autowired
+    private IEduHomeworkQuestionService questionService;
 
     @PreAuthorize("@ss.hasRole('admin') or @ss.hasRole('edu_admin') or @ss.hasRole('edu_teacher') or @ss.hasRole('edu_parent') or @ss.hasRole('edu_student')")
     @GetMapping("/models")
@@ -91,6 +106,69 @@ public class EduAiController extends BaseController
             recommendations = buildLocalRecommendations(body.getInterest(), body.getResources());
         }
         return success(recommendations);
+    }
+
+    @PreAuthorize("@ss.hasRole('edu_parent')")
+    @Log(title = "家长诊断建议", businessType = BusinessType.OTHER)
+    @PostMapping("/parent-diagnosis")
+    public AjaxResult parentDiagnosis(@RequestBody ParentDiagnosisBody body)
+    {
+        if (body == null || body.getStudentUserId() == null)
+        {
+            throw new ServiceException("请选择要诊断的孩子");
+        }
+        EduStudentProfile child = findCurrentParentChild(body.getStudentUserId());
+        String prompt = buildParentDiagnosisPrompt(child, body);
+        return success(aiService.generateParentDiagnosis(child.getStudentUserId(), prompt));
+    }
+
+    private EduStudentProfile findCurrentParentChild(Long studentUserId)
+    {
+        List<EduStudentProfile> children = profileService.selectCurrentUserChildren();
+        for (EduStudentProfile child : children)
+        {
+            if (child != null && studentUserId.equals(child.getStudentUserId()))
+            {
+                return child;
+            }
+        }
+        throw new ServiceException("只能查看已绑定孩子的诊断建议");
+    }
+
+    private String buildParentDiagnosisPrompt(EduStudentProfile child, ParentDiagnosisBody body)
+    {
+        EduCourseEnrollment enrollmentQuery = new EduCourseEnrollment();
+        enrollmentQuery.setStudentUserId(child.getStudentUserId());
+        List<EduCourseEnrollment> enrollments = enrollmentService.selectEnrollmentList(enrollmentQuery);
+
+        EduHomeworkQuestion questionQuery = new EduHomeworkQuestion();
+        questionQuery.setStudentUserId(child.getStudentUserId());
+        List<EduHomeworkQuestion> questions = questionService.selectQuestionList(questionQuery);
+
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("学生：").append(child.getStudentName())
+                .append("，年级班级：").append(StringUtils.defaultString(child.getGradeName(), "未填写"))
+                .append(StringUtils.defaultString(child.getClassName(), ""))
+                .append("，兴趣标签：").append(StringUtils.defaultString(child.getInterestTags(), "未填写"))
+                .append("\n");
+        prompt.append("家长补充关注：").append(StringUtils.defaultString(body.getConcern(), "未填写")).append("\n");
+        prompt.append("学习记录：\n");
+        for (EduCourseEnrollment item : enrollments)
+        {
+            prompt.append("- ").append(item.getCourseName())
+                    .append("：").append(StringUtils.defaultString(item.getLearningRecord(), "暂无记录"))
+                    .append("；互动：").append(StringUtils.defaultString(item.getInteractionSummary(), "暂无"))
+                    .append("\n");
+        }
+        prompt.append("作业问答情况：\n");
+        for (EduHomeworkQuestion item : questions)
+        {
+            prompt.append("- ").append(item.getQuestionTitle())
+                    .append("：").append(StringUtils.defaultString(item.getQuestionContent(), ""))
+                    .append("；AI答复摘要：").append(StringUtils.defaultString(item.getAiAnswer(), "暂无"))
+                    .append("\n");
+        }
+        return prompt.toString();
     }
 
     private List<JSONObject> normalizeRecommendationList(String content)
@@ -190,7 +268,7 @@ public class EduAiController extends BaseController
         {
             return result;
         }
-        Pattern linkPattern = Pattern.compile("(https?://[^\\s\\]）>]+)");
+        Pattern linkPattern = Pattern.compile("(https?://[^\\s\\]，；]+)");
         String[] lines = text.split("\\r?\\n");
         for (String rawLine : lines)
         {
@@ -206,7 +284,7 @@ public class EduAiController extends BaseController
             }
             String link = matcher.group(1);
             String title = line.substring(0, matcher.start()).replaceAll("^[\\-\\d\\.、\\s]+", "").trim();
-            String reason = line.substring(matcher.end()).replaceAll("^[：:：\\-\\s]+", "").trim();
+            String reason = line.substring(matcher.end()).replaceAll("^[，；：\\-\\s]+", "").trim();
             JSONObject object = new JSONObject();
             object.put("title", StringUtils.isEmpty(title) ? "推荐资源" : title);
             object.put("link", link);
@@ -224,7 +302,7 @@ public class EduAiController extends BaseController
             return result;
         }
 
-        String normalizedInterest = StringUtils.defaultString(interest).toLowerCase();
+        String normalizedInterest = StringUtils.defaultString(interest).toLowerCase(Locale.ROOT);
         String[] keywords = normalizedInterest.split("[,，、\\s]+");
         List<JSONObject> matched = new ArrayList<>();
         List<JSONObject> secondary = new ArrayList<>();
@@ -382,6 +460,33 @@ public class EduAiController extends BaseController
         public void setLink(String link)
         {
             this.link = link;
+        }
+    }
+
+    public static class ParentDiagnosisBody
+    {
+        private Long studentUserId;
+
+        private String concern;
+
+        public Long getStudentUserId()
+        {
+            return studentUserId;
+        }
+
+        public void setStudentUserId(Long studentUserId)
+        {
+            this.studentUserId = studentUserId;
+        }
+
+        public String getConcern()
+        {
+            return concern;
+        }
+
+        public void setConcern(String concern)
+        {
+            this.concern = concern;
         }
     }
 }
