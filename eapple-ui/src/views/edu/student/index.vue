@@ -214,7 +214,7 @@
             <el-table-column v-if="canManageProfile" label="操作" width="150" fixed="right">
               <template slot-scope="scope">
                 <el-button v-hasPermi="['edu:student:edit']" type="text" size="mini" @click.stop="handleUpdate(scope.row)">编辑</el-button>
-                <el-button v-hasPermi="['edu:student:remove']" type="text" size="mini" @click.stop="handleDelete(scope.row)">删除</el-button>
+                <el-button v-hasPermi="['edu:student:remove']" type="text" size="mini" class="danger-text" @click.stop="handleDelete(scope.row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -240,7 +240,7 @@
           <el-col v-if="isStudentOwner" :span="24">
             <el-form-item label="家长账号" prop="parentAccount">
               <el-input v-model="form.parentAccount" placeholder="请输入家长登录账号进行绑定" />
-              <div class="field-tip">填写家长登录账号后即可完成绑定，留空则保持当前绑定关系不变。</div>
+              <div class="field-tip">家长账号为必填项，已绑定时会自动回显当前家长登录账号。</div>
             </el-form-item>
           </el-col>
           <el-col :span="12"><el-form-item label="年级"><el-input v-model="form.gradeName" /></el-form-item></el-col>
@@ -375,6 +375,8 @@ export default {
       if (!this.isStudentOwner) {
         rules.studentUserId = [{ required: true, message: '请输入学生ID', trigger: 'blur' }]
         rules.parentUserId = [{ required: true, message: '请输入家长ID', trigger: 'blur' }]
+      } else {
+        rules.parentAccount = [{ required: true, message: '请输入家长账号', trigger: 'blur' }]
       }
       return rules
     },
@@ -464,7 +466,7 @@ export default {
       this.open = true
     },
     handleOwnerEdit(row) {
-      this.form = { ...row, parentAccount: '' }
+      this.form = { ...row, parentAccount: row.parentAccount || '' }
       this.title = '修改我的档案'
       this.open = true
       this.$nextTick(() => {
@@ -486,6 +488,9 @@ export default {
           this.$modal.msgSuccess('保存成功')
           this.open = false
           this.getList()
+          if (this.isStudentOwner) {
+            this.$store.dispatch('GetInfo')
+          }
         })
       })
     },
@@ -914,7 +919,7 @@ export default {
 }
 
 .content-table {
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .recommend-dialog {
@@ -1051,10 +1056,26 @@ export default {
 
 ::v-deep .el-table {
   overflow: hidden;
-  border-radius: 22px;
-  border: 1px solid rgba(106, 216, 218, 0.18);
+  border-radius: 0;
+  border: none;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 22px 38px rgba(41, 130, 141, 0.08);
+  box-shadow: none;
+}
+
+.list-panel {
+  overflow: hidden;
+}
+
+.list-panel :deep(.el-card__body) {
+  padding: 0;
+}
+
+.list-panel :deep(.pagination-container) {
+  margin: 0;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(106, 216, 218, 0.18);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: none;
 }
 
 ::v-deep .el-table th {
@@ -1082,6 +1103,17 @@ export default {
 
 ::v-deep .el-table--enable-row-hover .el-table__fixed-body-wrapper tr:hover > td {
   background: #f2f4ef !important;
+}
+
+::v-deep .el-table .el-table__body tr.hover-row > td,
+::v-deep .el-table .el-table__fixed tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-right tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td {
+  background: #f2f4ef !important;
+}
+
+.danger-text {
+  color: #ef5753 !important;
 }
 
 ::v-deep .el-input__inner,

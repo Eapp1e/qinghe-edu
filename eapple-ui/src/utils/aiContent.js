@@ -49,7 +49,7 @@ export function sanitizeAiDisplayContent(content) {
     return ''
   }
 
-  const punctuationPattern = /[\u4e00-\u9fa5，。！？；：、】【》、]/
+  const punctuationPattern = /[\u4e00-\u9fa5，。！？；：、（）【】《》]/
   const trailingAsciiPattern = /\s+(?:[A-Za-z]{2,12}|[A-Za-z]{2,12}\s+[A-Za-z]{2,12}|[A-Za-z]{2,12}\s+[A-Za-z]{2,12}\s+[A-Za-z]{2,12})$/
 
   const cleanedLines = normalized
@@ -59,7 +59,6 @@ export function sanitizeAiDisplayContent(content) {
     .filter(line => line && !/^[A-Za-z][A-Za-z0-9_\s-]{0,20}$/.test(line))
     .map((line) => {
       let cleaned = line
-        .replace(/\s+[A-Za-z]{2,12}\s+[�]\s+[A-Za-z]{2,12}$/g, '')
         .replace(/\s{2,}/g, ' ')
         .trim()
 

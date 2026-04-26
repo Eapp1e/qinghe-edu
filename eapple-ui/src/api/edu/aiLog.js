@@ -31,3 +31,17 @@ export function getMyAiLogSummary(query) {
     params: query
   })
 }
+
+export function delAiLog(logId) {
+  return request({
+    url: '/edu/aiLog/' + logId,
+    method: 'delete'
+  })
+}
+
+export function delMyAiLog(logId) {
+  return request({
+    url: '/edu/aiLog/my/' + logId,
+    method: 'delete'
+  })
+}

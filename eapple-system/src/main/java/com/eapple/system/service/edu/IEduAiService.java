@@ -15,6 +15,8 @@ public interface IEduAiService
 
     String generateOnlineResourceRecommendation(Long userId, String prompt);
 
+    String generateParentDiagnosis(Long studentUserId, String prompt);
+
     String getCurrentModel();
 
     List<EduAiModelOption> getAvailableModels();

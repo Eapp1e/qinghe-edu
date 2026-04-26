@@ -30,3 +30,12 @@ export function recommendOnlineResources(data) {
     data
   })
 }
+
+export function generateParentDiagnosis(data) {
+  return request({
+    url: '/edu/ai/parent-diagnosis',
+    method: 'post',
+    noErrorMessage: true,
+    data
+  })
+}

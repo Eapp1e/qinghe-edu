@@ -67,7 +67,10 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
             profile.setStudentUserId(SecurityUtils.getUserId());
             if (StringUtils.isEmpty(profile.getStudentName()))
             {
-                profile.setStudentName(SecurityUtils.getUsername());
+                SysUser currentUser = userService.selectUserById(SecurityUtils.getUserId());
+                profile.setStudentName(currentUser == null
+                        ? SecurityUtils.getUsername()
+                        : StringUtils.defaultString(currentUser.getNickName(), currentUser.getUserName()));
             }
             bindParentByAccount(profile);
             if (profile.getParentUserId() == null)
@@ -81,7 +84,9 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         }
         ensureProfileEditable(profile);
         profile.setCreateBy(SecurityUtils.getUsername());
-        return profileMapper.insertProfile(profile);
+        int rows = profileMapper.insertProfile(profile);
+        syncStudentNickname(profile);
+        return rows;
     }
 
     @Override
@@ -101,7 +106,9 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
             }
         }
         profile.setUpdateBy(SecurityUtils.getUsername());
-        return profileMapper.updateProfile(profile);
+        int rows = profileMapper.updateProfile(profile);
+        syncStudentNickname(profile);
+        return rows;
     }
 
     @Override
@@ -131,6 +138,18 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         }
         profile.setParentUserId(parentUser.getUserId());
         profile.setParentName(StringUtils.defaultString(parentUser.getNickName(), parentUser.getUserName()));
+    }
+
+    private void syncStudentNickname(EduStudentProfile profile)
+    {
+        if (!SecurityUtils.hasExactRole("edu_student") || StringUtils.isEmpty(profile.getStudentName()))
+        {
+            return;
+        }
+        SysUser user = new SysUser();
+        user.setUserId(SecurityUtils.getUserId());
+        user.setNickName(profile.getStudentName());
+        userService.updateUserProfile(user);
     }
 
     private boolean hasParentRole(SysUser user)

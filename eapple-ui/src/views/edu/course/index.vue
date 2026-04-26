@@ -818,6 +818,13 @@ export default {
   background: #f2f4ef !important;
 }
 
+::v-deep .el-table .el-table__body tr.hover-row > td,
+::v-deep .el-table .el-table__fixed tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-right tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td {
+  background: #f2f4ef !important;
+}
+
 ::v-deep .el-dialog {
   border-radius: 28px;
   overflow: hidden;

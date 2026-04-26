@@ -15,4 +15,8 @@ public interface IEduAiLogService
     Map<String, Long> getCurrentUserAiLogSummary(EduAiLog log);
 
     int insertAiLog(EduAiLog log);
+
+    int deleteAiLogByIds(Long[] logIds);
+
+    int deleteCurrentUserAiLogByIds(Long[] logIds);
 }

@@ -11,6 +11,8 @@ public class EduAiLog extends BaseEntity
     private String businessType;
     private Long bizId;
     private Long userId;
+    private String studentName;
+    private String concern;
 
     @Excel(name = "用户")
     private String userName;
@@ -76,6 +78,26 @@ public class EduAiLog extends BaseEntity
     public void setUserId(Long userId)
     {
         this.userId = userId;
+    }
+
+    public String getStudentName()
+    {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName)
+    {
+        this.studentName = studentName;
+    }
+
+    public String getConcern()
+    {
+        return concern;
+    }
+
+    public void setConcern(String concern)
+    {
+        this.concern = concern;
     }
 
     public String getUserName()
