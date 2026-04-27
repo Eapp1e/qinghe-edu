@@ -10,6 +10,8 @@ public interface EduFamilyTaskMapper
 
     List<EduFamilyTask> selectTaskList(EduFamilyTask task);
 
+    Long countTasks(EduFamilyTask task);
+
     int insertTask(EduFamilyTask task);
 
     int updateTask(EduFamilyTask task);

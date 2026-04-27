@@ -45,7 +45,7 @@ public class EduEnrollmentController extends BaseController
         util.exportExcel(response, list, "报名记录数据");
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:enrollment:edit') or @ss.hasRole('edu_parent')")
+    @PreAuthorize("@ss.hasPermi('edu:enrollment:edit') or @ss.hasRole('edu_teacher') or @ss.hasRole('edu_student')")
     @Log(title = "课程报名", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody EduCourseEnrollment enrollment)

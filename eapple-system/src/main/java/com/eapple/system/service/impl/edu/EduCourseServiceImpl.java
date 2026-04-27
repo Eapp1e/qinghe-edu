@@ -1,7 +1,9 @@
 package com.eapple.system.service.impl.edu;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -11,12 +13,14 @@ import org.springframework.stereotype.Service;
 import com.eapple.common.exception.ServiceException;
 import com.eapple.common.utils.SecurityUtils;
 import com.eapple.common.utils.StringUtils;
+import com.eapple.system.domain.edu.EduAiLog;
 import com.eapple.system.domain.edu.EduCourse;
 import com.eapple.system.domain.edu.EduCourseEnrollment;
 import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.mapper.edu.EduCourseMapper;
 import com.eapple.system.mapper.edu.EduEnrollmentMapper;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
+import com.eapple.system.service.edu.IEduAiLogService;
 import com.eapple.system.service.edu.IEduAiService;
 import com.eapple.system.service.edu.IEduCourseService;
 
@@ -34,6 +38,9 @@ public class EduCourseServiceImpl implements IEduCourseService
 
     @Autowired
     private IEduAiService aiService;
+
+    @Autowired
+    private IEduAiLogService aiLogService;
 
     @Override
     public EduCourse selectCourseById(Long courseId)
@@ -85,11 +92,16 @@ public class EduCourseServiceImpl implements IEduCourseService
     @Override
     public int deleteCourseByIds(Long[] courseIds)
     {
-        if (!SecurityUtils.isAdmin())
+        for (Long courseId : courseIds)
         {
-            for (Long courseId : courseIds)
+            EduCourse course = ensureCourseExists(courseId);
+            if (!"1".equals(course.getStatus()))
             {
-                ensureCourseOwner(ensureCourseExists(courseId));
+                throw new ServiceException("课程需要先停开后才能删除");
+            }
+            if (!SecurityUtils.isAdmin())
+            {
+                ensureCourseOwner(course);
             }
         }
         return courseMapper.deleteCourseByIds(courseIds);
@@ -103,6 +115,11 @@ public class EduCourseServiceImpl implements IEduCourseService
         {
             throw new ServiceException("当前课程未开放报名");
         }
+        if (course.getEndDate() != null && course.getEndDate().before(todayStart()))
+        {
+            throw new ServiceException("课程已结课，暂不支持报名");
+        }
+
         Long targetStudentId = resolveStudentUserId(studentUserId);
         EduStudentProfile profile = profileMapper.selectProfileByStudentUserId(targetStudentId);
         if (profile == null)
@@ -167,7 +184,7 @@ public class EduCourseServiceImpl implements IEduCourseService
         String prompt = "课程名称：" + course.getCourseName()
                 + "\n分类：" + course.getCategory()
                 + "\n教师：" + course.getTeacherName()
-                + "\n时间：" + course.getWeekDay() + " " + course.getStartTime() + "-" + course.getEndTime()
+                + "\n时间：" + course.getWeekDay()
                 + "\n地点：" + course.getCampus()
                 + "\n课程简介：" + StringUtils.defaultString(course.getDescription());
         String content = aiService.generateCourseNotice(courseId, prompt);
@@ -207,6 +224,10 @@ public class EduCourseServiceImpl implements IEduCourseService
 
         for (EduCourse course : allCourses)
         {
+            if (course.getEndDate() != null && course.getEndDate().before(todayStart()))
+            {
+                continue;
+            }
             if (enrollmentMapper.selectEnrollmentByCourseAndStudent(course.getCourseId(), targetStudentId) != null)
             {
                 continue;
@@ -223,19 +244,18 @@ public class EduCourseServiceImpl implements IEduCourseService
                 continue;
             }
             course.setRecommendationScore(score);
-            course.setRecommendationReason(buildRecommendationReason(course, profile));
             recommendations.add(course);
         }
 
-        recommendations.sort(Comparator.comparing(EduCourse::getRecommendationScore).reversed()
+        recommendations.sort(Comparator.comparing(EduCourse::getRecommendationScore, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(EduCourse::getEnrollCount, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(EduCourse::getCourseId, Comparator.reverseOrder()));
+                .thenComparing(EduCourse::getCourseId, Comparator.nullsLast(Comparator.reverseOrder())));
 
-        if (recommendations.size() > 4)
-        {
-            return new ArrayList<>(recommendations.subList(0, 4));
-        }
-        return recommendations;
+        List<EduCourse> topRecommendations = recommendations.size() > 4
+                ? new ArrayList<>(recommendations.subList(0, 4)) : recommendations;
+        fillRecommendationReasons(topRecommendations, profile, interestKeywords);
+        recordCourseRecommendationLog(profile, topRecommendations);
+        return topRecommendations;
     }
 
     private void fillQueryScope(EduCourse course, boolean onlyMine)
@@ -274,6 +294,16 @@ public class EduCourseServiceImpl implements IEduCourseService
             throw new ServiceException("课程不存在");
         }
         return course;
+    }
+
+    private Date todayStart()
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
     }
 
     private void ensureCourseOwner(EduCourse course)
@@ -333,12 +363,10 @@ public class EduCourseServiceImpl implements IEduCourseService
         {
             score += 10;
         }
-
         if (course.getEnrollCount() != null)
         {
             score += Math.min(course.getEnrollCount().intValue() * 3, 15);
         }
-
         if (course.getMaxCapacity() != null && course.getCurrentCapacity() != null)
         {
             int remain = course.getMaxCapacity() - course.getCurrentCapacity();
@@ -347,7 +375,6 @@ public class EduCourseServiceImpl implements IEduCourseService
                 score += Math.min(remain, 8);
             }
         }
-
         return score;
     }
 
@@ -396,7 +423,7 @@ public class EduCourseServiceImpl implements IEduCourseService
                 .replaceAll("\\s+", " ")
                 .trim();
 
-        String[] fragments = cleaned.split("[。！？!?\n]");
+        String[] fragments = cleaned.split("[。！？?!\n]");
         for (String fragment : fragments)
         {
             String candidate = fragment == null ? "" : fragment.trim();
@@ -407,8 +434,124 @@ public class EduCourseServiceImpl implements IEduCourseService
         }
 
         String interests = StringUtils.defaultString(profile.getInterestTags(), "当前兴趣");
-        String firstInterest = interests.split("[，,、\\s]+")[0];
+        String firstInterest = interests.split("[，、;；\\s]+")[0];
         return ensureSentence("课程内容与" + firstInterest + "方向较匹配，建议优先关注");
+    }
+
+    private void fillRecommendationReasons(List<EduCourse> courses, EduStudentProfile profile, Set<String> interestKeywords)
+    {
+        for (EduCourse course : courses)
+        {
+            course.setRecommendationReason(buildLocalRecommendationReason(course, profile, interestKeywords));
+        }
+    }
+
+    private String buildLocalRecommendationReason(EduCourse course, EduStudentProfile profile, Set<String> interestKeywords)
+    {
+        String matchedKeyword = findMatchedKeyword(course, interestKeywords);
+        String gradeName = StringUtils.defaultString(profile.getGradeName(), "当前年级");
+        String courseName = StringUtils.defaultString(course.getCourseName(), "这门课程");
+        String category = StringUtils.defaultString(course.getCategory(), "综合素养");
+        if (StringUtils.isNotEmpty(matchedKeyword))
+        {
+            return ensureSentence(courseName + "与孩子的“" + matchedKeyword + "”兴趣方向匹配，可在" + category + "学习中保持较高参与度");
+        }
+        if (StringUtils.isNotEmpty(profile.getInterestTags()))
+        {
+            return ensureSentence(courseName + "能承接孩子已有兴趣，适合作为" + gradeName + "阶段的课后拓展与持续练习");
+        }
+        return ensureSentence(courseName + "课程节奏和内容较适合" + gradeName + "学生，可用于补充课后服务中的实践体验");
+    }
+
+    private String findMatchedKeyword(EduCourse course, Set<String> interestKeywords)
+    {
+        String courseText = (StringUtils.defaultString(course.getCourseName()) + " "
+                + StringUtils.defaultString(course.getCategory()) + " "
+                + StringUtils.defaultString(course.getDescription())).toLowerCase(Locale.ROOT);
+        for (String keyword : interestKeywords)
+        {
+            if (courseText.contains(keyword))
+            {
+                return keyword;
+            }
+        }
+        return "";
+    }
+
+    private void recordCourseRecommendationLog(EduStudentProfile profile, List<EduCourse> recommendations)
+    {
+        if (recommendations == null || recommendations.isEmpty())
+        {
+            return;
+        }
+        EduAiLog log = new EduAiLog();
+        log.setBusinessType("course_recommendation");
+        log.setBizId(profile.getStudentUserId());
+        log.setUserId(SecurityUtils.getUserId());
+        log.setUserName(SecurityUtils.getUsername());
+        log.setRoleType(resolveRoleType());
+        log.setPromptContent(buildCourseRecommendationPrompt(profile, recommendations));
+        log.setResponseContent(buildCourseRecommendationResponse(profile, recommendations));
+        log.setModelName("QINGHE-Recommendation");
+        log.setStatus("success");
+        log.setRiskFlag("normal");
+        log.setPromptTokens(log.getPromptContent().length());
+        log.setCompletionTokens(log.getResponseContent().length());
+        log.setLatencyMs(0L);
+        aiLogService.insertAiLog(log);
+    }
+
+    private String buildCourseRecommendationPrompt(EduStudentProfile profile, List<EduCourse> recommendations)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("学生：").append(StringUtils.defaultString(profile.getStudentName())).append("\n");
+        builder.append("年级班级：").append(StringUtils.defaultString(profile.getGradeName())).append(" ")
+                .append(StringUtils.defaultString(profile.getClassName())).append("\n");
+        builder.append("兴趣标签：").append(StringUtils.defaultString(profile.getInterestTags(), "暂未填写")).append("\n");
+        builder.append("本次候选课程：");
+        for (EduCourse course : recommendations)
+        {
+            builder.append("\n- ").append(StringUtils.defaultString(course.getCourseName()))
+                    .append("（").append(StringUtils.defaultString(course.getCategory(), "未分类")).append("）")
+                    .append("，推荐分：").append(course.getRecommendationScore());
+        }
+        return builder.toString();
+    }
+
+    private String buildCourseRecommendationResponse(EduStudentProfile profile, List<EduCourse> recommendations)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("本次已结合").append(StringUtils.defaultString(profile.getStudentName(), "学生"))
+                .append("的年级、兴趣标签、课程容量和报名情况生成课程推荐。\n");
+        for (int i = 0; i < recommendations.size(); i++)
+        {
+            EduCourse course = recommendations.get(i);
+            builder.append(i + 1).append(". ").append(StringUtils.defaultString(course.getCourseName()))
+                    .append("：").append(StringUtils.defaultString(course.getRecommendationReason())).append("\n");
+        }
+        builder.append("建议家长优先选择孩子兴趣匹配度高、上课时间稳定且能持续完成学习记录的课程。");
+        return builder.toString();
+    }
+
+    private String resolveRoleType()
+    {
+        if (SecurityUtils.isAdmin())
+        {
+            return "admin";
+        }
+        if (SecurityUtils.hasExactRole("edu_teacher"))
+        {
+            return "edu_teacher";
+        }
+        if (SecurityUtils.hasExactRole("edu_parent"))
+        {
+            return "edu_parent";
+        }
+        if (SecurityUtils.hasExactRole("edu_student"))
+        {
+            return "edu_student";
+        }
+        return "user";
     }
 
     private String ensureSentence(String text)

@@ -118,8 +118,43 @@ public class EduAiController extends BaseController
             throw new ServiceException("请选择要诊断的孩子");
         }
         EduStudentProfile child = findCurrentParentChild(body.getStudentUserId());
-        String prompt = buildParentDiagnosisPrompt(child, body);
+        String prompt = buildCleanParentDiagnosisPrompt(child, body);
         return success(aiService.generateParentDiagnosis(child.getStudentUserId(), prompt));
+    }
+
+    private String buildCleanParentDiagnosisPrompt(EduStudentProfile child, ParentDiagnosisBody body)
+    {
+        EduCourseEnrollment enrollmentQuery = new EduCourseEnrollment();
+        enrollmentQuery.setStudentUserId(child.getStudentUserId());
+        List<EduCourseEnrollment> enrollments = enrollmentService.selectEnrollmentList(enrollmentQuery);
+
+        EduHomeworkQuestion questionQuery = new EduHomeworkQuestion();
+        questionQuery.setStudentUserId(child.getStudentUserId());
+        List<EduHomeworkQuestion> questions = questionService.selectQuestionList(questionQuery);
+
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("学生：").append(child.getStudentName()).append("\n");
+        prompt.append("年级班级：").append(StringUtils.defaultString(child.getGradeName(), "未填写"))
+                .append(StringUtils.defaultString(child.getClassName(), "")).append("\n");
+        prompt.append("兴趣标签：").append(StringUtils.defaultString(child.getInterestTags(), "未填写")).append("\n");
+        prompt.append("家长补充关注：").append(StringUtils.defaultString(body.getConcern(), "未填写")).append("\n");
+        prompt.append("学习记录：\n");
+        for (EduCourseEnrollment item : enrollments)
+        {
+            prompt.append("- ").append(item.getCourseName())
+                    .append("：").append(StringUtils.defaultString(item.getLearningRecord(), "暂无记录"))
+                    .append("；教师反馈：").append(StringUtils.defaultString(item.getInteractionSummary(), "暂无"))
+                    .append("\n");
+        }
+        prompt.append("作业问答情况：\n");
+        for (EduHomeworkQuestion item : questions)
+        {
+            prompt.append("- ").append(item.getQuestionTitle())
+                    .append("：").append(StringUtils.defaultString(item.getQuestionContent(), ""))
+                    .append("；AI答复摘要：").append(StringUtils.defaultString(item.getAiAnswer(), "暂无"))
+                    .append("\n");
+        }
+        return prompt.toString();
     }
 
     private EduStudentProfile findCurrentParentChild(Long studentUserId)

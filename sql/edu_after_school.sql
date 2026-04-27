@@ -129,7 +129,7 @@ insert into sys_menu values('2000', '课后服务平台', '0', '5', 'edu', '', '
 insert into sys_menu values('2001', '平台看板', '2000', '1', 'dashboard', 'edu/dashboard/index', '', '', 1, 0, 'C', '0', '0', 'edu:dashboard:view', 'dashboard', 'admin', sysdate(), '', null, '平台看板菜单');
 insert into sys_menu values('2002', '课程管理', '2000', '2', 'course', 'edu/course/index', '', '', 1, 0, 'C', '0', '0', 'edu:course:list', 'guide', 'admin', sysdate(), '', null, '课程管理菜单');
 insert into sys_menu values('2003', '学生档案', '2000', '3', 'student', 'edu/student/index', '', '', 1, 0, 'C', '0', '0', 'edu:student:list', 'peoples', 'admin', sysdate(), '', null, '学生档案菜单');
-insert into sys_menu values('2004', '报名管理', '2000', '4', 'enrollment', 'edu/enrollment/index', '', '', 1, 0, 'C', '0', '0', 'edu:enrollment:list', 'form', 'admin', sysdate(), '', null, '报名管理菜单');
+insert into sys_menu values('2004', '上课记录', '2000', '4', 'enrollment', 'edu/enrollment/index', '', '', 1, 0, 'C', '0', '0', 'edu:enrollment:list', 'form', 'admin', sysdate(), '', null, '课程上课与学习记录菜单');
 insert into sys_menu values('2005', '作业问答', '2000', '5', 'question', 'edu/question/index', '', '', 1, 0, 'C', '0', '0', 'edu:question:list', 'message', 'admin', sysdate(), '', null, '作业问答菜单');
 insert into sys_menu values('2006', 'AI日志', '2000', '6', 'aiLog', 'edu/aiLog/index', '', '', 1, 0, 'C', '0', '0', 'edu:ai:list', 'redis', 'admin', sysdate(), '', null, 'AI日志菜单');
 

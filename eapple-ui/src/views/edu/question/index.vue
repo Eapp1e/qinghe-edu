@@ -20,7 +20,7 @@
 
     <section
       v-show="showSearch"
-      class="toolbar-card search-toolbar"
+      class="toolbar-card toolbar-panel search-toolbar"
     >
       <div class="search-toolbar-row">
         <el-form
@@ -434,15 +434,19 @@ export default {
 }
 
 .search-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
   flex: 1;
 }
 
 ::v-deep .search-form .input-student .el-input__inner {
-  width: 156px;
+  width: 100% !important;
 }
 
 ::v-deep .search-form .select-status .el-input__inner {
-  width: 148px;
+  width: 100% !important;
 }
 
 .inline-right-toolbar {
@@ -459,7 +463,21 @@ export default {
 }
 
 ::v-deep .search-form .el-form-item {
-  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin: 0 !important;
+}
+
+::v-deep .search-form .el-form-item__content {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0 !important;
+}
+
+::v-deep .search-form .el-input,
+::v-deep .search-form .el-select {
+  width: 190px !important;
 }
 
 @media (max-width: 1400px) {

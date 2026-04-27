@@ -27,34 +27,36 @@
       </div>
     </section>
 
-    <section class="toolbar-card">
-      <el-form :model="queryParams" inline size="small">
-        <el-form-item label="账号">
-          <el-input v-model="queryParams.userName" placeholder="如 edu_teacher" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="queryParams.nickName" placeholder="如 李老师 / 王家长" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item label="状态" class="status-select">
-          <el-select v-model="queryParams.status" clearable placeholder="全部状态">
-            <el-option label="启用" value="0" />
-            <el-option label="停用" value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-tooltip content="查询" placement="top">
-            <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
-          </el-tooltip>
-          <el-tooltip content="重置筛选" placement="top">
-            <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
-          </el-tooltip>
-        </el-form-item>
-      </el-form>
+    <section class="toolbar-panel">
+      <div class="toolbar-main">
+        <el-form :model="queryParams" inline size="small" class="query-form">
+          <el-form-item label="账号">
+            <el-input v-model="queryParams.userName" placeholder="如 edu_teacher" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="姓名">
+            <el-input v-model="queryParams.nickName" placeholder="如 李老师 / 王家长" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="状态" class="status-select">
+            <el-select v-model="queryParams.status" clearable placeholder="全部状态">
+              <el-option label="启用" value="0" />
+              <el-option label="停用" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-tooltip content="查询" placement="top">
+              <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
+            </el-tooltip>
+            <el-tooltip content="重置筛选" placement="top">
+              <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
 
-      <div class="quick-actions">
-        <el-button type="primary" plain size="small" class="toolbar-gradient-btn" @click="handleAdd">新建用户</el-button>
-        <el-button size="small" icon="el-icon-download" @click="handleExport">导出</el-button>
-        <right-toolbar @queryTable="getList" />
+        <div class="toolbar-actions">
+          <el-button type="primary" plain size="small" class="toolbar-gradient-btn" @click="handleAdd">新建用户</el-button>
+          <el-button size="small" icon="el-icon-download" @click="handleExport">导出</el-button>
+          <right-toolbar @queryTable="getList" />
+        </div>
       </div>
     </section>
 
@@ -550,7 +552,7 @@ export default {
 
 .stat-card,
 .guide-item,
-.toolbar-card,
+.toolbar-panel,
 .content-table {
   border-radius: 22px;
 }
@@ -607,14 +609,10 @@ export default {
   font-size: 14px;
 }
 
-.toolbar-card {
+.toolbar-panel {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px 4px;
+  padding: 16px 18px;
   border: 1px solid rgba(157, 232, 233, 0.42);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
@@ -626,8 +624,24 @@ export default {
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
-.quick-actions {
-  padding-bottom: 14px;
+.toolbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.query-form {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .content-table {
@@ -741,7 +755,7 @@ export default {
 
 @media (max-width: 992px) {
   .page-hero,
-  .toolbar-card {
+  .toolbar-main {
     flex-direction: column;
     align-items: stretch;
   }
@@ -749,6 +763,10 @@ export default {
   .guide-panel,
   .hero-stats {
     grid-template-columns: 1fr;
+  }
+
+  .toolbar-actions {
+    justify-content: flex-start;
   }
 }
 </style>

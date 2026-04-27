@@ -98,7 +98,7 @@ export default {
       if (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')) {
         return '\u5b66\u4e60\u8bb0\u5f55'
       }
-      return defaultTitle
+      return '上课记录'
     }
   }
 }

@@ -6,7 +6,7 @@
           <span class="hero-badge">平台总览</span>
           <h1>中小学智能课后服务平台</h1>
           <p>
-            平台围绕课后课程管理、报名协同、学习跟踪与 AI 辅助服务构建统一工作台，
+            平台围绕课后课程、网课资源、AI 辅助、家长陪学与亲子任务构建统一工作台，
             为学校、教师、家长与学生提供高效、安全、可追踪的课后服务支持。
           </p>
           <div class="hero-actions">
@@ -33,12 +33,16 @@
             <span>支持课程发布、家长报名、容量控制和上课信息统一管理。</span>
           </div>
           <div class="spotlight-item">
-            <strong>学习与问答</strong>
-            <span>面向学生提供作业问题提交、AI 解答和学习过程跟踪。</span>
+            <strong>学习与 AI 辅助</strong>
+            <span>面向学生提供作业问答、课程推荐、网课资源推荐和学习过程跟踪。</span>
+          </div>
+          <div class="spotlight-item">
+            <strong>家校协同</strong>
+            <span>支持家长陪学建议、亲子任务、积分兑换和家庭教育资源沉淀。</span>
           </div>
           <div class="spotlight-item">
             <strong>运营与治理</strong>
-            <span>管理员可查看通知、统计报表、AI 日志与平台用户数据。</span>
+            <span>管理员可查看通知、统计报表、AI 日志、亲子任务与平台用户数据。</span>
           </div>
         </div>
       </el-card>
@@ -94,18 +98,21 @@ export default {
     return {
       dashboard: {},
       quickEntries: [
-        { title: '平台看板', desc: '查看课程、报名、问答和 AI 调用统计。', path: '/edu/dashboard' },
+        { title: '平台看板', desc: '查看课程、报名、问答、AI 与亲子任务统计。', path: '/edu/dashboard' },
         { title: '课程中心', desc: '维护课程信息、查看课程安排与报名情况。', path: '/edu/course' },
+        { title: '网课中心', desc: '管理拓展学习资源，支持学生获取在线课程推荐。', path: '/edu/onlineCourse' },
         { title: '学生档案', desc: '管理学生基础信息、兴趣方向与成长画像。', path: '/edu/student' },
         { title: '报名记录', desc: '跟踪课程报名进度与学习过程记录。', path: '/edu/enrollment' },
         { title: '作业问答', desc: '查看学生提问、AI 解答与辅导建议。', path: '/edu/question' },
+        { title: '家长陪学', desc: '沉淀 AI 诊断建议、历史记录与家长课堂资源。', path: '/edu/parentCompanion' },
+        { title: '亲子任务', desc: '管理家庭约定、完成证明、积分奖励与兑换记录。', path: '/edu/familyTask' },
         { title: '通知中心', desc: '发布课程通知、报名提醒和家校消息。', path: '/edu/platformNotice' }
       ],
       serviceScopes: [
-        { title: '学生端', desc: '查看课程、参与报名、提交作业问题并获得 AI 辅助解答。' },
-        { title: '家长端', desc: '为孩子报名课程、查看学习记录和课后服务动态。' },
-        { title: '教师端', desc: '发布课程、管理名单、生成教学建议与通知内容。' },
-        { title: '管理端', desc: '统一管理用户、课程、通知、AI 日志及平台统计数据。' }
+        { title: '学生端', desc: '查看课程、参与报名、提交作业问题、完成亲子任务并兑换积分奖励。' },
+        { title: '家长端', desc: '为孩子报名课程、获取陪学建议、发布亲子任务并确认积分兑换。' },
+        { title: '教师端', desc: '发布课程、管理名单、处理问答、生成教学建议与通知内容。' },
+        { title: '管理端', desc: '统一管理用户、课程、资源、通知、AI 日志、亲子任务及平台统计数据。' }
       ]
     }
   },
@@ -126,16 +133,17 @@ export default {
         { label: '报名总数', value: this.dashboard.totalEnrollments || 0 },
         { label: '问答总数', value: this.dashboard.totalQuestions || 0 },
         { label: 'AI 调用', value: this.dashboard.totalAiCalls || 0 },
-        { label: '活跃学生', value: this.dashboard.activeStudents || 0 },
-        { label: '活跃教师', value: this.dashboard.activeTeachers || 0 }
+        { label: '家长建议', value: this.dashboard.totalParentAdvices || 0 },
+        { label: '亲子任务', value: this.dashboard.totalFamilyTasks || 0 },
+        { label: '活跃学生', value: this.dashboard.activeStudents || 0 }
       ]
     },
     roleGuide() {
       const guides = {
         admin: [
-          { title: '查看平台看板', description: '了解课程开设、报名数量、问答情况与 AI 调用概览。' },
+          { title: '查看平台看板', description: '了解课程开设、报名数量、问答、AI 调用与亲子任务概览。' },
           { title: '进入通知中心', description: '发布课后服务通知，跟踪消息已读状态和触达情况。' },
-          { title: '检查 AI 日志', description: '审查模型调用记录与内容生成状态，保障平台安全运行。' }
+          { title: '检查家校协同', description: '查看家长陪学建议与亲子任务完成情况，保障平台服务闭环。' }
         ],
         teacher: [
           { title: '维护课程信息', description: '新增课程、更新课表安排，并完善课程说明与教学建议。' },
@@ -145,12 +153,12 @@ export default {
         parent: [
           { title: '查看学生档案', description: '了解孩子的年级班级、兴趣方向和参与课程情况。' },
           { title: '办理课程报名', description: '进入课程中心为孩子选择合适的课后服务课程。' },
-          { title: '跟踪学习记录', description: '查看报名进度、学习反馈和平台通知内容。' }
+          { title: '使用家长陪学', description: '结合孩子学习记录生成陪伴建议，并通过亲子任务落实家庭约定。' }
         ],
         student: [
           { title: '浏览课程安排', description: '查看当前开放的课后课程与兴趣班信息。' },
           { title: '提交作业问题', description: '把学习中遇到的问题提交给平台，获取 AI 辅助建议。' },
-          { title: '回顾学习过程', description: '查看自己的课程参与与问答记录，持续改进学习效果。' }
+          { title: '完成亲子任务', description: '接收家庭约定、上传完成证明，积累积分兑换现实奖励。' }
         ],
         visitor: [
           { title: '进入课程中心', description: '从课程信息开始了解平台提供的课后服务内容。' },
@@ -180,7 +188,14 @@ export default {
         items.push({
           key: 'ai-' + item.logId,
           time: parseTime(item.createTime),
-          text: `AI 完成了一次 ${item.businessType} 业务处理，状态为 ${item.status}。`
+          text: `AI 完成了一次${this.formatBusinessType(item.businessType)}处理，状态为${this.formatAiStatus(item.status)}。`
+        })
+      })
+      ;(this.dashboard.recentFamilyTasks || []).slice(0, 2).forEach(item => {
+        items.push({
+          key: 'family-' + item.taskId,
+          time: parseTime(item.createTime),
+          text: `亲子任务《${item.taskTitle}》已更新为${this.formatTaskStatus(item.status)}。`
         })
       })
       return items.length ? items : [{ key: 'empty', time: '当前', text: '暂无最新平台动态。' }]
@@ -199,6 +214,22 @@ export default {
     },
     goPage(path) {
       this.$router.push(path)
+    },
+    formatBusinessType(type) {
+      const map = {
+        homework_answer: '作业问答',
+        course_notice: '课程通知',
+        course_recommendation: '课程推荐',
+        online_resource_recommendation: '网课推荐',
+        parent_diagnosis: '家长陪学建议'
+      }
+      return map[type] || '智能辅助'
+    },
+    formatAiStatus(status) {
+      return ({ success: '已生成', failed: '生成失败' })[status] || '已生成'
+    },
+    formatTaskStatus(status) {
+      return ({ 0: '待完成', 1: '待确认', 2: '已完成', 3: '已退回' })[status] || '已更新'
     }
   }
 }
@@ -377,7 +408,7 @@ export default {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 18px;
 }

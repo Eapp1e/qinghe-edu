@@ -298,14 +298,64 @@ public class EduAiServiceImpl implements IEduAiService
         }
         if ("parent_diagnosis".equals(businessType))
         {
-            return buildParentDiagnosisMock(prompt);
+            return buildParentDiagnosisContent(prompt);
         }
         return "已生成可直接使用的教学辅助内容。\n建议结合实际情况做进一步微调。";
     }
 
+    private String buildParentDiagnosisContent(String prompt)
+    {
+        String student = extractBetween(prompt, "学生：", "\n");
+        String concern = extractAfter(prompt, "家长补充关注：");
+        if (StringUtils.isEmpty(student))
+        {
+            student = "孩子";
+        }
+        if (StringUtils.isEmpty(concern))
+        {
+            concern = "近期学习与生活习惯需要持续观察";
+        }
+
+        String state = student + "近期的主要信号集中在“" + concern + "”。结合学习记录、教师反馈和作业问答来看，问题更像是任务启动、情绪承受或习惯稳定性需要支持，而不是孩子单纯不配合。";
+        String action = "家长可以先把目标缩小到每天一个可完成动作：先认可孩子已经做到的部分，再一起约定开始时间、完成标准和复盘方式。沟通时尽量少用评价句，多用“你打算先做哪一步”“需要我陪你几分钟”这类选择型问题。";
+        String agreement = "本周家庭陪伴小约定：连续5天完成一个15到30分钟的小任务，孩子完成后用照片或一句话反馈，家长当天给出具体肯定，并奖励5到10分家庭积分。";
+
+        if (concern.contains("拖") || concern.contains("作业") || concern.contains("磨蹭") || concern.contains("启动"))
+        {
+            state = student + "在作业启动和时间感上需要支持，容易把困难任务拖到最后，但只要步骤被拆小，完成度通常会提升。";
+            action = "建议家长使用“先做10分钟”策略：先陪孩子列出3个小步骤，只提醒开始和收尾，不在过程中频繁催促；完成一个步骤就即时确认。";
+            agreement = "本周约定：每天固定一个作业启动时间，先完成最容易的一项，连续5天达成后兑换一次周末自主活动奖励。";
+        }
+        else if (concern.contains("阅读") || concern.contains("读书"))
+        {
+            state = student + "的阅读坚持度还不稳定，可能需要从兴趣、陪伴氛围和可见反馈三个方面同时建立正循环。";
+            action = "建议家长先让孩子自己选书，每天共读或安静陪读20分钟，结束后只问一个开放问题，比如“今天哪个情节最有画面感”。";
+            agreement = "本周约定：完成3次20分钟阅读打卡，每次记录一句喜欢的内容，累计后兑换一次家庭电影或亲子外出。";
+        }
+        else if (concern.contains("沟通") || concern.contains("顶嘴") || concern.contains("冲突") || concern.contains("情绪"))
+        {
+            state = student + "近期可能更需要被听见，冲突表面是态度问题，背后常常是自主感和情绪出口不足。";
+            action = "建议家长先暂停说教，使用“三句法”：我看到你很着急；我想先听你说完；我们一起选一个解决办法。等情绪降下来再谈规则。";
+            agreement = "本周约定：每天睡前8分钟亲子聊天，只聊一件开心事和一件困难事，家长不评价，只复述和回应。";
+        }
+        else if (concern.contains("整理") || concern.contains("忘带") || concern.contains("习惯"))
+        {
+            state = student + "在物品整理和习惯保持上还依赖外部提醒，需要把抽象要求变成可看见、可检查的小清单。";
+            action = "建议家长和孩子一起做一张“出门前三件事”清单，贴在书包旁；前3天陪同检查，之后逐步改为孩子自查。";
+            agreement = "本周约定：连续4天睡前整理书包和桌面，拍照打卡，累计后兑换一次自选晚餐或亲子游戏时间。";
+        }
+        else if (concern.contains("运动") || concern.contains("体能"))
+        {
+            state = student + "需要在学习之外补充身体活动，运动能帮助释放压力，也能改善注意力和睡眠节律。";
+            action = "建议家长不要把运动做成考核，先从饭后散步、跳绳或亲子球类15分钟开始，重点看坚持而不是成绩。";
+            agreement = "本周约定：完成3次亲子运动打卡，每次不少于15分钟，达成后兑换一次户外活动安排。";
+        }
+        return "孩子当前状态：" + state + "\n家长可以怎么做：" + action + "\n本周家庭陪伴小约定：" + agreement;
+    }
+
     private String buildParentDiagnosisMock(String prompt)
     {
-        String student = extractBetween(prompt, "学生：", "，");
+        String student = extractBetween(prompt, "学生：", "\n");
         String concern = extractAfter(prompt, "家长补充关注：");
         if (StringUtils.isEmpty(student))
         {

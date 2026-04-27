@@ -18,6 +18,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="signupSource" column="signup_source"/>
         <result property="learningRecord" column="learning_record"/>
         <result property="interactionSummary" column="interaction_summary"/>
+        <result property="campus" column="campus"/>
+        <result property="weekDay" column="week_day"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
@@ -26,49 +32,57 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="enrollmentSelect">
-        select enrollment_id, course_id, course_name, student_user_id, student_name, parent_user_id, parent_name,
-               teacher_user_id, teacher_name, status, signup_source, learning_record, interaction_summary,
-               create_by, create_time, update_by, update_time, remark
-        from edu_course_enrollment
+        select e.enrollment_id, e.course_id, e.course_name, e.student_user_id, e.student_name, e.parent_user_id, e.parent_name,
+               e.teacher_user_id, e.teacher_name, e.status, e.signup_source, e.learning_record, e.interaction_summary,
+               e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
+               c.campus, c.week_day, c.start_time, c.end_time, c.start_date, c.end_date
+        from edu_course_enrollment e
+        left join edu_course c on c.course_id = e.course_id
     </sql>
 
     <sql id="enrollmentWhere">
         <where>
             <if test="courseId != null">
-                and course_id = #{courseId}
+                and e.course_id = #{courseId}
             </if>
             <if test="teacherUserId != null">
-                and teacher_user_id = #{teacherUserId}
+                and e.teacher_user_id = #{teacherUserId}
             </if>
             <if test="parentUserId != null">
-                and parent_user_id = #{parentUserId}
+                and e.parent_user_id = #{parentUserId}
             </if>
             <if test="studentUserId != null">
-                and student_user_id = #{studentUserId}
+                and e.student_user_id = #{studentUserId}
             </if>
             <if test="studentName != null and studentName != ''">
-                and student_name like concat('%', #{studentName}, '%')
+                and e.student_name like concat('%', #{studentName}, '%')
+            </if>
+            <if test="courseName != null and courseName != ''">
+                and e.course_name like concat('%', #{courseName}, '%')
+            </if>
+            <if test="teacherName != null and teacherName != ''">
+                and e.teacher_name like concat('%', #{teacherName}, '%')
             </if>
             <if test="status != null and status != ''">
-                and status = #{status}
+                and e.status = #{status}
             </if>
         </where>
     </sql>
 
     <select id="selectEnrollmentById" parameterType="Long" resultMap="EduEnrollmentResult">
         <include refid="enrollmentSelect"/>
-        where enrollment_id = #{enrollmentId}
+        where e.enrollment_id = #{enrollmentId}
     </select>
 
     <select id="selectEnrollmentByCourseAndStudent" resultMap="EduEnrollmentResult">
         <include refid="enrollmentSelect"/>
-        where course_id = #{courseId} and student_user_id = #{studentUserId}
+        where e.course_id = #{courseId} and e.student_user_id = #{studentUserId}
     </select>
 
     <select id="selectEnrollmentList" parameterType="EduCourseEnrollment" resultMap="EduEnrollmentResult">
         <include refid="enrollmentSelect"/>
         <include refid="enrollmentWhere"/>
-        order by enrollment_id desc
+        order by e.enrollment_id desc
     </select>
 
     <insert id="insertEnrollment" parameterType="EduCourseEnrollment" useGeneratedKeys="true" keyProperty="enrollmentId">
@@ -111,7 +125,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <select id="countEnrollments" parameterType="EduCourseEnrollment" resultType="Long">
-        select count(1) from edu_course_enrollment
+        select count(1) from edu_course_enrollment e
         <include refid="enrollmentWhere"/>
     </select>
 </mapper>

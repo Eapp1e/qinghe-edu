@@ -310,6 +310,12 @@ export default {
       if (title === '报名记录' && (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent'))) {
         return '学习记录'
       }
+      if (title === '报名记录') {
+        return '上课记录'
+      }
+      if (title === '报名记录' && (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent'))) {
+        return '学习记录'
+      }
       return title
     },
     saveSidebarSort() {

@@ -2,6 +2,8 @@ package com.eapple.system.domain.edu;
 
 import com.eapple.common.annotation.Excel;
 import com.eapple.common.core.domain.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 
 public class EduCourseEnrollment extends BaseEntity
 {
@@ -39,6 +41,20 @@ public class EduCourseEnrollment extends BaseEntity
     private String learningRecord;
 
     private String interactionSummary;
+
+    private String campus;
+
+    private String weekDay;
+
+    private String startTime;
+
+    private String endTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
 
     public Long getEnrollmentId()
     {
@@ -168,5 +184,65 @@ public class EduCourseEnrollment extends BaseEntity
     public void setInteractionSummary(String interactionSummary)
     {
         this.interactionSummary = interactionSummary;
+    }
+
+    public String getCampus()
+    {
+        return campus;
+    }
+
+    public void setCampus(String campus)
+    {
+        this.campus = campus;
+    }
+
+    public String getWeekDay()
+    {
+        return weekDay;
+    }
+
+    public void setWeekDay(String weekDay)
+    {
+        this.weekDay = weekDay;
+    }
+
+    public String getStartTime()
+    {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime)
+    {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime()
+    {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime)
+    {
+        this.endTime = endTime;
+    }
+
+    public Date getStartDate()
+    {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate)
+    {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate()
+    {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate)
+    {
+        this.endDate = endDate;
     }
 }

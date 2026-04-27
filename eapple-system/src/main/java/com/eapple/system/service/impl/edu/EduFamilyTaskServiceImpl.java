@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import com.eapple.common.exception.ServiceException;
@@ -18,7 +19,7 @@ import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.edu.IEduFamilyTaskService;
 
 @Service
-public class EduFamilyTaskServiceImpl implements IEduFamilyTaskService
+public class EduFamilyTaskServiceImpl implements IEduFamilyTaskService, InitializingBean
 {
     @Autowired
     private EduFamilyTaskMapper taskMapper;
@@ -28,6 +29,12 @@ public class EduFamilyTaskServiceImpl implements IEduFamilyTaskService
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public void afterPropertiesSet()
+    {
+        ensureTaskTable();
+    }
 
     @Override
     public List<EduFamilyTask> selectTaskList(EduFamilyTask task)

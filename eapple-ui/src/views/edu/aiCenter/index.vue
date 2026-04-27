@@ -109,8 +109,8 @@
               <el-tag size="small" :type="statusTagType(scope.row.status)">{{ formatStatus(scope.row.status) }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column v-if="showRoleColumn" label="角色" width="100">
-            <template slot-scope="scope">{{ formatRoleType(scope.row.roleType) }}</template>
+          <el-table-column v-if="showRoleColumn" label="账号" width="130">
+            <template slot-scope="scope">{{ scope.row.userName || scope.row.userId || '未知账号' }}</template>
           </el-table-column>
           <el-table-column label="返回内容" min-width="320">
             <template slot-scope="scope">
@@ -125,6 +125,11 @@
                   查看完整内容
                 </el-button>
               </div>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="isAdminView" label="操作" width="90" fixed="right" align="center">
+            <template slot-scope="scope">
+              <el-button type="text" size="mini" class="danger-text" @click="handleDeleteLog(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -156,7 +161,7 @@
 
 <script>
 import { listAiModels, getCurrentAiModel, updateCurrentAiModel } from '@/api/edu/ai'
-import { listAiLog, listMyAiLog, getAiLogSummary, getMyAiLogSummary } from '@/api/edu/aiLog'
+import { listAiLog, listMyAiLog, getAiLogSummary, getMyAiLogSummary, delAiLog } from '@/api/edu/aiLog'
 import { renderAiContentHtml, sanitizeAiDisplayContent } from '@/utils/aiContent'
 
 export default {
@@ -420,6 +425,14 @@ export default {
       this.responseDialogContent = content || '暂无可展示内容'
       this.responseDialogHtml = renderAiContentHtml(content || '暂无可展示内容')
       this.responseDialogOpen = true
+    },
+    handleDeleteLog(row) {
+      this.$modal.confirm('确认删除这条 AI 调用记录吗？').then(() => {
+        return delAiLog(row.logId)
+      }).then(() => {
+        this.$modal.msgSuccess('删除成功')
+        this.refreshData()
+      }).catch(() => {})
     }
   }
 }
@@ -611,6 +624,10 @@ export default {
   background: #ffffff;
   color: #314c5d;
   line-height: 1.9;
+}
+
+.danger-text {
+  color: #ef5753;
 }
 
 .ai-rich-content :deep(h2),

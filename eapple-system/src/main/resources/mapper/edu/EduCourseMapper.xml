@@ -34,7 +34,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="baseCourseColumns">
         select c.course_id, c.course_name, c.category, c.teacher_user_id, c.teacher_name, c.campus,
                c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
-               c.current_capacity, c.status, c.description, c.ai_notice, c.ai_suggestion,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as current_capacity,
+               c.status, c.description, c.ai_notice, c.ai_suggestion,
                c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
                'N' as enrolled,
                (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as enroll_count
@@ -44,7 +45,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="courseColumns">
         select c.course_id, c.course_name, c.category, c.teacher_user_id, c.teacher_name, c.campus,
                c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
-               c.current_capacity, c.status, c.description, c.ai_notice, c.ai_suggestion,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as current_capacity,
+               c.status, c.description, c.ai_notice, c.ai_suggestion,
                c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
                (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as enroll_count
         <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'student'">
@@ -65,7 +67,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and c.course_name like concat('%', #{courseName}, '%')
             </if>
             <if test="category != null and category != ''">
-                and c.category = #{category}
+                and c.category like concat('%', #{category}, '%')
+            </if>
+            <if test="teacherName != null and teacherName != ''">
+                and c.teacher_name like concat('%', #{teacherName}, '%')
+            </if>
+            <if test="campus != null and campus != ''">
+                and c.campus like concat('%', #{campus}, '%')
+            </if>
+            <if test="weekDay != null and weekDay != ''">
+                and c.week_day like concat('%', #{weekDay}, '%')
             </if>
             <if test="teacherUserId != null">
                 and c.teacher_user_id = #{teacherUserId}

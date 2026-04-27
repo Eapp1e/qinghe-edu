@@ -12,7 +12,7 @@
           <strong>{{ total }}</strong>
         </div>
         <div class="stat-card">
-          <span>{{ isTeacherView ? '已启用课程' : '开放课程' }}</span>
+          <span>{{ isTeacherView ? '开设中课程' : '开放课程' }}</span>
           <strong>{{ openCount }}</strong>
         </div>
       </div>
@@ -27,9 +27,20 @@
           <el-form-item label="分类">
             <el-input v-model="queryParams.category" placeholder="请输入课程分类" clearable @keyup.enter.native="getList" />
           </el-form-item>
+          <el-form-item label="教师">
+            <el-input v-model="queryParams.teacherName" placeholder="请输入教师姓名" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="地点">
+            <el-input v-model="queryParams.campus" placeholder="请输入上课地点" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="上课日">
+            <el-select v-model="queryParams.weekDay" placeholder="全部星期" clearable>
+              <el-option v-for="item in weekOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+          </el-form-item>
           <el-form-item v-if="canManageCourse" label="状态" class="status-select">
             <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
-              <el-option label="启用中" value="0" />
+              <el-option label="开设中" value="0" />
               <el-option label="已停开" value="1" />
             </el-select>
           </el-form-item>
@@ -71,6 +82,37 @@
       </div>
     </section>
 
+    <section class="reminder-panel">
+      <div class="reminder-head">
+        <div>
+          <h3>上课提醒</h3>
+        </div>
+        <span>{{ currentDateText }}</span>
+      </div>
+      <div class="reminder-grid">
+        <div class="reminder-card">
+          <strong>今日课程</strong>
+          <div v-if="todayCourseReminders.length" class="reminder-list">
+            <div v-for="item in todayCourseReminders" :key="item.key" class="reminder-item">
+              <span>{{ item.courseName }}</span>
+              <em>{{ item.time }} · {{ item.campus || '未设置地点' }}</em>
+            </div>
+          </div>
+          <div v-else class="reminder-empty">今日暂无课程安排</div>
+        </div>
+        <div class="reminder-card">
+          <strong>后续课程</strong>
+          <div v-if="nextCourseReminders.length" class="reminder-list">
+            <div v-for="item in nextCourseReminders" :key="item.key" class="reminder-item">
+              <span>{{ item.courseName }}</span>
+              <em>{{ item.date }} {{ item.time }} · {{ item.campus || '未设置地点' }}</em>
+            </div>
+          </div>
+          <div v-else class="reminder-empty">暂无后续上课提醒</div>
+        </div>
+      </div>
+    </section>
+
     <section class="table-section-card">
     <el-table v-loading="loading" :data="courseList" class="content-table">
       <el-table-column label="课程" min-width="180">
@@ -83,21 +125,34 @@
       </el-table-column>
       <el-table-column label="分类" prop="category" min-width="120" align="center" show-overflow-tooltip />
       <el-table-column label="教师" prop="teacherName" min-width="130" align="center" show-overflow-tooltip />
-      <el-table-column label="上课时间" min-width="180" align="center">
-        <template slot-scope="scope">{{ scope.row.weekDay }} {{ scope.row.startTime }}-{{ scope.row.endTime }}</template>
+      <el-table-column label="上课周期" min-width="220" align="center">
+        <template slot-scope="scope">
+          <div class="schedule-cell">
+            <strong>{{ formatCourseRange(scope.row) }}</strong>
+            <span>{{ formatWeeklyPlan(scope.row) }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="最近一次上课" min-width="170" align="center">
+        <template slot-scope="scope">
+          <div class="next-class-cell">
+            <strong>{{ getNextClassText(scope.row) }}</strong>
+            <span>{{ getCourseProgressText(scope.row) }}</span>
+          </div>
+        </template>
       </el-table-column>
       <el-table-column label="地点" prop="campus" min-width="140" align="center" show-overflow-tooltip />
-      <el-table-column label="容量" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.currentCapacity }}/{{ scope.row.maxCapacity }}</template>
+      <el-table-column label="人数" width="110" align="center">
+        <template slot-scope="scope">{{ getCourseStudentCount(scope.row) }}/{{ scope.row.maxCapacity }}</template>
       </el-table-column>
       <el-table-column label="状态" width="110" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">
-            {{ scope.row.status === '0' ? (isTeacherView ? '已启用' : '开放中') : (isTeacherView ? '已停开' : '已关闭') }}
+          <el-tag :type="courseRuntimeStatus(scope.row).tag">
+            {{ courseRuntimeStatus(scope.row).text }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="isTeacherView ? '教师操作' : '操作'" min-width="290" fixed="right" align="center">
+      <el-table-column :label="isTeacherView ? '教师操作' : '操作'" min-width="340" fixed="right" align="center">
         <template slot-scope="scope">
           <template v-if="canEnrollCourse">
             <el-button size="mini" type="text" @click="handleEnroll(scope.row)">
@@ -106,8 +161,9 @@
           </template>
           <template v-if="canManageCourse">
             <el-button size="mini" type="text" @click="handleUpdate(scope.row)">编辑</el-button>
+            <el-button v-if="isTeacherView" size="mini" type="text" @click="handleRoster(scope.row)">报名名单</el-button>
             <el-button size="mini" type="text" @click="handleToggleStatus(scope.row)">
-              {{ scope.row.status === '0' ? '停开课程' : '启用课程' }}
+              {{ scope.row.status === '0' ? '停开课程' : '开设课程' }}
             </el-button>
             <el-button
               size="mini"
@@ -142,19 +198,52 @@
           <el-col :span="12"><el-form-item label="课程名称" prop="courseName"><el-input v-model="form.courseName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="课程分类" prop="category"><el-input v-model="form.category" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="校区" prop="campus"><el-input v-model="form.campus" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="上课星期" prop="weekDay"><el-input v-model="form.weekDay" placeholder="如：周三" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="开始时间" prop="startTime"><el-input v-model="form.startTime" placeholder="15:30" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="结束时间" prop="endTime"><el-input v-model="form.endTime" placeholder="17:00" /></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="每周几次" prop="weeklyFrequency">
+              <el-select v-model="form.weeklyFrequency" placeholder="请选择每周次数" @change="syncScheduleSlots">
+                <el-option v-for="item in [1, 2, 3, 4, 5]" :key="item" :label="`每周 ${item} 次`" :value="item" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="上课安排" prop="weekDay">
+              <div class="schedule-editor">
+                <div v-for="(slot, index) in form.scheduleSlots" :key="index" class="schedule-slot-row">
+                  <el-select v-model="slot.weekDay" placeholder="选择星期">
+                    <el-option v-for="item in weekOptions" :key="item" :label="item" :value="item" />
+                  </el-select>
+                  <el-time-picker v-model="slot.startTime" value-format="HH:mm" format="HH:mm" placeholder="开始时间" />
+                  <span class="schedule-separator">至</span>
+                  <el-time-picker v-model="slot.endTime" value-format="HH:mm" format="HH:mm" placeholder="结束时间" />
+                </div>
+              </div>
+            </el-form-item>
+          </el-col>
           <el-col :span="12"><el-form-item label="开始日期"><el-date-picker v-model="form.startDate" type="date" value-format="yyyy-MM-dd" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="结束日期"><el-date-picker v-model="form.endDate" type="date" value-format="yyyy-MM-dd" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="最大容量"><el-input-number v-model="form.maxCapacity" :min="1" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="状态"><el-radio-group v-model="form.status"><el-radio label="0">启用</el-radio><el-radio label="1">停开</el-radio></el-radio-group></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="最大人数"><el-input-number v-model="form.maxCapacity" :min="1" /></el-form-item></el-col>
           <el-col :span="24"><el-form-item label="课程简介"><el-input v-model="form.description" type="textarea" :rows="4" /></el-form-item></el-col>
         </el-row>
       </el-form>
       <div slot="footer">
         <el-button type="primary" @click="submitForm">确定</el-button>
         <el-button @click="open = false">取消</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="rosterTitle" :visible.sync="rosterOpen" width="760px">
+      <el-table :data="rosterList" class="content-table">
+        <el-table-column label="学生" prop="studentName" min-width="120" />
+        <el-table-column label="家长" prop="parentName" min-width="120" />
+        <el-table-column label="报名来源" min-width="110">
+          <template slot-scope="scope">{{ scope.row.signupSource === 'parent' ? '家长报名' : '学生报名' }}</template>
+        </el-table-column>
+        <el-table-column label="最近学习记录" min-width="220" show-overflow-tooltip>
+          <template slot-scope="scope">{{ scope.row.learningRecord || '暂未填写' }}</template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer">
+        <el-button @click="rosterOpen = false">关闭</el-button>
       </div>
     </el-dialog>
 
@@ -191,6 +280,7 @@ import {
 } from '@/api/edu/course'
 import { listMyChildren } from '@/api/edu/student'
 import { getCurrentAiModel, listAiModels } from '@/api/edu/ai'
+import { listEnrollment } from '@/api/edu/enrollment'
 
 export default {
   name: 'EduCourse',
@@ -203,6 +293,7 @@ export default {
       childrenList: [],
       aiModelOptions: [],
       currentAiModel: '',
+      weekOptions: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
       open: false,
       aiGenerating: false,
       aiGeneratingCourseId: undefined,
@@ -212,12 +303,18 @@ export default {
       aiPreviewType: '',
       aiPreviewCourseName: '',
       aiPreviewContent: '',
+      rosterOpen: false,
+      rosterTitle: '报名学生名单',
+      rosterList: [],
       title: '',
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         courseName: undefined,
         category: undefined,
+        teacherName: undefined,
+        campus: undefined,
+        weekDay: undefined,
         status: undefined
       },
       form: {},
@@ -225,7 +322,8 @@ export default {
         courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
         category: [{ required: true, message: '请输入课程分类', trigger: 'blur' }],
         campus: [{ required: true, message: '请输入上课地点', trigger: 'blur' }],
-        weekDay: [{ required: true, message: '请输入上课星期', trigger: 'blur' }]
+        weeklyFrequency: [{ required: true, message: '请选择每周上课次数', trigger: 'change' }],
+        weekDay: [{ required: true, message: '请完善上课安排', trigger: 'change' }]
       }
     }
   },
@@ -246,7 +344,7 @@ export default {
       return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     openCount() {
-      return this.courseList.filter(item => item.status === '0').length
+      return this.courseList.filter(item => this.courseRuntimeStatus(item).canEnroll).length
     },
     pageTitle() {
       if (this.isTeacherView) {
@@ -259,7 +357,7 @@ export default {
     },
     pageDescription() {
       if (this.isTeacherView) {
-        return '教师可发布课后课程，集中查看自己发布的课程，并按教学安排选择启用或停开课程。'
+        return '教师可发布课后课程，集中查看自己发布的课程，并按教学安排选择开设或停开课程。'
       }
       if (this.isAdminView) {
         return '管理员可查看全部课程，统一掌握课程开设情况、教师安排和课程状态。'
@@ -269,6 +367,37 @@ export default {
     currentAiModelLabel() {
       const current = this.aiModelOptions.find(item => item.modelName === this.currentAiModel)
       return current ? current.displayName : this.currentAiModel
+    },
+    currentDateText() {
+      return this.formatDate(new Date())
+    },
+    todayCourseReminders() {
+      const todayKey = this.formatDate(new Date()).slice(0, 10)
+      return this.courseList.flatMap(course => this.enumerateClassSessions(course)
+        .filter(session => this.formatDate(session.start).slice(0, 10) === todayKey)
+        .map(session => ({
+          key: `${course.courseId}-${session.start.getTime()}`,
+          courseName: course.courseName,
+          campus: course.campus,
+          time: `${session.slot.startTime}-${session.slot.endTime}`,
+          start: session.start
+        })))
+        .sort((a, b) => a.start - b.start)
+        .slice(0, 5)
+    },
+    nextCourseReminders() {
+      return this.courseList.map(course => {
+        const session = this.getNextClassSession(course)
+        if (!session) return null
+        return {
+          key: `${course.courseId}-${session.start.getTime()}`,
+          courseName: course.courseName,
+          campus: course.campus,
+          date: this.formatDate(session.start),
+          time: `${session.slot.startTime}-${session.slot.endTime}`,
+          start: session.start
+        }
+      }).filter(Boolean).sort((a, b) => a.start - b.start).slice(0, 5)
     }
   },
   created() {
@@ -315,6 +444,9 @@ export default {
         pageSize: 10,
         courseName: undefined,
         category: undefined,
+        teacherName: undefined,
+        campus: undefined,
+        weekDay: undefined,
         status: undefined
       }
       this.getList()
@@ -327,7 +459,12 @@ export default {
         courseId: undefined,
         maxCapacity: 30,
         status: '0',
-        currentCapacity: 0
+        currentCapacity: 0,
+        weeklyFrequency: 1,
+        weekDay: '周一 16:00-17:30',
+        scheduleSlots: [{ weekDay: '周一', startTime: '16:00', endTime: '17:30' }],
+        startTime: '16:00',
+        endTime: '17:30'
       }
     },
     handleAdd() {
@@ -336,11 +473,21 @@ export default {
       this.open = true
     },
     handleUpdate(row) {
-      this.form = { ...row }
+      const scheduleSlots = this.parseCourseSlots(row)
+      this.form = {
+        ...row,
+        weeklyFrequency: scheduleSlots.length || 1,
+        scheduleSlots
+      }
       this.title = '编辑课程'
       this.open = true
     },
     submitForm() {
+      this.prepareCourseSchedule()
+      if (!this.hasValidSchedule()) {
+        this.$modal.msgWarning('请完善每次课的星期与起止时间')
+        return
+      }
       this.$refs.form.validate(valid => {
         if (!valid) return
         const request = this.form.courseId ? updateCourse(this.form) : addCourse(this.form)
@@ -353,7 +500,7 @@ export default {
     },
     handleToggleStatus(row) {
       const nextStatus = row.status === '0' ? '1' : '0'
-      const actionText = nextStatus === '0' ? '启用' : '停开'
+      const actionText = nextStatus === '0' ? '开设' : '停开'
       this.$modal.confirm(`确认${actionText}课程“${row.courseName}”吗？`).then(() => {
         return updateCourse({ ...row, status: nextStatus })
       }).then(() => {
@@ -361,11 +508,29 @@ export default {
         this.getList()
       }).catch(() => {})
     },
+    hasValidSchedule() {
+      const slots = this.form.scheduleSlots || []
+      return slots.length > 0 && slots.every(item => item.weekDay && item.startTime && item.endTime && item.startTime < item.endTime)
+    },
     handleDelete(row) {
+      if (row.status !== '1') {
+        this.$modal.msgWarning('请先停开课程，再执行删除操作')
+        return
+      }
       this.$modal.confirm(`确认删除课程“${row.courseName}”吗？`).then(() => delCourse(row.courseId)).then(() => {
         this.$modal.msgSuccess('删除成功')
         this.getList()
       }).catch(() => {})
+    },
+    handleRoster(row) {
+      this.rosterTitle = `《${row.courseName}》报名学生名单`
+      this.rosterOpen = true
+      listEnrollment({ courseId: row.courseId, pageNum: 1, pageSize: 200 }).then(res => {
+        this.rosterList = res.rows || []
+      })
+    },
+    getCourseStudentCount(row) {
+      return row.enrollCount !== undefined && row.enrollCount !== null ? row.enrollCount : (row.currentCapacity || 0)
     },
     isAiGenerating(row, type) {
       return this.aiGenerating && this.aiGeneratingCourseId === row.courseId && this.aiGeneratingType === type
@@ -417,6 +582,11 @@ export default {
       return this.childrenList[0].studentUserId
     },
     handleEnroll(row) {
+      const runtime = this.courseRuntimeStatus(row)
+      if (row.enrolled !== 'Y' && !runtime.canEnroll) {
+        this.$modal.msgError(`当前课程${runtime.text}，暂不可报名`)
+        return
+      }
       const studentUserId = this.resolveStudentUserId()
       if (studentUserId === null) {
         return
@@ -502,6 +672,190 @@ export default {
       document.execCommand('copy')
       document.body.removeChild(textarea)
       this.$modal.msgSuccess('内容已复制')
+    },
+    syncScheduleSlots() {
+      const count = Number(this.form.weeklyFrequency || 1)
+      const slots = Array.isArray(this.form.scheduleSlots) ? this.form.scheduleSlots.slice(0, count) : []
+      while (slots.length < count) {
+        const weekDay = this.weekOptions[slots.length % this.weekOptions.length]
+        slots.push({ weekDay, startTime: this.form.startTime || '16:00', endTime: this.form.endTime || '17:30' })
+      }
+      this.$set(this.form, 'scheduleSlots', slots)
+      this.prepareCourseSchedule()
+    },
+    prepareCourseSchedule() {
+      const slots = (this.form.scheduleSlots || []).filter(item => item.weekDay && item.startTime && item.endTime)
+      if (!slots.length) {
+        return
+      }
+      this.form.weekDay = slots.map(item => `${item.weekDay} ${item.startTime}-${item.endTime}`).join('；')
+      this.form.startTime = slots[0].startTime
+      this.form.endTime = slots[0].endTime
+    },
+    parseCourseSlots(course) {
+      const text = String(course.weekDay || '')
+      const slots = []
+      const pattern = /(周[一二三四五六日天])\s*(\d{1,2}:\d{2})?\s*-?\s*(\d{1,2}:\d{2})?/g
+      let match = pattern.exec(text)
+      while (match) {
+        const weekDay = match[1] === '周天' ? '周日' : match[1]
+        slots.push({
+          weekDay,
+          startTime: match[2] || course.startTime || '16:00',
+          endTime: match[3] || course.endTime || '17:30'
+        })
+        match = pattern.exec(text)
+      }
+      if (slots.length) {
+        return slots
+      }
+      const fallbackDays = this.weekOptions.filter(item => text.includes(item))
+      if (fallbackDays.length) {
+        return fallbackDays.map(day => ({ weekDay: day, startTime: course.startTime || '16:00', endTime: course.endTime || '17:30' }))
+      }
+      return [{ weekDay: '周一', startTime: course.startTime || '16:00', endTime: course.endTime || '17:30' }]
+    },
+    parseDate(value) {
+      if (!value) return null
+      if (value instanceof Date) {
+        return new Date(value.getFullYear(), value.getMonth(), value.getDate())
+      }
+      const match = String(value).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/)
+      if (match) {
+        return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+      }
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) return null
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    },
+    parseDateTime(dateValue, timeValue) {
+      const date = this.parseDate(dateValue)
+      if (!date) return null
+      const time = String(timeValue || '00:00').split(':')
+      date.setHours(Number(time[0] || 0), Number(time[1] || 0), 0, 0)
+      return date
+    },
+    getWeekDayNumber(weekDay) {
+      const map = { 周日: 0, 周一: 1, 周二: 2, 周三: 3, 周四: 4, 周五: 5, 周六: 6 }
+      return map[weekDay]
+    },
+    getWeekDays(course) {
+      return this.parseCourseSlots(course)
+        .map(slot => this.getWeekDayNumber(slot.weekDay))
+        .filter(item => item !== undefined)
+    },
+    enumerateClassSessions(course) {
+      const start = this.parseDate(course.startDate)
+      const end = this.parseDate(course.endDate)
+      const slots = this.parseCourseSlots(course)
+      if (!start || !end || !slots.length) return []
+      const sessions = []
+      const cursor = new Date(start)
+      while (cursor <= end) {
+        slots.forEach(slot => {
+          if (this.getWeekDayNumber(slot.weekDay) === cursor.getDay()) {
+            sessions.push({
+              start: this.parseDateTime(cursor, slot.startTime),
+              end: this.parseDateTime(cursor, slot.endTime),
+              slot
+            })
+          }
+        })
+        cursor.setDate(cursor.getDate() + 1)
+      }
+      return sessions.sort((a, b) => a.start - b.start)
+    },
+    enumerateClassDates(course) {
+      return this.enumerateClassSessions(course).map(item => item.start)
+    },
+    getNextClassSession(course) {
+      const now = new Date()
+      return this.enumerateClassSessions(course).find(session => session.end >= now)
+    },
+    formatDate(date) {
+      if (!date) return ''
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      return `${year}-${month}-${day} ${weekMap[date.getDay()]}`
+    },
+    formatCourseRange(course) {
+      const start = this.parseDate(course.startDate)
+      const end = this.parseDate(course.endDate)
+      if (!start || !end) return '未设置周期'
+      return `${this.formatDate(start).slice(0, 10)} 至 ${this.formatDate(end).slice(0, 10)}`
+    },
+    formatWeeklyPlan(course) {
+      const slots = this.parseCourseSlots(course)
+      const frequency = slots.length ? `每周 ${slots.length} 次` : '未设置频次'
+      const detail = slots.map(item => `${item.weekDay} ${item.startTime}-${item.endTime}`).join('；')
+      return `${detail || '未设置星期'} · ${frequency}`
+    },
+    getNextClassText(course) {
+      const runtime = this.courseRuntimeStatus(course)
+      if (runtime.code === 'closed') return '已停开'
+      if (runtime.code === 'finished') return '全部课程已结束'
+      const next = this.getNextClassSession(course)
+      return next ? `${this.formatDate(next.start)} ${next.slot.startTime}` : '暂无后续课次'
+    },
+    getCourseProgressText(course) {
+      const sessions = this.enumerateClassSessions(course)
+      if (!sessions.length) return '未设置课次'
+      const now = new Date()
+      const finished = sessions.filter(session => session.end < now).length
+      return `第 ${Math.min(finished + 1, sessions.length)} / ${sessions.length} 次`
+    },
+    getReminderInfo(course) {
+      const runtime = this.courseRuntimeStatus(course)
+      if (runtime.code === 'closed' || runtime.code === 'finished') {
+        return { text: runtime.text, tag: 'info' }
+      }
+      if (runtime.code === 'inClass') {
+        return { text: '正在上课', tag: 'success' }
+      }
+      if (runtime.code === 'today') {
+        return { text: '今日上课', tag: 'primary' }
+      }
+      const next = this.getNextClassSession(course)
+      if (!next) {
+        return { text: '暂无提醒', tag: 'info' }
+      }
+      const hours = (next.start.getTime() - Date.now()) / 3600000
+      if (hours > 0 && hours <= 24) {
+        return { text: '24小时内', tag: 'warning' }
+      }
+      return { text: `下次 ${this.formatDate(next.start).slice(5)}`, tag: 'info' }
+    },
+    courseRuntimeStatus(course) {
+      if (course.status !== '0') {
+        return { code: 'closed', text: this.isTeacherView ? '已停开' : '已关闭', tag: 'info', canEnroll: false }
+      }
+      const now = new Date()
+      const sessions = this.enumerateClassSessions(course)
+      if (!sessions.length) {
+        return { code: 'active', text: '开设中', tag: 'success', canEnroll: true }
+      }
+      const first = sessions[0]
+      const last = sessions[sessions.length - 1]
+      if (now < first.start) {
+        return { code: 'pending', text: '待开课', tag: 'warning', canEnroll: true }
+      }
+      if (now > last.end) {
+        return { code: 'finished', text: '已结课', tag: 'info', canEnroll: false }
+      }
+      const current = sessions.find(session => session.start <= now && session.end >= now)
+      if (current) {
+        return { code: 'inClass', text: '上课中', tag: 'success', canEnroll: true }
+      }
+      const todayKey = this.formatDate(now).slice(0, 10)
+      const todaySession = sessions.find(session => this.formatDate(session.start).slice(0, 10) === todayKey)
+      if (todaySession) {
+        return todaySession.start > now
+          ? { code: 'today', text: '今日待上', tag: 'primary', canEnroll: true }
+          : { code: 'todayDone', text: '今日已过', tag: 'warning', canEnroll: true }
+      }
+      return { code: 'active', text: '开设中', tag: 'success', canEnroll: true }
     }
   }
 }
@@ -695,10 +1049,111 @@ export default {
   padding-top: 0;
 }
 
+.reminder-panel {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid rgba(157, 232, 233, 0.36);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 34px rgba(41, 130, 141, 0.08);
+}
+
+.reminder-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.reminder-head h3 {
+  margin: 0 0 8px;
+  color: #173746;
+  font-size: 24px;
+  font-family: "STZhongsong", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  letter-spacing: 0.01em;
+}
+
+.reminder-head span {
+  margin: 0;
+  color: #6f8792;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.reminder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.reminder-card {
+  min-height: 140px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(157, 232, 233, 0.36);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 30px rgba(41, 130, 141, 0.07);
+  text-align: center;
+}
+
+.reminder-card > strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  margin: 0 auto 14px;
+  padding: 0 14px;
+  border: 1px solid rgba(102, 188, 190, 0.22);
+  border-radius: 999px;
+  background: #eef9f6;
+  color: #173746;
+  text-align: center;
+}
+
+.reminder-list {
+  display: grid;
+  gap: 10px;
+}
+
+.reminder-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(202, 224, 226, 0.72);
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.reminder-item span {
+  color: #23495a;
+  font-weight: 700;
+}
+
+.reminder-item em {
+  color: #6f8792;
+  font-style: normal;
+  font-size: 12px;
+}
+
+.reminder-empty {
+  padding: 24px 12px;
+  border-radius: 16px;
+  background: #f8fbfb;
+  color: #8aa0a8;
+  text-align: center;
+}
+
 ::v-deep .query-form .el-form-item {
   display: inline-flex;
   align-items: center;
-  margin-bottom: 0;
+  width: auto !important;
+  min-height: 38px;
+  margin: 0 !important;
 }
 
 ::v-deep .query-form .el-form-item:last-child {
@@ -706,7 +1161,12 @@ export default {
 }
 
 ::v-deep .status-select .el-input__inner {
-  width: 148px;
+  width: 100% !important;
+}
+
+::v-deep .query-form .el-input,
+::v-deep .query-form .el-select {
+  width: 190px !important;
 }
 
 .content-table {
@@ -729,6 +1189,50 @@ export default {
   color: #6f8792;
   font-size: 12px;
   line-height: 1.6;
+}
+
+.schedule-cell,
+.next-class-cell {
+  display: grid;
+  gap: 6px;
+}
+
+.schedule-cell strong,
+.next-class-cell strong {
+  color: #173746;
+  font-size: 14px;
+}
+
+.schedule-cell span,
+.next-class-cell span {
+  color: #6f8792;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.schedule-editor {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.schedule-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.schedule-slot-row .el-select {
+  width: 120px;
+}
+
+.schedule-slot-row .el-date-editor.el-input {
+  width: 140px;
+}
+
+.schedule-separator {
+  color: #6f8792;
+  font-weight: 600;
 }
 
 .danger-text {
@@ -925,6 +1429,10 @@ export default {
     width: 100%;
     flex-wrap: wrap;
     justify-content: flex-start;
+  }
+
+  .reminder-grid {
+    grid-template-columns: 1fr;
   }
 }
 

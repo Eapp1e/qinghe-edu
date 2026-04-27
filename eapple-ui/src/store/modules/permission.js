@@ -247,6 +247,9 @@ function normalizeRouteTitle(title) {
   if (title === '报名记录' && (auth.hasRole('edu_student') || auth.hasRole('edu_parent'))) {
     return '学习记录'
   }
+  if (title === '报名记录') {
+    return '上课记录'
+  }
   if (title === '家庭陪学') {
     return '家长陪学'
   }
@@ -258,6 +261,7 @@ function normalizeRouteTitle(title) {
 
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
+    normalizeRouteMeta(route)
     if (type && route.children) {
       route.children = filterChildren(route.children)
     }
@@ -280,6 +284,15 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
     }
     return true
   })
+}
+
+function normalizeRouteMeta(route) {
+  if (route && route.meta && route.meta.title) {
+    route.meta = {
+      ...route.meta,
+      title: normalizeRouteTitle(route.meta.title)
+    }
+  }
 }
 
 function filterChildren(childrenMap, lastRouter = false) {

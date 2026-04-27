@@ -77,8 +77,7 @@
           <div v-if="item.studentFeedback" class="feedback-box">孩子反馈：{{ item.studentFeedback }}</div>
           <div v-if="!isAdminView" class="task-actions">
             <el-button v-if="isParent && item.status === '0'" type="text" @click="handleUpdate(item)">编辑</el-button>
-            <el-button v-if="isParent && item.status === '1'" type="text" @click="handleReview(item, '2')">确认完成</el-button>
-            <el-button v-if="isParent && item.status === '1'" type="text" @click="handleReview(item, '3')">退回</el-button>
+            <el-button v-if="isParent && item.status === '1'" type="text" @click="handleReview(item, '2')">检查</el-button>
             <el-button v-if="isStudent && item.status !== '2'" type="text" @click="handleSubmit(item)">{{ studentSubmitText(item.status) }}</el-button>
             <el-button v-if="isParent && item.status !== '2'" type="text" class="danger-link" @click="handleDelete(item)">删除</el-button>
           </div>
@@ -221,7 +220,38 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="reviewForm.status === '2' ? '确认完成' : '退回重做'" :visible.sync="reviewOpen" width="520px" append-to-body>
+    <el-dialog :title="reviewForm.status === '2' ? '检查完成情况' : '退回重做'" :visible.sync="reviewOpen" width="680px" append-to-body>
+      <section class="review-proof-card">
+        <div class="review-proof-head">
+          <div>
+            <span>{{ reviewForm.studentName || '孩子' }}</span>
+            <strong>{{ reviewForm.taskTitle || '亲子任务' }}</strong>
+          </div>
+          <el-tag size="small" :type="statusTagType(reviewForm.currentStatus || '1')">{{ formatStatus(reviewForm.currentStatus || '1') }}</el-tag>
+        </div>
+        <div class="review-proof-grid">
+          <div class="review-image-panel">
+            <el-image
+              v-if="reviewProofImage"
+              :src="reviewProofImage"
+              fit="cover"
+              :preview-src-list="[reviewProofImage]"
+            />
+            <div v-else class="default-proof-image">
+              <div class="default-proof-card">
+                <i class="el-icon-picture-outline"></i>
+                <span></span>
+                <span></span>
+              </div>
+              <p>孩子暂未上传完成图片</p>
+            </div>
+          </div>
+          <div class="review-feedback-panel">
+            <span>孩子完成说明</span>
+            <p>{{ reviewForm.studentFeedback || '孩子暂未填写完成说明，家长可结合线下情况进行检查。' }}</p>
+          </div>
+        </div>
+      </section>
       <el-form :model="reviewForm" label-width="96px">
         <el-form-item label="家长评语">
           <el-input v-model="reviewForm.parentComment" type="textarea" :rows="3" placeholder="可以写一句具体肯定或调整建议" />
@@ -229,7 +259,8 @@
       </el-form>
       <div slot="footer">
         <el-button @click="reviewOpen = false">取消</el-button>
-        <el-button type="primary" @click="submitReview">确定</el-button>
+        <el-button v-if="reviewForm.status === '2'" class="review-return-btn" @click="submitReviewAs('3')">退回</el-button>
+        <el-button type="primary" @click="submitReview">{{ reviewForm.status === '2' ? '确认完成' : '确定退回' }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -320,6 +351,10 @@ export default {
     paginatedRewardList() {
       const start = (this.rewardQuery.pageNum - 1) * this.rewardQuery.pageSize
       return this.rewardList.slice(start, start + this.rewardQuery.pageSize)
+    },
+    reviewProofImage() {
+      const images = (this.reviewForm.proofImages || '').split(',').map(item => item.trim()).filter(Boolean)
+      return images[0] || ''
     }
   },
   created() {
@@ -405,7 +440,16 @@ export default {
       })
     },
     handleReview(row, status) {
-      this.reviewForm = { taskId: row.taskId, status, parentComment: row.parentComment || '' }
+      this.reviewForm = {
+        taskId: row.taskId,
+        status,
+        currentStatus: row.status,
+        taskTitle: row.taskTitle,
+        studentName: row.studentName,
+        proofImages: row.proofImages || '',
+        studentFeedback: row.studentFeedback || '',
+        parentComment: row.parentComment || ''
+      }
       this.reviewOpen = true
     },
     submitReview() {
@@ -415,6 +459,10 @@ export default {
         this.getList()
         this.getSummary()
       })
+    },
+    submitReviewAs(status) {
+      this.reviewForm.status = status
+      this.submitReview()
     },
     handleDelete(row) {
       this.$modal.confirm('确认删除该亲子任务吗？').then(() => delFamilyTask(row.taskId)).then(() => {
@@ -906,8 +954,142 @@ export default {
   padding-top: 4px;
 }
 
+.review-proof-card {
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid rgba(134, 214, 222, 0.3);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 252, 255, 0.94));
+  box-shadow: 0 14px 28px rgba(35, 112, 128, 0.08);
+}
+
+.review-proof-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.review-proof-head span {
+  display: block;
+  margin-bottom: 6px;
+  color: #0d8f88;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.review-proof-head strong {
+  color: #173746;
+  font-size: 20px;
+  font-family: "STZhongsong", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+}
+
+.review-proof-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+}
+
+.review-image-panel {
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid rgba(134, 214, 222, 0.28);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.review-image-panel ::v-deep .el-image {
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  display: block;
+}
+
+.default-proof-image {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  padding: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 76% 22%, rgba(255, 211, 116, 0.28), transparent 26%),
+    linear-gradient(145deg, rgba(238, 252, 255, 0.96), rgba(255, 255, 255, 0.98));
+}
+
+.default-proof-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 78px;
+  border: 2px dashed rgba(73, 171, 183, 0.34);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 24px rgba(58, 142, 160, 0.14);
+}
+
+.default-proof-card i {
+  color: #4aaeba;
+  font-size: 30px;
+}
+
+.default-proof-card span {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(74, 174, 186, 0.22);
+}
+
+.default-proof-card span:nth-child(2) {
+  bottom: 18px;
+}
+
+.default-proof-card span:nth-child(3) {
+  bottom: 10px;
+  right: 34px;
+}
+
+.default-proof-image p {
+  margin: 8px 0 0;
+  color: #5f7885;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.review-feedback-panel {
+  padding: 16px 18px;
+  border: 1px solid rgba(134, 214, 222, 0.24);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.review-feedback-panel span {
+  display: block;
+  margin-bottom: 10px;
+  color: #0d8f88;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.review-feedback-panel p {
+  margin: 0;
+  color: #536f7e;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
 .danger-link {
   color: #e66b6b;
+}
+
+.review-return-btn {
+  border-color: rgba(239, 87, 83, 0.2);
+  background: rgba(255, 238, 237, 0.94);
+  color: #ef5753;
+  font-weight: 800;
 }
 
 .full-width {

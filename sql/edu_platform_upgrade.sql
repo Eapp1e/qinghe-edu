@@ -33,7 +33,7 @@ select * from (
   union all
   select 3003, '学生档案', 3000, 3, 'student', 'edu/student/index', '', '', 1, 0, 'C', '0', '0', 'edu:student:list', 'peoples', 'edu_platform', sysdate(), '', null, '学生档案'
   union all
-  select 3004, '报名记录', 3000, 4, 'enrollment', 'edu/enrollment/index', '', '', 1, 0, 'C', '0', '0', 'edu:enrollment:list', 'form', 'edu_platform', sysdate(), '', null, '课程报名记录'
+  select 3004, '上课记录', 3000, 4, 'enrollment', 'edu/enrollment/index', '', '', 1, 0, 'C', '0', '0', 'edu:enrollment:list', 'form', 'edu_platform', sysdate(), '', null, '课程上课与学习记录'
   union all
   select 3005, '作业问答', 3000, 5, 'question', 'edu/question/index', '', '', 1, 0, 'C', '0', '0', 'edu:question:list', 'message', 'edu_platform', sysdate(), '', null, '作业问题与 AI 解答'
   union all
@@ -193,6 +193,7 @@ update sys_menu set parent_id = 0, order_num = 1, path = 'index', route_name = '
 update sys_menu set parent_id = 0, order_num = 2, path = 'edu/course', route_name = 'EduCourse', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3002;
 update sys_menu set parent_id = 0, order_num = 3, path = 'edu/student', route_name = 'EduStudent', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3003;
 update sys_menu set parent_id = 0, order_num = 4, path = 'edu/enrollment', route_name = 'EduEnrollment', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3004;
+update sys_menu set menu_name = '上课记录', remark = '课程上课与学习记录', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3004;
 update sys_menu set parent_id = 0, order_num = 5, path = 'edu/question', route_name = 'EduQuestion', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3005;
 update sys_menu set menu_name = 'AI中心', parent_id = 0, order_num = 6, path = 'edu/ai-center', component = 'edu/aiCenter/index', route_name = 'EduAiCenter', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3006;
 update sys_menu set parent_id = 0, order_num = 7, path = 'edu/platform-user', route_name = 'EduPlatformUser', is_frame = 1, visible = '0', update_by = 'edu_platform', update_time = sysdate() where menu_id = 3007;
@@ -297,7 +298,7 @@ values
 (407, 135, '赵家长', 143, '赵子睿', '口算闯关 15 分钟', 'habit', '完成 15 分钟口算练习，记录正确率，不追求速度过快。', 9, '兑换一次周末亲子运动', date_format(date_add(sysdate(), interval 1 day), '%Y-%m-%d'), '/profile/upload/family/math-practice.jpg', '正确率 92%，有两道进位算错了。', '', '1', '家庭任务扩展演示', 'edu_parent_zhao', date_sub(sysdate(), interval 2 day), 'edu_student_zhao_1', date_sub(sysdate(), interval 0 day)),
 (408, 135, '赵家长', 144, '赵雨桐', '周末房间归位计划', 'chore', '把书、玩具、衣物分别放回固定位置，完成后拍一张整体照片。', 10, '兑换一次大餐点菜权', date_format(date_add(sysdate(), interval 5 day), '%Y-%m-%d'), '', '', '', '0', '家庭任务扩展演示', 'edu_parent_zhao', date_sub(sysdate(), interval 1 day), '', null);
 
-delete from edu_ai_log where log_id between 500 and 509;
+delete from edu_ai_log where log_id between 500 and 515;
 insert ignore into edu_ai_log
 (log_id, business_type, biz_id, user_id, user_name, role_type, prompt_content, response_content, model_name, status, risk_flag, error_message, prompt_tokens, completion_tokens, latency_ms, create_time)
 values
@@ -307,3 +308,56 @@ values
 (503, 'parent_diagnosis', 140, 133, 'edu_parent_wu', 'parent', '孩子整理习惯不好，经常忘带材料。', '孩子当前状态：学习参与稳定，但物品管理还依赖提醒。\n家长可以怎么做：用可视化清单替代反复催促，把“整理书包”固定到睡前流程。\n本周家庭陪伴小约定：连续三天按清单自查书包，完成后由孩子自己打勾。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 118, 174, 131, date_sub(sysdate(), interval 3 day)),
 (504, 'parent_diagnosis', 142, 134, 'edu_parent_sun', 'parent', '孩子做手工有耐心，但表达自己想法较少。', '孩子当前状态：精细动作和专注力较好，口头表达还需要安全的练习场景。\n家长可以怎么做：不要急着评价作品好坏，先请孩子介绍一个细节和一个选择理由。\n本周家庭陪伴小约定：每次作品完成后录一段30秒介绍，家长只做倾听和复述。', 'deepseek-ai/DeepSeek-V3', 'mock', 'normal', '', 122, 182, 149, date_sub(sysdate(), interval 2 day)),
 (505, 'parent_diagnosis', 143, 135, 'edu_parent_zhao', 'parent', '孩子口算速度有提升，但容易因为小错误沮丧。', '孩子当前状态：计算能力正在进步，但对错误的容忍度偏低。\n家长可以怎么做：把错题看作“提醒卡”，先找规律，再决定是否需要重复练习。\n本周家庭陪伴小约定：每天只挑2道错题讲清楚原因，完成后记录一个进步点。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 124, 176, 137, date_sub(sysdate(), interval 1 day));
+
+insert ignore into edu_ai_log
+(log_id, business_type, biz_id, user_id, user_name, role_type, prompt_content, response_content, model_name, status, risk_flag, error_message, prompt_tokens, completion_tokens, latency_ms, create_time)
+values
+(506, 'parent_diagnosis', 144, 135, 'edu_parent_zhao', 'parent', '孩子周末屏幕时间控制不好，一提醒就不高兴。', '孩子当前状态：娱乐需求强，规则边界还需要稳定建立。\n家长可以怎么做：提前约定使用时长和结束提醒，不在情绪上来时临时加规则。\n本周家庭陪伴小约定：周末屏幕时间分两段，每段结束前5分钟由孩子自己设置提醒。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 121, 171, 142, date_sub(sysdate(), interval 18 hour)),
+(507, 'parent_diagnosis', 137, 130, 'edu_parent_li', 'parent', '孩子和同伴发生矛盾后不愿意说细节。', '孩子当前状态：能感受到委屈，但还不擅长复盘冲突经过。\n家长可以怎么做：先接住情绪，再用“发生了什么、你希望怎样、下次可以怎么说”三个问题引导。\n本周家庭陪伴小约定：用角色扮演练习一次表达不舒服的说法。', 'deepseek-ai/DeepSeek-V3', 'mock', 'normal', '', 128, 184, 158, date_sub(sysdate(), interval 9 day)),
+(508, 'parent_diagnosis', 141, 133, 'edu_parent_wu', 'parent', '孩子晚上拖到很晚才睡，第二天精神不够。', '孩子当前状态：作息稳定性不足，睡前流程容易被零散事情打断。\n家长可以怎么做：把睡前30分钟固定为收纳、洗漱、阅读三步，不再临时安排学习任务。\n本周家庭陪伴小约定：连续四天记录上床时间，完成后一起选择一个周末家庭活动。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 119, 178, 145, date_sub(sysdate(), interval 8 day)),
+(509, 'parent_diagnosis', 136, 130, 'edu_parent_li', 'parent', '孩子考试前紧张，总说自己肯定做不好。', '孩子当前状态：对结果比较敏感，容易用否定语言评价自己。\n家长可以怎么做：把关注点从分数转向准备动作，帮助孩子列出已经会的内容。\n本周家庭陪伴小约定：考前每天说出一个“我已经准备好的点”，并做一次深呼吸练习。', 'deepseek-ai/DeepSeek-V3', 'mock', 'normal', '', 132, 188, 162, date_sub(sysdate(), interval 7 day)),
+(510, 'parent_diagnosis', 142, 134, 'edu_parent_sun', 'parent', '孩子上兴趣课很开心，但回家不愿意复盘。', '孩子当前状态：体验感强，但复盘意识还没有形成。\n家长可以怎么做：复盘不做成问答考试，而是让孩子选一张照片或作品讲一个亮点。\n本周家庭陪伴小约定：每次兴趣课后只分享“一个新学到的动作或技巧”。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 116, 169, 128, date_sub(sysdate(), interval 12 hour)),
+(511, 'parent_diagnosis', 138, 131, 'edu_parent_zhang', 'parent', '孩子写作业总想让家长陪在旁边。', '孩子当前状态：独立启动能力偏弱，但愿意在陪伴下完成任务。\n家长可以怎么做：从全程陪伴逐步过渡到分段检查，先陪开头5分钟，再约定完成一小段后回来反馈。\n本周家庭陪伴小约定：每天选择一项作业独立完成15分钟，家长只在开始和结束时出现。', 'deepseek-ai/DeepSeek-V3', 'mock', 'normal', '', 135, 193, 176, date_sub(sysdate(), interval 3 hour)),
+(512, 'parent_diagnosis', 113, 112, 'edu_parent', 'parent', '孩子最近编程课兴趣很高，但回家做练习一遇到报错就着急。', '孩子当前状态：对编程探索有兴趣，但遇到错误提示时容易把“代码有问题”理解成“自己不行”。\n家长可以怎么做：先陪孩子读出错误现象，再一起定位是哪一步没有执行，不急着改答案。\n本周家庭陪伴小约定：每次练习只记录一个发现和一个解决办法，完成后让孩子讲给家长听。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 129, 184, 151, date_sub(sysdate(), interval 4 hour)),
+(513, 'parent_diagnosis', 113, 112, 'edu_parent', 'parent', '孩子美术课作品完成得不错，但总担心别人画得比自己好。', '孩子当前状态：审美表达在进步，但同伴比较会影响自信。\n家长可以怎么做：评价时少说“像不像、好不好”，多问“你为什么这样配色、哪里最满意”。\n本周家庭陪伴小约定：每次作品完成后只选一个进步点贴到成长记录里。', 'deepseek-ai/DeepSeek-V3', 'mock', 'normal', '', 121, 172, 146, date_sub(sysdate(), interval 2 day)),
+(514, 'parent_diagnosis', 113, 112, 'edu_parent', 'parent', '孩子晚上阅读能开始，但很难坚持到三十分钟。', '孩子当前状态：阅读启动已经形成，但持续阅读还需要合适的目标坡度。\n家长可以怎么做：把30分钟拆成两个15分钟，中间允许孩子讲一个最有画面感的情节。\n本周家庭陪伴小约定：连续三天完成15分钟亲子共读，再逐步延长到20分钟。', 'Qwen/Qwen2.5-7B-Instruct', 'mock', 'normal', '', 118, 166, 133, date_sub(sysdate(), interval 5 day)),
+(515, 'parent_diagnosis', 113, 112, 'edu_parent', 'parent', '孩子放学后先玩再写作业，经常拖到很晚。', '孩子当前状态：任务优先级意识还不稳定，容易被即时娱乐吸引。\n家长可以怎么做：先共同约定“回家十分钟整理、二十分钟完成一项最小任务”，完成后再安排娱乐。\n本周家庭陪伴小约定：用可视化清单记录三天的开始时间，不评价快慢，只看是否准时启动。', 'deepseek-ai/DeepSeek-V3', 'mock', 'normal', '', 134, 192, 174, date_sub(sysdate(), interval 8 day));
+
+-- 课程排课逻辑优化：支持一门课多周次、多上课日，前端按当前日期计算最近一次上课与结课状态
+update edu_course set week_day = '周一 16:00-17:30；周三 16:00-17:30', start_date = '2026-04-20', end_date = '2026-06-26', start_time = '16:00', end_time = '17:30', remark = '每周2次，共20次左右' where course_id = 1;
+update edu_course set week_day = '周二 15:40-17:10；周四 15:40-17:10', start_date = '2026-04-21', end_date = '2026-06-25', start_time = '15:40', end_time = '17:10', remark = '每周2次，作品项目制' where course_id = 2;
+update edu_course set week_day = '周五 16:10-17:40', start_date = '2026-04-24', end_date = '2026-06-26', start_time = '16:10', end_time = '17:40', remark = '每周1次，专项训练' where course_id = 3;
+update edu_course set week_day = '周一 16:00-17:20；周四 16:00-17:20', start_date = '2026-04-13', end_date = '2026-06-25', start_time = '16:00', end_time = '17:20', remark = '每周2次，思维专题课' where course_id = 4;
+update edu_course set week_day = '周三 15:50-17:00', start_date = '2026-04-15', end_date = '2026-05-20', start_time = '15:50', end_time = '17:00', remark = '每周1次，短期启蒙课' where course_id = 5;
+update edu_course set week_day = '周二 16:20-17:20；周五 16:20-17:20', start_date = '2026-04-17', end_date = '2026-06-30', start_time = '16:20', end_time = '17:20', remark = '每周2次，口算训练' where course_id = 6;
+update edu_course set week_day = '周二 15:50-17:10；周四 15:50-17:10', start_date = '2026-04-14', end_date = '2026-06-25', start_time = '15:50', end_time = '17:10', remark = '每周2次，校园展示排练' where course_id = 7;
+update edu_course set week_day = '周日 15:40-17:10', start_date = '2026-03-01', end_date = '2026-04-26', start_time = '15:40', end_time = '17:10', status = '0', remark = '课程已按计划完成，可用于结课后记录与反馈测试' where course_id = 8;
+update edu_course set week_day = '周一 16:00-17:30；周三 16:00-17:30', start_date = '2026-05-04', end_date = '2026-06-24', start_time = '16:00', end_time = '17:30', remark = '下周开课，用于未开始状态演示' where course_id = 9;
+update edu_course set week_day = '周三 16:10-17:40；周五 16:10-17:40', start_date = '2026-04-15', end_date = '2026-06-26', start_time = '16:10', end_time = '17:40', remark = '每周2次，创客项目课' where course_id = 10;
+update edu_course set week_day = '周一 15:40-16:50；周三 15:40-16:50', start_date = '2026-04-20', end_date = '2026-06-24', start_time = '15:40', end_time = '16:50', remark = '每周2次，英语绘本阅读' where course_id = 11;
+update edu_course set week_day = '周二 16:00-17:10', start_date = '2026-04-21', end_date = '2026-06-23', start_time = '16:00', end_time = '17:10', remark = '每周1次，表达训练课' where course_id = 12;
+update edu_course set week_day = '周五 15:50-17:20', start_date = '2026-04-17', end_date = '2026-06-26', start_time = '15:50', end_time = '17:20', remark = '每周1次，科学实践课' where course_id = 13;
+update edu_course set week_day = '周一 16:10-17:30；周四 16:10-17:30', start_date = '2026-04-16', end_date = '2026-06-25', start_time = '16:10', end_time = '17:30', remark = '每周2次，体能训练课' where course_id = 14;
+update edu_course set week_day = '周二 15:40-17:00；周五 15:40-17:00', start_date = '2026-04-17', end_date = '2026-06-30', start_time = '15:40', end_time = '17:00', remark = '每周2次，机器人项目课' where course_id = 15;
+update edu_course set week_day = '周三 16:00-17:20', start_date = '2026-04-22', end_date = '2026-06-24', start_time = '16:00', end_time = '17:20', remark = '每周1次，书法审美课' where course_id = 16;
+update edu_course set week_day = '周四 16:00-17:20', start_date = '2026-04-16', end_date = '2026-06-25', start_time = '16:00', end_time = '17:20', remark = '每周1次，合唱排练课' where course_id = 17;
+update edu_course set week_day = '周一 15:50-17:10；周三 15:50-17:10', start_date = '2026-04-20', end_date = '2026-06-24', start_time = '15:50', end_time = '17:10', remark = '每周2次，综合素养课' where course_id = 18;
+
+-- 学习记录与教师反馈补充：按课次保存结构化内容，前端可选择具体上课时间查看和填写。
+update edu_course_enrollment
+set learning_record = '{"version":1,"fallback":"","sessions":{"2026-04-20-16:00":{"label":"第 1 次课 · 2026-04-20 周一","time":"16:00-17:30","student":"完成图形化编程入门练习，能独立让角色移动和转向。"},"2026-04-22-16:00":{"label":"第 2 次课 · 2026-04-22 周三","time":"16:00-17:30","student":"尝试使用循环积木，知道重复动作可以用循环简化。"}}}',
+    interaction_summary = '{"version":1,"fallback":"","sessions":{"2026-04-20-16:00":{"label":"第 1 次课 · 2026-04-20 周一","time":"16:00-17:30","teacher":"课堂参与积极，能跟随示范完成角色移动任务。"},"2026-04-22-16:00":{"label":"第 2 次课 · 2026-04-22 周三","time":"16:00-17:30","teacher":"开始理解循环结构，建议课后用小任务继续练习重复动作。"}}}',
+    remark = '课程仍在进行中，结课后将由教师补充整体成长反馈。'
+where enrollment_id = 1;
+
+update edu_course_enrollment
+set learning_record = '{"version":1,"fallback":"","sessions":{"2026-03-01-15:40":{"label":"第 1 次课 · 2026-03-01 周日","time":"15:40-17:10","student":"完成运球和基础脚步练习，体能消耗较大但能坚持。"},"2026-03-08-15:40":{"label":"第 2 次课 · 2026-03-08 周日","time":"15:40-17:10","student":"投篮姿势比第一次稳定，知道出手后要保持跟随动作。"},"2026-04-26-15:40":{"label":"第 9 次课 · 2026-04-26 周日","time":"15:40-17:10","student":"完成结课小测和分组对抗，能够主动给队友传球。"}}}',
+    interaction_summary = '{"version":1,"fallback":"","sessions":{"2026-03-01-15:40":{"label":"第 1 次课 · 2026-03-01 周日","time":"15:40-17:10","teacher":"基础协调性较好，需继续加强核心稳定和脚步节奏。"},"2026-03-08-15:40":{"label":"第 2 次课 · 2026-03-08 周日","time":"15:40-17:10","teacher":"投篮动作有改善，课堂配合度较高。"},"2026-04-26-15:40":{"label":"第 9 次课 · 2026-04-26 周日","time":"15:40-17:10","teacher":"结课对抗表现积极，能理解基础跑位和团队协作。"}}}',
+    remark = '本期课程已完成。学生在体能、运球稳定性和团队配合上有明显进步，建议后续继续参加球类专项训练。'
+where course_id = 8;
+
+update edu_course_enrollment
+set learning_record = ifnull(nullif(learning_record, ''), '{"version":1,"fallback":"","sessions":{}}'),
+    interaction_summary = ifnull(nullif(interaction_summary, ''), '{"version":1,"fallback":"","sessions":{}}'),
+    remark = ifnull(nullif(remark, ''), '课程进行中，结课后由教师补充整体成长反馈。')
+where learning_record is null or learning_record = '' or interaction_summary is null or interaction_summary = '' or remark is null or remark = '';

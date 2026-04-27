@@ -852,22 +852,22 @@ export default {
 ::v-deep .query-form .el-form-item {
   display: inline-flex;
   align-items: center;
-  margin-right: 4px;
-  margin-bottom: 0;
+  width: auto !important;
+  min-height: 38px;
+  margin: 0 !important;
 }
 
 ::v-deep .query-form .el-form-item:nth-child(1) {
-  width: 220px;
+  width: auto !important;
 }
 
 ::v-deep .query-form .el-form-item:nth-child(2),
 ::v-deep .query-form .el-form-item:nth-child(3) {
-  width: 180px;
+  width: auto !important;
 }
 
 ::v-deep .query-form .el-form-item:nth-child(4) {
-  width: 180px;
-  margin-right: 0;
+  width: auto !important;
 }
 
 ::v-deep .query-form .el-form-item:last-child {
@@ -890,11 +890,11 @@ export default {
 
 ::v-deep .query-form .el-input,
 ::v-deep .query-form .el-select {
-  width: 100%;
+  width: 190px !important;
 }
 
 ::v-deep .status-select .el-input__inner {
-  width: 136px;
+  width: 100% !important;
 }
 
 ::v-deep .query-form .el-input__inner,
