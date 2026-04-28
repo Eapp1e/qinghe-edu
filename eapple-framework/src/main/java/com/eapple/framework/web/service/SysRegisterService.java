@@ -53,6 +53,7 @@ public class SysRegisterService
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
         String loginRole = registerBody.getLoginRole();
+        String teacherType = registerBody.getTeacherType();
         SysUser sysUser = new SysUser();
         sysUser.setUserName(username);
 
@@ -95,7 +96,16 @@ public class SysRegisterService
             {
                 return "请选择有效的注册身份";
             }
+            if (StringUtils.equals(loginRole, "edu_teacher") && !StringUtils.equalsAny(teacherType,
+                    "science", "humanities", "art", "sports", "computer", "general"))
+            {
+                return "请选择有效的教师类型";
+            }
             sysUser.setNickName("待完善资料");
+            if (StringUtils.equals(loginRole, "edu_teacher"))
+            {
+                sysUser.setTeacherType(teacherType);
+            }
             sysUser.setPwdUpdateDate(DateUtils.getNowDate());
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
             boolean regFlag = userService.registerUser(sysUser);

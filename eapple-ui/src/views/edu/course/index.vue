@@ -12,7 +12,7 @@
           <strong>{{ total }}</strong>
         </div>
         <div class="stat-card">
-          <span>{{ isTeacherView ? '开设中课程' : '开放课程' }}</span>
+          <span>{{ isTeacherView ? '开设中课程' : (isStudentView ? '已报课程' : '开放课程') }}</span>
           <strong>{{ openCount }}</strong>
         </div>
       </div>
@@ -24,10 +24,17 @@
           <el-form-item label="课程名称">
             <el-input v-model="queryParams.courseName" placeholder="请输入课程名称" clearable @keyup.enter.native="getList" />
           </el-form-item>
-          <el-form-item label="分类">
-            <el-input v-model="queryParams.category" placeholder="请输入课程分类" clearable @keyup.enter.native="getList" />
+          <el-form-item v-if="!isTeacherView" label="分类">
+            <el-select v-model="queryParams.category" placeholder="全部分类" clearable>
+              <el-option v-for="item in categoryOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
           </el-form-item>
-          <el-form-item label="教师">
+          <el-form-item v-if="!canEnrollCourse" label="开课范围">
+            <el-select v-model="queryParams.gradeScope" placeholder="全部年级" clearable>
+              <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="!isTeacherView" label="教师">
             <el-input v-model="queryParams.teacherName" placeholder="请输入教师姓名" clearable @keyup.enter.native="getList" />
           </el-form-item>
           <el-form-item label="地点">
@@ -38,10 +45,18 @@
               <el-option v-for="item in weekOptions" :key="item" :label="item" :value="item" />
             </el-select>
           </el-form-item>
-          <el-form-item v-if="canManageCourse" label="状态" class="status-select">
-            <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
-              <el-option label="开设中" value="0" />
-              <el-option label="已停开" value="1" />
+          <el-form-item v-if="canEnrollCourse || canManageCourse" label="课程状态" class="status-select">
+            <el-select v-model="queryParams.runtimeStatus" placeholder="全部状态" clearable>
+              <el-option label="待开课" value="pending" />
+              <el-option label="开设中" value="active" />
+              <el-option label="已结课" value="finished" />
+              <el-option label="已停开" value="closed" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="canEnrollCourse" label="报名状态" class="status-select">
+            <el-select v-model="queryParams.enrolled" placeholder="全部报名" clearable>
+              <el-option label="已报名" value="Y" />
+              <el-option label="未报名" value="N" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -82,6 +97,18 @@
       </div>
     </section>
 
+    <section v-if="isTeacherView" class="teacher-profile-card">
+      <div>
+        <h3>教师身份</h3>
+      </div>
+      <div class="teacher-profile-meta">
+        <span>{{ $store.getters.nickName || $store.getters.name || '当前教师' }}</span>
+        <span>教学类型：{{ teacherTypeLabel }}</span>
+        <span>课程分类：{{ teacherCategoryLabel }}</span>
+        <span>共开设 {{ teacherCourseCount }} 门课</span>
+      </div>
+    </section>
+
     <section class="reminder-panel">
       <div class="reminder-head">
         <div>
@@ -115,6 +142,11 @@
 
     <section class="table-section-card">
     <el-table v-loading="loading" :data="courseList" class="content-table">
+      <el-table-column label="课程编号" min-width="120" align="center">
+        <template slot-scope="scope">
+          <span class="course-code-pill">{{ scope.row.courseCode || buildFallbackCourseCode(scope.row) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="课程" min-width="180">
         <template slot-scope="scope">
           <div class="course-name-cell">
@@ -124,6 +156,9 @@
         </template>
       </el-table-column>
       <el-table-column label="分类" prop="category" min-width="120" align="center" show-overflow-tooltip />
+      <el-table-column label="开课范围" min-width="160" align="center" show-overflow-tooltip>
+        <template slot-scope="scope">{{ formatGradeScope(scope.row.gradeScope) }}</template>
+      </el-table-column>
       <el-table-column label="教师" prop="teacherName" min-width="130" align="center" show-overflow-tooltip />
       <el-table-column label="上课周期" min-width="220" align="center">
         <template slot-scope="scope">
@@ -156,7 +191,7 @@
         <template slot-scope="scope">
           <template v-if="canEnrollCourse">
             <el-button size="mini" type="text" @click="handleEnroll(scope.row)">
-              {{ scope.row.enrolled === 'Y' ? '取消报名' : '报名' }}
+              {{ getEnrollActionText(scope.row) }}
             </el-button>
           </template>
           <template v-if="canManageCourse">
@@ -196,8 +231,26 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="课程名称" prop="courseName"><el-input v-model="form.courseName" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="课程分类" prop="category"><el-input v-model="form.category" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="校区" prop="campus"><el-input v-model="form.campus" /></el-form-item></el-col>
+          <el-col v-if="!isTeacherView" :span="12">
+            <el-form-item label="课程分类" prop="category">
+              <el-select v-model="form.category" class="full-width" placeholder="请选择课程分类">
+                <el-option v-for="item in categoryOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-else :span="12">
+            <el-form-item label="课程分类" prop="category">
+              <el-input :value="defaultTeacherCategory()" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="开课范围" prop="gradeScopeList">
+              <el-select v-model="form.gradeScopeList" class="full-width" multiple collapse-tags placeholder="请选择适用年级">
+                <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12"><el-form-item label="上课地点" prop="campus"><el-input v-model="form.campus" /></el-form-item></el-col>
           <el-col :span="12">
             <el-form-item label="每周几次" prop="weeklyFrequency">
               <el-select v-model="form.weeklyFrequency" placeholder="请选择每周次数" @change="syncScheduleSlots">
@@ -205,6 +258,7 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12"><el-form-item label="最大人数" prop="maxCapacity"><el-input-number v-model="form.maxCapacity" :min="1" /></el-form-item></el-col>
           <el-col :span="24">
             <el-form-item label="上课安排" prop="weekDay">
               <div class="schedule-editor">
@@ -219,9 +273,8 @@
               </div>
             </el-form-item>
           </el-col>
-          <el-col :span="12"><el-form-item label="开始日期"><el-date-picker v-model="form.startDate" type="date" value-format="yyyy-MM-dd" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="结束日期"><el-date-picker v-model="form.endDate" type="date" value-format="yyyy-MM-dd" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="最大人数"><el-input-number v-model="form.maxCapacity" :min="1" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="开始日期" prop="startDate"><el-date-picker v-model="form.startDate" type="date" value-format="yyyy-MM-dd" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="结束日期" prop="endDate"><el-date-picker v-model="form.endDate" type="date" value-format="yyyy-MM-dd" /></el-form-item></el-col>
           <el-col :span="24"><el-form-item label="课程简介"><el-input v-model="form.description" type="textarea" :rows="4" /></el-form-item></el-col>
         </el-row>
       </el-form>
@@ -290,10 +343,20 @@ export default {
       showSearch: true,
       total: 0,
       courseList: [],
+      statsCourseList: [],
       childrenList: [],
       aiModelOptions: [],
       currentAiModel: '',
       weekOptions: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+      gradeOptions: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级'],
+      categoryOptions: [
+        { value: '理科拓展', label: '理科拓展' },
+        { value: '文科阅读', label: '文科阅读' },
+        { value: '美育实践', label: '美育实践' },
+        { value: '体育健康', label: '体育健康' },
+        { value: '计算机编程', label: '计算机编程' },
+        { value: '综合素养', label: '综合素养' }
+      ],
       open: false,
       aiGenerating: false,
       aiGeneratingCourseId: undefined,
@@ -312,18 +375,24 @@ export default {
         pageSize: 10,
         courseName: undefined,
         category: undefined,
+        gradeScope: undefined,
         teacherName: undefined,
         campus: undefined,
         weekDay: undefined,
-        status: undefined
+        runtimeStatus: undefined,
+        enrolled: undefined
       },
       form: {},
       rules: {
         courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
         category: [{ required: true, message: '请输入课程分类', trigger: 'blur' }],
+        gradeScopeList: [{ type: 'array', required: true, message: '请选择开课范围', trigger: 'change' }],
         campus: [{ required: true, message: '请输入上课地点', trigger: 'blur' }],
+        maxCapacity: [{ required: true, message: '请设置最大人数', trigger: 'change' }],
         weeklyFrequency: [{ required: true, message: '请选择每周上课次数', trigger: 'change' }],
-        weekDay: [{ required: true, message: '请完善上课安排', trigger: 'change' }]
+        weekDay: [{ required: true, message: '请完善上课安排', trigger: 'change' }],
+        startDate: [{ required: true, message: '请选择开始日期', trigger: 'change' }],
+        endDate: [{ required: true, message: '请选择结束日期', trigger: 'change' }]
       }
     }
   },
@@ -337,6 +406,9 @@ export default {
     isAdminView() {
       return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
     },
+    isStudentView() {
+      return this.roleKeys.includes('edu_student')
+    },
     canManageCourse() {
       return this.isTeacherView || this.isAdminView
     },
@@ -344,7 +416,10 @@ export default {
       return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     openCount() {
-      return this.courseList.filter(item => this.courseRuntimeStatus(item).canEnroll).length
+      if (this.isStudentView) {
+        return this.statsCourseList.filter(item => item.enrolled === 'Y').length
+      }
+      return this.statsCourseList.filter(item => this.courseRuntimeStatus(item).canEnroll).length
     },
     pageTitle() {
       if (this.isTeacherView) {
@@ -364,6 +439,15 @@ export default {
       }
       return '集中展示课后课程、兴趣班和课程安排，支持课程报名、取消报名以及查看课程信息。'
     },
+    teacherTypeLabel() {
+      return this.formatTeacherType(this.$store.getters.teacherType)
+    },
+    teacherCategoryLabel() {
+      return this.defaultTeacherCategory()
+    },
+    teacherCourseCount() {
+      return this.statsCourseList.length
+    },
     currentAiModelLabel() {
       const current = this.aiModelOptions.find(item => item.modelName === this.currentAiModel)
       return current ? current.displayName : this.currentAiModel
@@ -373,7 +457,7 @@ export default {
     },
     todayCourseReminders() {
       const todayKey = this.formatDate(new Date()).slice(0, 10)
-      return this.courseList.flatMap(course => this.enumerateClassSessions(course)
+      return this.reminderCourseList.flatMap(course => this.enumerateClassSessions(course)
         .filter(session => this.formatDate(session.start).slice(0, 10) === todayKey)
         .map(session => ({
           key: `${course.courseId}-${session.start.getTime()}`,
@@ -386,8 +470,11 @@ export default {
         .slice(0, 5)
     },
     nextCourseReminders() {
-      return this.courseList.map(course => {
-        const session = this.getNextClassSession(course)
+      const tomorrow = new Date()
+      tomorrow.setHours(0, 0, 0, 0)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      return this.reminderCourseList.map(course => {
+        const session = this.enumerateClassSessions(course).find(item => item.start >= tomorrow)
         if (!session) return null
         return {
           key: `${course.courseId}-${session.start.getTime()}`,
@@ -398,6 +485,13 @@ export default {
           start: session.start
         }
       }).filter(Boolean).sort((a, b) => a.start - b.start).slice(0, 5)
+    },
+    reminderCourseList() {
+      const availableCourses = this.statsCourseList.filter(course => this.courseRuntimeStatus(course).code !== 'closed')
+      if (this.canEnrollCourse) {
+        return availableCourses.filter(course => course.enrolled === 'Y')
+      }
+      return availableCourses
     }
   },
   created() {
@@ -408,9 +502,13 @@ export default {
   methods: {
     getList() {
       this.loading = true
-      listCourse(this.queryParams).then(res => {
-        this.courseList = res.rows || []
-        this.total = res.total || 0
+      const statsParams = { ...this.queryParams, pageNum: 1, pageSize: 1000 }
+      const listParams = this.canEnrollCourse ? statsParams : this.queryParams
+      Promise.all([listCourse(listParams), listCourse(statsParams)]).then(([res, statsRes]) => {
+        const rows = this.uniqueCourses(res.rows || [])
+        this.courseList = this.canEnrollCourse ? this.paginateRows(rows, this.queryParams.pageNum, this.queryParams.pageSize) : rows
+        this.total = this.canEnrollCourse ? rows.length : (res.total || rows.length)
+        this.statsCourseList = this.uniqueCourses(statsRes.rows || [])
       }).finally(() => {
         this.loading = false
       })
@@ -444,12 +542,30 @@ export default {
         pageSize: 10,
         courseName: undefined,
         category: undefined,
+        gradeScope: undefined,
         teacherName: undefined,
         campus: undefined,
         weekDay: undefined,
-        status: undefined
+        runtimeStatus: undefined,
+        enrolled: undefined
       }
       this.getList()
+    },
+    uniqueCourses(rows) {
+      const seen = new Set()
+      return (rows || []).filter(row => {
+        const key = row.courseCode || row.courseId
+        if (seen.has(key)) {
+          return false
+        }
+        seen.add(key)
+        return true
+      })
+    },
+    paginateRows(rows, pageNum, pageSize) {
+      const size = Number(pageSize || 10)
+      const start = (Number(pageNum || 1) - 1) * size
+      return rows.slice(start, start + size)
     },
     handleExport() {
       exportCourse(this.queryParams)
@@ -460,6 +576,9 @@ export default {
         maxCapacity: 30,
         status: '0',
         currentCapacity: 0,
+        category: this.defaultTeacherCategory(),
+        gradeScope: '一年级,二年级,三年级,四年级,五年级,六年级,七年级,八年级,九年级',
+        gradeScopeList: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级'],
         weeklyFrequency: 1,
         weekDay: '周一 16:00-17:30',
         scheduleSlots: [{ weekDay: '周一', startTime: '16:00', endTime: '17:30' }],
@@ -476,6 +595,7 @@ export default {
       const scheduleSlots = this.parseCourseSlots(row)
       this.form = {
         ...row,
+        gradeScopeList: this.parseGradeScope(row.gradeScope),
         weeklyFrequency: scheduleSlots.length || 1,
         scheduleSlots
       }
@@ -483,7 +603,11 @@ export default {
       this.open = true
     },
     submitForm() {
+      if (this.isTeacherView) {
+        this.form.category = this.defaultTeacherCategory()
+      }
       this.prepareCourseSchedule()
+      this.prepareGradeScope()
       if (!this.hasValidSchedule()) {
         this.$modal.msgWarning('请完善每次课的星期与起止时间')
         return
@@ -583,6 +707,13 @@ export default {
     },
     handleEnroll(row) {
       const runtime = this.courseRuntimeStatus(row)
+      if (row.enrolled === 'Y' && runtime.code === 'finished') {
+        this.$router.push({
+          path: '/edu/enrollment',
+          query: { courseName: row.courseName }
+        })
+        return
+      }
       if (row.enrolled !== 'Y' && !runtime.canEnroll) {
         this.$modal.msgError(`当前课程${runtime.text}，暂不可报名`)
         return
@@ -604,6 +735,13 @@ export default {
         this.$modal.msgSuccess('报名成功')
         this.getList()
       }).catch(() => {})
+    },
+    getEnrollActionText(row) {
+      const runtime = this.courseRuntimeStatus(row)
+      if (row.enrolled === 'Y' && runtime.code === 'finished') {
+        return '查看记录'
+      }
+      return row.enrolled === 'Y' ? '取消报名' : '报名'
     },
     handleNotice(row) {
       this.startAiGenerating(row, 'notice', 'AI 生成通知', '课程通知')
@@ -691,6 +829,51 @@ export default {
       this.form.weekDay = slots.map(item => `${item.weekDay} ${item.startTime}-${item.endTime}`).join('；')
       this.form.startTime = slots[0].startTime
       this.form.endTime = slots[0].endTime
+    },
+    prepareGradeScope() {
+      const selected = Array.isArray(this.form.gradeScopeList) ? this.form.gradeScopeList : []
+      this.form.gradeScope = selected.join(',')
+    },
+    parseGradeScope(scope) {
+      const text = String(scope || '').replace(/，/g, ',')
+      const list = text.split(',').map(item => item.trim()).filter(Boolean)
+      return list.length ? list : this.gradeOptions.slice()
+    },
+    formatGradeScope(scope) {
+      const list = this.parseGradeScope(scope)
+      const indexes = list.map(item => this.gradeOptions.indexOf(item)).filter(index => index >= 0).sort((a, b) => a - b)
+      if (indexes.length && indexes.every((index, order) => order === 0 || index === indexes[order - 1] + 1)) {
+        const start = this.gradeOptions[indexes[0]]
+        const end = this.gradeOptions[indexes[indexes.length - 1]]
+        return start === end ? start : `${start.replace('年级', '')}至${end}`
+      }
+      return list.join('、') || '未设置'
+    },
+    formatTeacherType(value) {
+      const map = {
+        science: '理科',
+        humanities: '文科',
+        art: '美育',
+        sports: '体育',
+        computer: '计算机',
+        general: '综合实践'
+      }
+      return map[String(value || '').trim()] || '未设置'
+    },
+    defaultTeacherCategory() {
+      const map = {
+        science: '理科拓展',
+        humanities: '文科阅读',
+        art: '美育实践',
+        sports: '体育健康',
+        computer: '计算机编程',
+        general: '综合素养'
+      }
+      const teacherType = String(this.$store.getters.teacherType || 'general').trim()
+      return map[teacherType] || '综合素养'
+    },
+    buildFallbackCourseCode(row) {
+      return row && row.courseId ? `QH-C${String(row.courseId).padStart(4, '0')}` : '未编号'
     },
     parseCourseSlots(course) {
       const text = String(course.weekDay || '')
@@ -1049,6 +1232,55 @@ export default {
   padding-top: 0;
 }
 
+.teacher-profile-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border: 1px solid rgba(157, 232, 233, 0.36);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 34px rgba(41, 130, 141, 0.08);
+}
+
+.teacher-profile-card h3 {
+  margin: 0 0 8px;
+  color: #173746;
+  font-size: 24px;
+  font-family: "STZhongsong", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  letter-spacing: 0.01em;
+}
+
+.teacher-profile-card p {
+  margin: 0;
+  color: #6f8792;
+  font-size: 13px;
+}
+
+.teacher-profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.teacher-profile-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(103, 186, 178, 0.22);
+  border-radius: 999px;
+  background: #f7fbfa;
+  color: #315c62;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .reminder-panel {
   position: relative;
   z-index: 1;
@@ -1183,6 +1415,19 @@ export default {
 
 .course-name-cell strong {
   color: #173746;
+}
+
+.course-code-pill {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 86px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef8f7;
+  color: #2b7772;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .course-name-cell span {

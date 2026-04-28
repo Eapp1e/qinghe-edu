@@ -22,12 +22,14 @@ create table if not exists edu_student_profile (
 
 create table if not exists edu_course (
   course_id bigint(20) not null auto_increment comment '课程ID',
+  course_code varchar(32) default null comment '课程编号',
   course_name varchar(100) not null comment '课程名称',
   category varchar(50) default '' comment '课程分类',
+  grade_scope varchar(128) default '' comment '开课年级范围',
   teacher_user_id bigint(20) not null comment '教师用户ID',
   teacher_name varchar(64) default '' comment '教师姓名',
   campus varchar(100) default '' comment '校区/地点',
-  week_day varchar(16) default '' comment '上课星期',
+  week_day varchar(128) default '' comment '上课星期/时段',
   start_time varchar(16) default '' comment '开始时间',
   end_time varchar(16) default '' comment '结束时间',
   start_date date comment '开始日期',
@@ -43,7 +45,8 @@ create table if not exists edu_course (
   create_time datetime comment '创建时间',
   update_by varchar(64) default '' comment '更新者',
   update_time datetime comment '更新时间',
-  primary key (course_id)
+  primary key (course_id),
+  unique key uk_course_code (course_code)
 ) engine=innodb default charset=utf8mb4 comment='课后课程表';
 
 create table if not exists edu_course_enrollment (
@@ -137,7 +140,7 @@ create table if not exists edu_family_task (
 ) engine=innodb default charset=utf8mb4 comment='家庭任务表';
 
 insert ignore into sys_user (user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, pwd_update_date, create_by, create_time, update_by, update_time, remark) values
-(110, 103, 'edu_admin', '平台管理员', '00', 'edu_admin@example.com', '13800000010', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台管理员'),
+(110, 103, 'edu_admin', '管理员', '00', 'edu_admin@example.com', '13800000010', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台管理员'),
 (111, 103, 'edu_teacher', '李老师', '00', 'edu_teacher@example.com', '13800000011', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台教师'),
 (112, 103, 'edu_parent', '王家长', '00', 'edu_parent@example.com', '13800000012', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台家长'),
 (113, 103, 'edu_student', '王小明', '00', 'edu_student@example.com', '13800000013', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台学生');
@@ -153,9 +156,24 @@ insert ignore into edu_student_profile (profile_id, student_user_id, student_nam
 (1, 113, '王小明', 112, '王家长', '五年级', '2班', '男', '篮球,编程,书法', '0', '演示学生档案', 'admin', sysdate());
 
 insert ignore into edu_course (course_id, course_name, category, teacher_user_id, teacher_name, campus, week_day, start_time, end_time, start_date, end_date, max_capacity, current_capacity, status, description, ai_notice, ai_suggestion, remark, create_by, create_time) values
-(1, '少儿趣味编程', '科技创新', 111, '李老师', '教学楼A201', '周一', '16:00', '17:30', '2026-04-20', '2026-06-30', 30, 1, '0', '通过图形化编程和小游戏设计培养逻辑思维。', '【课后服务通知】本周将开展少儿趣味编程课程，请学生自备笔记本并准时到达教学楼A201。', '教学建议：采用任务闯关制，先做演示，再让学生分组完成小游戏。', '首页推荐课程', 'edu_teacher', sysdate()),
+(1, '少儿趣味编程', '计算机编程', 111, '李老师', '教学楼A201', '周一', '16:00', '17:30', '2026-04-20', '2026-06-30', 30, 1, '0', '通过图形化编程和小游戏设计培养逻辑思维。', '【课后服务通知】本周将开展少儿趣味编程课程，请学生自备笔记本并准时到达教学楼A201。', '教学建议：采用任务闯关制，先做演示，再让学生分组完成小游戏。', '首页推荐课程', 'edu_teacher', sysdate()),
 (2, '创意美术工坊', '艺术素养', 111, '李老师', '艺术教室B103', '周三', '15:40', '17:10', '2026-04-22', '2026-06-30', 25, 1, '0', '结合水彩与手工创作，提升审美与表达能力。', '【课后服务通知】创意美术工坊课程请携带画笔和围裙，课程结束后统一展示作品。', '教学建议：先进行色彩启发，再安排分层创作与作品讲评。', '家长关注度高', 'edu_teacher', sysdate()),
 (3, '篮球基础训练', '体育健康', 111, '李老师', '操场东侧篮球场', '周五', '16:10', '17:40', '2026-04-24', '2026-06-30', 35, 0, '0', '面向中高年级学生开展运球、传球、合作训练。', '', '', '学生兴趣课', 'edu_teacher', sysdate());
+
+update edu_course
+set category = case
+    when category in ('科技创新', '编程思维') then '计算机编程'
+    when category in ('艺术素养') then '美育实践'
+    else category
+end,
+grade_scope = case
+    when course_name regexp '篮球|足球|羽毛球|阅读|写作|编程|机器人|科学' then '三年级,四年级,五年级,六年级,七年级,八年级,九年级'
+    when course_name regexp '少儿|美术|舞蹈|陶艺' then '一年级,二年级,三年级,四年级,五年级,六年级'
+    else '一年级,二年级,三年级,四年级,五年级,六年级,七年级,八年级,九年级'
+end
+where grade_scope is null or grade_scope = '';
+
+update edu_course set course_code = concat('QH-C', lpad(course_id, 4, '0')) where course_code is null or course_code = '';
 
 insert ignore into edu_course_enrollment (enrollment_id, course_id, course_name, student_user_id, student_name, parent_user_id, parent_name, teacher_user_id, teacher_name, status, signup_source, learning_record, interaction_summary, remark, create_by, create_time) values
 (1, 1, '少儿趣味编程', 113, '王小明', 112, '王家长', 111, '李老师', '0', 'parent', '已完成第一周图形化编程体验，能独立完成角色移动任务。', '家长反馈孩子回家后愿意继续练习。', '报名演示数据', 'edu_parent', sysdate()),

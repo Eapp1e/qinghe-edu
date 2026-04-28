@@ -100,7 +100,7 @@
       <div class="reward-grid">
         <article v-for="item in paginatedRewardList" :key="item.rewardId" class="exchange-card">
           <div class="exchange-card-head">
-            <span>{{ item.points }} 积分</span>
+            <span>{{ formatRewardPointsText(item) }}</span>
             <el-tag size="mini" :type="rewardStatusTagType(item)">{{ rewardStatusText(item) }}</el-tag>
           </div>
           <h3>{{ item.title }}</h3>
@@ -232,10 +232,11 @@
         <div class="review-proof-grid">
           <div class="review-image-panel">
             <el-image
-              v-if="reviewProofImage"
+              v-if="reviewProofImage && !reviewImageError"
               :src="reviewProofImage"
               fit="cover"
               :preview-src-list="[reviewProofImage]"
+              @error="reviewImageError = true"
             />
             <div v-else class="default-proof-image">
               <div class="default-proof-card">
@@ -291,6 +292,7 @@ export default {
       form: {},
       submitForm: {},
       reviewForm: {},
+      reviewImageError: false,
       rewardForm: {},
       rewardList: [],
       rewardRequests: [],
@@ -344,6 +346,7 @@ export default {
     },
     availablePoints() {
       const confirmedCost = this.rewardRequests
+        .filter(item => this.isRewardRequestVisible(item))
         .filter(item => item.status === 'confirmed')
         .reduce((sum, item) => sum + Number(item.points || 0), 0)
       return Math.max((this.summary.points || 0) - confirmedCost, 0)
@@ -440,6 +443,7 @@ export default {
       })
     },
     handleReview(row, status) {
+      this.reviewImageError = false
       this.reviewForm = {
         taskId: row.taskId,
         status,
@@ -473,14 +477,14 @@ export default {
     },
     getDefaultRewards() {
       return [
-        { rewardId: 'default-1', title: '睡前故事点播权', points: 5, category: '亲子陪伴', description: '孩子选择一个睡前故事主题，家长当天确认后完成。' },
-        { rewardId: 'default-2', title: '亲子游戏十分钟', points: 8, category: '亲子陪伴', description: '完成兑换后安排一次短时亲子桌游或小游戏。' },
-        { rewardId: 'default-3', title: '早餐菜单建议权', points: 10, category: '生活体验', description: '孩子可提出一次早餐搭配建议，家长确认后安排。' },
-        { rewardId: 'default-4', title: '周末亲子观影半小时', points: 30, category: '亲子陪伴', description: '由家长确认兑换时间，作为完成亲子约定后的陪伴奖励。' },
-        { rewardId: 'default-5', title: '自主选择一次晚餐菜单', points: 45, category: '生活体验', description: '孩子可提出一次家庭晚餐建议，家长根据实际情况共同完成。' },
-        { rewardId: 'default-6', title: '户外活动优先选择权', points: 60, category: '成长激励', description: '周末户外安排中，孩子可优先选择一次活动项目。' },
-        { rewardId: 'default-7', title: '家庭小队长一天', points: 20, category: '成长激励', description: '孩子负责一次家庭小安排，家长给予支持和确认。' },
-        { rewardId: 'default-8', title: '自选绘本共读', points: 15, category: '休闲娱乐', description: '兑换后孩子选择一本绘本或短篇内容，与家长共同阅读。' }
+        { rewardId: 'default-1', title: '睡前故事点播权', points: 5, category: '亲子陪伴', publisherName: '王家长', description: '孩子选择一个睡前故事主题，家长当天确认后完成。' },
+        { rewardId: 'default-2', title: '亲子游戏十分钟', points: 8, category: '亲子陪伴', publisherName: '罗家长', description: '完成兑换后安排一次短时亲子桌游或小游戏。' },
+        { rewardId: 'default-3', title: '早餐菜单建议权', points: 10, category: '生活体验', publisherName: '周家长', description: '孩子可提出一次早餐搭配建议，家长确认后安排。' },
+        { rewardId: 'default-4', title: '周末亲子观影半小时', points: 30, category: '亲子陪伴', publisherName: '王家长', description: '由家长确认兑换时间，作为完成亲子约定后的陪伴奖励。' },
+        { rewardId: 'default-5', title: '自主选择一次晚餐菜单', points: 45, category: '生活体验', publisherName: '徐家长', description: '孩子可提出一次家庭晚餐建议，家长根据实际情况共同完成。' },
+        { rewardId: 'default-6', title: '户外活动优先选择权', points: 60, category: '成长激励', publisherName: '黄家长', description: '周末户外安排中，孩子可优先选择一次活动项目。' },
+        { rewardId: 'default-7', title: '家庭小队长一天', points: 20, category: '成长激励', publisherName: '郭家长', description: '孩子负责一次家庭小安排，家长给予支持和确认。' },
+        { rewardId: 'default-8', title: '自选绘本共读', points: 15, category: '休闲娱乐', publisherName: '马家长', description: '兑换后孩子选择一本绘本或短篇内容，与家长共同阅读。' }
       ]
     },
     getCustomRewards() {
@@ -498,8 +502,18 @@ export default {
         map[item.rewardId] = item
         return map
       }, {})
-      const defaultIds = this.getDefaultRewards().map(item => item.rewardId)
-      const mergedDefaults = this.getDefaultRewards().map(item => customMap[item.rewardId] || item)
+      const baseRewards = this.getDefaultRewards().concat([
+        { rewardId: 'default-9', title: '课间小零食选择权', points: 3, category: '生活体验', publisherName: '王家长', description: '兑换后孩子可在家长提供的健康零食范围内选择一次。' },
+        { rewardId: 'default-10', title: '家庭歌单点播', points: 4, category: '休闲娱乐', publisherName: '罗家长', description: '当天家庭活动时由孩子点播一首合适的歌曲。' },
+        { rewardId: 'default-11', title: '晚间散步路线选择', points: 6, category: '成长激励', publisherName: '周家长', description: '家长确认安全路线后，由孩子选择一次饭后散步方向。' },
+        { rewardId: 'default-12', title: '亲子手工材料包', points: 12, category: '亲子陪伴', publisherName: '徐家长', description: '兑换后安排一次简短手工制作，家长负责准备基础材料。' },
+        { rewardId: 'default-13', title: '周末运动项目优先选', points: 18, category: '成长激励', publisherName: '黄家长', description: '周末运动安排中，孩子优先选择篮球、羽毛球或骑行等项目。' },
+        { rewardId: 'default-14', title: '家庭电影夜选片权', points: 35, category: '休闲娱乐', publisherName: '郭家长', description: '在家长确认适龄内容后，由孩子选择一次家庭电影。' },
+        { rewardId: 'default-15', title: '一次亲子烘焙体验', points: 50, category: '生活体验', publisherName: '马家长', description: '兑换后安排一次简单烘焙或厨房协作体验。' },
+        { rewardId: 'default-16', title: '家庭短途出行提议权', points: 80, category: '成长激励', publisherName: '王家长', description: '孩子可提出一次周末短途出行建议，家长结合时间与安全情况确认。' }
+      ])
+      const defaultIds = baseRewards.map(item => item.rewardId)
+      const mergedDefaults = baseRewards.map(item => ({ ...item, ...(customMap[item.rewardId] || {}), publisherName: (customMap[item.rewardId] && customMap[item.rewardId].publisherName) || item.publisherName }))
       const appendedRewards = customRewards.filter(item => !defaultIds.includes(item.rewardId))
       return appendedRewards.concat(mergedDefaults)
     },
@@ -523,7 +537,8 @@ export default {
           title: this.rewardForm.title.trim(),
           points: this.rewardForm.points,
           category: this.rewardForm.category,
-          description: (this.rewardForm.description || '家长确认后完成兑换。').trim()
+          description: (this.rewardForm.description || '家长确认后完成兑换。').trim(),
+          publisherName: this.rewardForm.publisherName || this.$store.getters.nickName || this.$store.getters.name || '家长'
         }
         const customRewards = this.getCustomRewards().filter(item => item.rewardId !== reward.rewardId)
         customRewards.unshift(reward)
@@ -555,7 +570,37 @@ export default {
       localStorage.setItem(FAMILY_REWARD_REQUEST_STORAGE_KEY, JSON.stringify(list || []))
     },
     getRewardRequest(item) {
-      return this.rewardRequests.find(request => request.rewardId === item.rewardId) || {}
+      return this.rewardRequests.find(request => request.rewardId === item.rewardId && this.isRewardRequestVisible(request)) || {}
+    },
+    isRewardRequestVisible(request) {
+      if (!request) return false
+      if (!request.studentUserId) return true
+      if (this.isAdminView) return true
+      if (this.isStudent) return String(request.studentUserId) === String(this.$store.getters.id)
+      if (this.isParent) {
+        const childIds = (this.children || []).map(child => String(child.studentUserId))
+        return childIds.includes(String(request.studentUserId))
+      }
+      return true
+    },
+    getRewardAudienceText(item) {
+      const request = this.getRewardRequest(item)
+      if (request.parentName) {
+        return request.parentName
+      }
+      if (this.isAdminView) {
+        return item.publisherName === '平台预设' ? '' : (item.publisherName || '')
+      }
+      const names = (this.children || []).map(child => child.studentName).filter(Boolean)
+      return names.length ? `适用孩子：${names.join('、')}` : '适用孩子：绑定学生'
+    },
+    formatRewardPointsText(item) {
+      const base = `${item.points || 0}积分`
+      if (!this.isAdminView) {
+        return base
+      }
+      const publisher = this.getRewardAudienceText(item)
+      return publisher ? `${base} • ${publisher}` : base
     },
     handleRedeem(item) {
       if (this.availablePoints < item.points) {
@@ -564,7 +609,15 @@ export default {
       }
       this.rewardRequests = this.rewardRequests
         .filter(request => request.rewardId !== item.rewardId)
-        .concat([{ rewardId: item.rewardId, title: item.title, points: item.points, status: 'pending', createTime: Date.now() }])
+        .concat([{
+          rewardId: item.rewardId,
+          title: item.title,
+          points: item.points,
+          status: 'pending',
+          studentUserId: this.$store.getters.id,
+          studentName: this.$store.getters.nickName || this.$store.getters.name || '当前学生',
+          createTime: Date.now()
+        }])
       this.saveRewardRequests(this.rewardRequests)
       this.$modal.msgSuccess(`已提交“${item.title}”兑换申请，等待家长确认`)
     },
@@ -882,6 +935,7 @@ export default {
 
 .exchange-card {
   display: flex;
+  position: relative;
   flex-direction: column;
   gap: 12px;
   padding: 18px;
@@ -906,6 +960,18 @@ export default {
 
 .exchange-card h3 {
   font-size: 20px;
+}
+
+.exchange-audience {
+  display: inline-flex;
+  align-self: flex-end;
+  margin-top: auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(236, 250, 247, 0.96);
+  color: #4f6d78;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .exchange-card p {

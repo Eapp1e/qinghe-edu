@@ -112,13 +112,13 @@ export default {
     cards() {
       return [
         { label: '课程总数', value: this.dashboard.totalCourses || 0 },
-        { label: '报名总数', value: this.dashboard.totalEnrollments || 0 },
         { label: '提问总数', value: this.dashboard.totalQuestions || 0 },
         { label: 'AI 调用', value: this.dashboard.totalAiCalls || 0 },
         { label: '家长建议', value: this.dashboard.totalParentAdvices || 0 },
         { label: '亲子任务', value: this.dashboard.totalFamilyTasks || 0 },
         { label: '完成任务', value: this.dashboard.completedFamilyTasks || 0 },
-        { label: '活跃学生', value: this.dashboard.activeStudents || 0 }
+        { label: '活跃学生', value: this.dashboard.activeStudents || 0 },
+        { label: '活跃教师', value: this.dashboard.activeTeachers || 0 }
       ]
     },
     roleKeys() {
@@ -151,16 +151,21 @@ export default {
     },
     timeline() {
       const items = []
+      const now = Date.now()
+      const pushRecentItem = item => {
+        if (!item.rawTime || item.rawTime > now) return
+        items.push(item)
+      }
       ;(this.dashboard.recentCourses || []).slice(0, 5).forEach(item => {
-        items.push({
+        pushRecentItem({
           key: `course-${item.courseId}`,
-          time: this.formatCourseTime(item),
+          time: this.formatDisplayTime(item.createTime),
           text: `课程《${item.courseName}》已发布`,
-          rawTime: this.getTimeValue(item.createTime || item.startDate)
+          rawTime: this.getTimeValue(item.createTime)
         })
       })
       ;(this.dashboard.recentQuestions || []).slice(0, 5).forEach(item => {
-        items.push({
+        pushRecentItem({
           key: `question-${item.questionId}`,
           time: this.formatDisplayTime(item.createTime),
           text: `收到问题《${item.questionTitle}》`,
@@ -168,11 +173,12 @@ export default {
         })
       })
       ;(this.dashboard.recentFamilyTasks || []).slice(0, 5).forEach(item => {
-        items.push({
+        const eventTime = item.updateTime || item.createTime
+        pushRecentItem({
           key: `family-${item.taskId}`,
-          time: this.formatDisplayTime(item.createTime),
+          time: this.formatDisplayTime(eventTime),
           text: `亲子任务《${item.taskTitle}》${this.formatTaskStatus(item.status)}`,
-          rawTime: this.getTimeValue(item.updateTime || item.createTime)
+          rawTime: this.getTimeValue(eventTime)
         })
       })
       return items
@@ -182,11 +188,16 @@ export default {
         .concat(items.length ? [] : [{ key: 'empty', time: '当前', text: '暂无最新平台动态' }])
     },
     recentCourseCards() {
-      return (this.dashboard.recentCourses || []).slice(0, 5).map(item => ({
-        key: item.courseId,
-        title: item.courseName,
-        desc: `授课教师：${item.teacherName || '待安排'} · 容量 ${item.maxCapacity || item.capacity || 0} 人`,
-        meta: this.formatCourseTime(item)
+      return (this.dashboard.recentCourses || [])
+        .map(item => ({ course: item, next: this.getNextClassSession(item) }))
+        .filter(item => item.next)
+        .sort((a, b) => a.next.start - b.next.start)
+        .slice(0, 5)
+        .map(({ course, next }) => ({
+          key: `${course.courseId}-${next.start.getTime()}`,
+          title: course.courseName,
+          desc: `授课教师：${course.teacherName || '待安排'} · 容量 ${course.maxCapacity || course.capacity || 0} 人`,
+          meta: this.formatClassTime(next)
       }))
     }
   },
@@ -239,6 +250,61 @@ export default {
     formatCourseTime(item) {
       return this.formatDisplayTime(item.startDate || item.createTime, item.startTime || '')
     },
+    formatClassTime(session) {
+      return `${parseTime(session.start, '{y}-{m}-{d}')} ${session.slot.startTime}`
+    },
+    parseCourseSlots(course) {
+      const text = String(course.weekDay || '')
+      const slots = []
+      const pattern = /(周[一二三四五六日天])\s*(\d{1,2}:\d{2})?\s*-?\s*(\d{1,2}:\d{2})?/g
+      let match = pattern.exec(text)
+      while (match) {
+        slots.push({
+          weekDay: match[1] === '周天' ? '周日' : match[1],
+          startTime: match[2] || course.startTime || '16:00',
+          endTime: match[3] || course.endTime || '17:30'
+        })
+        match = pattern.exec(text)
+      }
+      return slots.length ? slots : [{ weekDay: '周一', startTime: course.startTime || '16:00', endTime: course.endTime || '17:30' }]
+    },
+    parseCourseDate(value) {
+      const date = this.parseDate(value)
+      if (!date) return null
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    },
+    parseClassDateTime(dateValue, timeValue) {
+      const date = this.parseCourseDate(dateValue)
+      if (!date) return null
+      const parts = String(timeValue || '00:00').split(':')
+      date.setHours(Number(parts[0] || 0), Number(parts[1] || 0), 0, 0)
+      return date
+    },
+    getWeekDayNumber(weekDay) {
+      return ({ 周日: 0, 周一: 1, 周二: 2, 周三: 3, 周四: 4, 周五: 5, 周六: 6 })[weekDay]
+    },
+    getNextClassSession(course) {
+      if (course.status && course.status !== '0') return null
+      const start = this.parseCourseDate(course.startDate)
+      const end = this.parseCourseDate(course.endDate)
+      const slots = this.parseCourseSlots(course)
+      if (!start || !end || !slots.length) return null
+      const now = new Date()
+      const cursor = new Date(Math.max(start.getTime(), new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()))
+      while (cursor <= end) {
+        for (const slot of slots) {
+          if (this.getWeekDayNumber(slot.weekDay) === cursor.getDay()) {
+            const sessionStart = this.parseClassDateTime(cursor, slot.startTime)
+            const sessionEnd = this.parseClassDateTime(cursor, slot.endTime)
+            if (sessionEnd && sessionEnd >= now) {
+              return { start: sessionStart, end: sessionEnd, slot }
+            }
+          }
+        }
+        cursor.setDate(cursor.getDate() + 1)
+      }
+      return null
+    },
     formatCourseName(name) {
       if (!name) return '未命名课程'
       return name.length > 12 ? `${name.slice(0, 12)}...` : name
@@ -286,7 +352,7 @@ export default {
         xAxis: {
           type: 'category',
           axisTick: { show: false },
-          data: ['课程', '报名', '问答', '家长建议', '亲子任务', '学生']
+          data: ['课程', '问答', '家长建议', '亲子任务', '学生']
         },
         yAxis: { type: 'value' },
         series: [{
@@ -301,7 +367,6 @@ export default {
           },
           data: [
             this.dashboard.totalCourses || 0,
-            this.dashboard.totalEnrollments || 0,
             this.dashboard.totalQuestions || 0,
             this.dashboard.totalParentAdvices || 0,
             this.dashboard.totalFamilyTasks || 0,

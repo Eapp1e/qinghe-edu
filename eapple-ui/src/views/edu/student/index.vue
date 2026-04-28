@@ -119,7 +119,9 @@
               <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item label="年级" prop="gradeName">
-              <el-input v-model="queryParams.gradeName" placeholder="请输入年级" clearable @keyup.enter.native="handleQuery" />
+              <el-select v-model="queryParams.gradeName" placeholder="请选择年级" clearable>
+                <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+              </el-select>
             </el-form-item>
             <el-form-item label="班级" prop="className">
               <el-input v-model="queryParams.className" placeholder="请输入班级" clearable @keyup.enter.native="handleQuery" />
@@ -243,7 +245,13 @@
               <div class="field-tip">家长账号为必填项，已绑定时会自动回显当前家长登录账号。</div>
             </el-form-item>
           </el-col>
-          <el-col :span="12"><el-form-item label="年级"><el-input v-model="form.gradeName" /></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="年级">
+              <el-select v-model="form.gradeName" class="full-width" placeholder="请选择年级">
+                <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+              </el-select>
+            </el-form-item>
+          </el-col>
           <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" /></el-form-item></el-col>
           <el-col :span="12">
             <el-form-item label="性别">
@@ -321,7 +329,9 @@ export default {
       recommendLoading: false,
       title: '',
       recommendTitle: '智能推荐课程',
+      gradeOptions: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级'],
       studentList: [],
+      statsStudentList: [],
       recommendList: [],
       queryParams: {
         pageNum: 1,
@@ -345,13 +355,13 @@ export default {
       return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     activeCount() {
-      return this.studentList.filter(item => item.status === '0').length
+      return this.statsStudentList.filter(item => item.status === '0').length
     },
     thirdStat() {
       if (this.isOwnerView) {
-        return this.studentList.reduce((count, item) => count + this.splitTags(item.interestTags).length, 0)
+        return this.statsStudentList.reduce((count, item) => count + this.splitTags(item.interestTags).length, 0)
       }
-      return new Set(this.studentList.map(item => item.parentUserId).filter(Boolean)).size
+      return new Set(this.statsStudentList.map(item => item.parentUserId).filter(Boolean)).size
     },
     canManageProfile() {
       return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
@@ -414,11 +424,12 @@ export default {
     },
     getList() {
       this.loading = true
-      listStudent(this.queryParams).then(res => {
+      const statsParams = { ...this.queryParams, pageNum: 1, pageSize: 1000 }
+      Promise.all([listStudent(this.queryParams), listStudent(statsParams)]).then(([res, statsRes]) => {
         this.studentList = res.rows || []
         this.total = res.total || 0
-        this.loading = false
-      }).catch(() => {
+        this.statsStudentList = statsRes.rows || []
+      }).finally(() => {
         this.loading = false
       })
     },

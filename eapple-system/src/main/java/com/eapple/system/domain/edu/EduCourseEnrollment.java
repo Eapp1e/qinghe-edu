@@ -35,6 +35,8 @@ public class EduCourseEnrollment extends BaseEntity
     private String status;
 
     @Excel(name = "报名来源")
+    private String courseStatus;
+
     private String signupSource;
 
     @Excel(name = "学习记录")
@@ -154,6 +156,16 @@ public class EduCourseEnrollment extends BaseEntity
     public void setStatus(String status)
     {
         this.status = status;
+    }
+
+    public String getCourseStatus()
+    {
+        return courseStatus;
+    }
+
+    public void setCourseStatus(String courseStatus)
+    {
+        this.courseStatus = courseStatus;
     }
 
     public String getSignupSource()

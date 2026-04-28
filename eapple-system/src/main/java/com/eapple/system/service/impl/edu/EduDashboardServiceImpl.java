@@ -22,8 +22,6 @@ import com.eapple.system.service.edu.IEduDashboardService;
 @Service
 public class EduDashboardServiceImpl implements IEduDashboardService
 {
-    private static final long SEEDED_PARENT_ADVICE_COUNT = 16L;
-
     @Autowired
     private EduCourseMapper courseMapper;
 
@@ -63,20 +61,20 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         applyDashboardScope(dynamicCourseQuery, new EduCourseEnrollment(), dynamicQuestionQuery, dynamicLogQuery,
                 new EduAiLog(), dynamicFamilyTaskQuery, new EduFamilyTask(), new EduStudentProfile());
 
-        courseQuery.getParams().put("limitTop", 5);
+        courseQuery.getParams().put("limitTop", 100);
         dynamicCourseQuery.getParams().put("limitTop", 5);
         dynamicQuestionQuery.getParams().put("limitTop", 5);
         dynamicLogQuery.getParams().put("limitTop", 5);
         dynamicFamilyTaskQuery.getParams().put("limitTop", 5);
         parentAdviceQuery.setBusinessType("parent_diagnosis");
+        parentAdviceQuery.setStatus("success");
         completedFamilyTaskQuery.setStatus("2");
 
         vo.setTotalCourses(courseMapper.countCourses(courseQuery));
         vo.setTotalEnrollments(enrollmentMapper.countEnrollments(enrollmentQuery));
         vo.setTotalQuestions(questionMapper.countQuestions(questionQuery));
         vo.setTotalAiCalls(aiLogMapper.countAiLogs(logQuery));
-        Long parentAdviceCount = aiLogMapper.countAiLogs(parentAdviceQuery);
-        vo.setTotalParentAdvices((parentAdviceCount == null ? 0L : parentAdviceCount) + SEEDED_PARENT_ADVICE_COUNT);
+        vo.setTotalParentAdvices(aiLogMapper.countAiLogs(parentAdviceQuery));
         vo.setTotalFamilyTasks(familyTaskMapper.countTasks(new EduFamilyTask()));
         vo.setCompletedFamilyTasks(familyTaskMapper.countTasks(completedFamilyTaskQuery));
         vo.setActiveStudents(profileMapper.countActiveStudents(profileQuery));

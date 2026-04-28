@@ -36,7 +36,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { unlockScreen } from '@/api/login'
-import defAva from '@/assets/images/profile.jpg'
+import defaultMaleAvatar from '@/assets/images/default-avatar-male.svg'
 
 export default {
   name: 'LockScreen',
@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     onAvatarError(e) {
-      e.target.src = defAva
+      e.target.src = defaultMaleAvatar
     },
     startClock() {
       const update = () => {

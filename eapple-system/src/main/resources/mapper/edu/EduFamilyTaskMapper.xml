@@ -71,7 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectTaskList" parameterType="EduFamilyTask" resultMap="EduFamilyTaskResult">
         <include refid="taskSelect"/>
         <include refid="taskWhere"/>
-        order by task_id desc
+        order by ifnull(update_time, create_time) desc, task_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>

@@ -11,11 +11,17 @@ public class EduCourse extends BaseEntity
 
     private Long courseId;
 
+    @Excel(name = "课程编号")
+    private String courseCode;
+
     @Excel(name = "课程名称")
     private String courseName;
 
     @Excel(name = "课程分类")
     private String category;
+
+    @Excel(name = "开课范围")
+    private String gradeScope;
 
     private Long teacherUserId;
 
@@ -58,6 +64,8 @@ public class EduCourse extends BaseEntity
 
     private String enrolled;
 
+    private String runtimeStatus;
+
     private Integer recommendationScore;
 
     private String recommendationReason;
@@ -70,6 +78,16 @@ public class EduCourse extends BaseEntity
     public void setCourseId(Long courseId)
     {
         this.courseId = courseId;
+    }
+
+    public String getCourseCode()
+    {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode)
+    {
+        this.courseCode = courseCode;
     }
 
     public String getCourseName()
@@ -90,6 +108,16 @@ public class EduCourse extends BaseEntity
     public void setCategory(String category)
     {
         this.category = category;
+    }
+
+    public String getGradeScope()
+    {
+        return gradeScope;
+    }
+
+    public void setGradeScope(String gradeScope)
+    {
+        this.gradeScope = gradeScope;
     }
 
     public Long getTeacherUserId()
@@ -250,6 +278,16 @@ public class EduCourse extends BaseEntity
     public void setEnrolled(String enrolled)
     {
         this.enrolled = enrolled;
+    }
+
+    public String getRuntimeStatus()
+    {
+        return runtimeStatus;
+    }
+
+    public void setRuntimeStatus(String runtimeStatus)
+    {
+        this.runtimeStatus = runtimeStatus;
     }
 
     public Integer getRecommendationScore()

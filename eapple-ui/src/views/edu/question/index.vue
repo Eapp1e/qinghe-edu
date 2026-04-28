@@ -194,6 +194,7 @@ export default {
       open: false,
       answerOpen: false,
       questionList: [],
+      statsQuestionList: [],
       currentQuestion: {},
       regeneratingQuestionId: null,
       queryParams: {
@@ -216,7 +217,7 @@ export default {
       return this.$store.getters.roles || []
     },
     answeredCount() {
-      return this.questionList.filter(item => item.answerStatus === '1').length
+      return this.statsQuestionList.filter(item => item.answerStatus === '1').length
     },
     isTeacherRole() {
       return this.roleKeys.includes('edu_teacher')
@@ -255,9 +256,11 @@ export default {
   methods: {
     getList() {
       this.loading = true
-      listQuestion(this.queryParams).then(res => {
-        this.questionList = res.rows
-        this.total = res.total
+      const statsParams = { ...this.queryParams, pageNum: 1, pageSize: 1000 }
+      Promise.all([listQuestion(this.queryParams), listQuestion(statsParams)]).then(([res, statsRes]) => {
+        this.questionList = res.rows || []
+        this.total = res.total || 0
+        this.statsQuestionList = statsRes.rows || []
       }).finally(() => {
         this.loading = false
       })

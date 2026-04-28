@@ -437,8 +437,16 @@ export default {
         this.$modal.msgWarning('请先选择已绑定孩子')
         return
       }
+      const concern = String(this.diagnosisForm.concern || '').trim()
+      if (!concern) {
+        this.$modal.msgWarning('请填写近期关注，AI 建议会围绕该问题生成')
+        return
+      }
       this.aiLoading = true
-      generateParentDiagnosis(this.diagnosisForm).then(res => {
+      generateParentDiagnosis({
+        studentUserId: this.diagnosisForm.studentUserId,
+        concern
+      }).then(res => {
         const content = this.resolveDiagnosisContent(res)
         this.diagnosisResult = content || '暂无可展示内容'
         this.openDiagnosisDialog(this.diagnosisResult)
@@ -493,11 +501,8 @@ export default {
       const request = this.isAdminView ? listAiLog(this.buildHistoryQuery()) : listMyAiLog(this.buildHistoryQuery())
       request.then(res => {
         const rows = res.rows || []
-        const demoRows = this.filterDemoDiagnosisHistory(this.buildDemoDiagnosisHistory())
-        const apiKeys = new Set(rows.map(item => String(item.logId)))
-        const mergedRows = rows.concat(demoRows.filter(item => !apiKeys.has(String(item.logId))))
-        this.historyList = mergedRows.sort((a, b) => this.parseHistoryTime(b.createTime) - this.parseHistoryTime(a.createTime))
-        this.historyTotal = Math.max(Number(res.total || 0), mergedRows.length)
+        this.historyList = rows.sort((a, b) => this.parseHistoryTime(b.createTime) - this.parseHistoryTime(a.createTime))
+        this.historyTotal = Number(res.total || rows.length || 0)
       }).finally(() => {
         this.historyLoading = false
       })
@@ -558,19 +563,12 @@ export default {
       return Number.isNaN(time) ? 0 : time
     },
     extractStudentName(prompt) {
-      const normalMatch = (prompt || '').match(/学生[：:]\s*([^\n]+)/)
-      if (normalMatch) return normalMatch[1].trim()
-      const directMatch = (prompt || '').match(/学生[：:]\s*([^\n]+)/)
-      if (directMatch) return directMatch[1].trim()
-      const match = (prompt || '').match(/学生：([^，,\n]+)/)
+      const text = String(prompt || '')
+      const match = text.match(/(?:^|\n)学生[：:]\s*([^\n；;，,]+)/)
       return match && match[1] ? match[1].trim() : '--'
     },
     extractConcern(prompt) {
-      const normalMatch = (prompt || '').match(/家长补充关注[：:]\s*([^\n]+)/)
-      if (normalMatch) return normalMatch[1].trim()
-      const directMatch = (prompt || '').match(/家长补充关注[：:]\s*([^\n]+)/)
-      if (directMatch) return directMatch[1].trim()
-      const match = (prompt || '').match(/家长补充关注：([^\n]+)/)
+      const match = String(prompt || '').match(/(?:^|\n)家长补充关注[：:]\s*([^\n]+)/)
       const value = match && match[1] ? match[1].trim() : ''
       return value || '未填写'
     },

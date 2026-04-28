@@ -117,6 +117,11 @@ public class EduAiController extends BaseController
         {
             throw new ServiceException("请选择要诊断的孩子");
         }
+        if (StringUtils.isEmpty(StringUtils.trim(body.getConcern())))
+        {
+            throw new ServiceException("请填写近期关注，AI 建议会围绕该问题生成");
+        }
+        body.setConcern(StringUtils.trim(body.getConcern()));
         EduStudentProfile child = findCurrentParentChild(body.getStudentUserId());
         String prompt = buildCleanParentDiagnosisPrompt(child, body);
         return success(aiService.generateParentDiagnosis(child.getStudentUserId(), prompt));

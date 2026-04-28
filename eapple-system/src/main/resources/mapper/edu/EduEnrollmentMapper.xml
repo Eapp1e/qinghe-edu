@@ -15,6 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="teacherUserId" column="teacher_user_id"/>
         <result property="teacherName" column="teacher_name"/>
         <result property="status" column="status"/>
+        <result property="courseStatus" column="course_status"/>
         <result property="signupSource" column="signup_source"/>
         <result property="learningRecord" column="learning_record"/>
         <result property="interactionSummary" column="interaction_summary"/>
@@ -35,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select e.enrollment_id, e.course_id, e.course_name, e.student_user_id, e.student_name, e.parent_user_id, e.parent_name,
                e.teacher_user_id, e.teacher_name, e.status, e.signup_source, e.learning_record, e.interaction_summary,
                e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
-               c.campus, c.week_day, c.start_time, c.end_time, c.start_date, c.end_date
+               c.status as course_status, c.campus, c.week_day, c.start_time, c.end_time, c.start_date, c.end_date
         from edu_course_enrollment e
         left join edu_course c on c.course_id = e.course_id
     </sql>

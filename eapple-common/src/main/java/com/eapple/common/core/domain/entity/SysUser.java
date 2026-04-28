@@ -55,6 +55,9 @@ public class SysUser extends BaseEntity
     /** 用户头像 */
     private String avatar;
 
+    /** 教师类型（science 文理科、art 美育、sports 体育、computer 计算机等） */
+    private String teacherType;
+
     /** 密码 */
     private String password;
 
@@ -199,6 +202,16 @@ public class SysUser extends BaseEntity
         this.avatar = avatar;
     }
 
+    public String getTeacherType()
+    {
+        return teacherType;
+    }
+
+    public void setTeacherType(String teacherType)
+    {
+        this.teacherType = teacherType;
+    }
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword()
     {
@@ -321,6 +334,7 @@ public class SysUser extends BaseEntity
             .append("phonenumber", getPhonenumber())
             .append("sex", getSex())
             .append("avatar", getAvatar())
+            .append("teacherType", getTeacherType())
             .append("password", getPassword())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())

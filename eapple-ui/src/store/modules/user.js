@@ -4,7 +4,12 @@ import { MessageBox, } from 'element-ui'
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { isHttp, isEmpty } from "@/utils/validate"
-import defAva from '@/assets/images/profile.jpg'
+import defaultMaleAvatar from '@/assets/images/default-avatar-male.svg'
+import defaultFemaleAvatar from '@/assets/images/default-avatar-female.svg'
+
+function resolveDefaultAvatar(sex) {
+  return String(sex) === '1' ? defaultFemaleAvatar : defaultMaleAvatar
+}
 
 const user = {
   state: {
@@ -12,6 +17,7 @@ const user = {
     id: '',
     name: '',
     nickName: '',
+    teacherType: '',
     avatar: '',
     roles: [],
     permissions: []
@@ -29,6 +35,9 @@ const user = {
     },
     SET_NICK_NAME: (state, nickName) => {
       state.nickName = nickName
+    },
+    SET_TEACHER_TYPE: (state, teacherType) => {
+      state.teacherType = teacherType
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
@@ -68,7 +77,7 @@ const user = {
           const user = res.user
           let avatar = user.avatar || ""
           if (!isHttp(avatar)) {
-            avatar = (isEmpty(avatar)) ? defAva : process.env.VUE_APP_BASE_API + avatar
+            avatar = (isEmpty(avatar)) ? resolveDefaultAvatar(user.sex) : process.env.VUE_APP_BASE_API + avatar
           }
           if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', res.roles)
@@ -79,6 +88,7 @@ const user = {
           commit('SET_ID', user.userId)
           commit('SET_NAME', user.userName)
           commit('SET_NICK_NAME', user.nickName)
+          commit('SET_TEACHER_TYPE', user.teacherType || '')
           commit('SET_AVATAR', avatar)
           /* 初始密码提示 */
           if(res.isDefaultModifyPwd) {

@@ -12,7 +12,7 @@
           <strong>{{ displayTotal }}</strong>
         </div>
         <div class="stat-card">
-          <span>{{ isCourseRecordView ? '已结课课程' : '已完成' }}</span>
+          <span>{{ secondStatLabel }}</span>
           <strong>{{ displayFinishedCount }}</strong>
         </div>
       </div>
@@ -48,7 +48,7 @@
 
         <div class="toolbar-actions">
           <el-button size="mini" icon="el-icon-download" @click="handleExport">导出</el-button>
-          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" />
+          <right-toolbar :showSearch.sync="showSearch" @queryTable="refreshList" />
         </div>
       </div>
     </section>
@@ -64,7 +64,7 @@
             <header>
               <div>
                 <strong>{{ course.courseName }}</strong>
-                <span>{{ formatCourseRange(course) }}</span>
+                <span>{{ formatCourseRange(course) }} · {{ formatGradeScope(course.gradeScope) }}</span>
               </div>
               <el-tag size="small" :type="recordRuntimeStatus(course).tag">{{ recordRuntimeStatus(course).text }}</el-tag>
             </header>
@@ -72,6 +72,7 @@
               <span>已上课 {{ getPastSessions(course).length }} 次，未反馈 {{ getTeacherMissingFeedbackCount(course) }} 次</span>
               <div class="teacher-action-buttons">
                 <el-button size="mini" class="toolbar-plain-btn" @click="handleTeacherRoster(course)">学生名单</el-button>
+                <el-button v-if="isAdminView" size="mini" class="toolbar-plain-btn" @click="handleCourseRecordView(course)">查看记录</el-button>
                 <el-button v-if="isTeacherView" size="mini" class="toolbar-plain-btn" @click="handleTeacherCourse(course)">填写课次反馈</el-button>
               </div>
             </div>
@@ -91,7 +92,7 @@
             <header>
               <div>
                 <strong>{{ course.courseName }}</strong>
-                <span>{{ formatCourseRange(course) }}</span>
+                <span>{{ formatCourseRange(course) }} · {{ formatGradeScope(course.gradeScope) }}</span>
               </div>
               <el-tag size="small" type="success">已结课</el-tag>
             </header>
@@ -99,6 +100,7 @@
               <span>已上课 {{ getPastSessions(course).length }} 次，结课反馈{{ getTeacherFinalFeedback(course) ? '已填写' : '未填写' }}</span>
               <div class="teacher-action-buttons">
                 <el-button size="mini" class="toolbar-plain-btn" @click="handleTeacherRoster(course)">学生名单</el-button>
+                <el-button v-if="isAdminView" size="mini" class="toolbar-plain-btn" @click="handleCourseRecordView(course)">查看记录</el-button>
                 <el-button v-if="isTeacherView" size="mini" class="toolbar-plain-btn" @click="handleTeacherFinal(course)">
                   {{ getTeacherFinalFeedback(course) ? '修改结课反馈' : '填写结课反馈' }}
                 </el-button>
@@ -193,9 +195,20 @@
     </section>
     </template>
 
-    <el-dialog :title="dialogTitle" :visible.sync="open" width="760px">
+    <el-dialog :visible.sync="open" width="760px">
+      <template slot="title">
+        <div class="record-dialog-title">
+          <strong>{{ dialogTitle }}{{ form.courseName ? `：${form.courseName}` : '' }}</strong>
+          <span v-if="!isCourseSummaryMode && !isStudentView">{{ missingSessionCount }} 次未提交</span>
+        </div>
+      </template>
       <el-form :model="form" label-width="96px" class="record-form">
         <template v-if="!isCourseSummaryMode">
+        <el-form-item label="未填写课次" class="missing-session-item">
+          <div class="missing-tip">
+            <span>{{ missingSessionText }}</span>
+          </div>
+        </el-form-item>
         <el-form-item label="上课时间">
           <el-select v-model="selectedSessionKey" class="session-select" placeholder="请选择已上课次">
             <el-option
@@ -209,10 +222,6 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <div class="missing-tip">
-          <strong>未填写课次</strong>
-          <span>{{ missingSessionText }}</span>
-        </div>
         </template>
         <el-form-item v-if="isStudentView">
           <template slot="label">
@@ -295,15 +304,17 @@
     <el-dialog :title="teacherSessionTitle" :visible.sync="teacherSessionOpen" width="720px">
       <div class="detail-summary">
         <strong>{{ teacherSessionCourse.courseName }}</strong>
-        <span>选择已上课课次并填写本节反馈</span>
+        <span>{{ getTeacherMissingFeedbackCount(teacherSessionCourse) }} 次未提交</span>
       </div>
       <el-select v-model="teacherSessionKey" class="session-select teacher-session-select" placeholder="请选择课次" @change="handleTeacherSessionChange">
         <el-option
           v-for="session in getPastSessions(teacherSessionCourse)"
           :key="session.key"
-          :label="`${session.label} ${session.time}`"
           :value="session.key"
-        />
+        >
+          <span>{{ session.label }} {{ session.time }}</span>
+          <span class="session-option-status">{{ getCourseSessionFeedback(teacherSessionCourse, session) ? '已填写' : '未填写' }}</span>
+        </el-option>
       </el-select>
       <el-input v-model="teacherSessionFeedback" type="textarea" :rows="5" placeholder="填写本节课课堂表现、任务完成情况和下次课建议，将同步给本节课所有报名学生。" />
       <div slot="footer">
@@ -315,7 +326,6 @@
     <el-dialog title="填写结课反馈" :visible.sync="teacherFinalOpen" width="720px">
       <div class="detail-summary">
         <strong>{{ teacherFinalCourse.courseName }}</strong>
-        <span>结课状态由课程结束时间自动判定</span>
       </div>
       <el-input v-model="teacherFinalFeedback" type="textarea" :rows="5" placeholder="填写整门课程的整体表现、成长变化和后续建议，将同步给本课程所有报名学生。" />
       <div slot="footer">
@@ -331,17 +341,64 @@
         <el-table-column label="报名来源" min-width="110">
           <template slot-scope="scope">{{ scope.row.signupSource === 'parent' ? '家长报名' : '学生报名' }}</template>
         </el-table-column>
-        <el-table-column label="课次记录" min-width="170">
-          <template slot-scope="scope">
-            <div class="record-progress">
-              <strong>{{ getFilledSummary(scope.row) }}</strong>
-              <span>{{ getMissingSummary(scope.row) }}</span>
-            </div>
-          </template>
-        </el-table-column>
       </el-table>
       <div slot="footer">
         <el-button @click="teacherRosterOpen = false">关闭</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="courseRecordDialogTitle" :visible.sync="courseRecordOpen" width="860px">
+      <div class="detail-summary">
+        <strong>{{ courseRecordCourse.courseName }}</strong>
+        <span>{{ formatCourseRange(courseRecordCourse) }}</span>
+      </div>
+      <div class="course-record-filters">
+        <el-select v-if="!courseRecordFinalMode" v-model="courseRecordSessionKey" class="session-select" placeholder="请选择课次">
+          <el-option
+            v-for="session in courseRecordSessions"
+            :key="session.key"
+            :label="`${session.label} ${session.time}`"
+            :value="session.key"
+          />
+        </el-select>
+        <el-select v-model="courseRecordPersonKey" class="session-select" placeholder="请选择学生或教师">
+          <el-option
+            v-for="person in courseRecordPeople"
+            :key="person.key"
+            :label="person.label"
+            :value="person.key"
+          />
+        </el-select>
+      </div>
+      <div v-if="currentCourseRecordPerson" class="session-detail-card course-record-card">
+        <header>
+          <strong>{{ currentCourseRecordPerson.label }}</strong>
+          <span>{{ courseRecordFinalMode ? '结课归档' : (currentCourseRecordSession ? `${currentCourseRecordSession.label} ${currentCourseRecordSession.time}` : '未选择课次') }}</span>
+        </header>
+        <div v-if="courseRecordFinalMode" class="session-detail-grid">
+          <section>
+            <label>学生课程总结</label>
+            <p>{{ getCourseRecordFinalText('student') }}</p>
+          </section>
+          <section>
+            <label>教师结课反馈</label>
+            <p>{{ getCourseRecordFinalText('teacher') }}</p>
+          </section>
+        </div>
+        <div v-else class="session-detail-grid">
+          <section>
+            <label>学生学习记录</label>
+            <p>{{ getCourseRecordText('student') }}</p>
+          </section>
+          <section>
+            <label>教师本次反馈</label>
+            <p>{{ getCourseRecordText('teacher') }}</p>
+          </section>
+        </div>
+      </div>
+      <div v-else class="record-empty">请选择课次和查看对象。</div>
+      <div slot="footer">
+        <el-button @click="courseRecordOpen = false">关闭</el-button>
       </div>
     </el-dialog>
   </div>
@@ -389,7 +446,12 @@ export default {
       teacherFinalFeedback: '',
       teacherRosterOpen: false,
       teacherRosterTitle: '学生名单',
-      teacherRosterRows: []
+      teacherRosterRows: [],
+      courseRecordOpen: false,
+      courseRecordCourse: {},
+      courseRecordSessionKey: '',
+      courseRecordPersonKey: '',
+      courseRecordFinalMode: false
     }
   },
   computed: {
@@ -416,22 +478,23 @@ export default {
     },
     pageTitle() {
       if (this.isStudentOrParent) return '\u5b66\u4e60\u8bb0\u5f55'
-      if (this.isCourseRecordView) return '上课记录'
+      if (this.isTeacherView || this.isAdminView) return '上课记录'
       return '\u62a5\u540d\u8bb0\u5f55'
     },
     pageBadge() {
       if (this.isStudentOrParent) return 'Learning Record'
-      if (this.isCourseRecordView) return 'Class Record'
+      if (this.isTeacherView || this.isAdminView) return 'Class Record'
       return 'Enrollment Tracker'
     },
     pageDescription() {
       if (this.isStudentOrParent) {
         return '集中查看每次课学习记录、教师反馈与结课总结，支持学生补充课中记录，家长同步了解成长进展。'
       }
-      if (this.isCourseRecordView) {
-        return this.isTeacherView
-          ? '按课程维护每次课反馈、查看学生名单，并在课程结束后统一填写结课反馈。'
-          : '按课程查看全平台上课进度、学生名单、课中记录与结课总结，确保课程过程留痕完整。'
+      if (this.isTeacherView) {
+        return '按课程维护每次课反馈、查看学生名单，并在课程结束后统一填写结课反馈。'
+      }
+      if (this.isAdminView) {
+        return '集中查看全平台学生课中记录、教师反馈与结课总结，掌握课程过程留痕与学习反馈情况。'
       }
       return '集中查看平台报名状态、课程归属、教师安排与学习记录，快速跟踪课后服务参与情况。'
     },
@@ -444,14 +507,19 @@ export default {
     displayFinishedCount() {
       return this.isCourseRecordView ? this.finishedTeacherCourseSections.length : this.finishedCount
     },
+    secondStatLabel() {
+      if (this.isCourseRecordView) return '已结课课程'
+      if (this.isStudentView) return '已结课'
+      return '已完成'
+    },
     activeEnrollmentList() {
-      return this.filteredEnrollmentList
+      return this.filteredEnrollmentList.filter(item => this.recordRuntimeStatus(item).code !== 'closed')
     },
     activePagedEnrollmentList() {
       return this.paginateRows(this.activeEnrollmentList, this.activePageNum, this.activePageSize)
     },
     finishedEnrollmentList() {
-      return this.filteredEnrollmentList.filter(item => this.isCourseFinished(item))
+      return this.filteredEnrollmentList.filter(item => this.recordRuntimeStatus(item).code !== 'closed' && this.isCourseFinished(item))
     },
     finishedPagedEnrollmentList() {
       return this.paginateRows(this.finishedEnrollmentList, this.finishedPageNum, this.finishedPageSize)
@@ -479,6 +547,7 @@ export default {
           rows: map.get(this.getCourseKey(course)) || [],
           sessions: this.enumerateClassSessions(course)
         }))
+        .filter(course => this.recordRuntimeStatus(course).code !== 'closed')
         .filter(course => !this.queryParams.runtimeStatus || this.recordRuntimeStatus(course).code === this.queryParams.runtimeStatus)
       return sections.sort((a, b) => {
         const aTime = a.sessions[0] ? a.sessions[0].start.getTime() : 0
@@ -487,13 +556,13 @@ export default {
       })
     },
     activeTeacherCourseSections() {
-      return this.teacherCourseSections
+      return this.teacherCourseSections.filter(item => this.recordRuntimeStatus(item).code !== 'closed')
     },
     activePagedTeacherCourseSections() {
       return this.paginateRows(this.activeTeacherCourseSections, this.activeTeacherPageNum, this.activeTeacherPageSize)
     },
     finishedTeacherCourseSections() {
-      return this.teacherCourseSections.filter(item => this.isCourseFinished(item))
+      return this.teacherCourseSections.filter(item => this.recordRuntimeStatus(item).code !== 'closed' && this.isCourseFinished(item))
     },
     finishedPagedTeacherCourseSections() {
       return this.paginateRows(this.finishedTeacherCourseSections, this.finishedTeacherPageNum, this.finishedTeacherPageSize)
@@ -532,6 +601,10 @@ export default {
       return this.availableSessions.find(item => item.key === this.selectedSessionKey) || this.availableSessions[0]
     },
     missingSessionText() {
+      if (!this.missingSessionCount) return '已上课次均已填写'
+      return `${this.missingSessionCount} 次待补充`
+    },
+    missingSessionCount() {
       const records = this.parseSessionRecords(this.form)
       const missing = this.availableSessions.filter(item => {
         const record = records[item.key] || {}
@@ -539,14 +612,39 @@ export default {
         if (this.isTeacherView) return !record.teacher
         return !record.student || !record.teacher
       })
-      if (!missing.length) return '已上课次均已填写'
-      return `${missing.length} 次待补充`
+      return missing.length
     },
     teacherSessionTitle() {
       return this.teacherSession && this.teacherSession.label ? '填写本节课反馈' : '填写反馈'
+    },
+    courseRecordDialogTitle() {
+      return this.courseRecordFinalMode ? '查看结课总结' : '查看课次记录'
+    },
+    courseRecordSessions() {
+      return this.getPastSessions(this.courseRecordCourse)
+    },
+    courseRecordRows() {
+      return this.courseRecordCourse.rows || []
+    },
+    courseRecordPeople() {
+      const teacherName = this.courseRecordCourse.teacherName || (this.courseRecordRows[0] && this.courseRecordRows[0].teacherName) || '授课教师'
+      return [{ key: 'teacher', label: `教师：${teacherName}` }].concat(this.courseRecordRows.map(row => ({
+        key: `student-${row.enrollmentId}`,
+        label: `学生：${row.studentName}`,
+        row
+      })))
+    },
+    currentCourseRecordSession() {
+      return this.courseRecordSessions.find(item => item.key === this.courseRecordSessionKey)
+    },
+    currentCourseRecordPerson() {
+      return this.courseRecordPeople.find(item => item.key === this.courseRecordPersonKey)
     }
   },
   created() {
+    if (this.$route.query && this.$route.query.courseName) {
+      this.queryParams.courseName = this.$route.query.courseName
+    }
     this.getList()
   },
   watch: {
@@ -557,7 +655,12 @@ export default {
   methods: {
     getList() {
       this.loading = true
-      const params = { ...this.queryParams, status: undefined }
+      const params = {
+        ...this.queryParams,
+        pageNum: 1,
+        pageSize: 1000,
+        status: undefined
+      }
       const courseParams = {
         pageNum: 1,
         pageSize: 1000,
@@ -575,6 +678,17 @@ export default {
       }).catch(() => {
         this.loading = false
       })
+    },
+    refreshList() {
+      this.activePageNum = 1
+      this.finishedPageNum = 1
+      this.activeTeacherPageNum = 1
+      this.finishedTeacherPageNum = 1
+      this.teacherSessionOpen = false
+      this.teacherRosterOpen = false
+      this.courseRecordOpen = false
+      this.detailOpen = false
+      this.getList()
     },
     resetQuery() {
       this.queryParams = { pageNum: 1, pageSize: 10, studentName: undefined, courseName: undefined, teacherName: undefined, runtimeStatus: undefined }
@@ -781,6 +895,10 @@ export default {
       return content || '暂未填写'
     },
     recordRuntimeStatus(row) {
+      const courseStatus = row.courseStatus !== undefined && row.courseStatus !== null ? row.courseStatus : row.status
+      if (courseStatus !== undefined && courseStatus !== null && String(courseStatus) !== '0') {
+        return { code: 'closed', text: '已停开', tag: 'info' }
+      }
       const sessions = this.enumerateClassSessions(row)
       const now = new Date()
       if (!sessions.length) {
@@ -858,6 +976,50 @@ export default {
       this.teacherRosterTitle = `《${course.courseName}》学生名单`
       this.teacherRosterRows = course.rows || []
       this.teacherRosterOpen = true
+    },
+    handleCourseRecordView(course) {
+      this.courseRecordCourse = course
+      const sessions = this.getPastSessions(course)
+      this.courseRecordFinalMode = this.isCourseFinished(course)
+      this.courseRecordSessionKey = sessions.length ? sessions[sessions.length - 1].key : ''
+      this.courseRecordPersonKey = 'teacher'
+      this.courseRecordOpen = true
+    },
+    getCourseRecordFinalText(type) {
+      const person = this.currentCourseRecordPerson
+      if (!person) {
+        return '暂未选择'
+      }
+      const targetRow = person.key === 'teacher'
+        ? (this.courseRecordRows[0] || this.courseRecordCourse)
+        : person.row
+      if (!targetRow) {
+        return '暂未填写'
+      }
+      if (type === 'student' && person.key === 'teacher') {
+        return '请选择具体学生查看课程总结'
+      }
+      if (type === 'teacher') {
+        return this.getFinalFeedback(targetRow)
+      }
+      return this.getCourseSummary(targetRow)
+    },
+    getCourseRecordText(type) {
+      const session = this.currentCourseRecordSession
+      const person = this.currentCourseRecordPerson
+      if (!session || !person) {
+        return '暂未选择'
+      }
+      const targetRow = person.key === 'teacher'
+        ? (this.courseRecordRows[0] || this.courseRecordCourse)
+        : person.row
+      if (!targetRow) {
+        return '暂未填写'
+      }
+      if (type === 'student' && person.key === 'teacher') {
+        return '请选择具体学生查看学习记录'
+      }
+      return this.getSessionRecordText(targetRow, session, type)
     },
     getTeacherFinalFeedback(course) {
       const rows = course.rows || []
@@ -960,6 +1122,18 @@ export default {
       const end = this.parseDate(row.endDate)
       if (!start || !end) return '未设置周期'
       return `${this.formatDateKey(start)} 至 ${this.formatDateKey(end)}`
+    },
+    formatGradeScope(scope) {
+      const grades = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级']
+      const list = String(scope || '').replace(/，/g, ',').split(',').map(item => item.trim()).filter(Boolean)
+      if (!list.length) return '全年级'
+      const indexes = list.map(item => grades.indexOf(item)).filter(index => index >= 0).sort((a, b) => a - b)
+      if (indexes.length === list.length && indexes.every((index, order) => order === 0 || index === indexes[order - 1] + 1)) {
+        const start = grades[indexes[0]]
+        const end = grades[indexes[indexes.length - 1]]
+        return start === end ? start : `${start.replace('年级', '')}至${end}`
+      }
+      return list.join('、')
     }
   }
 }
@@ -1323,6 +1497,27 @@ export default {
   width: 100%;
 }
 
+.record-dialog-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.record-dialog-title strong {
+  color: #173746;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.record-dialog-title span {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef8f7;
+  color: #4d837b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .teacher-session-select {
   width: 100%;
   margin-bottom: 14px;
@@ -1340,17 +1535,24 @@ export default {
 
 .missing-tip,
 .final-feedback-lock {
-  margin: 0 0 16px 96px;
-  padding: 12px 14px;
+  padding: 9px 14px;
   border-radius: 16px;
   background: #f6fbfb;
   color: #6f8792;
-  line-height: 1.7;
+  line-height: 22px;
 }
 
-.missing-tip strong {
-  margin-right: 10px;
-  color: #315766;
+.missing-session-item {
+  margin-bottom: 16px;
+}
+
+.missing-session-item .missing-tip {
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.record-form ::v-deep .missing-session-item .el-form-item__label {
+  line-height: 40px;
 }
 
 .detail-summary {
@@ -1379,6 +1581,17 @@ export default {
   max-height: 460px;
   overflow-y: auto;
   padding-right: 4px;
+}
+
+.course-record-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.course-record-card {
+  margin-top: 8px;
 }
 
 .session-detail-card {

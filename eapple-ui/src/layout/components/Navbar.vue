@@ -307,13 +307,17 @@ export default {
     },
     resolveRouteTitle(route) {
       const title = ((route.meta || {}).title || '').toString()
-      if (title === '报名记录' && (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent'))) {
+      const normalizedTitle = title.trim()
+      if (['报名记录', '上课记录'].includes(normalizedTitle)) {
+        return (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')) ? '学习记录' : '上课记录'
+      }
+      if (title === '报名记录' && this.$auth.hasRole('edu_student')) {
         return '学习记录'
       }
       if (title === '报名记录') {
         return '上课记录'
       }
-      if (title === '报名记录' && (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent'))) {
+      if (title === '报名记录' && this.$auth.hasRole('edu_student')) {
         return '学习记录'
       }
       return title

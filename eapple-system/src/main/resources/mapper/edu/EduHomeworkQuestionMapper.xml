@@ -67,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectQuestionList" parameterType="EduHomeworkQuestion" resultMap="EduQuestionResult">
         <include refid="questionSelect"/>
         <include refid="questionWhere"/>
-        order by question_id desc
+        order by create_time desc, question_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>

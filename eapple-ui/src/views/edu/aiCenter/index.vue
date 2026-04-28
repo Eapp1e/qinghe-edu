@@ -427,11 +427,14 @@ export default {
       this.responseDialogOpen = true
     },
     handleDeleteLog(row) {
+      const currentPage = Number(this.queryParams.pageNum || 1)
       this.$modal.confirm('确认删除这条 AI 调用记录吗？').then(() => {
         return delAiLog(row.logId)
       }).then(() => {
         this.$modal.msgSuccess('删除成功')
-        this.refreshData()
+        this.queryParams.pageNum = this.aiLogList.length <= 1 && currentPage > 1 ? currentPage - 1 : currentPage
+        this.getLogList()
+        this.getLogSummary()
       }).catch(() => {})
     }
   }
