@@ -116,8 +116,6 @@ npm run dev
 
 默认数据库名为 `qinghe_edu`，如需连接已有数据库，可通过环境变量 `MYSQL_DATABASE` 覆盖。
 
-## 版权
+## 项目地址
 
-Copyright (c) 2026 EAPPLE
-
-GitHub: [@Eapp1e](https://github.com/Eapp1e)
+GitHub: [https://github.com/Eapp1e/qinghe-edu](https://github.com/Eapp1e/qinghe-edu)
