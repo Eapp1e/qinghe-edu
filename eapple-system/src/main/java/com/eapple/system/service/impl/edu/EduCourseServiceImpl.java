@@ -14,19 +14,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.eapple.common.exception.ServiceException;
 import com.eapple.common.core.domain.entity.SysUser;
 import com.eapple.common.utils.SecurityUtils;
 import com.eapple.common.utils.StringUtils;
 import com.eapple.system.mapper.SysUserMapper;
-import com.eapple.system.domain.edu.EduAiLog;
 import com.eapple.system.domain.edu.EduCourse;
 import com.eapple.system.domain.edu.EduCourseEnrollment;
 import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.mapper.edu.EduCourseMapper;
 import com.eapple.system.mapper.edu.EduEnrollmentMapper;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
-import com.eapple.system.service.edu.IEduAiLogService;
 import com.eapple.system.service.edu.IEduAiService;
 import com.eapple.system.service.edu.IEduCourseService;
 
@@ -49,9 +50,6 @@ public class EduCourseServiceImpl implements IEduCourseService
 
     @Autowired
     private IEduAiService aiService;
-
-    @Autowired
-    private IEduAiLogService aiLogService;
 
     @Override
     public EduCourse selectCourseById(Long courseId)
@@ -291,8 +289,7 @@ public class EduCourseServiceImpl implements IEduCourseService
 
         List<EduCourse> topRecommendations = recommendations.size() > 4
                 ? new ArrayList<>(recommendations.subList(0, 4)) : recommendations;
-        fillRecommendationReasons(topRecommendations, profile, interestKeywords);
-        recordCourseRecommendationLog(profile, topRecommendations);
+        fillRecommendationReasons(topRecommendations, profile);
         return topRecommendations;
     }
 
@@ -1007,23 +1004,12 @@ public class EduCourseServiceImpl implements IEduCourseService
         return keywords;
     }
 
-    private String buildRecommendationReason(EduCourse course, EduStudentProfile profile)
-    {
-        String prompt = "学生姓名：" + profile.getStudentName()
-                + "\n年级班级：" + StringUtils.defaultString(profile.getGradeName()) + " " + StringUtils.defaultString(profile.getClassName())
-                + "\n兴趣标签：" + StringUtils.defaultString(profile.getInterestTags(), "暂无")
-                + "\n课程名称：" + course.getCourseName()
-                + "\n课程分类：" + StringUtils.defaultString(course.getCategory(), "未分类")
-                + "\n课程简介：" + StringUtils.defaultString(course.getDescription(), "暂无简介");
-        String aiReason = aiService.generateCourseRecommendation(profile.getStudentUserId(), prompt);
-        return sanitizeRecommendationReason(aiReason, profile);
-    }
-
-    private String sanitizeRecommendationReason(String aiReason, EduStudentProfile profile)
+    private String sanitizeRecommendationReason(String aiReason)
     {
         String cleaned = StringUtils.defaultString(aiReason)
                 .replace("\r", "")
                 .replace("```markdown", "")
+                .replace("```json", "")
                 .replace("```", "")
                 .replace("**", "")
                 .replace("user", "")
@@ -1033,7 +1019,7 @@ public class EduCourseServiceImpl implements IEduCourseService
                 .replaceAll("\\s+", " ")
                 .trim();
 
-        String[] fragments = cleaned.split("[。！？?!\n]");
+        String[] fragments = cleaned.split("[.!?;；。！？\n]");
         for (String fragment : fragments)
         {
             String candidate = fragment == null ? "" : fragment.trim();
@@ -1042,73 +1028,75 @@ public class EduCourseServiceImpl implements IEduCourseService
                 return ensureSentence(candidate);
             }
         }
-
-        String interests = StringUtils.defaultString(profile.getInterestTags(), "当前兴趣");
-        String firstInterest = interests.split("[，、;；\\s]+")[0];
-        return ensureSentence("课程内容与" + firstInterest + "方向较匹配，建议优先关注");
+        throw new ServiceException("AI course recommendation returned no displayable reason");
     }
 
-    private void fillRecommendationReasons(List<EduCourse> courses, EduStudentProfile profile, Set<String> interestKeywords)
+    private void fillRecommendationReasons(List<EduCourse> courses, EduStudentProfile profile)
     {
-        for (EduCourse course : courses)
-        {
-            course.setRecommendationReason(buildLocalRecommendationReason(course, profile, interestKeywords));
-        }
-    }
-
-    private String buildLocalRecommendationReason(EduCourse course, EduStudentProfile profile, Set<String> interestKeywords)
-    {
-        String matchedKeyword = findMatchedKeyword(course, interestKeywords);
-        String gradeName = StringUtils.defaultString(profile.getGradeName(), "当前年级");
-        String courseName = StringUtils.defaultString(course.getCourseName(), "这门课程");
-        String category = StringUtils.defaultString(course.getCategory(), "综合素养");
-        if (StringUtils.isNotEmpty(matchedKeyword))
-        {
-            return ensureSentence(courseName + "与孩子的“" + matchedKeyword + "”兴趣方向匹配，可在" + category + "学习中保持较高参与度");
-        }
-        if (StringUtils.isNotEmpty(profile.getInterestTags()))
-        {
-            return ensureSentence(courseName + "能承接孩子已有兴趣，适合作为" + gradeName + "阶段的课后拓展与持续练习");
-        }
-        return ensureSentence(courseName + "课程节奏和内容较适合" + gradeName + "学生，可用于补充课后服务中的实践体验");
-    }
-
-    private String findMatchedKeyword(EduCourse course, Set<String> interestKeywords)
-    {
-        String courseText = (StringUtils.defaultString(course.getCourseName()) + " "
-                + StringUtils.defaultString(course.getCategory()) + " "
-                + StringUtils.defaultString(course.getDescription())).toLowerCase(Locale.ROOT);
-        for (String keyword : interestKeywords)
-        {
-            if (courseText.contains(keyword))
-            {
-                return keyword;
-            }
-        }
-        return "";
-    }
-
-    private void recordCourseRecommendationLog(EduStudentProfile profile, List<EduCourse> recommendations)
-    {
-        if (recommendations == null || recommendations.isEmpty())
+        if (courses == null || courses.isEmpty())
         {
             return;
         }
-        EduAiLog log = new EduAiLog();
-        log.setBusinessType("course_recommendation");
-        log.setBizId(profile.getStudentUserId());
-        log.setUserId(SecurityUtils.getUserId());
-        log.setUserName(SecurityUtils.getUsername());
-        log.setRoleType(resolveRoleType());
-        log.setPromptContent(buildCourseRecommendationPrompt(profile, recommendations));
-        log.setResponseContent(buildCourseRecommendationResponse(profile, recommendations));
-        log.setModelName("QINGHE-Recommendation");
-        log.setStatus("success");
-        log.setRiskFlag("normal");
-        log.setPromptTokens(log.getPromptContent().length());
-        log.setCompletionTokens(log.getResponseContent().length());
-        log.setLatencyMs(0L);
-        aiLogService.insertAiLog(log);
+        String content = aiService.generateCourseRecommendation(profile.getStudentUserId(), buildCourseRecommendationPrompt(profile, courses));
+        List<String> reasons = parseAiRecommendationReasons(content);
+        if (reasons.isEmpty())
+        {
+            throw new ServiceException("AI course recommendation returned no displayable reason");
+        }
+
+        for (int i = 0; i < courses.size(); i++)
+        {
+            String reason = i < reasons.size() ? reasons.get(i) : reasons.get(reasons.size() - 1);
+            courses.get(i).setRecommendationReason(sanitizeRecommendationReason(reason));
+        }
+    }
+
+    private List<String> parseAiRecommendationReasons(String content)
+    {
+        List<String> reasons = new ArrayList<>();
+        if (StringUtils.isEmpty(content))
+        {
+            return reasons;
+        }
+        String normalized = content.trim()
+                .replace("```json", "")
+                .replace("```JSON", "")
+                .replace("```", "")
+                .trim();
+        try
+        {
+            JSONArray array = JSON.parseArray(normalized);
+            for (int i = 0; i < array.size(); i++)
+            {
+                Object item = array.get(i);
+                if (item instanceof JSONObject)
+                {
+                    String reason = ((JSONObject) item).getString("reason");
+                    if (StringUtils.isNotEmpty(reason))
+                    {
+                        reasons.add(reason);
+                    }
+                }
+                else if (item != null && StringUtils.isNotEmpty(String.valueOf(item)))
+                {
+                    reasons.add(String.valueOf(item));
+                }
+            }
+            return reasons;
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        for (String line : normalized.split("\\r?\\n"))
+        {
+            String reason = line == null ? "" : line.replaceAll("^\\s*\\d+[\\.?)]\\s*", "").trim();
+            if (StringUtils.isNotEmpty(reason))
+            {
+                reasons.add(reason);
+            }
+        }
+        return reasons;
     }
 
     private String buildCourseRecommendationPrompt(EduStudentProfile profile, List<EduCourse> recommendations)
@@ -1125,21 +1113,6 @@ public class EduCourseServiceImpl implements IEduCourseService
                     .append("（").append(StringUtils.defaultString(course.getCategory(), "未分类")).append("）")
                     .append("，推荐分：").append(course.getRecommendationScore());
         }
-        return builder.toString();
-    }
-
-    private String buildCourseRecommendationResponse(EduStudentProfile profile, List<EduCourse> recommendations)
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append("本次已结合").append(StringUtils.defaultString(profile.getStudentName(), "学生"))
-                .append("的年级、兴趣标签、课程容量和报名情况生成课程推荐。\n");
-        for (int i = 0; i < recommendations.size(); i++)
-        {
-            EduCourse course = recommendations.get(i);
-            builder.append(i + 1).append(". ").append(StringUtils.defaultString(course.getCourseName()))
-                    .append("：").append(StringUtils.defaultString(course.getRecommendationReason())).append("\n");
-        }
-        builder.append("建议家长优先选择孩子兴趣匹配度高、上课时间稳定且能持续完成学习记录的课程。");
         return builder.toString();
     }
 

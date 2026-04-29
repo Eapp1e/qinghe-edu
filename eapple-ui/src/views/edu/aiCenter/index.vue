@@ -364,15 +364,13 @@ export default {
     },
     statusTagType(status) {
       if (status === 'success') return 'success'
-      if (status === 'mock') return 'success'
       if (status === 'failed') return 'danger'
       return 'info'
     },
     formatStatus(status) {
       const map = {
         success: '成功',
-        failed: '失败',
-        mock: '成功'
+        failed: '失败'
       }
       return map[status] || '未知'
     },

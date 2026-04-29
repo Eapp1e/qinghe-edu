@@ -122,7 +122,7 @@ edu:
     enabled: true
     endpoint: https://api.siliconflow.cn/v1/chat/completions
     apiKey: ${SILICONFLOW_API_KEY:}
-    model: Qwen/Qwen2.5-7B-Instruct
+    model: deepseek-ai/DeepSeek-V3.2
     timeoutSeconds: 90
     maxPromptLength: 1200
     bannedKeywords:

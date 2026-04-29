@@ -41,6 +41,16 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
+.env
+.env.*
+*.secret
+*.secrets
+*.key
+*.pem
+application-local.yml
+application-local.yaml
+application-secret.yml
+application-secret.yaml
 eapple-admin/src/main/resources/application-private.yml
 runtime/
 eapple-ui/dist-stage-check/

@@ -26,7 +26,6 @@
         <el-form-item label="状态">
           <el-select v-model="queryParams.status" clearable placeholder="请选择状态">
             <el-option label="success" value="success" />
-            <el-option label="mock" value="mock" />
             <el-option label="failed" value="failed" />
           </el-select>
         </el-form-item>
@@ -107,7 +106,6 @@ export default {
     },
     statusTagType(status) {
       if (status === 'success') return 'success'
-      if (status === 'mock') return 'warning'
       if (status === 'failed') return 'danger'
       return 'info'
     }

@@ -76,15 +76,12 @@ public class EduAiLogServiceImpl implements IEduAiLogService
         EduAiLog successQuery = copyLog(baseLog);
         successQuery.setStatus("success");
 
-        EduAiLog legacyMockQuery = copyLog(baseLog);
-        legacyMockQuery.setStatus("mock");
-
         EduAiLog failedQuery = copyLog(baseLog);
         failedQuery.setStatus("failed");
 
         Map<String, Long> summary = new HashMap<>(4);
         summary.put("total", aiLogMapper.countAiLogs(totalQuery));
-        summary.put("success", aiLogMapper.countAiLogs(successQuery) + aiLogMapper.countAiLogs(legacyMockQuery));
+        summary.put("success", aiLogMapper.countAiLogs(successQuery));
         summary.put("failed", aiLogMapper.countAiLogs(failedQuery));
         return summary;
     }

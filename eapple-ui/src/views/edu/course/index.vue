@@ -746,11 +746,15 @@ export default {
     handleNotice(row) {
       this.startAiGenerating(row, 'notice', 'AI 生成通知', '课程通知')
       generateCourseNotice(row.courseId).then(res => {
-        const content = res.data || row.aiNotice || '当前暂无生成内容，请稍后重试。'
+        const content = res.data
+        if (!content) {
+          this.$modal.msgWarning('AI 未返回可展示内容，请稍后重试')
+          return
+        }
         this.openAiPreview('AI 生成通知', '课程通知', row, content)
         this.getList()
       }).catch(() => {
-        this.handleAiFailure(row, 'AI 生成通知', '课程通知', row.aiNotice)
+        this.handleAiFailure('课程通知')
       }).finally(() => {
         this.stopAiGenerating()
       })
@@ -758,23 +762,22 @@ export default {
     handleSuggestion(row) {
       this.startAiGenerating(row, 'suggestion', 'AI 教学建议', '教学建议')
       generateTeachingSuggestion(row.courseId).then(res => {
-        const content = res.data || row.aiSuggestion || '当前暂无生成内容，请稍后重试。'
+        const content = res.data
+        if (!content) {
+          this.$modal.msgWarning('AI 未返回可展示内容，请稍后重试')
+          return
+        }
         this.openAiPreview('AI 教学建议', '教学建议', row, content)
         this.getList()
       }).catch(() => {
-        this.handleAiFailure(row, 'AI 教学建议', '教学建议', row.aiSuggestion)
+        this.handleAiFailure('教学建议')
       }).finally(() => {
         this.stopAiGenerating()
       })
     },
-    handleAiFailure(row, title, type, fallbackContent) {
-      if (fallbackContent) {
-        this.$modal.msgWarning(`${type}生成较慢，已回退展示上一次成功内容`)
-        this.openAiPreview(title, type, row, fallbackContent)
-        return
-      }
+    handleAiFailure(type) {
       this.aiPreviewOpen = false
-      this.$modal.msgWarning(`${type}暂时未生成成功，请稍后重试`)
+      this.$modal.msgWarning(`${type}生成失败，请检查模型配置后重试`)
     },
     openAiPreview(title, type, row, content) {
       this.aiPreviewTitle = title

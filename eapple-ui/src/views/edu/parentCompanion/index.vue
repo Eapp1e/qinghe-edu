@@ -507,49 +507,6 @@ export default {
         this.historyLoading = false
       })
     },
-    buildDemoDiagnosisHistory() {
-      const baseRows = [
-        ['王小明', '作业启动慢，总要家长催三四遍才开始', 'edu_parent', '2026-04-27 20:18:00', '孩子不是不会做，而是从休息状态切换到任务状态比较慢。建议把“开始写作业”改成一个明确动作：先拿出作业本、铅笔和计时器，完成后立刻肯定启动行为；每天只追踪启动时间，不先评价正确率。'],
-        ['王小明', '数学口算错题变多，一批评就说自己笨', 'edu_parent', '2026-04-26 19:42:00', '当前更需要保护孩子的错误承受力。建议把错题改名为“提醒卡”，每天只复盘2道，先请孩子说出当时怎么想，再一起找一个可执行的小提醒，例如看清进位、圈出单位。'],
-        ['王小明', '课后编程课很喜欢，但遇到报错就急躁', 'edu_parent', '2026-04-25 21:05:00', '兴趣基础较好，卡点在问题拆解。家长可以陪孩子建立“报错三步”：读提示、找行号、改一个地方再运行。不要直接给答案，重点表扬他愿意调试的过程。'],
-        ['王小明', '阅读三十分钟坚持不稳定', 'edu_parent', '2026-04-24 20:30:00', '建议先降低连续时长压力，把30分钟拆成两个15分钟，中间请孩子复述一个最有画面感的情节。完成后给家庭积分，连续三天后再逐步延长。'],
-        ['王小明', '练琴时只愿意弹会的曲子，不愿练新段落', 'edu_parent', '2026-04-23 19:25:00', '孩子倾向用熟悉内容获得掌控感。建议把新段落拆成4小节，只练5分钟，并允许最后用熟悉曲子收尾，让练习既有挑战也有成功体验。'],
-        ['王小明', '周末电子屏幕时间容易失控', 'edu_parent', '2026-04-22 18:58:00', '建议把屏幕管理从临时争执改成提前约定：周五晚上共同写下可用时长、使用时段和停止提醒。停止后安排一个替代活动，如亲子棋类或户外散步。'],
-        ['王小明', '收拾书包经常漏带材料', 'edu_parent', '2026-04-21 21:16:00', '这类问题适合用外部工具替代反复提醒。建议做一张“睡前书包清单”，只保留5项：课本、作业、本子、文具、水杯。家长只问“清单完成了吗”，减少唠叨。'],
-        ['王小明', '被同学否定后情绪低落，不愿继续参加活动', 'edu_parent', '2026-04-20 20:48:00', '先接住情绪，再讨论行动。可以说“被否定确实会难受”，再问“你希望下次别人怎么说更舒服”。随后一起准备一句回应语，帮助孩子恢复参与感。'],
-        ['王小明', '做家务任务完成了但总忘记拍照提交', 'edu_parent', '2026-04-19 18:36:00', '这说明任务本身能完成，提交流程需要更显眼。建议把“拍照提交”写进任务最后一步，并在完成地点放一张小提示卡，先连续提醒三天形成习惯。'],
-        ['王小明', '科学实验课回来很兴奋，但表达过程零散', 'edu_parent', '2026-04-18 19:55:00', '可以用“三句话复盘”：今天做了什么、最意外的现象是什么、下次想验证什么。家长只追问一个细节，帮助孩子把兴趣转化为表达能力。'],
-        ['王小明', '编程课遇到报错就着急', 'edu_parent', '2026-04-27 14:20:00', '孩子对编程探索有兴趣，但容易把报错理解成自己不行。建议家长先陪孩子读出现象，再一起定位是哪一步没有执行；本周只记录一个发现和一个解决办法。'],
-        ['王小明', '阅读坚持不到三十分钟', 'edu_parent', '2026-04-23 20:35:00', '孩子已经能启动阅读，但持续阅读还需要合适坡度。建议把30分钟拆成两个15分钟，中间让孩子讲一个最有画面感的情节。'],
-        ['李沐阳', '低年级阅读坚持不稳定', 'edu_parent_li', '2026-04-21 19:12:00', '孩子阅读兴趣有基础，但持续时间受环境影响。建议固定睡前共读20分钟，读后只问一个开放问题，让孩子保留选择权。'],
-        ['张可欣', '作业拖延且沟通容易急', 'edu_parent_zhang', '2026-04-22 18:46:00', '孩子创作表达意愿强，但面对固定任务启动较慢。建议先肯定投入，再把作业拆成两个小段，中间给一次选择权。'],
-        ['陈一诺', '学习遇到难题容易放弃', 'edu_parent_chen', '2026-04-24 21:05:00', '孩子运动任务完成度高，说明执行力不错；学习难题上的挫败感需要被看见。建议先说出卡住的第一步，再找最小突破口。'],
-        ['吴星辰', '整理习惯不好，经常忘带材料', 'edu_parent_wu', '2026-04-25 07:50:00', '孩子学习参与稳定，但物品管理还依赖提醒。建议用可视化清单替代反复催促，把整理书包固定到睡前流程。'],
-        ['孙若涵', '做手工有耐心但表达想法少', 'edu_parent_sun', '2026-04-25 20:18:00', '孩子精细动作和专注力较好，口头表达需要安全练习场景。建议作品完成后只请孩子介绍一个细节和一个选择理由。'],
-        ['赵子睿', '口算小错误后容易沮丧', 'edu_parent_zhao', '2026-04-26 19:40:00', '孩子计算能力正在进步，但对错误容忍度偏低。建议把错题看作提醒卡，每天只挑2道错题讲清楚原因。']
-      ]
-      return baseRows.map((item, index) => ({
-        logId: `demo-${index}`,
-        businessType: 'parent_diagnosis',
-        userName: item[2],
-        promptContent: `学生：${item[0]}\n家长补充关注：${item[1]}`,
-        responseContent: item[4],
-        status: 'success',
-        createTime: item[3]
-      }))
-    },
-    filterDemoDiagnosisHistory(rows) {
-      const concern = (this.historySearch.concern || '').trim()
-      const studentName = (this.historySearch.studentName || '').trim()
-      const status = (this.historySearch.status || '').trim()
-      return rows.filter(row => {
-        if (this.isParentView && row.userName !== 'edu_parent') return false
-        if (this.isAdminView && studentName && !this.extractStudentName(row.promptContent).includes(studentName)) return false
-        if (concern && !this.extractConcern(row.promptContent).includes(concern)) return false
-        if (status && row.status !== status) return false
-        return true
-      })
-    },
     handleHistorySearch() {
       this.historyQuery.pageNum = 1
       this.getDiagnosisHistory()
@@ -580,11 +537,11 @@ export default {
     statusTagType(status) {
       if (status === 'success') return 'success'
       if (status === 'failed') return 'danger'
-      return 'success'
+      return 'info'
     },
     formatStatus(status) {
-      const map = { success: '成功', failed: '失败', mock: '已生成' }
-      return map[status] || '已生成'
+      const map = { success: '成功', failed: '失败' }
+      return map[status] || '未知'
     },
     showHistoryDetail(row) {
       const content = row.responseContent || row.errorMessage || '暂无可展示内容'
@@ -624,12 +581,6 @@ export default {
       URL.revokeObjectURL(link.href)
     },
     handleDeleteLog(row) {
-      if (String(row.logId || '').startsWith('demo-')) {
-        this.historyList = this.historyList.filter(item => item.logId !== row.logId)
-        this.historyTotal = this.historyList.length
-        this.$modal.msgSuccess('删除成功')
-        return
-      }
       this.$modal.confirm('确认删除这条历史建议记录吗？').then(() => {
         const request = this.isAdminView ? delAiLog(row.logId) : delMyAiLog(row.logId)
         return request
