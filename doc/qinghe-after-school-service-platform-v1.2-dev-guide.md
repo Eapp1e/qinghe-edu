@@ -1,6 +1,6 @@
-# 青禾智学课后服务平台开发环境搭建手册
+# 青禾智学课后服务平台 v1.2 开发环境搭建手册
 
-本文档用于说明 QINGHE After-school Service Platform 的本地开发环境、数据库初始化、前后端启动和常见问题处理。项目功能介绍以根目录 `README.md` 为准，本文件只保留开发和运行相关内容。
+本文档用于说明 QINGHE After-school Service Platform v1.2 的本地开发环境、数据库初始化、前后端启动、AI 私有配置和常见问题处理。项目功能介绍以根目录 `README.md` 为准，本文档聚焦开发与运行配置。
 
 ## 1. 环境要求
 
@@ -51,7 +51,7 @@ IDEA 中同步检查：
 
 ## 3. 数据库初始化
 
-默认数据库名为：
+默认数据库名：
 
 ```text
 qinghe_edu
@@ -79,7 +79,7 @@ sql/edu_demo_question_expansion.sql
 sql/edu_notice_refresh.sql
 ```
 
-如果你本机已有旧库，不建议继续使用旧库名。更规范的做法是新建或迁移到 `qinghe_edu`，这样项目配置、文档和展示名称保持一致。
+如果本机已有旧库，不建议继续使用旧库名。更规范的做法是新建或迁移到 `qinghe_edu`，这样项目配置、文档和展示名称保持一致。
 
 ## 4. 后端启动
 
@@ -104,7 +104,7 @@ http://localhost:8080/
 如果启动时报 `Unknown database 'qinghe_edu'`：
 
 - 确认 MySQL 已启动
-- 确认 `root / 123456` 账号密码与本地一致
+- 确认数据库账号密码与本地配置一致
 - 确认该账号有创建数据库权限
 - 手动执行 `create database if not exists qinghe_edu default character set utf8mb4 collate utf8mb4_general_ci;`
 - 重新导入上述 SQL 脚本
@@ -135,24 +135,39 @@ npm run dev
 http://localhost/
 ```
 
-## 6. AI 配置
+## 6. AI 私有配置
 
-AI 配置位于：
+平台 AI 默认配置位于：
 
 ```text
 eapple-admin/src/main/resources/application.yml
 ```
 
-建议使用环境变量配置密钥：
+项目支持按工作树维护本地私有配置文件：
 
 ```text
-SILICONFLOW_API_KEY
+eapple-admin/src/main/resources/application-private.yml
 ```
 
-不要把真实 API Key 写入 Git 仓库。提交前可用以下命令检查：
+该文件已在 `.gitignore` 中忽略，适合为 `qinghe-edu` 单独配置 API Key，避免写入 Windows 用户级环境变量，也避免提交到 Gitee 或 GitHub。示例：
+
+```yaml
+edu:
+  ai:
+    apiKey: sk-xxxx
+```
+
+当前 AI 中心提供三个代表性模型：
+
+- `deepseek-ai/DeepSeek-V3.2`：默认模型，综合生成质量和通用问答能力较好。
+- `Qwen/Qwen2.5-72B-Instruct`：适合稳定中文问答、教学建议和内容生成。
+- `THUDM/GLM-4-32B-0414`：适合作为通用对话与教育场景的补充模型。
+
+提交前建议检查真实密钥未进入仓库：
 
 ```powershell
-rg -n "sk-[a-zA-Z0-9]" .
+rg -n "sk-[A-Za-z0-9]{20,}" . -g "!**/target/**" -g "!**/dist/**" -g "!**/node_modules/**" -g "!eapple-admin/src/main/resources/application-private.yml"
+git check-ignore -v eapple-admin/src/main/resources/application-private.yml
 ```
 
 ## 7. 常见问题
@@ -179,7 +194,7 @@ chcp 65001
 
 ### 数据库表不存在
 
-通常是 SQL 导入顺序不完整。先导入 `qinghe_system_base.sql`，再导入教育业务表和演示数据脚本。
+通常是 SQL 导入顺序不完整。先导入 `qinghe_system_base.sql`，再导入教育业务表、升级脚本和演示数据脚本。
 
 ## 8. 建议开发流程
 
