@@ -125,6 +125,10 @@ public class SysUserController extends BaseController
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user)
     {
+        if (containsPlatformAdminRole(user.getRoleIds()) && !SecurityUtils.isAdmin())
+        {
+            return error("只有系统管理员可以创建管理员账号");
+        }
         deptService.checkDeptDataScope(user.getDeptId());
         roleService.checkRoleDataScope(user.getRoleIds());
         if (!userService.checkUserNameUnique(user))
@@ -152,6 +156,15 @@ public class SysUserController extends BaseController
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user)
     {
+        if (isSystemAdminUser(user.getUserId()) && !SecurityUtils.isAdmin())
+        {
+            return error("只有系统管理员可以编辑系统管理员账号");
+        }
+        if ((containsPlatformAdminRole(user.getRoleIds()) || isPlatformAdminUser(user.getUserId()))
+                && !isSelf(user.getUserId()) && !SecurityUtils.isAdmin())
+        {
+            return error("只有系统管理员可以编辑管理员账号");
+        }
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         deptService.checkDeptDataScope(user.getDeptId());
@@ -240,10 +253,62 @@ public class SysUserController extends BaseController
     @PutMapping("/authRole")
     public AjaxResult insertAuthRole(Long userId, Long[] roleIds)
     {
+        if (isSystemAdminUser(userId) && !SecurityUtils.isAdmin())
+        {
+            return error("只有系统管理员可以调整系统管理员账号角色");
+        }
+        if ((containsPlatformAdminRole(roleIds) || isPlatformAdminUser(userId)) && !isSelf(userId) && !SecurityUtils.isAdmin())
+        {
+            return error("只有系统管理员可以调整管理员账号角色");
+        }
         userService.checkUserDataScope(userId);
         roleService.checkRoleDataScope(roleIds);
         userService.insertUserAuth(userId, roleIds);
         return success();
+    }
+
+    private boolean containsPlatformAdminRole(Long[] roleIds)
+    {
+        if (roleIds == null || roleIds.length == 0)
+        {
+            return false;
+        }
+        List<SysRole> roles = roleService.selectRoleAll();
+        for (Long roleId : roleIds)
+        {
+            for (SysRole role : roles)
+            {
+                if (roleId != null && roleId.equals(role.getRoleId()) && "edu_admin".equals(role.getRoleKey()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isPlatformAdminUser(Long userId)
+    {
+        if (userId == null)
+        {
+            return false;
+        }
+        SysUser user = userService.selectUserById(userId);
+        if (user == null || user.getRoles() == null)
+        {
+            return false;
+        }
+        return user.getRoles().stream().anyMatch(role -> "edu_admin".equals(role.getRoleKey()));
+    }
+
+    private boolean isSystemAdminUser(Long userId)
+    {
+        return SecurityUtils.isAdmin(userId);
+    }
+
+    private boolean isSelf(Long userId)
+    {
+        return userId != null && userId.equals(getUserId());
     }
 
     /**

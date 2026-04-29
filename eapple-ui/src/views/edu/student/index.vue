@@ -119,7 +119,9 @@
               <el-input v-model="queryParams.studentName" placeholder="请输入学生姓名" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item label="年级" prop="gradeName">
-              <el-input v-model="queryParams.gradeName" placeholder="请输入年级" clearable @keyup.enter.native="handleQuery" />
+              <el-select v-model="queryParams.gradeName" placeholder="请选择年级" clearable>
+                <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+              </el-select>
             </el-form-item>
             <el-form-item label="班级" prop="className">
               <el-input v-model="queryParams.className" placeholder="请输入班级" clearable @keyup.enter.native="handleQuery" />
@@ -214,7 +216,7 @@
             <el-table-column v-if="canManageProfile" label="操作" width="150" fixed="right">
               <template slot-scope="scope">
                 <el-button v-hasPermi="['edu:student:edit']" type="text" size="mini" @click.stop="handleUpdate(scope.row)">编辑</el-button>
-                <el-button v-hasPermi="['edu:student:remove']" type="text" size="mini" @click.stop="handleDelete(scope.row)">删除</el-button>
+                <el-button v-hasPermi="['edu:student:remove']" type="text" size="mini" class="danger-text" @click.stop="handleDelete(scope.row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -240,10 +242,16 @@
           <el-col v-if="isStudentOwner" :span="24">
             <el-form-item label="家长账号" prop="parentAccount">
               <el-input v-model="form.parentAccount" placeholder="请输入家长登录账号进行绑定" />
-              <div class="field-tip">填写家长登录账号后即可完成绑定，留空则保持当前绑定关系不变。</div>
+              <div class="field-tip">家长账号为必填项，已绑定时会自动回显当前家长登录账号。</div>
             </el-form-item>
           </el-col>
-          <el-col :span="12"><el-form-item label="年级"><el-input v-model="form.gradeName" /></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="年级">
+              <el-select v-model="form.gradeName" class="full-width" placeholder="请选择年级">
+                <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+              </el-select>
+            </el-form-item>
+          </el-col>
           <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" /></el-form-item></el-col>
           <el-col :span="12">
             <el-form-item label="性别">
@@ -321,7 +329,9 @@ export default {
       recommendLoading: false,
       title: '',
       recommendTitle: '智能推荐课程',
+      gradeOptions: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级'],
       studentList: [],
+      statsStudentList: [],
       recommendList: [],
       queryParams: {
         pageNum: 1,
@@ -345,13 +355,13 @@ export default {
       return this.roleKeys.includes('edu_student') || this.roleKeys.includes('edu_parent')
     },
     activeCount() {
-      return this.studentList.filter(item => item.status === '0').length
+      return this.statsStudentList.filter(item => item.status === '0').length
     },
     thirdStat() {
       if (this.isOwnerView) {
-        return this.studentList.reduce((count, item) => count + this.splitTags(item.interestTags).length, 0)
+        return this.statsStudentList.reduce((count, item) => count + this.splitTags(item.interestTags).length, 0)
       }
-      return new Set(this.studentList.map(item => item.parentUserId).filter(Boolean)).size
+      return new Set(this.statsStudentList.map(item => item.parentUserId).filter(Boolean)).size
     },
     canManageProfile() {
       return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
@@ -375,6 +385,8 @@ export default {
       if (!this.isStudentOwner) {
         rules.studentUserId = [{ required: true, message: '请输入学生ID', trigger: 'blur' }]
         rules.parentUserId = [{ required: true, message: '请输入家长ID', trigger: 'blur' }]
+      } else {
+        rules.parentAccount = [{ required: true, message: '请输入家长账号', trigger: 'blur' }]
       }
       return rules
     },
@@ -412,11 +424,12 @@ export default {
     },
     getList() {
       this.loading = true
-      listStudent(this.queryParams).then(res => {
+      const statsParams = { ...this.queryParams, pageNum: 1, pageSize: 1000 }
+      Promise.all([listStudent(this.queryParams), listStudent(statsParams)]).then(([res, statsRes]) => {
         this.studentList = res.rows || []
         this.total = res.total || 0
-        this.loading = false
-      }).catch(() => {
+        this.statsStudentList = statsRes.rows || []
+      }).finally(() => {
         this.loading = false
       })
     },
@@ -464,7 +477,7 @@ export default {
       this.open = true
     },
     handleOwnerEdit(row) {
-      this.form = { ...row, parentAccount: '' }
+      this.form = { ...row, parentAccount: row.parentAccount || '' }
       this.title = '修改我的档案'
       this.open = true
       this.$nextTick(() => {
@@ -486,6 +499,9 @@ export default {
           this.$modal.msgSuccess('保存成功')
           this.open = false
           this.getList()
+          if (this.isStudentOwner) {
+            this.$store.dispatch('GetInfo')
+          }
         })
       })
     },
@@ -847,22 +863,22 @@ export default {
 ::v-deep .query-form .el-form-item {
   display: inline-flex;
   align-items: center;
-  margin-right: 4px;
-  margin-bottom: 0;
+  width: auto !important;
+  min-height: 38px;
+  margin: 0 !important;
 }
 
 ::v-deep .query-form .el-form-item:nth-child(1) {
-  width: 220px;
+  width: auto !important;
 }
 
 ::v-deep .query-form .el-form-item:nth-child(2),
 ::v-deep .query-form .el-form-item:nth-child(3) {
-  width: 180px;
+  width: auto !important;
 }
 
 ::v-deep .query-form .el-form-item:nth-child(4) {
-  width: 180px;
-  margin-right: 0;
+  width: auto !important;
 }
 
 ::v-deep .query-form .el-form-item:last-child {
@@ -885,11 +901,11 @@ export default {
 
 ::v-deep .query-form .el-input,
 ::v-deep .query-form .el-select {
-  width: 100%;
+  width: 190px !important;
 }
 
 ::v-deep .status-select .el-input__inner {
-  width: 136px;
+  width: 100% !important;
 }
 
 ::v-deep .query-form .el-input__inner,
@@ -914,7 +930,7 @@ export default {
 }
 
 .content-table {
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .recommend-dialog {
@@ -1051,10 +1067,26 @@ export default {
 
 ::v-deep .el-table {
   overflow: hidden;
-  border-radius: 22px;
-  border: 1px solid rgba(106, 216, 218, 0.18);
+  border-radius: 0;
+  border: none;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 22px 38px rgba(41, 130, 141, 0.08);
+  box-shadow: none;
+}
+
+.list-panel {
+  overflow: hidden;
+}
+
+.list-panel :deep(.el-card__body) {
+  padding: 0;
+}
+
+.list-panel :deep(.pagination-container) {
+  margin: 0;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(106, 216, 218, 0.18);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: none;
 }
 
 ::v-deep .el-table th {
@@ -1082,6 +1114,17 @@ export default {
 
 ::v-deep .el-table--enable-row-hover .el-table__fixed-body-wrapper tr:hover > td {
   background: #f2f4ef !important;
+}
+
+::v-deep .el-table .el-table__body tr.hover-row > td,
+::v-deep .el-table .el-table__fixed tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-right tr.hover-row > td,
+::v-deep .el-table .el-table__fixed-body-wrapper tr.hover-row > td {
+  background: #f2f4ef !important;
+}
+
+.danger-text {
+  color: #ef5753 !important;
 }
 
 ::v-deep .el-input__inner,

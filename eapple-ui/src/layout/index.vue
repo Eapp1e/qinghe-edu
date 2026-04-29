@@ -138,19 +138,23 @@ export default {
     top: 0;
     right: 0;
     z-index: 9;
-    width: calc(100% - #{$base-sidebar-width});
+    left: $base-sidebar-width;
+    width: auto;
     transition: width 0.28s;
   }
 
   .hideSidebar .fixed-header {
-    width: calc(100% - 54px);
+    left: 54px;
+    width: auto;
   }
 
   .sidebarHide .fixed-header {
+    left: 0;
     width: 100%;
   }
 
   .mobile .fixed-header {
+    left: 0;
     width: 100%;
   }
 </style>

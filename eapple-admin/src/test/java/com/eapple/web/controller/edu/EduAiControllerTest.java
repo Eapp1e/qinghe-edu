@@ -8,11 +8,17 @@ import com.eapple.common.core.domain.AjaxResult;
 import com.eapple.common.core.domain.entity.SysUser;
 import com.eapple.common.core.domain.model.LoginUser;
 import com.eapple.common.exception.ServiceException;
+import com.eapple.system.config.EduAiProperties;
+import com.eapple.system.domain.edu.EduAiLog;
+import com.eapple.system.mapper.SysConfigMapper;
+import com.eapple.system.service.edu.IEduAiLogService;
 import com.eapple.system.service.edu.IEduAiService;
+import com.eapple.system.service.impl.edu.EduAiServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,31 +52,31 @@ class EduAiControllerTest
     void shouldRejectEmptyInterest()
     {
         EduAiController.OnlineResourceBody body = new EduAiController.OnlineResourceBody();
-        body.setResources(Collections.singletonList(resource("国家中小学智慧教育平台", "官方平台", "综合", "国家平台", "https://example.com")));
+        body.setResources(Collections.singletonList(resource("Official resource", "Official", "General", "Resource", "https://example.com")));
 
         Assertions.assertThrows(ServiceException.class, () -> controller.onlineResourceRecommend(body));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldFallbackToLocalRecommendationsWhenAiReturnsEmptyArray()
+    void shouldKeepAiEmptyRecommendationResultWithoutLocalFallback()
     {
         Mockito.when(aiService.generateOnlineResourceRecommendation(Mockito.eq(1L), Mockito.anyString()))
                 .thenReturn("[]");
 
         EduAiController.OnlineResourceBody body = new EduAiController.OnlineResourceBody();
-        body.setInterest("数学 思维");
+        body.setInterest("math thinking");
         body.setResources(List.of(
-                resource("小学数学思维课", "Bilibili", "数学", "适合中小学生拓展思维训练", "https://example.com/math"),
-                resource("英语口语趣学", "中国大学MOOC", "英语", "适合日常英语启蒙", "https://example.com/english")));
+                resource("Math Thinking", "Bilibili", "Math", "Math thinking training", "https://example.com/math"),
+                resource("English Speaking", "MOOC", "English", "English speaking", "https://example.com/english")));
 
         AjaxResult result = controller.onlineResourceRecommend(body);
         List<JSONObject> data = (List<JSONObject>) result.get(AjaxResult.DATA_TAG);
 
         Assertions.assertNotNull(data);
-        Assertions.assertFalse(data.isEmpty());
-        Assertions.assertEquals("小学数学思维课", data.get(0).getString("title"));
-        Assertions.assertTrue(data.get(0).getString("reason").contains("数学 思维"));
+        Assertions.assertTrue(data.isEmpty());
+        Mockito.verify(aiService, Mockito.times(1))
+                .generateOnlineResourceRecommendation(Mockito.eq(1L), Mockito.anyString());
     }
 
     @Test
@@ -78,19 +84,47 @@ class EduAiControllerTest
     void shouldParseLinkLinesReturnedByAi()
     {
         Mockito.when(aiService.generateOnlineResourceRecommendation(Mockito.eq(1L), Mockito.anyString()))
-                .thenReturn("- 数学动画课堂 https://example.com/video 适合课后巩固");
+                .thenReturn("- Math Animation https://example.com/video suitable for review");
 
         EduAiController.OnlineResourceBody body = new EduAiController.OnlineResourceBody();
-        body.setInterest("数学");
+        body.setInterest("math");
         body.setResources(Collections.singletonList(
-                resource("数学动画课堂", "Bilibili", "数学", "趣味数学视频", "https://example.com/video")));
+                resource("Math Animation", "Bilibili", "Math", "Math video", "https://example.com/video")));
 
         AjaxResult result = controller.onlineResourceRecommend(body);
         List<JSONObject> data = (List<JSONObject>) result.get(AjaxResult.DATA_TAG);
 
         Assertions.assertEquals(1, data.size());
-        Assertions.assertEquals("数学动画课堂", data.get(0).getString("title"));
+        Assertions.assertEquals("Math Animation", data.get(0).getString("title"));
         Assertions.assertEquals("https://example.com/video", data.get(0).getString("link"));
+    }
+
+    @Test
+    void shouldFailInsteadOfMockingWhenAiConfigIsIncomplete()
+    {
+        EduAiServiceImpl realService = new EduAiServiceImpl();
+        EduAiProperties properties = new EduAiProperties();
+        properties.setEnabled(true);
+        properties.setEndpoint("https://example.com/v1/chat/completions");
+        properties.setApiKey("");
+        properties.setModel("Qwen/Qwen2.5-7B-Instruct");
+        properties.setMaxPromptLength(1200);
+        properties.setTimeoutSeconds(1);
+
+        IEduAiLogService logService = Mockito.mock(IEduAiLogService.class);
+        SysConfigMapper configMapper = Mockito.mock(SysConfigMapper.class);
+        ReflectionTestUtils.setField(realService, "aiProperties", properties);
+        ReflectionTestUtils.setField(realService, "aiLogService", logService);
+        ReflectionTestUtils.setField(realService, "sysConfigMapper", configMapper);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> realService.answerHomeworkQuestion(100L, "question"));
+        Assertions.assertTrue(error.getMessage().contains("AI"));
+
+        ArgumentCaptor<EduAiLog> captor = ArgumentCaptor.forClass(EduAiLog.class);
+        Mockito.verify(logService, Mockito.times(1)).insertAiLog(captor.capture());
+        Assertions.assertEquals("failed", captor.getValue().getStatus());
+        Assertions.assertEquals("review", captor.getValue().getRiskFlag());
     }
 
     private EduAiController.OnlineResourceItem resource(String title, String source, String category, String description, String link)

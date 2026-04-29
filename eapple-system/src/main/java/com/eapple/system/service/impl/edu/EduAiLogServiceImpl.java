@@ -56,6 +56,18 @@ public class EduAiLogServiceImpl implements IEduAiLogService
         return aiLogMapper.insertAiLog(log);
     }
 
+    @Override
+    public int deleteAiLogByIds(Long[] logIds)
+    {
+        return aiLogMapper.deleteAiLogByIds(logIds);
+    }
+
+    @Override
+    public int deleteCurrentUserAiLogByIds(Long[] logIds)
+    {
+        return aiLogMapper.deleteCurrentUserAiLogByIds(SecurityUtils.getUserId(), logIds);
+    }
+
     private Map<String, Long> buildSummary(EduAiLog baseLog)
     {
         EduAiLog totalQuery = copyLog(baseLog);

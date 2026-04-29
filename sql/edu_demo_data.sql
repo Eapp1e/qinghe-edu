@@ -38,10 +38,10 @@ insert into sys_role_menu select * from (
 ) t;
 
 -- 演示账号，密码均为 admin123
-insert into sys_user values(110, 103, 'edu_admin',   '平台管理员', '00', 'edu_admin@example.com',   '13800000010', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台管理员');
-insert into sys_user values(111, 103, 'edu_teacher', '李老师',     '00', 'edu_teacher@example.com', '13800000011', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台教师');
-insert into sys_user values(112, 103, 'edu_parent',  '王家长',     '00', 'edu_parent@example.com',  '13800000012', '0', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台家长');
-insert into sys_user values(113, 103, 'edu_student', '王小明',     '00', 'edu_student@example.com', '13800000013', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台学生');
+insert into sys_user values(110, 103, 'edu_admin',   '管理员', '00', 'edu_admin@example.com',   '13800000010', '1', '', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台管理员');
+insert into sys_user values(111, 103, 'edu_teacher', '李老师',     '00', 'edu_teacher@example.com', '13800000011', '0', '', 'computer,art,sports,science', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台教师');
+insert into sys_user values(112, 103, 'edu_parent',  '王家长',     '00', 'edu_parent@example.com',  '13800000012', '0', '', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台家长');
+insert into sys_user values(113, 103, 'edu_student', '王小明',     '00', 'edu_student@example.com', '13800000013', '1', '', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), sysdate(), 'admin', sysdate(), '', null, '课后服务平台学生');
 
 insert into sys_user_role values (110, 100);
 insert into sys_user_role values (111, 101);
@@ -54,7 +54,7 @@ values
 
 insert into edu_course (course_id, course_name, category, teacher_user_id, teacher_name, campus, week_day, start_time, end_time, start_date, end_date, max_capacity, current_capacity, status, description, ai_notice, ai_suggestion, remark, create_by, create_time)
 values
-(1, '少儿趣味编程', '科技创新', 111, '李老师', '教学楼A201', '周一', '16:00', '17:30', '2026-04-20', '2026-06-30', 30, 1, '0', '通过图形化编程和小游戏设计培养逻辑思维。', '【课后服务通知】本周将开展少儿趣味编程课程，请学生自备笔记本并准时到达教学楼A201。', '课堂建议：采用任务闯关制，先做演示，再让学生分组完成小游戏。', '首页推荐课程', 'edu_teacher', sysdate()),
+(1, '少儿趣味编程', '计算机编程', 111, '李老师', '教学楼A201', '周一', '16:00', '17:30', '2026-04-20', '2026-06-30', 30, 1, '0', '通过图形化编程和小游戏设计培养逻辑思维。', '【课后服务通知】本周将开展少儿趣味编程课程，请学生自备笔记本并准时到达教学楼A201。', '课堂建议：采用任务闯关制，先做演示，再让学生分组完成小游戏。', '首页推荐课程', 'edu_teacher', sysdate()),
 (2, '创意美术工坊', '艺术素养', 111, '李老师', '艺术教室B103', '周三', '15:40', '17:10', '2026-04-22', '2026-06-30', 25, 1, '0', '结合水彩与手工创作，提升审美与表达能力。', '【课后服务通知】创意美术工坊课程请携带画笔和围裙，课程结束后统一展示作品。', '教学建议：先进行色彩启发，再安排分层创作与作品讲评。', '家长关注度高', 'edu_teacher', sysdate()),
 (3, '篮球基础训练', '体育健康', 111, '李老师', '操场东侧篮球场', '周五', '16:10', '17:40', '2026-04-24', '2026-06-30', 35, 0, '0', '面向中高年级学生开展运球、传球、合作训练。', '', '', '学生兴趣课', 'edu_teacher', sysdate());
 

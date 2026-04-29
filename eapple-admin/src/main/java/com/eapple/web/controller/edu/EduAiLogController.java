@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.eapple.common.core.controller.BaseController;
@@ -52,5 +54,19 @@ public class EduAiLogController extends BaseController
     {
         Map<String, Long> summary = aiLogService.getCurrentUserAiLogSummary(log);
         return AjaxResult.success(summary);
+    }
+
+    @PreAuthorize("@ss.hasRole('admin') or @ss.hasRole('edu_admin')")
+    @DeleteMapping("/{logIds}")
+    public AjaxResult remove(@PathVariable Long[] logIds)
+    {
+        return toAjax(aiLogService.deleteAiLogByIds(logIds));
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:ai:list')")
+    @DeleteMapping("/my/{logIds}")
+    public AjaxResult removeMy(@PathVariable Long[] logIds)
+    {
+        return toAjax(aiLogService.deleteCurrentUserAiLogByIds(logIds));
     }
 }

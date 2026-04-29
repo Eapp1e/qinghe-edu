@@ -28,8 +28,9 @@ public class EduAiServiceImpl implements IEduAiService
     private static final String USER_MODEL_KEY_PREFIX = "edu.ai.userModel.";
 
     private static final List<EduAiModelOption> AVAILABLE_MODELS = List.of(
-            new EduAiModelOption("Qwen/Qwen2.5-7B-Instruct", "Qwen 2.5 7B", "已验证可用，响应更快，适合日常教学与学习辅助"),
-            new EduAiModelOption("deepseek-ai/DeepSeek-V3", "DeepSeek V3", "已验证可用，生成质量更高，适合正式内容与完整建议"));
+            new EduAiModelOption("deepseek-ai/DeepSeek-V3.2", "DeepSeek V3.2", "综合能力最均衡，适合作业问答、家长陪学建议和课程推荐，已完成真实联调"),
+            new EduAiModelOption("Qwen/Qwen2.5-72B-Instruct", "Qwen 2.5 72B", "中文指令理解稳定，适合正式通知、长文本建议和教学内容生成，已完成真实联调"),
+            new EduAiModelOption("THUDM/GLM-4-32B-0414", "GLM-4 32B", "表达风格稳健，适合作为多模型对照和通用文本生成备选，已完成真实联调"));
 
     @Autowired
     private EduAiProperties aiProperties;
@@ -68,6 +69,12 @@ public class EduAiServiceImpl implements IEduAiService
     public String generateOnlineResourceRecommendation(Long userId, String prompt)
     {
         return invoke("online_resource_recommendation", userId, buildOnlineResourcePrompt(prompt));
+    }
+
+    @Override
+    public String generateParentDiagnosis(Long studentUserId, String prompt)
+    {
+        return invoke("parent_diagnosis", studentUserId, buildParentDiagnosisPrompt(prompt));
     }
 
     @Override
@@ -141,17 +148,9 @@ public class EduAiServiceImpl implements IEduAiService
         try
         {
             validatePrompt(prompt, log);
-            String content;
-            if (!aiProperties.isEnabled() || StringUtils.isEmpty(aiProperties.getEndpoint()) || StringUtils.isEmpty(aiProperties.getApiKey()))
-            {
-                content = buildMockResponse(businessType);
-                log.setStatus("mock");
-            }
-            else
-            {
-                content = requestRemote(currentModel, prompt);
-                log.setStatus("success");
-            }
+            validateRuntimeConfig();
+            String content = requestRemote(currentModel, prompt);
+            log.setStatus("success");
             log.setResponseContent(content);
             log.setRiskFlag("normal");
             log.setLatencyMs(System.currentTimeMillis() - start);
@@ -168,6 +167,22 @@ public class EduAiServiceImpl implements IEduAiService
             log.setLatencyMs(System.currentTimeMillis() - start);
             aiLogService.insertAiLog(log);
             throw new ServiceException("AI 调用失败: " + e.getMessage());
+        }
+    }
+
+    private void validateRuntimeConfig()
+    {
+        if (!aiProperties.isEnabled())
+        {
+            throw new ServiceException("AI 服务未启用，请先完成模型服务配置");
+        }
+        if (StringUtils.isEmpty(aiProperties.getEndpoint()))
+        {
+            throw new ServiceException("AI 服务地址未配置，请先配置模型接口地址");
+        }
+        if (StringUtils.isEmpty(aiProperties.getApiKey()))
+        {
+            throw new ServiceException("AI API Key 未配置，请先配置真实模型密钥");
         }
     }
 
@@ -203,25 +218,25 @@ public class EduAiServiceImpl implements IEduAiService
         JSONObject body = new JSONObject();
         body.put("model", modelName);
         body.put("messages", JSONArray.of(
-                JSONObject.of("role", "system", "content", "你是中小学课后服务平台的 AI 助手，请直接输出安全、简洁、可展示的中文内容。除非用户要求，否则不要输出 Markdown 标记。"),
+                JSONObject.of("role", "system", "content", "你是中小学课后服务平台的 AI 助手，请直接输出安全、简洁、可展示的中文内容。除非用户要求，否则不要输出 Markdown 表格。"),
                 JSONObject.of("role", "user", "content", prompt)));
         body.put("temperature", 0.4);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(aiProperties.getEndpoint()))
-                .timeout(Duration.ofSeconds(aiProperties.getTimeoutSeconds()))
+                .timeout(Duration.ofSeconds(resolveTimeoutSeconds()))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + aiProperties.getApiKey())
                 .POST(HttpRequest.BodyPublishers.ofString(body.toJSONString()))
                 .build();
 
         HttpClient client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(aiProperties.getTimeoutSeconds()))
+                .connectTimeout(Duration.ofSeconds(resolveTimeoutSeconds()))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 403)
         {
-            throw new ServiceException("远程接口返回状态码 403");
+            throw new ServiceException("远程接口返回状态码 403，请检查模型密钥或账号权限");
         }
         if (response.statusCode() >= 300)
         {
@@ -234,12 +249,24 @@ public class EduAiServiceImpl implements IEduAiService
         {
             throw new ServiceException("AI 未返回有效结果");
         }
-        return choices.getJSONObject(0).getJSONObject("message").getString("content");
+        JSONObject message = choices.getJSONObject(0).getJSONObject("message");
+        String content = message == null ? null : message.getString("content");
+        if (StringUtils.isEmpty(StringUtils.trim(content)))
+        {
+            throw new ServiceException("AI 未返回可展示内容");
+        }
+        return content.trim();
+    }
+
+    private Integer resolveTimeoutSeconds()
+    {
+        Integer timeoutSeconds = aiProperties.getTimeoutSeconds();
+        return timeoutSeconds == null || timeoutSeconds <= 0 ? 30 : timeoutSeconds;
     }
 
     private String buildHomeworkPrompt(String prompt)
     {
-        return "请根据学生问题给出清晰、友好的课后答疑，控制在1到2段，不要使用Markdown。\n" + prompt;
+        return "请根据学生问题给出清晰、友好的课后答疑，控制在1到3段，不要使用Markdown。\n" + prompt;
     }
 
     private String buildNoticePrompt(String prompt)
@@ -254,51 +281,46 @@ public class EduAiServiceImpl implements IEduAiService
 
     private String buildRecommendationPrompt(String prompt)
     {
-        return "请根据学生档案和课程信息，只输出一句简洁的推荐理由，控制在30字以内，不要使用Markdown，不要分点。\n" + prompt;
+        return "请根据学生档案和候选课程，给每门候选课程生成具体推荐理由。"
+                + "只返回JSON数组，数组项格式为：{\"courseName\":\"课程名称\",\"reason\":\"30字以内推荐理由\"}。"
+                + "推荐理由必须结合孩子年级、兴趣或课程内容，不要使用Markdown，不要输出无关说明。\n" + prompt;
     }
 
     private String buildOnlineResourcePrompt(String prompt)
     {
         return "你是中小学课后网课资源推荐助手。请严格根据给定资源库进行推荐，不要杜撰资源，不要输出Markdown，不要解释过程。"
-                + "请只返回JSON数组，最多3项，格式为"
+                + "请只返回JSON数组，最多4项，格式为："
                 + "[{\"title\":\"资源标题\",\"reason\":\"20字内推荐理由\",\"link\":\"资源链接\"}]。"
                 + "若没有合适资源，返回空数组[]。\n" + prompt;
     }
 
-    private String buildMockResponse(String businessType)
+    private String buildParentDiagnosisPrompt(String prompt)
     {
-        if ("homework_answer".equals(businessType))
-        {
-            return "先别着急重做，先检查关键步骤。\n把不会的部分拆开看，再按顺序重新尝试一次。";
-        }
-        if ("course_notice".equals(businessType))
-        {
-            return "请同学们提前10分钟到教室，带好学习用品，按时参加课后课程。";
-        }
-        if ("course_recommendation".equals(businessType))
-        {
-            return "课程内容与学生兴趣较匹配，适合作为优先报名选择。";
-        }
-        if ("online_resource_recommendation".equals(businessType))
-        {
-            return "[{\"title\":\"国家中小学智慧教育平台\",\"reason\":\"适合系统补充课堂知识\",\"link\":\"https://basic.smartedu.cn/\"}]";
-        }
-        return "已生成可直接使用的教学辅助内容。\n建议结合实际情况做进一步微调。";
+        return "你是青禾智学课后服务平台的家庭教育顾问。请结合学生学习记录、作业问答和家长反馈，给家长输出一份温和、具体、可执行的中文建议。"
+                + "结构请包含：1. 孩子当前状态；2. 家长可以怎么做；3. 本周家庭陪伴小约定。"
+                + "避免责备孩子或家长，不要使用夸张诊断，不要输出 Markdown 表格。\n" + prompt;
     }
 
     private String resolveRoleType()
     {
-        if (SecurityUtils.hasRole("edu_teacher"))
+        try
         {
-            return "teacher";
+            if (SecurityUtils.hasRole("edu_teacher"))
+            {
+                return "teacher";
+            }
+            if (SecurityUtils.hasRole("edu_parent"))
+            {
+                return "parent";
+            }
+            if (SecurityUtils.hasRole("edu_student"))
+            {
+                return "student";
+            }
         }
-        if (SecurityUtils.hasRole("edu_parent"))
+        catch (Exception ignored)
         {
-            return "parent";
-        }
-        if (SecurityUtils.hasRole("edu_student"))
-        {
-            return "student";
+            // AI logging must not fail just because the security context is incomplete in tests or background jobs.
         }
         return "admin";
     }

@@ -649,16 +649,11 @@ export default {
           link: item.link
         }))
         if (!this.aiRecommendations.length) {
-          this.aiRecommendations = this.buildLocalRecommendations(interest)
-        }
-        if (!this.aiRecommendations.length) {
-          this.$modal.msgWarning('当前没有匹配到合适资源，可以换个关键词试试')
+          this.$modal.msgWarning('AI 未匹配到可展示资源，可以换个关键词再试')
         }
       }).catch(() => {
-        this.aiRecommendations = this.buildLocalRecommendations(interest)
-        if (!this.aiRecommendations.length) {
-          this.$modal.msgWarning('当前没有匹配到合适资源，可以换个关键词试试')
-        }
+        this.aiRecommendations = []
+        this.$modal.msgWarning('AI 推荐暂时不可用，请检查模型配置后重试')
       }).finally(() => {
         this.aiLoading = false
       })
@@ -741,71 +736,6 @@ export default {
         ...(item.tags || []).slice(0, 3)
       ].filter(Boolean)
       return this.compressText(parts.join(' / '), 40)
-    },
-    buildLocalRecommendations(interest) {
-      const keywords = this.extractKeywords(interest)
-
-      const scored = this.resources.map(item => {
-        const haystack = [
-          item.title,
-          item.source,
-          item.category,
-          item.description,
-          ...(item.tags || [])
-        ].join(' ').toLowerCase()
-        let score = 0
-        keywords.forEach(word => {
-          if (haystack.includes(word)) {
-            score += word.length > 2 ? 3 : 1
-          }
-        })
-        if (!keywords.length) {
-          score = 0
-        }
-        return { item, score }
-      })
-
-      const matched = scored
-        .filter(entry => entry.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
-        .map(entry => ({
-          title: entry.item.title,
-          source: entry.item.source,
-          reason: `推荐学习 ${entry.item.category} 方向内容，和“${interest}”较为匹配。`,
-          link: entry.item.link
-        }))
-      if (matched.length) {
-        return matched
-      }
-
-      const categoryFallbackMap = [
-        { keys: ['数学', '思维', '奥数', '逻辑'], category: '数学提升' },
-        { keys: ['编程', 'scratch'], category: '编程启蒙' },
-        { keys: ['英语', '绘本', '口语', '拼读'], category: '英语拓展' },
-        { keys: ['科学', '实验', '科普', '天文'], category: '科学探究' },
-        { keys: ['美术', '手工', '绘画', '故宫', '传统文化'], category: '美育素养' },
-        { keys: ['历史', '人文', '国博', '阅读', '语文'], category: '综合课程' }
-      ]
-      const target = categoryFallbackMap.find(item => item.keys.some(key => interest.toLowerCase().includes(key)))
-      if (target) {
-        return this.resources
-          .filter(item => item.category === target.category)
-          .slice(0, 3)
-          .map(item => ({
-            title: item.title,
-            source: item.source,
-            reason: `推荐 ${target.category} 方向资源，适合围绕“${interest}”继续学习。`,
-            link: item.link
-          }))
-      }
-
-      return this.resources.slice(0, 3).map(item => ({
-        title: item.title,
-        source: item.source,
-        reason: `可先从该平台开始了解“${interest}”相关内容。`,
-        link: item.link
-      }))
     }
   }
 }

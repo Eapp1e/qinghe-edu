@@ -1,10 +1,10 @@
 ﻿<template>
   <div class="app-container dashboard-page">
-    <section class="hero-card">
+    <section class="module-hero dashboard-hero">
       <div>
         <span class="hero-badge">Platform Overview</span>
         <h1>平台首页</h1>
-        <p>集中查看课后服务平台的课程运行、报名情况、作业问答与整体活跃趋势。</p>
+        <p>{{ dashboardScopeDescription }}</p>
       </div>
     </section>
 
@@ -21,7 +21,7 @@
         <div ref="overviewChart" class="chart-box"></div>
       </el-card>
       <el-card shadow="never" class="chart-card">
-        <div slot="header">平台业务结构</div>
+        <div slot="header">家校服务结构</div>
         <div ref="structureChart" class="chart-box"></div>
       </el-card>
       <el-card shadow="never" class="chart-card">
@@ -41,7 +41,7 @@
           <div class="info-panel timeline-panel">
             <div class="panel-head">
               <strong>近期动态</strong>
-              <span>聚合课程发布与学生提问等平台动态</span>
+              <span>聚合课程、问答与亲子任务等平台动态</span>
             </div>
             <div class="timeline-scroll">
               <el-timeline>
@@ -94,11 +94,15 @@ export default {
         totalEnrollments: 0,
         totalQuestions: 0,
         totalAiCalls: 0,
+        totalParentAdvices: 0,
+        totalFamilyTasks: 0,
+        completedFamilyTasks: 0,
         activeStudents: 0,
         activeTeachers: 0,
         recentCourses: [],
         recentQuestions: [],
         recentAiLogs: [],
+        recentFamilyTasks: [],
         popularCourses: []
       },
       charts: []
@@ -108,37 +112,92 @@ export default {
     cards() {
       return [
         { label: '课程总数', value: this.dashboard.totalCourses || 0 },
-        { label: '报名总数', value: this.dashboard.totalEnrollments || 0 },
         { label: '提问总数', value: this.dashboard.totalQuestions || 0 },
         { label: 'AI 调用', value: this.dashboard.totalAiCalls || 0 },
+        { label: '家长建议', value: this.dashboard.totalParentAdvices || 0 },
+        { label: '亲子任务', value: this.dashboard.totalFamilyTasks || 0 },
+        { label: '完成任务', value: this.dashboard.completedFamilyTasks || 0 },
         { label: '活跃学生', value: this.dashboard.activeStudents || 0 },
         { label: '活跃教师', value: this.dashboard.activeTeachers || 0 }
       ]
     },
+    roleKeys() {
+      return this.$store.getters.roles || []
+    },
+    isAdminView() {
+      return this.roleKeys.includes('admin') || this.roleKeys.includes('edu_admin')
+    },
+    dashboardScopeLabel() {
+      if (this.isAdminView) return '全平台数据'
+      if (this.roleKeys.includes('edu_teacher')) return '我的课程数据'
+      if (this.roleKeys.includes('edu_parent')) return '我的孩子数据'
+      if (this.roleKeys.includes('edu_student')) return '我的学习数据'
+      return '个人可见数据'
+    },
+    dashboardScopeDescription() {
+      if (this.isAdminView) {
+        return '集中查看全平台课程运行、报名情况、作业问答、家长陪学、亲子任务与整体活跃趋势。'
+      }
+      if (this.roleKeys.includes('edu_teacher')) {
+        return '集中查看本人课程相关的报名、问答、AI 调用与近期课程运行情况。'
+      }
+      if (this.roleKeys.includes('edu_parent')) {
+        return '集中查看已绑定孩子相关的课程报名、作业问答、家长陪学建议与亲子任务情况。'
+      }
+      if (this.roleKeys.includes('edu_student')) {
+        return '集中查看本人课程、问答、学习动态与亲子任务完成情况。'
+      }
+      return '根据当前账号权限展示可查看的课后服务数据。'
+    },
     timeline() {
       const items = []
-      ;(this.dashboard.recentCourses || []).slice(0, 3).forEach(item => {
-        items.push({
+      const now = Date.now()
+      const pushRecentItem = item => {
+        if (!item.rawTime || item.rawTime > now) return
+        items.push(item)
+      }
+      ;(this.dashboard.recentCourses || []).slice(0, 5).forEach(item => {
+        pushRecentItem({
           key: `course-${item.courseId}`,
-          time: this.formatCourseTime(item),
-          text: `课程《${item.courseName}》已发布`
+          time: this.formatDisplayTime(item.createTime),
+          text: `课程《${item.courseName}》已发布`,
+          rawTime: this.getTimeValue(item.createTime)
         })
       })
-      ;(this.dashboard.recentQuestions || []).slice(0, 4).forEach(item => {
-        items.push({
+      ;(this.dashboard.recentQuestions || []).slice(0, 5).forEach(item => {
+        pushRecentItem({
           key: `question-${item.questionId}`,
           time: this.formatDisplayTime(item.createTime),
-          text: `收到问题《${item.questionTitle}》`
+          text: `收到问题《${item.questionTitle}》`,
+          rawTime: this.getTimeValue(item.createTime)
         })
       })
-      return items.length ? items : [{ key: 'empty', time: '当前', text: '暂无最新平台动态' }]
+      ;(this.dashboard.recentFamilyTasks || []).slice(0, 5).forEach(item => {
+        const eventTime = item.updateTime || item.createTime
+        pushRecentItem({
+          key: `family-${item.taskId}`,
+          time: this.formatDisplayTime(eventTime),
+          text: `亲子任务《${item.taskTitle}》${this.formatTaskStatus(item.status)}`,
+          rawTime: this.getTimeValue(eventTime)
+        })
+      })
+      return items
+        .sort((a, b) => (b.rawTime || 0) - (a.rawTime || 0))
+        .slice(0, 5)
+        .map(({ rawTime, ...item }) => item)
+        .concat(items.length ? [] : [{ key: 'empty', time: '当前', text: '暂无最新平台动态' }])
     },
     recentCourseCards() {
-      return (this.dashboard.recentCourses || []).slice(0, 3).map(item => ({
-        key: item.courseId,
-        title: item.courseName,
-        desc: `授课教师：${item.teacherName || '待安排'} · 容量 ${item.maxCapacity || item.capacity || 0} 人`,
-        meta: this.formatCourseTime(item)
+      return (this.dashboard.recentCourses || [])
+        .map(item => ({ course: item, next: this.getNextClassSession(item) }))
+        .filter(item => item.next)
+        .sort((a, b) => a.next.start - b.next.start)
+        .slice(0, 5)
+        .map(({ course, next }) => ({
+          key: `${course.courseId}-${next.start.getTime()}`,
+          title: course.courseName,
+          desc: `授课教师：${course.teacherName || '待安排'} · 容量 ${course.maxCapacity || course.capacity || 0} 人`,
+          meta: this.formatClassTime(next)
       }))
     }
   },
@@ -191,9 +250,84 @@ export default {
     formatCourseTime(item) {
       return this.formatDisplayTime(item.startDate || item.createTime, item.startTime || '')
     },
+    formatClassTime(session) {
+      return `${parseTime(session.start, '{y}-{m}-{d}')} ${session.slot.startTime}`
+    },
+    parseCourseSlots(course) {
+      const text = String(course.weekDay || '')
+      const slots = []
+      const pattern = /(周[一二三四五六日天])\s*(\d{1,2}:\d{2})?\s*-?\s*(\d{1,2}:\d{2})?/g
+      let match = pattern.exec(text)
+      while (match) {
+        slots.push({
+          weekDay: match[1] === '周天' ? '周日' : match[1],
+          startTime: match[2] || course.startTime || '16:00',
+          endTime: match[3] || course.endTime || '17:30'
+        })
+        match = pattern.exec(text)
+      }
+      return slots.length ? slots : [{ weekDay: '周一', startTime: course.startTime || '16:00', endTime: course.endTime || '17:30' }]
+    },
+    parseCourseDate(value) {
+      const date = this.parseDate(value)
+      if (!date) return null
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    },
+    parseClassDateTime(dateValue, timeValue) {
+      const date = this.parseCourseDate(dateValue)
+      if (!date) return null
+      const parts = String(timeValue || '00:00').split(':')
+      date.setHours(Number(parts[0] || 0), Number(parts[1] || 0), 0, 0)
+      return date
+    },
+    getWeekDayNumber(weekDay) {
+      return ({ 周日: 0, 周一: 1, 周二: 2, 周三: 3, 周四: 4, 周五: 5, 周六: 6 })[weekDay]
+    },
+    getNextClassSession(course) {
+      if (course.status && course.status !== '0') return null
+      const start = this.parseCourseDate(course.startDate)
+      const end = this.parseCourseDate(course.endDate)
+      const slots = this.parseCourseSlots(course)
+      if (!start || !end || !slots.length) return null
+      const now = new Date()
+      const cursor = new Date(Math.max(start.getTime(), new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()))
+      while (cursor <= end) {
+        for (const slot of slots) {
+          if (this.getWeekDayNumber(slot.weekDay) === cursor.getDay()) {
+            const sessionStart = this.parseClassDateTime(cursor, slot.startTime)
+            const sessionEnd = this.parseClassDateTime(cursor, slot.endTime)
+            if (sessionEnd && sessionEnd >= now) {
+              return { start: sessionStart, end: sessionEnd, slot }
+            }
+          }
+        }
+        cursor.setDate(cursor.getDate() + 1)
+      }
+      return null
+    },
     formatCourseName(name) {
       if (!name) return '未命名课程'
       return name.length > 12 ? `${name.slice(0, 12)}...` : name
+    },
+    formatBusinessType(type) {
+      const map = {
+        homework_answer: '作业问答',
+        course_notice: '课程通知',
+        course_recommendation: '课程推荐',
+        online_resource_recommendation: '网课推荐',
+        parent_diagnosis: '家长陪学建议'
+      }
+      return map[type] || '智能辅助'
+    },
+    formatAiStatus(status) {
+      return ({ success: '生成', failed: '失败' })[status] || '生成'
+    },
+    formatTaskStatus(status) {
+      return ({ 0: '待完成', 1: '待家长确认', 2: '已完成', 3: '已退回' })[status] || '已更新'
+    },
+    getTimeValue(value) {
+      const date = this.parseDate(value)
+      return date ? date.getTime() : 0
     },
     getData() {
       getEduDashboard().then(res => {
@@ -218,7 +352,7 @@ export default {
         xAxis: {
           type: 'category',
           axisTick: { show: false },
-          data: ['课程', '报名', '问答', '学生', '教师']
+          data: ['课程', '问答', '家长建议', '亲子任务', '学生']
         },
         yAxis: { type: 'value' },
         series: [{
@@ -233,10 +367,10 @@ export default {
           },
           data: [
             this.dashboard.totalCourses || 0,
-            this.dashboard.totalEnrollments || 0,
             this.dashboard.totalQuestions || 0,
-            this.dashboard.activeStudents || 0,
-            this.dashboard.activeTeachers || 0
+            this.dashboard.totalParentAdvices || 0,
+            this.dashboard.totalFamilyTasks || 0,
+            this.dashboard.activeStudents || 0
           ]
         }]
       })
@@ -246,15 +380,28 @@ export default {
       const chart = echarts.init(this.$refs.structureChart, 'macarons')
       chart.setOption({
         tooltip: { trigger: 'item' },
-        legend: { bottom: 0 },
+        legend: {
+          bottom: 0,
+          icon: 'circle',
+          itemWidth: 9,
+          itemHeight: 9
+        },
         series: [{
+          name: '服务结构',
           type: 'pie',
-          radius: ['45%', '70%'],
+          radius: ['42%', '68%'],
+          center: ['50%', '44%'],
+          avoidLabelOverlap: true,
           itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 4 },
+          label: {
+            color: '#405868',
+            formatter: '{b}\n{d}%'
+          },
           data: [
-            { value: this.dashboard.totalCourses || 0, name: '课程' },
-            { value: this.dashboard.totalEnrollments || 0, name: '报名' },
-            { value: this.dashboard.totalQuestions || 0, name: '问答' }
+            { value: this.dashboard.totalEnrollments || 0, name: '课程报名' },
+            { value: this.dashboard.totalQuestions || 0, name: '作业问答' },
+            { value: this.dashboard.totalParentAdvices || 0, name: '家长建议' },
+            { value: this.dashboard.completedFamilyTasks || 0, name: '完成任务' }
           ]
         }]
       })
@@ -400,6 +547,14 @@ export default {
         const key = parseTime(date, '{y}-{m}-{d}')
         questionMap[key] = (questionMap[key] || 0) + 1
       })
+      const familyTaskMap = {}
+      ;(this.dashboard.recentFamilyTasks || []).forEach(item => {
+        const date = this.parseDate(item.updateTime || item.createTime)
+        if (!date) return
+        if (date > today || date < windowStart) return
+        const key = parseTime(date, '{y}-{m}-{d}')
+        familyTaskMap[key] = (familyTaskMap[key] || 0) + 1
+      })
       const categoryKeys = Array.from({ length: 7 }, (_, index) => {
         const date = new Date(windowStart)
         date.setDate(windowStart.getDate() + index)
@@ -436,6 +591,13 @@ export default {
             smooth: true,
             areaStyle: { color: 'rgba(47, 152, 255, 0.12)' },
             data: categoryKeys.map(label => questionMap[label] || 0)
+          },
+          {
+            name: '亲子任务',
+            type: 'line',
+            smooth: true,
+            areaStyle: { color: 'rgba(255, 177, 73, 0.12)' },
+            data: categoryKeys.map(label => familyTaskMap[label] || 0)
           }
         ]
       })
@@ -455,46 +617,12 @@ export default {
 <style scoped>
 .dashboard-page {
   display: grid;
-  gap: 20px;
-}
-
-.hero-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 28px 32px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(21, 34, 46, 0.96), rgba(29, 73, 82, 0.9));
-  color: #fff;
-}
-
-.hero-badge {
-  display: inline-flex;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(32, 224, 182, 0.14);
-  color: #8ff6dc;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-}
-
-.hero-card h1 {
-  margin: 14px 0 10px;
-  font-size: 34px;
-}
-
-.hero-card p {
-  max-width: 720px;
-  margin: 0;
-  color: rgba(232, 246, 246, 0.78);
-  line-height: 1.7;
+  gap: 18px;
 }
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -574,7 +702,7 @@ export default {
 }
 
 .timeline-panel {
-  padding: 24px 24px 18px;
+  padding: 24px 20px 18px 26px;
   min-height: 520px;
   display: flex;
   flex-direction: column;
@@ -582,7 +710,8 @@ export default {
 
 .timeline-scroll {
   flex: 1;
-  padding-right: 8px;
+  margin-top: 2px;
+  padding: 4px 8px 0 4px;
   overflow-y: auto;
 }
 
@@ -673,11 +802,29 @@ export default {
 }
 
 .timeline-panel ::v-deep .el-timeline {
-  padding-left: 12px;
+  padding-left: 8px;
 }
 
 .timeline-panel ::v-deep .el-timeline-item {
+  display: flex;
+  align-items: center;
   padding-bottom: 14px;
+}
+
+.timeline-panel ::v-deep .el-timeline-item__tail {
+  left: 6px;
+  top: 50%;
+  height: calc(100% + 14px);
+  border-left-color: rgba(61, 136, 160, 0.2);
+}
+
+.timeline-panel ::v-deep .el-timeline-item:last-child .el-timeline-item__tail {
+  display: none;
+}
+
+.timeline-panel ::v-deep .el-timeline-item__wrapper {
+  width: 100%;
+  padding-left: 34px;
 }
 
 .timeline-panel ::v-deep .el-timeline-item:last-child {
@@ -685,6 +832,8 @@ export default {
 }
 
 .timeline-panel ::v-deep .el-timeline-item__node {
+  top: 50%;
+  transform: translateY(-50%);
   width: 14px;
   height: 14px;
   background: linear-gradient(180deg, #5ebf8e, #7fb08e);
@@ -757,7 +906,7 @@ export default {
     grid-column: span 1;
   }
 
-  .hero-card {
+  .module-hero {
     padding: 24px;
   }
 

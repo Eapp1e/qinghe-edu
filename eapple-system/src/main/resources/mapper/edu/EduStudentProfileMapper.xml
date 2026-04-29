@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="studentName" column="student_name"/>
         <result property="parentUserId" column="parent_user_id"/>
         <result property="parentName" column="parent_name"/>
+        <result property="parentAccount" column="parent_account"/>
         <result property="gradeName" column="grade_name"/>
         <result property="className" column="class_name"/>
         <result property="gender" column="gender"/>
@@ -23,7 +24,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="profileSelect">
-        select profile_id, student_user_id, student_name, parent_user_id, parent_name, grade_name, class_name, gender,
+        select profile_id, student_user_id, student_name, parent_user_id, parent_name,
+               (select u.user_name from sys_user u where u.user_id = edu_student_profile.parent_user_id) as parent_account,
+               grade_name, class_name, gender,
                interest_tags, status, create_by, create_time, update_by, update_time, remark
         from edu_student_profile
     </sql>

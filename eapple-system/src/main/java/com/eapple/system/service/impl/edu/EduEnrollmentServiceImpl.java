@@ -47,15 +47,29 @@ public class EduEnrollmentServiceImpl implements IEduEnrollmentService
         {
             throw new ServiceException("报名记录不存在");
         }
-        if (!SecurityUtils.isAdmin() && SecurityUtils.hasExactRole("edu_teacher")
-                && !SecurityUtils.getUserId().equals(dbEnrollment.getTeacherUserId()))
+        if (SecurityUtils.hasExactRole("edu_parent") || SecurityUtils.hasExactRole("edu_admin")
+                || (SecurityUtils.isAdmin() && !SecurityUtils.hasExactRole("edu_teacher")
+                && !SecurityUtils.hasExactRole("edu_student")))
         {
-            throw new ServiceException("只能管理本人课程的报名记录");
+            throw new ServiceException("家长端和管理端仅支持查看学习记录");
         }
-        if (!SecurityUtils.isAdmin() && SecurityUtils.hasExactRole("edu_parent")
-                && !SecurityUtils.getUserId().equals(dbEnrollment.getParentUserId()))
+        if (SecurityUtils.hasExactRole("edu_teacher"))
         {
-            throw new ServiceException("只能维护当前家长关联学生的报名记录");
+            if (!SecurityUtils.getUserId().equals(dbEnrollment.getTeacherUserId()))
+            {
+                throw new ServiceException("只能维护本人课程的上课记录与反馈");
+            }
+            enrollment.setLearningRecord(null);
+        }
+        if (SecurityUtils.hasExactRole("edu_student"))
+        {
+            if (!SecurityUtils.getUserId().equals(dbEnrollment.getStudentUserId()))
+            {
+                throw new ServiceException("学生只能填写自己的学习记录");
+            }
+            enrollment.setStatus(null);
+            enrollment.setInteractionSummary(null);
+            enrollment.setRemark(null);
         }
         enrollment.setUpdateBy(SecurityUtils.getUsername());
         return enrollmentMapper.updateEnrollment(enrollment);

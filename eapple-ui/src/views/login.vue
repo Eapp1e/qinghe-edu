@@ -16,26 +16,26 @@
         <p class="eyebrow">QINGHE After-school Service Platform</p>
         <h1 class="intro-title">青禾|中小学智慧课后服务平台</h1>
         <p class="subtitle">
-          面向学校课后服务管理场景，围绕学生、家长、教师与管理员四类角色，
-          提供课程发布、在线报名、学习跟踪、作业问答、平台通知与 AI 辅助服务。
+          面向中小学课后服务真实业务，围绕课程开设、学习记录、家长陪学、
+          亲子任务和 AI 辅助形成统一工作台，支持学生、家长、教师与管理员分端协同。
         </p>
 
         <div class="feature-grid">
           <div class="feature-card">
-            <strong>课程服务</strong>
-            <span>统一管理兴趣课程、授课教师、上课时间与报名容量，保障课后课程组织有序。</span>
+            <strong>课程管理</strong>
+            <span>按年级、教师类型和课表统一管理课程开设、报名与提醒。</span>
           </div>
           <div class="feature-card">
-            <strong>家校协同</strong>
-            <span>支持家长查看学生档案、学习记录和报名状态，提升课后服务透明度。</span>
+            <strong>过程记录</strong>
+            <span>沉淀课中记录、教师反馈和结课总结，完整追踪学习过程。</span>
           </div>
           <div class="feature-card">
-            <strong>教学辅助</strong>
-            <span>教师可借助 AI 生成课程通知、教学建议和作业答疑内容，提高工作效率。</span>
+            <strong>智能辅助</strong>
+            <span>支持作业问答、课程推荐、家长建议和教学内容生成。</span>
           </div>
           <div class="feature-card">
-            <strong>运营管理</strong>
-            <span>统一维护平台用户、课程公告、学习数据与 AI 日志，提升课后服务运营效率。</span>
+            <strong>家校共育</strong>
+            <span>联动家长陪学、亲子任务和积分兑换，促进习惯养成。</span>
           </div>
         </div>
       </section>
@@ -138,7 +138,7 @@
       @closed="resetRegisterForm"
     >
       <div class="register-dialog__intro">
-        <span>支持学生、家长和教师自助注册，账号仅支持字母和数字，真实姓名请在对应档案中完善。</span>
+        <span>支持学生、家长和教师自助注册；教师需选择唯一教学类型，后续课程分类将自动匹配。</span>
       </div>
 
       <el-form ref="registerForm" :model="registerForm" :rules="registerRules" label-position="top" :hide-required-asterisk="true">
@@ -165,6 +165,15 @@
             <span class="required-label"><i>*</i> 账号</span>
           </template>
           <el-input v-model.trim="registerForm.username" placeholder="请输入字母或数字账号" maxlength="20" />
+        </el-form-item>
+
+        <el-form-item v-if="registerForm.loginRole === 'edu_teacher'" prop="teacherType">
+          <template slot="label">
+            <span class="required-label"><i>*</i> 教师类型</span>
+          </template>
+          <el-select v-model="registerForm.teacherType" class="register-teacher-type" placeholder="请选择教师类型">
+            <el-option v-for="item in teacherTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
 
         <el-form-item prop="password">
@@ -207,7 +216,7 @@
       </el-form>
 
       <div class="register-tip">
-        注册后将自动绑定所选身份，真实姓名请到学生档案或对应资料页完善，管理员账号仍需由平台统一创建。
+        注册后将自动绑定所选身份；真实姓名请到学生档案或个人资料中完善，管理员账号仍需由系统管理员统一创建。
       </div>
 
       <div slot="footer" class="dialog-footer">
@@ -282,6 +291,14 @@ export default {
         { value: 'edu_parent', label: '家长账号', desc: '适用于查看孩子档案和报名课程' },
         { value: 'edu_teacher', label: '教师账号', desc: '适用于发布课程和生成教学建议' }
       ],
+      teacherTypeOptions: [
+        { value: 'science', label: '理科教师' },
+        { value: 'humanities', label: '文科教师' },
+        { value: 'art', label: '美育教师' },
+        { value: 'sports', label: '体育教师' },
+        { value: 'computer', label: '计算机教师' },
+        { value: 'general', label: '综合实践教师' }
+      ],
       passwordVisible: false,
       registerPasswordVisible: false,
       registerConfirmVisible: false,
@@ -294,10 +311,12 @@ export default {
         username: '',
         password: '',
         confirmPassword: '',
-        loginRole: 'edu_student'
+        loginRole: 'edu_student',
+        teacherType: ''
       },
       registerRules: {
         loginRole: [{ required: true, trigger: 'change', message: '请选择注册身份' }],
+        teacherType: [{ required: true, trigger: 'change', message: '请选择教师类型' }],
         username: [{ validator: validateRegisterUsername, trigger: 'blur' }],
         password: [
           { required: true, trigger: 'blur', message: '请输入登录密码' },
@@ -356,13 +375,19 @@ export default {
         username: '',
         password: '',
         confirmPassword: '',
-        loginRole: 'edu_student'
+        loginRole: 'edu_student',
+        teacherType: ''
       }
     },
     selectRegisterRole(role) {
       this.registerForm.loginRole = role
+      if (role !== 'edu_teacher') {
+        this.registerForm.teacherType = ''
+      } else if (!this.registerForm.teacherType) {
+        this.registerForm.teacherType = 'general'
+      }
       this.$nextTick(() => {
-        this.$refs.registerForm && this.$refs.registerForm.clearValidate('loginRole')
+        this.$refs.registerForm && this.$refs.registerForm.clearValidate(['loginRole', 'teacherType'])
       })
     },
     handleLogin() {
@@ -398,7 +423,8 @@ export default {
         register({
           username: this.registerForm.username,
           password: this.registerForm.password,
-          loginRole: this.registerForm.loginRole
+          loginRole: this.registerForm.loginRole,
+          teacherType: this.registerForm.teacherType
         }).then(response => {
           this.$message.success(response.msg || '注册成功，请返回登录')
           this.loginForm.username = this.registerForm.username
@@ -1233,6 +1259,10 @@ export default {
   color: #718797;
   font-size: 13px;
   line-height: 1.6;
+}
+
+.register-teacher-type {
+  width: 100%;
 }
 
 ::v-deep .register-dialog {

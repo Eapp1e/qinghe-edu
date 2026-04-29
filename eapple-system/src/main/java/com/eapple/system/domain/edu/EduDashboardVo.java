@@ -8,12 +8,16 @@ public class EduDashboardVo
     private Long totalEnrollments;
     private Long totalQuestions;
     private Long totalAiCalls;
+    private Long totalFamilyTasks;
+    private Long completedFamilyTasks;
+    private Long totalParentAdvices;
     private Long activeStudents;
     private Long activeTeachers;
     private List<EduCourse> recentCourses;
     private List<EduCourse> popularCourses;
     private List<EduHomeworkQuestion> recentQuestions;
     private List<EduAiLog> recentAiLogs;
+    private List<EduFamilyTask> recentFamilyTasks;
 
     public Long getTotalCourses()
     {
@@ -53,6 +57,36 @@ public class EduDashboardVo
     public void setTotalAiCalls(Long totalAiCalls)
     {
         this.totalAiCalls = totalAiCalls;
+    }
+
+    public Long getTotalFamilyTasks()
+    {
+        return totalFamilyTasks;
+    }
+
+    public void setTotalFamilyTasks(Long totalFamilyTasks)
+    {
+        this.totalFamilyTasks = totalFamilyTasks;
+    }
+
+    public Long getCompletedFamilyTasks()
+    {
+        return completedFamilyTasks;
+    }
+
+    public void setCompletedFamilyTasks(Long completedFamilyTasks)
+    {
+        this.completedFamilyTasks = completedFamilyTasks;
+    }
+
+    public Long getTotalParentAdvices()
+    {
+        return totalParentAdvices;
+    }
+
+    public void setTotalParentAdvices(Long totalParentAdvices)
+    {
+        this.totalParentAdvices = totalParentAdvices;
     }
 
     public Long getActiveStudents()
@@ -113,5 +147,15 @@ public class EduDashboardVo
     public void setRecentAiLogs(List<EduAiLog> recentAiLogs)
     {
         this.recentAiLogs = recentAiLogs;
+    }
+
+    public List<EduFamilyTask> getRecentFamilyTasks()
+    {
+        return recentFamilyTasks;
+    }
+
+    public void setRecentFamilyTasks(List<EduFamilyTask> recentFamilyTasks)
+    {
+        this.recentFamilyTasks = recentFamilyTasks;
     }
 }

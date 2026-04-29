@@ -29,8 +29,11 @@ const state = {
 function resolveViewTitle(view) {
   const defaultTitle = (view.meta && view.meta.title) || 'no-name'
   const roles = store.getters.roles || []
-  if (defaultTitle === '\u62a5\u540d\u8bb0\u5f55' && (roles.includes('edu_student') || roles.includes('edu_parent'))) {
+  if (defaultTitle === '\u62a5\u540d\u8bb0\u5f55' && roles.includes('edu_student')) {
     return '\u5b66\u4e60\u8bb0\u5f55'
+  }
+  if (defaultTitle === '\u62a5\u540d\u8bb0\u5f55') {
+    return '上课记录'
   }
   return defaultTitle
 }

@@ -37,6 +37,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userId != null">
                 and user_id = #{userId}
             </if>
+            <if test="bizId != null">
+                and biz_id = #{bizId}
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and prompt_content like concat('%学生：', #{studentName}, '%')
+            </if>
+            <if test="concern != null and concern != ''">
+                and prompt_content like concat('%家长补充关注：%', #{concern}, '%')
+            </if>
+            <if test="promptContent != null and promptContent != ''">
+                and prompt_content like concat('%', #{promptContent}, '%')
+            </if>
             <if test="status != null and status != ''">
                 and status = #{status}
             </if>
@@ -46,7 +58,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectAiLogList" parameterType="EduAiLog" resultMap="EduAiLogResult">
         <include refid="logSelect"/>
         <include refid="logWhere"/>
-        order by log_id desc
+        order by create_time desc, log_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>
@@ -60,6 +72,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         (#{businessType}, #{bizId}, #{userId}, #{userName}, #{roleType}, #{promptContent}, #{responseContent}, #{modelName},
          #{status}, #{riskFlag}, #{errorMessage}, #{promptTokens}, #{completionTokens}, #{latencyMs}, sysdate())
     </insert>
+
+    <delete id="deleteAiLogByIds" parameterType="Long">
+        delete from edu_ai_log where log_id in
+        <foreach collection="array" item="logId" open="(" separator="," close=")">
+            #{logId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCurrentUserAiLogByIds">
+        delete from edu_ai_log
+        where user_id = #{userId}
+        and log_id in
+        <foreach collection="logIds" item="logId" open="(" separator="," close=")">
+            #{logId}
+        </foreach>
+    </delete>
 
     <select id="countAiLogs" parameterType="EduAiLog" resultType="Long">
         select count(1) from edu_ai_log

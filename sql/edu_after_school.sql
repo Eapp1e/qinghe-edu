@@ -30,12 +30,14 @@ create table edu_student_profile (
 
 create table edu_course (
   course_id bigint(20) not null auto_increment comment '课程ID',
+  course_code varchar(32) default null comment '课程编号',
   course_name varchar(100) not null comment '课程名称',
   category varchar(50) default '' comment '课程分类',
+  grade_scope varchar(128) default '' comment '开课年级范围',
   teacher_user_id bigint(20) not null comment '教师用户ID',
   teacher_name varchar(64) default '' comment '教师姓名',
   campus varchar(100) default '' comment '校区/地点',
-  week_day varchar(16) default '' comment '上课星期',
+  week_day varchar(128) default '' comment '上课星期/时段',
   start_time varchar(16) default '' comment '开始时间',
   end_time varchar(16) default '' comment '结束时间',
   start_date date comment '开始日期',
@@ -51,7 +53,8 @@ create table edu_course (
   create_time datetime comment '创建时间',
   update_by varchar(64) default '' comment '更新者',
   update_time datetime comment '更新时间',
-  primary key (course_id)
+  primary key (course_id),
+  unique key uk_course_code (course_code)
 ) engine=innodb default charset=utf8mb4 comment='课后课程表';
 
 create table edu_course_enrollment (
@@ -119,7 +122,7 @@ create table edu_ai_log (
 ) engine=innodb default charset=utf8mb4 comment='AI调用日志表';
 
 -- 角色初始化
-insert into sys_role values ('100', '课后平台管理员', 'edu_admin', 100, 1, 1, 1, '0', '0', 'admin', sysdate(), '', null, '课后服务平台管理员');
+insert into sys_role values ('100', '管理员', 'edu_admin', 100, 1, 1, 1, '0', '0', 'admin', sysdate(), '', null, '课后服务平台管理员');
 insert into sys_role values ('101', '课后平台教师', 'edu_teacher', 101, 2, 1, 1, '0', '0', 'admin', sysdate(), '', null, '课后服务平台教师');
 insert into sys_role values ('102', '课后平台家长', 'edu_parent', 102, 2, 1, 1, '0', '0', 'admin', sysdate(), '', null, '课后服务平台家长');
 insert into sys_role values ('103', '课后平台学生', 'edu_student', 103, 2, 1, 1, '0', '0', 'admin', sysdate(), '', null, '课后服务平台学生');
@@ -129,7 +132,7 @@ insert into sys_menu values('2000', '课后服务平台', '0', '5', 'edu', '', '
 insert into sys_menu values('2001', '平台看板', '2000', '1', 'dashboard', 'edu/dashboard/index', '', '', 1, 0, 'C', '0', '0', 'edu:dashboard:view', 'dashboard', 'admin', sysdate(), '', null, '平台看板菜单');
 insert into sys_menu values('2002', '课程管理', '2000', '2', 'course', 'edu/course/index', '', '', 1, 0, 'C', '0', '0', 'edu:course:list', 'guide', 'admin', sysdate(), '', null, '课程管理菜单');
 insert into sys_menu values('2003', '学生档案', '2000', '3', 'student', 'edu/student/index', '', '', 1, 0, 'C', '0', '0', 'edu:student:list', 'peoples', 'admin', sysdate(), '', null, '学生档案菜单');
-insert into sys_menu values('2004', '报名管理', '2000', '4', 'enrollment', 'edu/enrollment/index', '', '', 1, 0, 'C', '0', '0', 'edu:enrollment:list', 'form', 'admin', sysdate(), '', null, '报名管理菜单');
+insert into sys_menu values('2004', '上课记录', '2000', '4', 'enrollment', 'edu/enrollment/index', '', '', 1, 0, 'C', '0', '0', 'edu:enrollment:list', 'form', 'admin', sysdate(), '', null, '课程上课与学习记录菜单');
 insert into sys_menu values('2005', '作业问答', '2000', '5', 'question', 'edu/question/index', '', '', 1, 0, 'C', '0', '0', 'edu:question:list', 'message', 'admin', sysdate(), '', null, '作业问答菜单');
 insert into sys_menu values('2006', 'AI日志', '2000', '6', 'aiLog', 'edu/aiLog/index', '', '', 1, 0, 'C', '0', '0', 'edu:ai:list', 'redis', 'admin', sysdate(), '', null, 'AI日志菜单');
 

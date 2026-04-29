@@ -6,8 +6,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <resultMap id="EduCourseResult" type="EduCourse">
         <id property="courseId" column="course_id"/>
+        <result property="courseCode" column="course_code"/>
         <result property="courseName" column="course_name"/>
         <result property="category" column="category"/>
+        <result property="gradeScope" column="grade_scope"/>
         <result property="teacherUserId" column="teacher_user_id"/>
         <result property="teacherName" column="teacher_name"/>
         <result property="campus" column="campus"/>
@@ -32,26 +34,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="baseCourseColumns">
-        select c.course_id, c.course_name, c.category, c.teacher_user_id, c.teacher_name, c.campus,
+        select distinct c.course_id, c.course_code, c.course_name, c.category, c.grade_scope, c.teacher_user_id, c.teacher_name, c.campus,
                c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
-               c.current_capacity, c.status, c.description, c.ai_notice, c.ai_suggestion,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as current_capacity,
+               c.status, c.description, c.ai_notice, c.ai_suggestion,
                c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
                'N' as enrolled,
-               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as enroll_count
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as enroll_count
         from edu_course c
     </sql>
 
     <sql id="courseColumns">
-        select c.course_id, c.course_name, c.category, c.teacher_user_id, c.teacher_name, c.campus,
+        select distinct c.course_id, c.course_code, c.course_name, c.category, c.grade_scope, c.teacher_user_id, c.teacher_name, c.campus,
                c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
-               c.current_capacity, c.status, c.description, c.ai_notice, c.ai_suggestion,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as current_capacity,
+               c.status, c.description, c.ai_notice, c.ai_suggestion,
                c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
-               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id) as enroll_count
+                (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as enroll_count
         <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'student'">
-            , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId}) then 'Y' else 'N' end as enrolled
+            , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0') then 'Y' else 'N' end as enrolled
         </if>
         <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'parent'">
-            , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId}) then 'Y' else 'N' end as enrolled
+            , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId} and e.status = '0') then 'Y' else 'N' end as enrolled
         </if>
         <if test="_parameter == null or _parameter.getClass().name == 'java.lang.Long' or params.currentUserId == null">
             , 'N' as enrolled
@@ -64,8 +68,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="courseName != null and courseName != ''">
                 and c.course_name like concat('%', #{courseName}, '%')
             </if>
+            <if test="courseCode != null and courseCode != ''">
+                and c.course_code like concat('%', #{courseCode}, '%')
+            </if>
             <if test="category != null and category != ''">
-                and c.category = #{category}
+                and c.category like concat('%', #{category}, '%')
+            </if>
+            <if test="gradeScope != null and gradeScope != ''">
+                and c.grade_scope like concat('%', #{gradeScope}, '%')
+            </if>
+            <if test="teacherName != null and teacherName != ''">
+                and c.teacher_name like concat('%', #{teacherName}, '%')
+            </if>
+            <if test="campus != null and campus != ''">
+                and c.campus like concat('%', #{campus}, '%')
+            </if>
+            <if test="weekDay != null and weekDay != ''">
+                and c.week_day like concat('%', #{weekDay}, '%')
             </if>
             <if test="teacherUserId != null">
                 and c.teacher_user_id = #{teacherUserId}
@@ -73,11 +92,64 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">
                 and c.status = #{status}
             </if>
+            <if test="runtimeStatus != null and runtimeStatus != ''">
+                <choose>
+                    <when test="runtimeStatus == 'closed'">
+                        and c.status = '1'
+                    </when>
+                    <when test="runtimeStatus == 'pending'">
+                        and c.status = '0' and c.start_date is not null and c.start_date &gt; curdate()
+                    </when>
+                    <when test="runtimeStatus == 'finished'">
+                        and c.status = '0' and c.end_date is not null and c.end_date &lt; curdate()
+                    </when>
+                    <when test="runtimeStatus == 'active'">
+                        and c.status = '0'
+                        and (c.start_date is null or c.start_date &lt;= curdate())
+                        and (c.end_date is null or c.end_date &gt;= curdate())
+                    </when>
+                </choose>
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.gradeStage == 'elementary'">
+                and (
+                    c.grade_scope is null or c.grade_scope = ''
+                    or c.grade_scope regexp '一年级|二年级|三年级|四年级|五年级|六年级'
+                )
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.gradeStage == 'middle'">
+                and (
+                    c.grade_scope is null or c.grade_scope = ''
+                    or c.grade_scope regexp '七年级|八年级|九年级'
+                )
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.studentGrade != null and params.studentGrade != ''">
+                and (c.grade_scope is null or c.grade_scope = '' or find_in_set(#{params.studentGrade}, c.grade_scope))
+            </if>
             <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'student'">
                 and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId})
             </if>
             <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'parent'">
                 and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId})
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and enrolled != null and enrolled != '' and params.currentRole == 'student'">
+                <choose>
+                    <when test='enrolled == "Y"'>
+                        and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0')
+                    </when>
+                    <when test='enrolled == "N"'>
+                        and not exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0')
+                    </when>
+                </choose>
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and enrolled != null and enrolled != '' and params.currentRole == 'parent'">
+                <choose>
+                    <when test='enrolled == "Y"'>
+                        and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId} and e.status = '0')
+                    </when>
+                    <when test='enrolled == "N"'>
+                        and not exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId} and e.status = '0')
+                    </when>
+                </choose>
             </if>
         </where>
     </sql>
@@ -90,7 +162,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectCourseList" parameterType="EduCourse" resultMap="EduCourseResult">
         <include refid="courseColumns"/>
         <include refid="courseWhere"/>
-        order by c.course_id desc
+        order by c.create_time desc, c.course_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>
@@ -107,10 +179,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <insert id="insertCourse" parameterType="EduCourse" useGeneratedKeys="true" keyProperty="courseId">
         insert into edu_course
-        (course_name, category, teacher_user_id, teacher_name, campus, week_day, start_time, end_time, start_date, end_date,
+        (course_code, course_name, category, grade_scope, teacher_user_id, teacher_name, campus, week_day, start_time, end_time, start_date, end_date,
          max_capacity, current_capacity, status, description, ai_notice, ai_suggestion, remark, create_by, create_time)
         values
-        (#{courseName}, #{category}, #{teacherUserId}, #{teacherName}, #{campus}, #{weekDay}, #{startTime}, #{endTime}, #{startDate}, #{endDate},
+        (#{courseCode}, #{courseName}, #{category}, #{gradeScope}, #{teacherUserId}, #{teacherName}, #{campus}, #{weekDay}, #{startTime}, #{endTime}, #{startDate}, #{endDate},
          #{maxCapacity}, #{currentCapacity}, #{status}, #{description}, #{aiNotice}, #{aiSuggestion}, #{remark}, #{createBy}, sysdate())
     </insert>
 
@@ -118,7 +190,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update edu_course
         <set>
             <if test="courseName != null">course_name = #{courseName},</if>
+            <if test="courseCode != null">course_code = #{courseCode},</if>
             <if test="category != null">category = #{category},</if>
+            <if test="gradeScope != null">grade_scope = #{gradeScope},</if>
             <if test="teacherName != null">teacher_name = #{teacherName},</if>
             <if test="campus != null">campus = #{campus},</if>
             <if test="weekDay != null">week_day = #{weekDay},</if>

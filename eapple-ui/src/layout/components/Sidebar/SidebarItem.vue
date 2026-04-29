@@ -92,13 +92,14 @@ export default {
     },
     resolveTitle(route) {
       const defaultTitle = route && route.meta ? route.meta.title : ''
-      if (defaultTitle !== '\u62a5\u540d\u8bb0\u5f55') {
+      const normalizedTitle = (defaultTitle || '').trim()
+      if (!['报名记录', '上课记录'].includes(normalizedTitle)) {
         return defaultTitle
       }
       if (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')) {
-        return '\u5b66\u4e60\u8bb0\u5f55'
+        return '学习记录'
       }
-      return defaultTitle
+      return '上课记录'
     }
   }
 }

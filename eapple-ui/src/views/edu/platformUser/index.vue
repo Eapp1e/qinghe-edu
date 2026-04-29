@@ -27,34 +27,45 @@
       </div>
     </section>
 
-    <section class="toolbar-card">
-      <el-form :model="queryParams" inline size="small">
-        <el-form-item label="账号">
-          <el-input v-model="queryParams.userName" placeholder="如 edu_teacher" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="queryParams.nickName" placeholder="如 李老师 / 王家长" clearable @keyup.enter.native="getList" />
-        </el-form-item>
-        <el-form-item label="状态" class="status-select">
-          <el-select v-model="queryParams.status" clearable placeholder="全部状态">
-            <el-option label="启用" value="0" />
-            <el-option label="停用" value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-tooltip content="查询" placement="top">
-            <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
-          </el-tooltip>
-          <el-tooltip content="重置筛选" placement="top">
-            <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
-          </el-tooltip>
-        </el-form-item>
-      </el-form>
+    <section class="toolbar-panel">
+      <div class="toolbar-main">
+        <el-form :model="queryParams" inline size="small" class="query-form">
+          <el-form-item label="账号">
+            <el-input v-model="queryParams.userName" placeholder="如 edu_teacher" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="姓名">
+            <el-input v-model="queryParams.nickName" placeholder="如 李老师 / 王家长" clearable @keyup.enter.native="getList" />
+          </el-form-item>
+          <el-form-item label="角色" class="status-select">
+            <el-select v-model="queryParams.roleType" clearable placeholder="全部角色">
+              <el-option label="系统管理员" value="admin" />
+              <el-option label="管理员" value="edu_admin" />
+              <el-option label="教师" value="edu_teacher" />
+              <el-option label="家长" value="edu_parent" />
+              <el-option label="学生" value="edu_student" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="状态" class="status-select">
+            <el-select v-model="queryParams.status" clearable placeholder="全部状态">
+              <el-option label="启用" value="0" />
+              <el-option label="停用" value="1" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-tooltip content="查询" placement="top">
+              <el-button type="primary" size="small" class="toolbar-icon-btn" icon="el-icon-search" @click="getList" />
+            </el-tooltip>
+            <el-tooltip content="重置筛选" placement="top">
+              <el-button size="small" class="toolbar-icon-btn" icon="el-icon-delete" @click="resetQuery" />
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
 
-      <div class="quick-actions">
-        <el-button type="primary" plain size="small" class="toolbar-gradient-btn" @click="handleAdd">新建用户</el-button>
-        <el-button size="small" icon="el-icon-download" @click="handleExport">导出</el-button>
-        <right-toolbar @queryTable="getList" />
+        <div class="toolbar-actions">
+          <el-button type="primary" plain size="small" class="toolbar-gradient-btn" @click="handleAdd">新建用户</el-button>
+          <el-button size="small" icon="el-icon-download" @click="handleExport">导出</el-button>
+          <right-toolbar @queryTable="getList" />
+        </div>
       </div>
     </section>
 
@@ -73,6 +84,9 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="教师类型" min-width="120">
+        <template slot-scope="scope">{{ teacherTypeLabel(scope.row.teacherType) }}</template>
+      </el-table-column>
       <el-table-column label="联系方式" prop="phonenumber" min-width="130" />
       <el-table-column label="状态" width="100" align="center">
         <template slot-scope="scope">
@@ -87,7 +101,7 @@
       <el-table-column label="备注" prop="remark" min-width="180" show-overflow-tooltip />
       <el-table-column label="操作" width="220" align="center">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-if="canEditUser(scope.row)" type="text" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button type="text" size="mini" @click="handleResetPwd(scope.row)">重置密码</el-button>
           <el-button v-if="scope.row.userId !== 1" type="text" size="mini" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
         </template>
@@ -114,7 +128,22 @@
           <el-col :span="12">
             <el-form-item label="角色类型" prop="roleIds">
               <el-select v-model="form.roleIds" multiple placeholder="请选择角色">
-                <el-option v-for="item in eduRoleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId" />
+                <el-option
+                  v-for="item in eduRoleOptions"
+                  :key="item.roleId"
+                  :label="displayRoleOptionName(item)"
+                  :value="item.roleId"
+                  :disabled="item.roleKey === 'edu_admin' && !isSystemAdmin"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="isTeacherRoleSelected" :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="教师类型" prop="teacherType">
+              <el-select v-model="form.teacherType" placeholder="请选择教师类型">
+                <el-option v-for="item in teacherTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -186,7 +215,8 @@ export default {
         pageSize: 10,
         userName: '',
         nickName: '',
-        status: ''
+        status: '',
+        roleType: ''
       },
       form: {
         userId: undefined,
@@ -199,11 +229,20 @@ export default {
         sex: '0',
         status: '0',
         remark: '',
+        teacherType: '',
         postIds: [],
         roleIds: []
       },
+      teacherTypeOptions: [
+        { value: 'science', label: '理科' },
+        { value: 'humanities', label: '文科' },
+        { value: 'art', label: '美育' },
+        { value: 'sports', label: '体育' },
+        { value: 'computer', label: '计算机' },
+        { value: 'general', label: '综合实践' }
+      ],
       roleGuide: [
-        { key: 'admin', label: '平台管理员', desc: '负责平台用户、课程、AI日志与公告的统一维护。' },
+        { key: 'admin', label: '管理员', desc: '负责平台用户、课程、AI日志与公告的统一维护。' },
         { key: 'teacher', label: '教师', desc: '负责发布课程、查看报名与使用 AI 生成教学内容。' },
         { key: 'parent', label: '家长', desc: '负责为孩子报名课程并查看学习记录与互动历史。' },
         { key: 'student', label: '学生', desc: '负责查看课程、提交作业问题并获取 AI 解答。' }
@@ -212,7 +251,8 @@ export default {
         userName: [{ required: true, message: '请输入账号', trigger: 'blur' }],
         nickName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        roleIds: [{ type: 'array', required: true, message: '请选择角色类型', trigger: 'change' }]
+        roleIds: [{ type: 'array', required: true, message: '请选择角色类型', trigger: 'change' }],
+        teacherType: [{ required: true, message: '请选择教师类型', trigger: 'change' }]
       }
     }
   },
@@ -222,6 +262,13 @@ export default {
     },
     enabledCount() {
       return this.userList.filter(item => item.status === '0').length
+    },
+    isTeacherRoleSelected() {
+      const teacherRole = this.allRoles.find(item => item.roleKey === 'edu_teacher')
+      return teacherRole && (this.form.roleIds || []).includes(teacherRole.roleId)
+    },
+    isSystemAdmin() {
+      return Number(this.$store.getters.id) === 1 || (this.$store.getters.roles || []).includes('admin')
     }
   },
   created() {
@@ -251,18 +298,18 @@ export default {
         const rows = res.rows || []
         const filteredRows = rows
           .filter(item => this.isEduPlatformUser(item))
+          .filter(item => this.matchesRoleFilter(item))
           .sort((a, b) => (a.userId || 0) - (b.userId || 0))
         this.total = filteredRows.length
         const start = (this.queryParams.pageNum - 1) * this.queryParams.pageSize
         const end = start + this.queryParams.pageSize
-        const pageRows = filteredRows.slice(start, end)
-        this.userList = await this.enrichUserRoles(pageRows)
+        this.userList = await this.enrichUserRoles(filteredRows.slice(start, end))
       }).finally(() => {
         this.loading = false
       })
     },
     resetQuery() {
-      this.queryParams = { pageNum: 1, pageSize: 10, userName: '', nickName: '', status: '' }
+      this.queryParams = { pageNum: 1, pageSize: 10, userName: '', nickName: '', status: '', roleType: '' }
       this.getList()
     },
     async handleExport() {
@@ -277,7 +324,7 @@ export default {
         const filteredRows = rows
           .filter(item => this.isEduPlatformUser(item))
           .sort((a, b) => (a.userId || 0) - (b.userId || 0))
-        const enrichedRows = await this.enrichUserRoles(filteredRows)
+        const enrichedRows = (await this.enrichUserRoles(filteredRows)).filter(item => this.matchesRoleFilter(item))
         const csvRows = [
           ['账号', '姓名', '角色类型', '联系方式', '状态', '备注']
         ].concat(
@@ -308,6 +355,7 @@ export default {
         sex: '0',
         status: '0',
         remark: '',
+        teacherType: '',
         postIds: [],
         roleIds: []
       }
@@ -321,8 +369,11 @@ export default {
       const hasStudentProfile = this.studentProfiles.some(item => Number(item.studentUserId) === Number(row.userId))
       const hasParentProfile = this.studentProfiles.some(item => Number(item.parentUserId) === Number(row.userId))
 
-      if (row.userName === 'admin' || roleKeys.includes('admin') || roleKeys.includes('edu_admin') || remark.includes('管理员')) {
-        return '平台管理员'
+      if (row.userName === 'admin' || roleKeys.includes('admin')) {
+        return '系统管理员'
+      }
+      if (roleKeys.includes('edu_admin') || remark.includes('管理员')) {
+        return '管理员'
       }
       if (roleKeys.includes('edu_teacher') || (row.userName && row.userName.startsWith('edu_teacher')) || remark.includes('教师')) {
         return '教师'
@@ -334,6 +385,17 @@ export default {
         return '学生'
       }
       return '学生'
+    },
+    resolveRoleKey(row) {
+      const label = this.resolveRoleLabel(row)
+      const map = {
+        系统管理员: 'admin',
+        管理员: 'edu_admin',
+        教师: 'edu_teacher',
+        家长: 'edu_parent',
+        学生: 'edu_student'
+      }
+      return map[label] || ''
     },
     resolveDisplayName(row) {
       const roleKeys = this.extractRoleKeys(row)
@@ -395,16 +457,71 @@ export default {
       if (label.includes('学生')) return ''
       return 'info'
     },
+    matchesRoleFilter(row) {
+      if (!this.queryParams.roleType) return true
+      const roleKeys = this.extractRoleKeys(row)
+      if (this.queryParams.roleType === 'admin') {
+        return row.userName === 'admin' || roleKeys.includes('admin') || this.resolveRoleKey(row) === 'admin'
+      }
+      return roleKeys.includes(this.queryParams.roleType) || this.resolveRoleKey(row) === this.queryParams.roleType
+    },
+    displayRoleOptionName(role) {
+      if (!role) return ''
+      if (role.roleKey === 'edu_admin') return '管理员'
+      return role.roleName
+        .replace('课后平台管理员', '管理员')
+        .replace('课后服务管理员', '管理员')
+        .replace('平台管理员', '管理员')
+    },
+    isPlatformAdminRow(row) {
+      return this.extractRoleKeys(row).includes('edu_admin')
+    },
+    isSystemAdminRow(row) {
+      return row && (row.userName === 'admin' || this.extractRoleKeys(row).includes('admin'))
+    },
+    isSelfRow(row) {
+      return row && Number(row.userId) === Number(this.$store.getters.id)
+    },
+    canEditUser(row) {
+      if (this.isSystemAdminRow(row)) {
+        return this.isSystemAdmin
+      }
+      if (this.isSelfRow(row)) {
+        return true
+      }
+      if (this.isPlatformAdminRow(row)) {
+        return this.isSystemAdmin
+      }
+      return true
+    },
+    teacherTypeLabel(value) {
+      const values = String(value || '').split(',').map(item => item.trim()).filter(Boolean)
+      if (!values.length) return '--'
+      return values.map(type => {
+        const hit = this.teacherTypeOptions.find(item => item.value === type)
+        return hit ? hit.label : type
+      }).join('、')
+    },
     escapeCsvValue(value) {
       const text = value == null ? '' : String(value)
       return `"${text.replace(/"/g, '""')}"`
     },
     handleAdd() {
+      if (!this.isSystemAdmin) {
+        const adminRole = this.allRoles.find(item => item.roleKey === 'edu_admin')
+        if (adminRole) {
+          this.form.roleIds = (this.form.roleIds || []).filter(id => id !== adminRole.roleId)
+        }
+      }
       this.resetFormData()
       this.dialogTitle = '新增平台用户'
       this.open = true
     },
     handleUpdate(row) {
+      if (!this.canEditUser(row)) {
+        this.$modal.msgWarning('只有系统管理员可以编辑管理员账号')
+        return
+      }
       this.resetFormData()
       getUser(row.userId).then(res => {
         this.form = {
@@ -449,6 +566,16 @@ export default {
     submitForm() {
       this.$refs.form.validate(valid => {
         if (!valid) return
+        if (!this.isTeacherRoleSelected) {
+          this.form.teacherType = ''
+        }
+        if (!this.isSystemAdmin && Number(this.form.userId) !== Number(this.$store.getters.id)) {
+          const adminRole = this.allRoles.find(item => item.roleKey === 'edu_admin')
+          if (adminRole && (this.form.roleIds || []).includes(adminRole.roleId)) {
+            this.$modal.msgWarning('只有系统管理员可以创建或编辑管理员账号')
+            return
+          }
+        }
         const request = this.form.userId ? updateUser(this.form) : addUser(this.form)
         request.then(() => {
           this.$modal.msgSuccess(this.form.userId ? '保存成功' : '新增成功')
@@ -550,7 +677,7 @@ export default {
 
 .stat-card,
 .guide-item,
-.toolbar-card,
+.toolbar-panel,
 .content-table {
   border-radius: 22px;
 }
@@ -607,14 +734,10 @@ export default {
   font-size: 14px;
 }
 
-.toolbar-card {
+.toolbar-panel {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px 4px;
+  padding: 16px 18px;
   border: 1px solid rgba(157, 232, 233, 0.42);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(236, 251, 255, 0.52)),
@@ -626,8 +749,24 @@ export default {
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
-.quick-actions {
-  padding-bottom: 14px;
+.toolbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.query-form {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .content-table {
@@ -741,7 +880,7 @@ export default {
 
 @media (max-width: 992px) {
   .page-hero,
-  .toolbar-card {
+  .toolbar-main {
     flex-direction: column;
     align-items: stretch;
   }
@@ -749,6 +888,10 @@ export default {
   .guide-panel,
   .hero-stats {
     grid-template-columns: 1fr;
+  }
+
+  .toolbar-actions {
+    justify-content: flex-start;
   }
 }
 </style>

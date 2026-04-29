@@ -20,7 +20,7 @@
 
     <section
       v-show="showSearch"
-      class="toolbar-card search-toolbar"
+      class="toolbar-card toolbar-panel search-toolbar"
     >
       <div class="search-toolbar-row">
         <el-form
@@ -194,6 +194,7 @@ export default {
       open: false,
       answerOpen: false,
       questionList: [],
+      statsQuestionList: [],
       currentQuestion: {},
       regeneratingQuestionId: null,
       queryParams: {
@@ -216,7 +217,7 @@ export default {
       return this.$store.getters.roles || []
     },
     answeredCount() {
-      return this.questionList.filter(item => item.answerStatus === '1').length
+      return this.statsQuestionList.filter(item => item.answerStatus === '1').length
     },
     isTeacherRole() {
       return this.roleKeys.includes('edu_teacher')
@@ -255,9 +256,11 @@ export default {
   methods: {
     getList() {
       this.loading = true
-      listQuestion(this.queryParams).then(res => {
-        this.questionList = res.rows
-        this.total = res.total
+      const statsParams = { ...this.queryParams, pageNum: 1, pageSize: 1000 }
+      Promise.all([listQuestion(this.queryParams), listQuestion(statsParams)]).then(([res, statsRes]) => {
+        this.questionList = res.rows || []
+        this.total = res.total || 0
+        this.statsQuestionList = statsRes.rows || []
       }).finally(() => {
         this.loading = false
       })
@@ -434,15 +437,19 @@ export default {
 }
 
 .search-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
   flex: 1;
 }
 
 ::v-deep .search-form .input-student .el-input__inner {
-  width: 156px;
+  width: 100% !important;
 }
 
 ::v-deep .search-form .select-status .el-input__inner {
-  width: 148px;
+  width: 100% !important;
 }
 
 .inline-right-toolbar {
@@ -459,7 +466,21 @@ export default {
 }
 
 ::v-deep .search-form .el-form-item {
-  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin: 0 !important;
+}
+
+::v-deep .search-form .el-form-item__content {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0 !important;
+}
+
+::v-deep .search-form .el-input,
+::v-deep .search-form .el-select {
+  width: 190px !important;
 }
 
 @media (max-width: 1400px) {

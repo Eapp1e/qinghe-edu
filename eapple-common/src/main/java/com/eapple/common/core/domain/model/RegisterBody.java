@@ -7,5 +7,15 @@ package com.eapple.common.core.domain.model;
  */
 public class RegisterBody extends LoginBody
 {
+    private String teacherType;
 
+    public String getTeacherType()
+    {
+        return teacherType;
+    }
+
+    public void setTeacherType(String teacherType)
+    {
+        this.teacherType = teacherType;
+    }
 }
