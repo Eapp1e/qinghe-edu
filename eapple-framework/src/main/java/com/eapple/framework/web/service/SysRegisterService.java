@@ -101,7 +101,7 @@ public class SysRegisterService
             {
                 return "请选择有效的教师类型";
             }
-            sysUser.setNickName("待完善资料");
+            sysUser.setNickName(username);
             if (StringUtils.equals(loginRole, "edu_teacher"))
             {
                 sysUser.setTeacherType(teacherType);

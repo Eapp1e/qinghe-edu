@@ -55,7 +55,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0') then 'Y' else 'N' end as enrolled
         </if>
         <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'parent'">
-            , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId} and e.status = '0') then 'Y' else 'N' end as enrolled
+            , case when exists (
+                select 1 from edu_course_enrollment e
+                where e.course_id = c.course_id
+                and e.parent_user_id = #{params.currentUserId}
+                <if test="params.targetStudentUserId != null">
+                    and e.student_user_id = #{params.targetStudentUserId}
+                </if>
+                and e.status = '0'
+              ) then 'Y' else 'N' end as enrolled
         </if>
         <if test="_parameter == null or _parameter.getClass().name == 'java.lang.Long' or params.currentUserId == null">
             , 'N' as enrolled
@@ -129,7 +137,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId})
             </if>
             <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'parent'">
-                and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId})
+                and exists (
+                    select 1 from edu_course_enrollment e
+                    where e.course_id = c.course_id
+                    and e.parent_user_id = #{params.currentUserId}
+                    <if test="params.targetStudentUserId != null">
+                        and e.student_user_id = #{params.targetStudentUserId}
+                    </if>
+                )
             </if>
             <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and enrolled != null and enrolled != '' and params.currentRole == 'student'">
                 <choose>
@@ -144,10 +159,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and enrolled != null and enrolled != '' and params.currentRole == 'parent'">
                 <choose>
                     <when test='enrolled == "Y"'>
-                        and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId} and e.status = '0')
+                        and exists (
+                            select 1 from edu_course_enrollment e
+                            where e.course_id = c.course_id
+                            and e.parent_user_id = #{params.currentUserId}
+                            <if test="params.targetStudentUserId != null">
+                                and e.student_user_id = #{params.targetStudentUserId}
+                            </if>
+                            and e.status = '0'
+                        )
                     </when>
                     <when test='enrolled == "N"'>
-                        and not exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.parent_user_id = #{params.currentUserId} and e.status = '0')
+                        and not exists (
+                            select 1 from edu_course_enrollment e
+                            where e.course_id = c.course_id
+                            and e.parent_user_id = #{params.currentUserId}
+                            <if test="params.targetStudentUserId != null">
+                                and e.student_user_id = #{params.targetStudentUserId}
+                            </if>
+                            and e.status = '0'
+                        )
                     </when>
                 </choose>
             </if>

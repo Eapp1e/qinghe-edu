@@ -26,6 +26,7 @@ export function recommendOnlineResources(data) {
   return request({
     url: '/edu/ai/online-resource-recommend',
     method: 'post',
+    timeout: 120000,
     noErrorMessage: true,
     data
   })
@@ -35,6 +36,7 @@ export function generateParentDiagnosis(data) {
   return request({
     url: '/edu/ai/parent-diagnosis',
     method: 'post',
+    timeout: 120000,
     noErrorMessage: true,
     data
   })

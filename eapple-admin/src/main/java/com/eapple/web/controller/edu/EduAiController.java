@@ -118,7 +118,7 @@ public class EduAiController extends BaseController
         body.setConcern(StringUtils.trim(body.getConcern()));
         EduStudentProfile child = findCurrentParentChild(body.getStudentUserId());
         String prompt = buildParentDiagnosisPrompt(child, body);
-        return success(aiService.generateParentDiagnosis(child.getStudentUserId(), prompt));
+        return AjaxResult.success("生成成功", aiService.generateParentDiagnosis(child.getStudentUserId(), prompt));
     }
 
     private String buildParentDiagnosisPrompt(EduStudentProfile child, ParentDiagnosisBody body)
@@ -135,25 +135,65 @@ public class EduAiController extends BaseController
         prompt.append("学生：").append(child.getStudentName()).append("\n");
         prompt.append("年级班级：").append(StringUtils.defaultString(child.getGradeName(), "未填写"))
                 .append(StringUtils.defaultString(child.getClassName(), "")).append("\n");
-        prompt.append("兴趣标签：").append(StringUtils.defaultString(child.getInterestTags(), "未填写")).append("\n");
-        prompt.append("家长补充关注：").append(body.getConcern()).append("\n");
-        prompt.append("学习记录：\n");
+        prompt.append("兴趣标签：").append(truncateText(StringUtils.defaultString(child.getInterestTags(), "未填写"), 50)).append("\n");
+        prompt.append("家长补充关注：").append(truncateText(body.getConcern(), 80)).append("\n");
+        prompt.append("近期学习记录摘要：\n");
+        appendEnrollmentSummary(prompt, enrollments);
+        prompt.append("近期作业问答摘要：\n");
+        appendQuestionSummary(prompt, questions);
+        return prompt.toString();
+    }
+
+    private void appendEnrollmentSummary(StringBuilder prompt, List<EduCourseEnrollment> enrollments)
+    {
+        int count = 0;
         for (EduCourseEnrollment item : enrollments)
         {
-            prompt.append("- ").append(item.getCourseName())
-                    .append("：").append(StringUtils.defaultString(item.getLearningRecord(), "暂无记录"))
-                    .append("；教师反馈：").append(StringUtils.defaultString(item.getInteractionSummary(), "暂无"))
+            if (item == null || count >= 3)
+            {
+                break;
+            }
+            prompt.append("- ").append(truncateText(item.getCourseName(), 28))
+                    .append("：学习记录=").append(truncateText(StringUtils.defaultString(item.getLearningRecord(), "暂无记录"), 45))
+                    .append("；教师反馈=").append(truncateText(StringUtils.defaultString(item.getInteractionSummary(), "暂无"), 45))
                     .append("\n");
+            count++;
         }
-        prompt.append("作业问答情况：\n");
+        if (count == 0)
+        {
+            prompt.append("- 暂无课程学习记录\n");
+        }
+    }
+
+    private void appendQuestionSummary(StringBuilder prompt, List<EduHomeworkQuestion> questions)
+    {
+        int count = 0;
         for (EduHomeworkQuestion item : questions)
         {
-            prompt.append("- ").append(item.getQuestionTitle())
-                    .append("：").append(StringUtils.defaultString(item.getQuestionContent(), ""))
-                    .append("；AI答复摘要：").append(StringUtils.defaultString(item.getAiAnswer(), "暂无"))
+            if (item == null || count >= 3)
+            {
+                break;
+            }
+            prompt.append("- ").append(truncateText(item.getQuestionTitle(), 30))
+                    .append("：问题=").append(truncateText(StringUtils.defaultString(item.getQuestionContent(), ""), 45))
+                    .append("；AI答复=").append(truncateText(StringUtils.defaultString(item.getAiAnswer(), "暂无"), 45))
                     .append("\n");
+            count++;
         }
-        return prompt.toString();
+        if (count == 0)
+        {
+            prompt.append("- 暂无作业问答记录\n");
+        }
+    }
+
+    private String truncateText(String text, int maxLength)
+    {
+        String value = StringUtils.defaultString(text, "").trim();
+        if (value.length() <= maxLength)
+        {
+            return value;
+        }
+        return value.substring(0, maxLength) + "…";
     }
 
     private EduStudentProfile findCurrentParentChild(Long studentUserId)

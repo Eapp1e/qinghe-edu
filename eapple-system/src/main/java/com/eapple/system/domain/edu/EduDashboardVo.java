@@ -1,6 +1,7 @@
 package com.eapple.system.domain.edu;
 
 import java.util.List;
+import com.eapple.system.domain.SysNotice;
 
 public class EduDashboardVo
 {
@@ -18,6 +19,7 @@ public class EduDashboardVo
     private List<EduHomeworkQuestion> recentQuestions;
     private List<EduAiLog> recentAiLogs;
     private List<EduFamilyTask> recentFamilyTasks;
+    private List<SysNotice> recentNotices;
 
     public Long getTotalCourses()
     {
@@ -157,5 +159,15 @@ public class EduDashboardVo
     public void setRecentFamilyTasks(List<EduFamilyTask> recentFamilyTasks)
     {
         this.recentFamilyTasks = recentFamilyTasks;
+    }
+
+    public List<SysNotice> getRecentNotices()
+    {
+        return recentNotices;
+    }
+
+    public void setRecentNotices(List<SysNotice> recentNotices)
+    {
+        this.recentNotices = recentNotices;
     }
 }

@@ -21,6 +21,11 @@
     <section class="toolbar-panel">
       <div class="toolbar-main">
         <el-form v-show="showSearch" :inline="true" :model="queryParams" size="small" class="query-form">
+          <el-form-item v-if="shouldSelectChild" label="孩子" class="status-select">
+            <el-select v-model="queryParams.studentUserId" placeholder="请选择孩子" @change="handleChildChange">
+              <el-option v-for="item in childrenList" :key="item.studentUserId" :label="item.studentName" :value="item.studentUserId" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="课程名称">
             <el-input v-model="queryParams.courseName" placeholder="请输入课程名称" clearable @keyup.enter.native="getList" />
           </el-form-item>
@@ -345,6 +350,7 @@ export default {
       courseList: [],
       statsCourseList: [],
       childrenList: [],
+      childSelectTipShown: false,
       aiModelOptions: [],
       currentAiModel: '',
       weekOptions: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
@@ -380,7 +386,8 @@ export default {
         campus: undefined,
         weekDay: undefined,
         runtimeStatus: undefined,
-        enrolled: undefined
+        enrolled: undefined,
+        studentUserId: undefined
       },
       form: {},
       rules: {
@@ -408,6 +415,12 @@ export default {
     },
     isStudentView() {
       return this.roleKeys.includes('edu_student')
+    },
+    isParentView() {
+      return this.roleKeys.includes('edu_parent')
+    },
+    shouldSelectChild() {
+      return this.isParentView && this.childrenList.length > 1
     },
     canManageCourse() {
       return this.isTeacherView || this.isAdminView
@@ -495,12 +508,21 @@ export default {
     }
   },
   created() {
-    this.getList()
-    this.getChildren()
+    if (this.isParentView) {
+      this.getChildren()
+    } else {
+      this.getList()
+    }
     this.getAiModelConfig()
   },
   methods: {
     getList() {
+      if (this.shouldSelectChild && !this.queryParams.studentUserId) {
+        this.courseList = []
+        this.statsCourseList = []
+        this.total = 0
+        return
+      }
       this.loading = true
       const statsParams = { ...this.queryParams, pageNum: 1, pageSize: 1000 }
       const listParams = this.canEnrollCourse ? statsParams : this.queryParams
@@ -519,6 +541,16 @@ export default {
       }
       listMyChildren().then(res => {
         this.childrenList = res.data || []
+        if (this.childrenList.length === 1) {
+          this.queryParams.studentUserId = this.childrenList[0].studentUserId
+        }
+        if (this.shouldSelectChild && !this.queryParams.studentUserId && !this.childSelectTipShown) {
+          this.childSelectTipShown = true
+          this.$nextTick(() => {
+            this.$modal.msgWarning('请先在搜索栏选择孩子，再查看课程与上课提醒')
+          })
+        }
+        this.getList()
       })
     },
     getAiModelConfig() {
@@ -534,9 +566,15 @@ export default {
     },
     handleQuery() {
       this.queryParams.pageNum = 1
+      if (this.shouldSelectChild && !this.queryParams.studentUserId) {
+        this.$modal.msgWarning('请先选择孩子')
+        this.getList()
+        return
+      }
       this.getList()
     },
     resetQuery() {
+      const currentStudentUserId = this.queryParams.studentUserId
       this.queryParams = {
         pageNum: 1,
         pageSize: 10,
@@ -547,8 +585,13 @@ export default {
         campus: undefined,
         weekDay: undefined,
         runtimeStatus: undefined,
-        enrolled: undefined
+        enrolled: undefined,
+        studentUserId: this.childrenList.length === 1 ? this.childrenList[0].studentUserId : currentStudentUserId
       }
+      this.getList()
+    },
+    handleChildChange() {
+      this.queryParams.pageNum = 1
       this.getList()
     },
     uniqueCourses(rows) {
@@ -699,11 +742,11 @@ export default {
         this.$modal.msgError('请先维护孩子档案后再报名')
         return null
       }
-      if (this.childrenList.length > 1) {
-        this.$modal.msgError('当前账号关联了多个孩子，请先保留一个孩子档案或按需扩展选择功能')
+      if (!this.queryParams.studentUserId) {
+        this.$modal.msgWarning('请先选择孩子')
         return null
       }
-      return this.childrenList[0].studentUserId
+      return this.queryParams.studentUserId
     },
     handleEnroll(row) {
       const runtime = this.courseRuntimeStatus(row)

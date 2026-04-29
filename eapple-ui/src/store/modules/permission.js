@@ -159,13 +159,16 @@ function getSidebarSortMode() {
 }
 
 function getSidebarSortStorageKey() {
-  if (auth.hasRole('edu_teacher')) {
+  if (hasExactAnyRole(['admin', 'edu_admin'])) {
+    return 'layout-setting-sidebar-sort-admin'
+  }
+  if (hasExactAnyRole(['edu_teacher'])) {
     return 'layout-setting-sidebar-sort-teacher'
   }
-  if (auth.hasRole('edu_parent')) {
+  if (hasExactAnyRole(['edu_parent'])) {
     return 'layout-setting-sidebar-sort-parent'
   }
-  if (auth.hasRole('edu_student')) {
+  if (hasExactAnyRole(['edu_student'])) {
     return 'layout-setting-sidebar-sort-student'
   }
   return 'layout-setting-sidebar-sort-admin'
@@ -202,8 +205,8 @@ function normalizeRouteOrder(route, mode, order) {
 function compareRouteByCustomOrder(a, b, order) {
   const keyA = getRouteOrderKey(a)
   const keyB = getRouteOrderKey(b)
-  const indexA = order.indexOf(keyA)
-  const indexB = order.indexOf(keyB)
+  const indexA = findRouteOrderIndex(order, keyA)
+  const indexB = findRouteOrderIndex(order, keyB)
   if (indexA === -1 && indexB === -1) {
     return 0
   }
@@ -214,6 +217,34 @@ function compareRouteByCustomOrder(a, b, order) {
     return -1
   }
   return indexA - indexB
+}
+
+function findRouteOrderIndex(order, key) {
+  const index = order.indexOf(key)
+  if (index !== -1) {
+    return index
+  }
+  const aliases = getRouteOrderAliases(key)
+  for (let i = 0; i < aliases.length; i++) {
+    const aliasIndex = order.indexOf(aliases[i])
+    if (aliasIndex !== -1) {
+      return aliasIndex
+    }
+  }
+  return -1
+}
+
+function getRouteOrderAliases(key) {
+  if (!key) {
+    return []
+  }
+  if (key.indexOf('上课记录::') === 0) {
+    return [key.replace('上课记录::', '学习记录::'), key.replace('上课记录::', '报名记录::')]
+  }
+  if (key.indexOf('学习记录::') === 0) {
+    return [key.replace('学习记录::', '上课记录::'), key.replace('学习记录::', '报名记录::')]
+  }
+  return []
 }
 
 function getRouteOrderKey(route) {
@@ -244,7 +275,10 @@ function getRouteDisplayInfo(route) {
 }
 
 function normalizeRouteTitle(title) {
-  if (title === '报名记录' && (auth.hasRole('edu_student') || auth.hasRole('edu_parent'))) {
+  if (['报名记录', '上课记录', '学习记录'].includes(title) && hasExactAnyRole(['admin', 'edu_admin', 'edu_teacher'])) {
+    return '上课记录'
+  }
+  if (['报名记录', '上课记录', '学习记录'].includes(title) && hasExactAnyRole(['edu_student', 'edu_parent'])) {
     return '学习记录'
   }
   if (title === '报名记录') {
@@ -257,6 +291,10 @@ function normalizeRouteTitle(title) {
     return '亲子任务'
   }
   return title
+}
+
+function hasExactAnyRole(roles) {
+  return roles.some(role => auth.hasExactRole(role))
 }
 
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {

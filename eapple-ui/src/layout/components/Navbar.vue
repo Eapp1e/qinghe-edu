@@ -229,14 +229,30 @@ export default {
       }
       const modules = this.defaultSidebarItems.slice()
       const orderMap = new Map(modules.map(item => [item.key, item]))
-      const ordered = this.sidebarCustomOrder.map(key => orderMap.get(key)).filter(Boolean)
-      const remainder = modules.filter(item => !this.sidebarCustomOrder.includes(item.key))
+      const normalizedOrder = this.sidebarCustomOrder.map(key => this.resolveSidebarOrderKey(key, orderMap))
+      const ordered = normalizedOrder.map(key => orderMap.get(key)).filter(Boolean)
+      const remainder = modules.filter(item => !normalizedOrder.includes(item.key))
       return ordered.concat(remainder)
     },
+    resolveSidebarOrderKey(key, orderMap) {
+      if (orderMap.has(key)) {
+        return key
+      }
+      const aliases = []
+      if (key.indexOf('上课记录::') === 0) {
+        aliases.push(key.replace('上课记录::', '学习记录::'), key.replace('上课记录::', '报名记录::'))
+      }
+      if (key.indexOf('学习记录::') === 0) {
+        aliases.push(key.replace('学习记录::', '上课记录::'), key.replace('学习记录::', '报名记录::'))
+      }
+      const hit = aliases.find(item => orderMap.has(item))
+      return hit || key
+    },
     getSidebarSortStorageKey() {
-      if (this.$auth.hasRole('edu_teacher')) return 'layout-setting-sidebar-sort-teacher'
-      if (this.$auth.hasRole('edu_parent')) return 'layout-setting-sidebar-sort-parent'
-      if (this.$auth.hasRole('edu_student')) return 'layout-setting-sidebar-sort-student'
+      if (this.$auth.hasExactRole('admin') || this.$auth.hasExactRole('edu_admin')) return 'layout-setting-sidebar-sort-admin'
+      if (this.$auth.hasExactRole('edu_teacher')) return 'layout-setting-sidebar-sort-teacher'
+      if (this.$auth.hasExactRole('edu_parent')) return 'layout-setting-sidebar-sort-parent'
+      if (this.$auth.hasExactRole('edu_student')) return 'layout-setting-sidebar-sort-student'
       return 'layout-setting-sidebar-sort-admin'
     },
     getSidebarSortSetting() {
@@ -308,17 +324,9 @@ export default {
     resolveRouteTitle(route) {
       const title = ((route.meta || {}).title || '').toString()
       const normalizedTitle = title.trim()
-      if (['报名记录', '上课记录'].includes(normalizedTitle)) {
-        return (this.$auth.hasRole('edu_student') || this.$auth.hasRole('edu_parent')) ? '学习记录' : '上课记录'
-      }
-      if (title === '报名记录' && this.$auth.hasRole('edu_student')) {
-        return '学习记录'
-      }
-      if (title === '报名记录') {
-        return '上课记录'
-      }
-      if (title === '报名记录' && this.$auth.hasRole('edu_student')) {
-        return '学习记录'
+      const enrollmentTitles = ['报名记录', '上课记录', '学习记录', '鎶ュ悕璁板綍', '涓婅璁板綍']
+      if (enrollmentTitles.includes(normalizedTitle)) {
+        return (this.$auth.hasExactRole('edu_student') || this.$auth.hasExactRole('edu_parent')) ? '学习记录' : '上课记录'
       }
       return title
     },

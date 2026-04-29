@@ -319,7 +319,16 @@ public class EduCourseServiceImpl implements IEduCourseService
             EduStudentProfile profileQuery = new EduStudentProfile();
             profileQuery.setParentUserId(SecurityUtils.getUserId());
             List<EduStudentProfile> children = profileMapper.selectProfileList(profileQuery);
-            applyParentGradeStageParam(course, children);
+            EduStudentProfile selectedChild = resolveParentSelectedChild(course, children);
+            if (selectedChild != null)
+            {
+                course.getParams().put("targetStudentUserId", selectedChild.getStudentUserId());
+                applyGradeStageParam(course, selectedChild);
+            }
+            else
+            {
+                applyParentGradeStageParam(course, children);
+            }
             if (!onlyMine)
             {
                 course.setStatus("0");
@@ -335,6 +344,26 @@ public class EduCourseServiceImpl implements IEduCourseService
             throw new ServiceException("课程不存在");
         }
         return course;
+    }
+
+    private EduStudentProfile resolveParentSelectedChild(EduCourse course, List<EduStudentProfile> children)
+    {
+        Long selectedStudentId = course.getStudentUserId();
+        if (selectedStudentId == null)
+        {
+            return children != null && children.size() == 1 ? children.get(0) : null;
+        }
+        if (children != null)
+        {
+            for (EduStudentProfile child : children)
+            {
+                if (selectedStudentId.equals(child.getStudentUserId()))
+                {
+                    return child;
+                }
+            }
+        }
+        throw new ServiceException("只能查看已关联孩子的课程");
     }
 
     private Date todayStart()

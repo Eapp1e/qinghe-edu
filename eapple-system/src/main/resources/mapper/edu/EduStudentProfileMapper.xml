@@ -24,53 +24,59 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="profileSelect">
-        select profile_id, student_user_id, student_name, parent_user_id, parent_name,
-               (select u.user_name from sys_user u where u.user_id = edu_student_profile.parent_user_id) as parent_account,
-               grade_name, class_name, gender,
-               interest_tags, status, create_by, create_time, update_by, update_time, remark
-        from edu_student_profile
+        select p.profile_id, p.student_user_id,
+               coalesce(nullif(su.nick_name, ''), su.user_name, p.student_name) as student_name,
+               p.parent_user_id,
+               coalesce(nullif(pu.nick_name, ''), pu.user_name, p.parent_name) as parent_name,
+               pu.user_name as parent_account,
+               p.grade_name, p.class_name, p.gender,
+               p.interest_tags, p.status, p.create_by, p.create_time,
+               p.update_by, p.update_time, p.remark
+        from edu_student_profile p
+        left join sys_user su on su.user_id = p.student_user_id
+        left join sys_user pu on pu.user_id = p.parent_user_id
     </sql>
 
     <sql id="profileWhere">
         <where>
             <if test="studentUserId != null">
-                and student_user_id = #{studentUserId}
+                and p.student_user_id = #{studentUserId}
             </if>
             <if test="parentUserId != null">
-                and parent_user_id = #{parentUserId}
+                and p.parent_user_id = #{parentUserId}
             </if>
             <if test="studentName != null and studentName != ''">
-                and student_name like concat('%', #{studentName}, '%')
+                and coalesce(nullif(su.nick_name, ''), su.user_name, p.student_name) like concat('%', #{studentName}, '%')
             </if>
             <if test="parentName != null and parentName != ''">
-                and parent_name like concat('%', #{parentName}, '%')
+                and coalesce(nullif(pu.nick_name, ''), pu.user_name, p.parent_name) like concat('%', #{parentName}, '%')
             </if>
             <if test="gradeName != null and gradeName != ''">
-                and grade_name like concat('%', #{gradeName}, '%')
+                and p.grade_name like concat('%', #{gradeName}, '%')
             </if>
             <if test="className != null and className != ''">
-                and class_name like concat('%', #{className}, '%')
+                and p.class_name like concat('%', #{className}, '%')
             </if>
             <if test="status != null and status != ''">
-                and status = #{status}
+                and p.status = #{status}
             </if>
         </where>
     </sql>
 
     <select id="selectProfileById" parameterType="Long" resultMap="EduProfileResult">
         <include refid="profileSelect"/>
-        where profile_id = #{profileId}
+        where p.profile_id = #{profileId}
     </select>
 
     <select id="selectProfileByStudentUserId" parameterType="Long" resultMap="EduProfileResult">
         <include refid="profileSelect"/>
-        where student_user_id = #{studentUserId}
+        where p.student_user_id = #{studentUserId}
     </select>
 
     <select id="selectProfileList" parameterType="EduStudentProfile" resultMap="EduProfileResult">
         <include refid="profileSelect"/>
         <include refid="profileWhere"/>
-        order by profile_id desc
+        order by p.profile_id desc
     </select>
 
     <insert id="insertProfile" parameterType="EduStudentProfile" useGeneratedKeys="true" keyProperty="profileId">

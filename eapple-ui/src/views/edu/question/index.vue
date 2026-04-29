@@ -105,7 +105,7 @@
           <el-tag :type="scope.row.answerStatus === '1' ? 'success' : 'warning'">{{ scope.row.answerStatus === '1' ? '已解答' : '待解答' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="220">
         <template slot-scope="scope">
           <el-button type="text" size="mini" @click="handleViewAnswer(scope.row)">查看解答</el-button>
           <el-button
@@ -116,7 +116,7 @@
           >
             重新解答
           </el-button>
-          <el-button v-hasPermi="['edu:question:remove']" type="text" size="mini" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-if="canDeleteQuestion(scope.row)" type="text" size="mini" class="danger-text" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -125,9 +125,10 @@
     </section>
 
     <el-dialog title="提交作业问题" :visible.sync="open" width="700px">
+      <div v-loading="submitLoading" element-loading-text="AI 正在生成解答，请稍候..." class="question-submit-panel">
       <el-form ref="form" :model="form" :rules="rules" label-width="90px">
-        <el-form-item label="课程ID">
-          <el-input v-model="form.courseId" placeholder="可选，填写课程 ID" />
+        <el-form-item label="课程">
+          <el-input v-model="form.courseId" placeholder="可选，填写数字 ID 或 QH-C0019 这类课程编号" />
         </el-form-item>
         <el-form-item label="学生ID">
           <el-input v-model="form.studentUserId" placeholder="家长代提交时填写" />
@@ -139,9 +140,26 @@
           <el-input v-model="form.questionContent" type="textarea" :rows="5" />
         </el-form-item>
       </el-form>
+      <div v-if="currentQuestion.questionId" class="answer-panel answer-panel--inline">
+        <div class="answer-head">
+          <strong>{{ currentQuestion.questionTitle || '作业解答详情' }}</strong>
+          <el-tag :type="currentQuestion.answerStatus === '1' ? 'success' : 'warning'" size="mini">
+            {{ currentQuestion.answerStatus === '1' ? '已解答' : '待解答' }}
+          </el-tag>
+        </div>
+        <div class="answer-block">
+          <span>问题内容</span>
+          <p>{{ currentQuestion.questionContent || '暂无问题内容' }}</p>
+        </div>
+        <div class="answer-block answer-result">
+          <span>AI 解答</span>
+          <div class="answer-rich" v-html="renderAnswerHtml(currentQuestion.aiAnswer || '当前暂无解答内容，请稍后再查看。')" />
+        </div>
+      </div>
+      </div>
       <div slot="footer">
-        <el-button type="primary" @click="submitForm">提交并生成 AI 解答</el-button>
-        <el-button @click="open = false">取消</el-button>
+        <el-button type="primary" :loading="submitLoading" @click="submitForm">{{ submitLoading ? 'AI 生成中...' : '提交并生成 AI 解答' }}</el-button>
+        <el-button :disabled="submitLoading" @click="open = false">关闭</el-button>
       </div>
     </el-dialog>
 
@@ -193,6 +211,7 @@ export default {
       total: 0,
       open: false,
       answerOpen: false,
+      submitLoading: false,
       questionList: [],
       statsQuestionList: [],
       currentQuestion: {},
@@ -275,6 +294,7 @@ export default {
     },
     handleAdd() {
       this.form = {}
+      this.currentQuestion = {}
       this.open = true
     },
     renderAnswerHtml(content) {
@@ -283,12 +303,57 @@ export default {
     submitForm() {
       this.$refs.form.validate(valid => {
         if (!valid) return
-        addQuestion(this.form).then(() => {
-          this.$modal.msgSuccess('提交成功')
-          this.open = false
+        const payload = this.buildQuestionPayload()
+        if (payload === null) return
+        this.submitLoading = true
+        this.currentQuestion = {}
+        addQuestion(payload).then(res => {
+          this.currentQuestion = res.data || {}
+          this.$modal.msgSuccess('提交成功，AI 解答已生成')
           this.getList()
+        }).catch(error => {
+          this.$modal.msgWarning(error && error.message ? error.message : 'AI 解答生成失败，请稍后重试')
+        }).finally(() => {
+          this.submitLoading = false
         })
       })
+    },
+    buildQuestionPayload() {
+      const payload = { ...this.form }
+      const courseId = this.normalizeLongInput(payload.courseId, '课程')
+      if (courseId === null) {
+        return null
+      }
+      const studentUserId = this.normalizeLongInput(payload.studentUserId, '学生')
+      if (studentUserId === null) {
+        return null
+      }
+      if (courseId === undefined) {
+        delete payload.courseId
+      } else {
+        payload.courseId = courseId
+      }
+      if (studentUserId === undefined) {
+        delete payload.studentUserId
+      } else {
+        payload.studentUserId = studentUserId
+      }
+      return payload
+    },
+    normalizeLongInput(value, label) {
+      const text = String(value || '').trim()
+      if (!text) {
+        return undefined
+      }
+      if (/^\d+$/.test(text)) {
+        return Number(text)
+      }
+      const courseCodeMatch = text.match(/^QH-C0*(\d+)$/i)
+      if (label === '课程' && courseCodeMatch) {
+        return Number(courseCodeMatch[1])
+      }
+      this.$modal.msgWarning(`${label}编号只能填写数字${label === '课程' ? '，或 QH-C0019 这类课程编号' : ''}`)
+      return null
     },
     handleExport() {
       exportQuestion(this.queryParams)
@@ -334,6 +399,15 @@ export default {
         this.$modal.msgSuccess('删除成功')
         this.getList()
       })
+    },
+    canDeleteQuestion(row) {
+      if (this.isAdminSideRole) {
+        return true
+      }
+      if (this.isStudentOrParentRole) {
+        return true
+      }
+      return this.$auth.hasPermi && this.$auth.hasPermi('edu:question:remove')
     }
   }
 }
@@ -512,6 +586,10 @@ export default {
 .answer-panel {
   display: grid;
   gap: 16px;
+}
+
+.answer-panel--inline {
+  margin-top: 18px;
 }
 
 .answer-head {

@@ -24,6 +24,14 @@ function authRole(role) {
   }
 }
 
+function authExactRole(role) {
+  const roles = store.getters && store.getters.roles
+  if (role && role.length > 0 && Array.isArray(roles)) {
+    return roles.some(v => v === role)
+  }
+  return false
+}
+
 export default {
   // 验证用户是否具备某权限
   hasPermi(permission) {
@@ -44,6 +52,9 @@ export default {
   // 验证用户是否具备某角色
   hasRole(role) {
     return authRole(role)
+  },
+  hasExactRole(role) {
+    return authExactRole(role)
   },
   // 验证用户是否含有指定角色，只需包含其中一个
   hasRoleOr(roles) {

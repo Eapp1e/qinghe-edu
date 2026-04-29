@@ -41,7 +41,7 @@
           <div class="info-panel timeline-panel">
             <div class="panel-head">
               <strong>近期动态</strong>
-              <span>聚合课程、问答与亲子任务等平台动态</span>
+              <span>聚合公告通知、课程、问答与亲子任务等平台动态</span>
             </div>
             <div class="timeline-scroll">
               <el-timeline>
@@ -103,6 +103,7 @@ export default {
         recentQuestions: [],
         recentAiLogs: [],
         recentFamilyTasks: [],
+        recentNotices: [],
         popularCourses: []
       },
       charts: []
@@ -161,6 +162,15 @@ export default {
           key: `course-${item.courseId}`,
           time: this.formatDisplayTime(item.createTime),
           text: `课程《${item.courseName}》已发布`,
+          rawTime: this.getTimeValue(item.createTime)
+        })
+      })
+      ;(this.dashboard.recentNotices || []).slice(0, 5).forEach(item => {
+        const noticeType = item.noticeType === '2' ? '公告' : '通知'
+        pushRecentItem({
+          key: `notice-${item.noticeId}`,
+          time: this.formatDisplayTime(item.createTime),
+          text: `${noticeType}《${item.noticeTitle}》已发布`,
           rawTime: this.getTimeValue(item.createTime)
         })
       })

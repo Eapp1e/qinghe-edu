@@ -33,12 +33,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="enrollmentSelect">
-        select e.enrollment_id, e.course_id, e.course_name, e.student_user_id, e.student_name, e.parent_user_id, e.parent_name,
-               e.teacher_user_id, e.teacher_name, e.status, e.signup_source, e.learning_record, e.interaction_summary,
+        select e.enrollment_id, e.course_id, e.course_name, e.student_user_id,
+               coalesce(nullif(su.nick_name, ''), su.user_name, e.student_name) as student_name,
+               e.parent_user_id,
+               coalesce(nullif(pu.nick_name, ''), pu.user_name, e.parent_name) as parent_name,
+               e.teacher_user_id,
+               coalesce(nullif(tu.nick_name, ''), tu.user_name, e.teacher_name) as teacher_name,
+               e.status, e.signup_source, e.learning_record, e.interaction_summary,
                e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
                c.status as course_status, c.campus, c.week_day, c.start_time, c.end_time, c.start_date, c.end_date
         from edu_course_enrollment e
         left join edu_course c on c.course_id = e.course_id
+        left join sys_user su on su.user_id = e.student_user_id
+        left join sys_user pu on pu.user_id = e.parent_user_id
+        left join sys_user tu on tu.user_id = e.teacher_user_id
     </sql>
 
     <sql id="enrollmentWhere">
@@ -56,13 +64,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and e.student_user_id = #{studentUserId}
             </if>
             <if test="studentName != null and studentName != ''">
-                and e.student_name like concat('%', #{studentName}, '%')
+                and coalesce(nullif(su.nick_name, ''), su.user_name, e.student_name) like concat('%', #{studentName}, '%')
             </if>
             <if test="courseName != null and courseName != ''">
                 and e.course_name like concat('%', #{courseName}, '%')
             </if>
             <if test="teacherName != null and teacherName != ''">
-                and e.teacher_name like concat('%', #{teacherName}, '%')
+                and coalesce(nullif(tu.nick_name, ''), tu.user_name, e.teacher_name) like concat('%', #{teacherName}, '%')
             </if>
             <if test="status != null and status != ''">
                 and e.status = #{status}
@@ -127,6 +135,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="countEnrollments" parameterType="EduCourseEnrollment" resultType="Long">
         select count(1) from edu_course_enrollment e
+        left join sys_user su on su.user_id = e.student_user_id
+        left join sys_user tu on tu.user_id = e.teacher_user_id
         <include refid="enrollmentWhere"/>
     </select>
 </mapper>

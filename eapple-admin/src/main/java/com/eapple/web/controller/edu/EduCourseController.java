@@ -111,13 +111,13 @@ public class EduCourseController extends BaseController
     @PostMapping("/notice/{courseId}")
     public AjaxResult generateNotice(@PathVariable Long courseId)
     {
-        return success(courseService.generateCourseNotice(courseId));
+        return AjaxResult.success("生成成功", courseService.generateCourseNotice(courseId));
     }
 
     @PreAuthorize("@ss.hasPermi('edu:course:edit') or @ss.hasRole('edu_teacher')")
     @PostMapping("/suggestion/{courseId}")
     public AjaxResult generateSuggestion(@PathVariable Long courseId)
     {
-        return success(courseService.generateTeachingSuggestion(courseId));
+        return AjaxResult.success("生成成功", courseService.generateTeachingSuggestion(courseId));
     }
 }

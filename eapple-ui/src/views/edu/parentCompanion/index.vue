@@ -152,7 +152,12 @@
     </section>
 
     <el-dialog :title="historyDialogTitle" :visible.sync="historyDialogOpen" width="760px" append-to-body>
-      <div class="history-detail-body ai-rich-content" v-html="historyDialogHtml"></div>
+      <div
+        v-loading="diagnosisDialogLoading"
+        element-loading-text="AI 正在生成建议，请稍候..."
+        class="history-detail-body ai-rich-content"
+        v-html="historyDialogHtml"
+      ></div>
       <div slot="footer">
         <el-button @click="historyDialogOpen = false">关闭</el-button>
       </div>
@@ -214,6 +219,7 @@ export default {
       activeCategory: 'all',
       children: [],
       aiLoading: false,
+      diagnosisDialogLoading: false,
       historyLoading: false,
       diagnosisResult: '',
       historyList: [],
@@ -443,6 +449,10 @@ export default {
         return
       }
       this.aiLoading = true
+      this.historyDialogTitle = 'AI 诊断建议'
+      this.historyDialogHtml = ''
+      this.historyDialogOpen = true
+      this.diagnosisDialogLoading = true
       generateParentDiagnosis({
         studentUserId: this.diagnosisForm.studentUserId,
         concern
@@ -451,10 +461,13 @@ export default {
         this.diagnosisResult = content || '暂无可展示内容'
         this.openDiagnosisDialog(this.diagnosisResult)
         this.getDiagnosisHistory()
-      }).catch(() => {
-        this.$modal.msgWarning('AI 暂时不可用，请稍后再试')
+      }).catch(error => {
+        const message = error && error.message ? error.message : 'AI 暂时不可用，请稍后再试'
+        this.historyDialogHtml = this.renderSafeAiHtml(message)
+        this.$modal.msgWarning(message)
       }).finally(() => {
         this.aiLoading = false
+        this.diagnosisDialogLoading = false
       })
     },
     resolveDiagnosisContent(res) {
@@ -544,6 +557,7 @@ export default {
       return map[status] || '未知'
     },
     showHistoryDetail(row) {
+      this.diagnosisDialogLoading = false
       const content = row.responseContent || row.errorMessage || '暂无可展示内容'
       this.historyDialogTitle = '建议完整内容'
       this.historyDialogShowMeta = false

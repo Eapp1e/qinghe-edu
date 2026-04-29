@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import com.eapple.common.annotation.DataScope;
 import com.eapple.common.constant.UserConstants;
@@ -62,6 +63,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Autowired
     private ISysDeptService deptService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     protected Validator validator;
@@ -339,7 +343,28 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public int updateUserProfile(SysUser user)
     {
-        return userMapper.updateUser(user);
+        int rows = userMapper.updateUser(user);
+        syncEduDisplayName(user);
+        return rows;
+    }
+
+    private void syncEduDisplayName(SysUser user)
+    {
+        if (user == null || user.getUserId() == null || StringUtils.isEmpty(user.getNickName()))
+        {
+            return;
+        }
+        String displayName = user.getNickName();
+        Long userId = user.getUserId();
+        jdbcTemplate.update("update edu_student_profile set student_name = ? where student_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_student_profile set parent_name = ? where parent_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_course set teacher_name = ? where teacher_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_course_enrollment set student_name = ? where student_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_course_enrollment set parent_name = ? where parent_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_course_enrollment set teacher_name = ? where teacher_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_homework_question set student_name = ? where student_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_family_task set student_name = ? where student_user_id = ?", displayName, userId);
+        jdbcTemplate.update("update edu_family_task set parent_name = ? where parent_user_id = ?", displayName, userId);
     }
 
     /**

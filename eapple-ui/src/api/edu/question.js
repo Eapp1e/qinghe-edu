@@ -20,6 +20,8 @@ export function addQuestion(data) {
   return request({
     url: '/edu/question',
     method: 'post',
+    timeout: 120000,
+    noErrorMessage: true,
     data
   })
 }

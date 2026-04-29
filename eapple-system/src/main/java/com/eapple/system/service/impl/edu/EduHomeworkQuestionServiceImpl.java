@@ -87,6 +87,10 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
     @Override
     public int deleteQuestionByIds(Long[] questionIds)
     {
+        for (Long questionId : questionIds)
+        {
+            verifyQuestionDeletePermission(questionId);
+        }
         return questionMapper.deleteQuestionByIds(questionIds);
     }
 
@@ -124,5 +128,23 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
             return studentUserId;
         }
         return studentUserId;
+    }
+
+    private void verifyQuestionDeletePermission(Long questionId)
+    {
+        EduHomeworkQuestion question = questionMapper.selectQuestionById(questionId);
+        if (question == null)
+        {
+            return;
+        }
+        Long currentUserId = SecurityUtils.getUserId();
+        if (SecurityUtils.hasExactRole("edu_student") && !currentUserId.equals(question.getStudentUserId()))
+        {
+            throw new ServiceException("只能删除自己的作业问答");
+        }
+        if (SecurityUtils.hasExactRole("edu_parent") && !currentUserId.equals(question.getParentUserId()))
+        {
+            throw new ServiceException("只能删除已绑定孩子的作业问答");
+        }
     }
 }

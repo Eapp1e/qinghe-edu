@@ -58,7 +58,8 @@ public class EduHomeworkQuestionController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody EduHomeworkQuestion question)
     {
-        return toAjax(questionService.insertQuestion(question));
+        questionService.insertQuestion(question);
+        return AjaxResult.success("生成成功", questionService.selectQuestionById(question.getQuestionId()));
     }
 
     @PreAuthorize("@ss.hasPermi('edu:question:edit') or @ss.hasAnyRoles('admin,edu_admin,edu_teacher')")
@@ -66,10 +67,10 @@ public class EduHomeworkQuestionController extends BaseController
     @PostMapping("/regenerate/{questionId}")
     public AjaxResult regenerate(@PathVariable Long questionId)
     {
-        return success(questionService.regenerateAnswer(questionId));
+        return AjaxResult.success("生成成功", questionService.regenerateAnswer(questionId));
     }
 
-    @PreAuthorize("@ss.hasPermi('edu:question:remove')")
+    @PreAuthorize("@ss.hasPermi('edu:question:remove') or @ss.hasAnyRoles('admin,edu_admin,edu_parent,edu_student')")
     @DeleteMapping("/{questionIds}")
     public AjaxResult remove(@PathVariable Long[] questionIds)
     {

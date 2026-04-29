@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.eapple.common.utils.SecurityUtils;
+import com.eapple.system.domain.SysNotice;
 import com.eapple.system.domain.edu.EduAiLog;
 import com.eapple.system.domain.edu.EduCourse;
 import com.eapple.system.domain.edu.EduCourseEnrollment;
@@ -11,6 +12,7 @@ import com.eapple.system.domain.edu.EduDashboardVo;
 import com.eapple.system.domain.edu.EduFamilyTask;
 import com.eapple.system.domain.edu.EduHomeworkQuestion;
 import com.eapple.system.domain.edu.EduStudentProfile;
+import com.eapple.system.mapper.SysNoticeMapper;
 import com.eapple.system.mapper.edu.EduAiLogMapper;
 import com.eapple.system.mapper.edu.EduCourseMapper;
 import com.eapple.system.mapper.edu.EduEnrollmentMapper;
@@ -40,6 +42,9 @@ public class EduDashboardServiceImpl implements IEduDashboardService
     @Autowired
     private EduFamilyTaskMapper familyTaskMapper;
 
+    @Autowired
+    private SysNoticeMapper noticeMapper;
+
     @Override
     public EduDashboardVo getDashboard()
     {
@@ -57,6 +62,7 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         EduHomeworkQuestion dynamicQuestionQuery = new EduHomeworkQuestion();
         EduAiLog dynamicLogQuery = new EduAiLog();
         EduFamilyTask dynamicFamilyTaskQuery = new EduFamilyTask();
+        SysNotice noticeQuery = new SysNotice();
 
         applyDashboardScope(dynamicCourseQuery, new EduCourseEnrollment(), dynamicQuestionQuery, dynamicLogQuery,
                 new EduAiLog(), dynamicFamilyTaskQuery, new EduFamilyTask(), new EduStudentProfile());
@@ -69,6 +75,7 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         parentAdviceQuery.setBusinessType("parent_diagnosis");
         parentAdviceQuery.setStatus("success");
         completedFamilyTaskQuery.setStatus("2");
+        noticeQuery.setStatus("0");
 
         vo.setTotalCourses(courseMapper.countCourses(courseQuery));
         vo.setTotalEnrollments(enrollmentMapper.countEnrollments(enrollmentQuery));
@@ -85,11 +92,17 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         List<EduHomeworkQuestion> recentQuestions = questionMapper.selectQuestionList(dynamicQuestionQuery);
         List<EduAiLog> recentAiLogs = aiLogMapper.selectAiLogList(dynamicLogQuery);
         List<EduFamilyTask> recentFamilyTasks = familyTaskMapper.selectTaskList(dynamicFamilyTaskQuery);
+        List<SysNotice> recentNotices = noticeMapper.selectNoticeList(noticeQuery);
+        if (recentNotices.size() > 5)
+        {
+            recentNotices = recentNotices.subList(0, 5);
+        }
         vo.setRecentCourses(recentCourses);
         vo.setPopularCourses(popularCourses);
         vo.setRecentQuestions(recentQuestions);
         vo.setRecentAiLogs(recentAiLogs);
         vo.setRecentFamilyTasks(recentFamilyTasks);
+        vo.setRecentNotices(recentNotices);
         return vo;
     }
 

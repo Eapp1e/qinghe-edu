@@ -66,6 +66,8 @@ public class EduCourse extends BaseEntity
 
     private String runtimeStatus;
 
+    private Long studentUserId;
+
     private Integer recommendationScore;
 
     private String recommendationReason;
@@ -288,6 +290,16 @@ public class EduCourse extends BaseEntity
     public void setRuntimeStatus(String runtimeStatus)
     {
         this.runtimeStatus = runtimeStatus;
+    }
+
+    public Long getStudentUserId()
+    {
+        return studentUserId;
+    }
+
+    public void setStudentUserId(Long studentUserId)
+    {
+        this.studentUserId = studentUserId;
     }
 
     public Integer getRecommendationScore()

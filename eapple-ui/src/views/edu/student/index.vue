@@ -38,7 +38,7 @@
         <article v-for="item in studentList" :key="item.profileId" class="profile-card">
           <div class="profile-head">
             <div>
-              <span class="profile-badge">{{ $auth.hasRole('edu_student') ? '我的档案' : '学生档案' }}</span>
+              <span class="profile-badge">{{ profileBadgeText(item) }}</span>
               <h2>{{ item.studentName }}</h2>
               <p>{{ item.gradeName || '未设置年级' }} · {{ item.className || '未设置班级' }}</p>
             </div>
@@ -407,6 +407,14 @@ export default {
         return '集中查看关联学生的基础档案、班级信息、兴趣标签和智能推荐课程。'
       }
       return '教师端和管理员端可查看全部学生档案，并维护学生基础信息、家长关联关系、年级班级与兴趣标签。'
+    },
+    profileBadgeText() {
+      return item => {
+        if (this.isOwnerView) {
+          return `ID：${item.studentUserId || item.profileId || '--'}`
+        }
+        return '学生档案'
+      }
     }
   },
   created() {

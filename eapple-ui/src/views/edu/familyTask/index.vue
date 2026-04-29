@@ -13,7 +13,7 @@
         </div>
         <div class="stat-card">
           <span>兑换奖励</span>
-          <strong>{{ rewardList.length }}</strong>
+          <strong>{{ rewardCardCount }}</strong>
         </div>
       </div>
     </section>
@@ -59,7 +59,7 @@
 
     <section class="table-section-card task-section-card">
       <div class="task-grid">
-        <article v-for="item in taskList" :key="item.taskId" class="task-card">
+        <article v-for="item in displayTaskList" :key="item.displayKey || item.taskId" class="task-card">
           <div class="task-head">
             <div>
               <span class="task-type">{{ formatType(item.taskType) }}</span>
@@ -83,7 +83,7 @@
           </div>
         </article>
       </div>
-      <el-empty v-if="!loading && !taskList.length" description="暂无亲子任务" />
+      <el-empty v-if="!loading && !displayTaskList.length" description="暂无亲子任务" />
       <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
     </section>
 
@@ -93,7 +93,7 @@
           <h3>积分兑换专区</h3>
         </div>
         <div class="exchange-head-actions">
-          <span v-if="!isAdminView" class="points-balance">{{ isStudent ? '当前剩余' : '孩子剩余' }} {{ availablePoints }} 积分</span>
+          <span v-if="!isAdminView" class="points-balance">{{ pointsBalanceText }}</span>
           <el-button v-if="isParent" type="primary" size="mini" icon="el-icon-plus" class="toolbar-gradient-btn" @click="openRewardDialog">添加奖励</el-button>
         </div>
       </div>
@@ -125,8 +125,8 @@
         </article>
       </div>
       <pagination
-        v-show="rewardList.length > rewardQuery.pageSize"
-        :total="rewardList.length"
+        v-show="rewardPaginationTotal > rewardQuery.pageSize"
+        :total="rewardPaginationTotal"
         :page.sync="rewardQuery.pageNum"
         :limit.sync="rewardQuery.pageSize"
         @pagination="handleRewardPageChange"
@@ -135,8 +135,8 @@
 
     <el-dialog :title="taskDialogTitle" :visible.sync="taskOpen" width="680px" append-to-body>
       <el-form ref="taskForm" :model="form" :rules="rules" label-width="96px">
-        <el-form-item label="孩子" prop="studentUserId">
-          <el-select v-model="form.studentUserId" class="full-width" placeholder="请选择已绑定孩子" :disabled="!!form.taskId">
+        <el-form-item label="孩子" prop="studentUserIds">
+          <el-select v-model="form.studentUserIds" multiple class="full-width" placeholder="请选择已绑定孩子" :disabled="!!form.taskId">
             <el-option v-for="item in children" :key="item.studentUserId" :label="item.studentName" :value="item.studentUserId" />
           </el-select>
         </el-form-item>
@@ -183,6 +183,11 @@
       <el-form ref="rewardForm" :model="rewardForm" :rules="rewardRules" label-width="96px">
         <el-form-item label="奖励名称" prop="title">
           <el-input v-model="rewardForm.title" placeholder="如：周末观影半小时" />
+        </el-form-item>
+        <el-form-item label="适用孩子" prop="studentUserIds">
+          <el-select v-model="rewardForm.studentUserIds" multiple class="full-width" placeholder="请选择可兑换的孩子">
+            <el-option v-for="item in children" :key="item.studentUserId" :label="item.studentName" :value="item.studentUserId" />
+          </el-select>
         </el-form-item>
         <el-form-item label="所需积分" prop="points">
           <el-input-number v-model="rewardForm.points" :min="1" :max="999" class="full-width" />
@@ -308,12 +313,13 @@ export default {
         status: undefined
       },
       rules: {
-        studentUserId: [{ required: true, message: '请选择孩子', trigger: 'change' }],
+        studentUserIds: [{ required: true, type: 'array', min: 1, message: '请选择孩子', trigger: 'change' }],
         taskTitle: [{ required: true, message: '请填写任务标题', trigger: 'blur' }],
         taskType: [{ required: true, message: '请选择任务类型', trigger: 'change' }]
       },
       rewardRules: {
         title: [{ required: true, message: '请填写奖励名称', trigger: 'blur' }],
+        studentUserIds: [{ required: true, type: 'array', min: 1, message: '请选择可兑换的孩子', trigger: 'change' }],
         points: [{ required: true, message: '请设置兑换积分', trigger: 'change' }],
         category: [{ required: true, message: '请选择奖励类型', trigger: 'change' }]
       }
@@ -345,15 +351,59 @@ export default {
       return this.form.taskId ? '编辑亲子任务' : '发布亲子任务'
     },
     availablePoints() {
-      const confirmedCost = this.rewardRequests
-        .filter(item => this.isRewardRequestVisible(item))
-        .filter(item => item.status === 'confirmed')
-        .reduce((sum, item) => sum + Number(item.points || 0), 0)
-      return Math.max((this.summary.points || 0) - confirmedCost, 0)
+      if (this.isParent) {
+        return this.children.reduce((sum, child) => sum + this.availablePointsForStudent(child.studentUserId), 0)
+      }
+      if (this.isStudent) {
+        return this.availablePointsForStudent(this.$store.getters.id)
+      }
+      return this.summary.points || 0
+    },
+    rewardCardCount() {
+      return this.visibleRewardList.length
+    },
+    pointsBalanceText() {
+      if (this.isStudent) {
+        return `当前剩余 ${this.availablePointsForStudent(this.$store.getters.id)} 积分`
+      }
+      const balances = (this.children || []).map(child => this.availablePointsForStudent(child.studentUserId))
+      return `孩子剩余${balances.length ? balances.join('、') : 0}积分`
+    },
+    visibleRewardList() {
+      return this.rewardList.filter(item => this.isRewardVisible(item))
+    },
+    displayTaskList() {
+      if (this.isStudent) {
+        return this.taskList
+      }
+      const grouped = []
+      const groupMap = new Map()
+      ;(this.taskList || []).forEach(item => {
+        const groupKey = this.getTaskGroupKey(item)
+        if (!groupKey) {
+          grouped.push(item)
+          return
+        }
+        if (!groupMap.has(groupKey)) {
+          const group = { ...item, displayKey: groupKey, taskIds: [], taskGroupKey: groupKey, studentNames: [] }
+          groupMap.set(groupKey, group)
+          grouped.push(group)
+        }
+        const group = groupMap.get(groupKey)
+        group.taskIds.push(item.taskId)
+        if (item.studentName && !group.studentNames.includes(item.studentName)) {
+          group.studentNames.push(item.studentName)
+        }
+        group.studentName = group.studentNames.join('、')
+      })
+      return grouped
     },
     paginatedRewardList() {
       const start = (this.rewardQuery.pageNum - 1) * this.rewardQuery.pageSize
-      return this.rewardList.slice(start, start + this.rewardQuery.pageSize)
+      return this.visibleRewardList.slice(start, start + this.rewardQuery.pageSize)
+    },
+    rewardPaginationTotal() {
+      return this.visibleRewardList.length
     },
     reviewProofImage() {
       const images = (this.reviewForm.proofImages || '').split(',').map(item => item.trim()).filter(Boolean)
@@ -361,15 +411,40 @@ export default {
     }
   },
   created() {
+    if (this.isParent) {
+      this.getChildren()
+    }
     this.rewardList = this.loadRewardList()
     this.rewardRequests = this.loadRewardRequests()
     this.getList()
     this.getSummary()
-    if (this.isParent) {
-      this.getChildren()
-    }
   },
   methods: {
+    getTaskGroupKey(item) {
+      const remark = (item && item.remark ? item.remark : '').toString()
+      return remark.indexOf('BATCH_TASK:') === 0 ? remark : ''
+    },
+    buildTaskPayload(studentUserId, batchKey) {
+      const payload = { ...this.form, studentUserId, remark: batchKey }
+      delete payload.studentUserIds
+      delete payload.taskIds
+      delete payload.taskGroupKey
+      delete payload.displayKey
+      delete payload.studentNames
+      return payload
+    },
+    availablePointsForStudent(studentUserId) {
+      const confirmedCost = this.rewardRequests
+        .filter(item => this.isRewardRequestVisible(item))
+        .filter(item => String(item.studentUserId) === String(studentUserId))
+        .filter(item => ['pending', 'confirmed'].includes(item.status))
+        .reduce((sum, item) => sum + Number(item.points || 0), 0)
+      const earned = this.taskList
+        .filter(item => String(item.studentUserId) === String(studentUserId))
+        .filter(item => String(item.status) === '2')
+        .reduce((sum, item) => sum + Number(item.rewardPoints || 0), 0)
+      return Math.max(earned - confirmedCost, 0)
+    },
     getList() {
       this.loading = true
       listFamilyTask(this.queryParams).then(res => {
@@ -398,20 +473,30 @@ export default {
       this.getList()
     },
     handleAdd() {
-      this.form = { taskType: 'habit', rewardPoints: 10, rewardText: '' }
+      this.form = { taskType: 'habit', rewardPoints: 10, rewardText: '', studentUserIds: [] }
       if (this.children.length) {
-        this.form.studentUserId = this.children[0].studentUserId
+        this.form.studentUserIds = this.children.map(item => item.studentUserId)
       }
       this.taskOpen = true
     },
     handleUpdate(row) {
-      this.form = { ...row }
+      const studentUserIds = row.taskGroupKey
+        ? this.taskList.filter(item => this.getTaskGroupKey(item) === row.taskGroupKey).map(item => item.studentUserId)
+        : [row.studentUserId]
+      this.form = { ...row, studentUserIds }
       this.taskOpen = true
     },
     submitTaskForm() {
       this.$refs.taskForm.validate(valid => {
         if (!valid) return
-        const request = this.form.taskId ? updateFamilyTask(this.form) : addFamilyTask(this.form)
+        if (!this.form.studentUserIds || !this.form.studentUserIds.length) {
+          this.$modal.msgWarning('请选择孩子')
+          return
+        }
+        const batchKey = this.form.taskGroupKey || this.form.remark || `BATCH_TASK:${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        const request = this.form.taskId
+          ? Promise.all((this.form.taskIds || [this.form.taskId]).map(taskId => updateFamilyTask({ ...this.buildTaskPayload(this.form.studentUserIds[0], batchKey), taskId })))
+          : Promise.all(this.form.studentUserIds.map(studentUserId => addFamilyTask(this.buildTaskPayload(studentUserId, batchKey))))
         request.then(() => {
           this.$modal.msgSuccess('保存成功')
           this.taskOpen = false
@@ -469,7 +554,8 @@ export default {
       this.submitReview()
     },
     handleDelete(row) {
-      this.$modal.confirm('确认删除该亲子任务吗？').then(() => delFamilyTask(row.taskId)).then(() => {
+      const taskIds = row.taskIds || [row.taskId]
+      this.$modal.confirm('确认删除该亲子任务吗？').then(() => delFamilyTask(taskIds)).then(() => {
         this.$modal.msgSuccess('删除成功')
         this.getList()
         this.getSummary()
@@ -521,7 +607,13 @@ export default {
       localStorage.setItem(FAMILY_REWARD_STORAGE_KEY, JSON.stringify(list || []))
     },
     openRewardDialog() {
-      this.rewardForm = { title: '', points: 10, category: '亲子陪伴', description: '' }
+      this.rewardForm = {
+        title: '',
+        points: 10,
+        category: '亲子陪伴',
+        description: '',
+        studentUserIds: (this.children || []).map(item => item.studentUserId)
+      }
       this.rewardOpen = true
       this.$nextTick(() => {
         if (this.$refs.rewardForm) {
@@ -538,7 +630,10 @@ export default {
           points: this.rewardForm.points,
           category: this.rewardForm.category,
           description: (this.rewardForm.description || '家长确认后完成兑换。').trim(),
-          publisherName: this.rewardForm.publisherName || this.$store.getters.nickName || this.$store.getters.name || '家长'
+          publisherUserId: this.$store.getters.id,
+          publisherName: this.rewardForm.publisherName || this.$store.getters.nickName || this.$store.getters.name || '家长',
+          studentUserIds: (this.rewardForm.studentUserIds || []).map(item => String(item)),
+          studentNames: this.resolveRewardStudentNames(this.rewardForm.studentUserIds || [])
         }
         const customRewards = this.getCustomRewards().filter(item => item.rewardId !== reward.rewardId)
         customRewards.unshift(reward)
@@ -549,7 +644,10 @@ export default {
       })
     },
     editReward(item) {
-      this.rewardForm = { ...item }
+      this.rewardForm = {
+        ...item,
+        studentUserIds: (item.studentUserIds || []).map(item => Number(item))
+      }
       this.rewardOpen = true
       this.$nextTick(() => {
         if (this.$refs.rewardForm) {
@@ -568,6 +666,25 @@ export default {
     },
     saveRewardRequests(list) {
       localStorage.setItem(FAMILY_REWARD_REQUEST_STORAGE_KEY, JSON.stringify(list || []))
+    },
+    resolveRewardStudentNames(studentUserIds) {
+      const idSet = new Set((studentUserIds || []).map(item => String(item)))
+      return (this.children || [])
+        .filter(child => idSet.has(String(child.studentUserId)))
+        .map(child => child.studentName)
+    },
+    isRewardVisible(item) {
+      if (!item) return false
+      if (this.isAdminView) return true
+      if (this.isParent) {
+        const currentName = this.$store.getters.nickName || this.$store.getters.name || ''
+        return String(item.publisherUserId || '') === String(this.$store.getters.id || '') || (!!currentName && item.publisherName === currentName)
+      }
+      if (this.isStudent) {
+        const studentIds = (item.studentUserIds || []).map(id => String(id))
+        return studentIds.includes(String(this.$store.getters.id))
+      }
+      return false
     },
     getRewardRequest(item) {
       return this.rewardRequests.find(request => request.rewardId === item.rewardId && this.isRewardRequestVisible(request)) || {}
@@ -591,7 +708,11 @@ export default {
       if (this.isAdminView) {
         return item.publisherName === '平台预设' ? '' : (item.publisherName || '')
       }
-      const names = (this.children || []).map(child => child.studentName).filter(Boolean)
+      const idSet = new Set((item.studentUserIds || []).map(id => String(id)))
+      const names = (this.children || [])
+        .filter(child => !idSet.size || idSet.has(String(child.studentUserId)))
+        .map(child => child.studentName)
+        .filter(Boolean)
       return names.length ? `适用孩子：${names.join('、')}` : '适用孩子：绑定学生'
     },
     formatRewardPointsText(item) {
@@ -603,26 +724,29 @@ export default {
       return publisher ? `${base} • ${publisher}` : base
     },
     handleRedeem(item) {
-      if (this.availablePoints < item.points) {
+      const studentUserId = this.$store.getters.id
+      if (this.availablePointsForStudent(studentUserId) < item.points) {
         this.$modal.msgWarning('当前积分不足，继续完成亲子任务即可兑换')
         return
       }
       this.rewardRequests = this.rewardRequests
-        .filter(request => request.rewardId !== item.rewardId)
+        .filter(request => !(request.rewardId === item.rewardId && String(request.studentUserId) === String(studentUserId)))
         .concat([{
           rewardId: item.rewardId,
           title: item.title,
           points: item.points,
           status: 'pending',
-          studentUserId: this.$store.getters.id,
+          studentUserId,
           studentName: this.$store.getters.nickName || this.$store.getters.name || '当前学生',
+          parentUserId: item.publisherUserId,
+          parentName: item.publisherName,
           createTime: Date.now()
         }])
       this.saveRewardRequests(this.rewardRequests)
       this.$modal.msgSuccess(`已提交“${item.title}”兑换申请，等待家长确认`)
     },
     handleCancelRedeem(item) {
-      this.rewardRequests = this.rewardRequests.filter(request => request.rewardId !== item.rewardId)
+      this.rewardRequests = this.rewardRequests.filter(request => !(request.rewardId === item.rewardId && String(request.studentUserId) === String(this.$store.getters.id)))
       this.saveRewardRequests(this.rewardRequests)
       this.$modal.msgSuccess('兑换申请已取消')
     },
