@@ -25,49 +25,60 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="questionSelect">
-        select question_id, course_id, course_name, student_user_id, student_name, parent_user_id, teacher_user_id,
-               question_title, question_content, ai_answer, answer_status, safety_flag, create_by, create_time, update_by, update_time, remark
-        from edu_homework_question
+        select q.question_id, q.course_id, q.course_name, q.student_user_id, q.student_name, q.parent_user_id, q.teacher_user_id,
+               q.question_title, q.question_content, q.ai_answer, q.answer_status, q.safety_flag,
+               q.create_by, q.create_time, q.update_by, q.update_time, q.remark
+        from edu_homework_question q
+        left join sys_user su on su.user_id = q.student_user_id
+        left join sys_user pu on pu.user_id = q.parent_user_id
+        left join sys_user tu on tu.user_id = q.teacher_user_id
     </sql>
 
     <sql id="questionWhere">
         <where>
             <if test="courseId != null">
-                and course_id = #{courseId}
+                and q.course_id = #{courseId}
             </if>
             <if test="teacherUserId != null">
-                and teacher_user_id = #{teacherUserId}
+                and q.teacher_user_id = #{teacherUserId}
             </if>
             <if test="parentUserId != null">
-                and parent_user_id = #{parentUserId}
+                and q.parent_user_id = #{parentUserId}
             </if>
             <if test="studentUserId != null">
-                and student_user_id = #{studentUserId}
+                and q.student_user_id = #{studentUserId}
             </if>
             <if test="courseName != null and courseName != ''">
-                and course_name like concat('%', #{courseName}, '%')
+                and q.course_name like concat('%', #{courseName}, '%')
             </if>
             <if test="studentName != null and studentName != ''">
-                and student_name like concat('%', #{studentName}, '%')
+                and q.student_name like concat('%', #{studentName}, '%')
             </if>
             <if test="questionTitle != null and questionTitle != ''">
-                and question_title like concat('%', #{questionTitle}, '%')
+                and q.question_title like concat('%', #{questionTitle}, '%')
             </if>
             <if test="answerStatus != null and answerStatus != ''">
-                and answer_status = #{answerStatus}
+                and q.answer_status = #{answerStatus}
+            </if>
+            <if test="params.schoolId != null">
+                and (
+                    su.school_id = #{params.schoolId}
+                    or pu.school_id = #{params.schoolId}
+                    or tu.school_id = #{params.schoolId}
+                )
             </if>
         </where>
     </sql>
 
     <select id="selectQuestionById" parameterType="Long" resultMap="EduQuestionResult">
         <include refid="questionSelect"/>
-        where question_id = #{questionId}
+        where q.question_id = #{questionId}
     </select>
 
     <select id="selectQuestionList" parameterType="EduHomeworkQuestion" resultMap="EduQuestionResult">
         <include refid="questionSelect"/>
         <include refid="questionWhere"/>
-        order by create_time desc, question_id desc
+        order by q.create_time desc, q.question_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>
@@ -99,7 +110,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <select id="countQuestions" parameterType="EduHomeworkQuestion" resultType="Long">
-        select count(1) from edu_homework_question
+        select count(1) from edu_homework_question q
+        left join sys_user su on su.user_id = q.student_user_id
+        left join sys_user pu on pu.user_id = q.parent_user_id
+        left join sys_user tu on tu.user_id = q.teacher_user_id
         <include refid="questionWhere"/>
     </select>
 </mapper>

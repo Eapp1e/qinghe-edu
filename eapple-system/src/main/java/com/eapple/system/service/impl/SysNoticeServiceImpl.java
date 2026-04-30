@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.eapple.system.domain.SysNotice;
 import com.eapple.system.mapper.SysNoticeMapper;
 import com.eapple.system.service.ISysNoticeService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 /**
  * 公告服务实现。
@@ -39,6 +40,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService
     @Override
     public List<SysNotice> selectNoticeList(SysNotice notice)
     {
+        EduSchoolScopeUtils.applySchoolScope(notice);
         return noticeMapper.selectNoticeList(notice);
     }
 

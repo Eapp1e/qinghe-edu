@@ -794,6 +794,39 @@ where grade_scope is null or grade_scope = '';
 
 update edu_course c set current_capacity = (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0');
 
+set @add_school_id_sql = (
+    select if(
+        count(*) = 0,
+        'alter table sys_user add column school_id bigint(20) default null comment ''学校ID'' after dept_id',
+        'select 1'
+    )
+    from information_schema.columns
+    where table_schema = database() and table_name = 'sys_user' and column_name = 'school_id'
+);
+prepare add_school_id_stmt from @add_school_id_sql;
+execute add_school_id_stmt;
+deallocate prepare add_school_id_stmt;
+
+set @add_school_name_sql = (
+    select if(
+        count(*) = 0,
+        'alter table sys_user add column school_name varchar(64) default '''' comment ''所属学校'' after school_id',
+        'select 1'
+    )
+    from information_schema.columns
+    where table_schema = database() and table_name = 'sys_user' and column_name = 'school_name'
+);
+prepare add_school_name_stmt from @add_school_name_sql;
+execute add_school_name_stmt;
+deallocate prepare add_school_name_stmt;
+
+update sys_user set school_id = null, school_name = null where user_name = 'admin';
+update sys_user
+set school_id = 1, school_name = '青禾学校'
+where user_name <> 'admin'
+  and del_flag = '0'
+  and (school_id is null or school_name is null or school_name = '');
+
 update edu_course set course_code = concat('QH-C', lpad(course_id, 4, '0')) where course_code is null or course_code = '';
 set @add_course_code_index_sql = (
   select if(

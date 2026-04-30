@@ -32,6 +32,12 @@ public class SysUser extends BaseEntity
     @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
 
+    @Excel(name = "所属学校ID", type = Type.EXPORT, cellType = ColumnType.NUMERIC)
+    private Long schoolId;
+
+    @Excel(name = "所属学校")
+    private String schoolName;
+
     /** 用户账号 */
     @Excel(name = "登录名称")
     private String userName;
@@ -132,6 +138,26 @@ public class SysUser extends BaseEntity
     public void setDeptId(Long deptId)
     {
         this.deptId = deptId;
+    }
+
+    public Long getSchoolId()
+    {
+        return schoolId;
+    }
+
+    public void setSchoolId(Long schoolId)
+    {
+        this.schoolId = schoolId;
+    }
+
+    public String getSchoolName()
+    {
+        return schoolName;
+    }
+
+    public void setSchoolName(String schoolName)
+    {
+        this.schoolName = schoolName;
     }
 
     @Xss(message = "用户昵称不能包含脚本字符")
@@ -328,6 +354,8 @@ public class SysUser extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("userId", getUserId())
             .append("deptId", getDeptId())
+            .append("schoolId", getSchoolId())
+            .append("schoolName", getSchoolName())
             .append("userName", getUserName())
             .append("nickName", getNickName())
             .append("email", getEmail())

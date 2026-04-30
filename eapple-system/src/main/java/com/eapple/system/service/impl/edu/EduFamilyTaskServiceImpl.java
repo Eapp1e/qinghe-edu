@@ -17,6 +17,7 @@ import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.mapper.edu.EduFamilyTaskMapper;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.edu.IEduFamilyTaskService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 @Service
 public class EduFamilyTaskServiceImpl implements IEduFamilyTaskService, InitializingBean
@@ -173,6 +174,7 @@ public class EduFamilyTaskServiceImpl implements IEduFamilyTaskService, Initiali
 
     private void applyRoleScope(EduFamilyTask task)
     {
+        EduSchoolScopeUtils.applySchoolScope(task);
         if (SecurityUtils.hasExactRole("edu_parent"))
         {
             task.setParentUserId(SecurityUtils.getUserId());
@@ -216,6 +218,7 @@ public class EduFamilyTaskServiceImpl implements IEduFamilyTaskService, Initiali
     {
         EduStudentProfile query = new EduStudentProfile();
         query.setParentUserId(SecurityUtils.getUserId());
+        EduSchoolScopeUtils.applySchoolScope(query);
         return profileMapper.selectProfileList(query).stream()
                 .map(EduStudentProfile::getStudentUserId)
                 .filter(id -> id != null)

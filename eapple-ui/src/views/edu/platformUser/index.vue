@@ -84,6 +84,9 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column v-if="isSystemAdmin" label="所属学校" min-width="130">
+        <template slot-scope="scope">{{ resolveSchoolName(scope.row) }}</template>
+      </el-table-column>
       <el-table-column label="教师类型" min-width="120">
         <template slot-scope="scope">{{ teacherTypeLabel(scope.row.teacherType) }}</template>
       </el-table-column>
@@ -148,6 +151,10 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="所属学校">
+          <el-input v-model="form.schoolName" disabled />
+          <div class="school-lock-tip">当前测试阶段，学校绑定后暂不支持修改</div>
+        </el-form-item>
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item v-if="form.userId === undefined" label="账号" prop="userName">
@@ -230,6 +237,8 @@ export default {
         status: '0',
         remark: '',
         teacherType: '',
+        schoolId: 1,
+        schoolName: '青禾学校',
         postIds: [],
         roleIds: []
       },
@@ -356,6 +365,8 @@ export default {
         status: '0',
         remark: '',
         teacherType: '',
+        schoolId: 1,
+        schoolName: '青禾学校',
         postIds: [],
         roleIds: []
       }
@@ -506,6 +517,12 @@ export default {
       const text = value == null ? '' : String(value)
       return `"${text.replace(/"/g, '""')}"`
     },
+    resolveSchoolName(row) {
+      if (row && row.userName === 'admin') {
+        return '全平台'
+      }
+      return (row && row.schoolName) || '青禾学校'
+    },
     handleAdd() {
       if (!this.isSystemAdmin) {
         const adminRole = this.allRoles.find(item => item.roleKey === 'edu_admin')
@@ -528,6 +545,7 @@ export default {
           ...this.form,
           ...res.data,
           password: '',
+          schoolName: this.resolveSchoolName(res.data),
           roleIds: res.roleIds || [],
           postIds: res.postIds || []
         }
@@ -595,6 +613,13 @@ export default {
   gap: 18px;
   padding-top: 6px;
   overflow: hidden;
+}
+
+.school-lock-tip {
+  margin-top: 6px;
+  color: #6f8796;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .platform-page::before,

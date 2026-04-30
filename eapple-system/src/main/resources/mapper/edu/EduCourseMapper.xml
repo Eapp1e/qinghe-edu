@@ -182,6 +182,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     </when>
                 </choose>
             </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.schoolId != null">
+                and exists (
+                    select 1 from sys_user tu
+                    where tu.user_id = c.teacher_user_id
+                    and tu.school_id = #{params.schoolId}
+                )
+            </if>
         </where>
     </sql>
 
@@ -262,7 +269,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="courseWhere"/>
     </select>
 
-    <select id="countActiveTeachers" resultType="Long">
-        select count(distinct teacher_user_id) from edu_course where status = '0'
+    <select id="countActiveTeachers" parameterType="EduCourse" resultType="Long">
+        select count(distinct c.teacher_user_id) from edu_course c
+        <where>
+            c.status = '0'
+            <if test="params.schoolId != null">
+                and exists (
+                    select 1 from sys_user tu
+                    where tu.user_id = c.teacher_user_id
+                    and tu.school_id = #{params.schoolId}
+                )
+            </if>
+        </where>
     </select>
 </mapper>

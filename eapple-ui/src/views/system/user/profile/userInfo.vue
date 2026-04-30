@@ -9,6 +9,10 @@
     <el-form-item label="邮箱" prop="email">
       <el-input v-model="form.email" maxlength="50" />
     </el-form-item>
+    <el-form-item label="所属学校">
+      <el-input v-model="form.schoolName" disabled />
+      <div class="profile-lock-tip">学校绑定后暂不支持修改</div>
+    </el-form-item>
     <el-form-item label="性别">
       <el-radio-group v-model="form.sex">
         <el-radio label="0">男</el-radio>
@@ -53,7 +57,7 @@ export default {
     user: {
       handler(user) {
         if (user) {
-          this.form = { nickName: user.nickName, phonenumber: user.phonenumber, email: user.email, sex: user.sex }
+          this.form = { nickName: user.nickName, phonenumber: user.phonenumber, email: user.email, sex: user.sex, schoolName: this.resolveSchoolName(user) }
         }
       },
       immediate: true
@@ -62,7 +66,7 @@ export default {
   methods: {
     reset() {
       const user = this.user || {}
-      this.form = { nickName: user.nickName, phonenumber: user.phonenumber, email: user.email, sex: user.sex }
+      this.form = { nickName: user.nickName, phonenumber: user.phonenumber, email: user.email, sex: user.sex, schoolName: this.resolveSchoolName(user) }
       this.$nextTick(() => {
         this.$refs.form && this.$refs.form.clearValidate()
       })
@@ -79,7 +83,22 @@ export default {
           })
         }
       })
+    },
+    resolveSchoolName(user) {
+      if (user && user.userName === 'admin') {
+        return '全平台'
+      }
+      return (user && user.schoolName) || '青禾学校'
     }
   }
 }
 </script>
+
+<style scoped>
+.profile-lock-tip {
+  margin-top: 6px;
+  color: #6f8796;
+  font-size: 12px;
+  line-height: 1.5;
+}
+</style>

@@ -28,22 +28,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="taskSelect">
-        select task_id, parent_user_id, parent_name, student_user_id, student_name, task_title, task_type,
-               task_content, reward_points, reward_text, due_date, proof_images, student_feedback,
-               parent_comment, status, create_by, create_time, update_by, update_time, remark
-        from edu_family_task
+        select t.task_id, t.parent_user_id, t.parent_name, t.student_user_id, t.student_name, t.task_title, t.task_type,
+               t.task_content, t.reward_points, t.reward_text, t.due_date, t.proof_images, t.student_feedback,
+               t.parent_comment, t.status, t.create_by, t.create_time, t.update_by, t.update_time, t.remark
+        from edu_family_task t
+        left join sys_user pu on pu.user_id = t.parent_user_id
+        left join sys_user su on su.user_id = t.student_user_id
     </sql>
 
     <sql id="taskWhere">
         <where>
             <if test="parentUserId != null">
-                and parent_user_id = #{parentUserId}
+                and t.parent_user_id = #{parentUserId}
             </if>
             <if test="studentUserId != null">
-                and student_user_id = #{studentUserId}
+                and t.student_user_id = #{studentUserId}
             </if>
             <if test="boundStudentUserIds != null and boundStudentUserIds.size > 0">
-                and student_user_id in
+                and t.student_user_id in
                 <foreach collection="boundStudentUserIds" item="studentId" open="(" separator="," close=")">
                     #{studentId}
                 </foreach>
@@ -52,33 +54,41 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and 1 = 0
             </if>
             <if test="taskTitle != null and taskTitle != ''">
-                and task_title like concat('%', #{taskTitle}, '%')
+                and t.task_title like concat('%', #{taskTitle}, '%')
             </if>
             <if test="taskType != null and taskType != ''">
-                and task_type = #{taskType}
+                and t.task_type = #{taskType}
             </if>
             <if test="status != null and status != ''">
-                and status = #{status}
+                and t.status = #{status}
+            </if>
+            <if test="params.schoolId != null">
+                and (
+                    pu.school_id = #{params.schoolId}
+                    or su.school_id = #{params.schoolId}
+                )
             </if>
         </where>
     </sql>
 
     <select id="selectTaskById" parameterType="Long" resultMap="EduFamilyTaskResult">
         <include refid="taskSelect"/>
-        where task_id = #{taskId}
+        where t.task_id = #{taskId}
     </select>
 
     <select id="selectTaskList" parameterType="EduFamilyTask" resultMap="EduFamilyTaskResult">
         <include refid="taskSelect"/>
         <include refid="taskWhere"/>
-        order by ifnull(update_time, create_time) desc, task_id desc
+        order by ifnull(t.update_time, t.create_time) desc, t.task_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>
     </select>
 
     <select id="countTasks" parameterType="EduFamilyTask" resultType="Long">
-        select count(1) from edu_family_task
+        select count(1) from edu_family_task t
+        left join sys_user pu on pu.user_id = t.parent_user_id
+        left join sys_user su on su.user_id = t.student_user_id
         <include refid="taskWhere"/>
     </select>
 

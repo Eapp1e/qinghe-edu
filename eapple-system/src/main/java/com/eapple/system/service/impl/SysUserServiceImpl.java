@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ import com.eapple.system.mapper.SysUserRoleMapper;
 import com.eapple.system.service.ISysConfigService;
 import com.eapple.system.service.ISysDeptService;
 import com.eapple.system.service.ISysUserService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 /**
  * 用户 业务层处理
@@ -39,7 +41,7 @@ import com.eapple.system.service.ISysUserService;
  * @author Eapp1e
  */
 @Service
-public class SysUserServiceImpl implements ISysUserService
+public class SysUserServiceImpl implements ISysUserService, InitializingBean
 {
     private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
@@ -70,6 +72,12 @@ public class SysUserServiceImpl implements ISysUserService
     @Autowired
     protected Validator validator;
 
+    @Override
+    public void afterPropertiesSet()
+    {
+        ensureSchoolColumns();
+    }
+
     /**
      * 根据条件分页查询用户列表
      * 
@@ -80,6 +88,7 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user)
     {
+        EduSchoolScopeUtils.applySchoolScope(user);
         return userMapper.selectUserList(user);
     }
 
@@ -93,6 +102,7 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user)
     {
+        EduSchoolScopeUtils.applySchoolScope(user);
         return userMapper.selectAllocatedList(user);
     }
 
@@ -106,6 +116,7 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user)
     {
+        EduSchoolScopeUtils.applySchoolScope(user);
         return userMapper.selectUnallocatedList(user);
     }
 
@@ -265,6 +276,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Transactional
     public int insertUser(SysUser user)
     {
+        EduSchoolScopeUtils.bindDefaultSchool(user);
         // 新增用户信息
         int rows = userMapper.insertUser(user);
         // 新增用户岗位关联
@@ -283,6 +295,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public boolean registerUser(SysUser user)
     {
+        EduSchoolScopeUtils.bindDefaultSchool(user);
         return userMapper.insertUser(user) > 0;
     }
 
@@ -545,6 +558,7 @@ public class SysUserServiceImpl implements ISysUserService
                     String password = configService.selectConfigByKey("sys.user.initPassword");
                     user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);
+                    EduSchoolScopeUtils.bindDefaultSchool(user);
                     userMapper.insertUser(user);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 导入成功");
@@ -586,5 +600,30 @@ public class SysUserServiceImpl implements ISysUserService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    private void ensureSchoolColumns()
+    {
+        ensureColumn("school_id",
+                "alter table sys_user add column school_id bigint(20) default null comment '学校ID' after dept_id");
+        ensureColumn("school_name",
+                "alter table sys_user add column school_name varchar(64) default '' comment '所属学校' after school_id");
+        jdbcTemplate.update("update sys_user set school_id = null, school_name = null where user_name = 'admin'");
+        jdbcTemplate.update("update sys_user set school_id = ?, school_name = ? "
+                        + "where user_name <> 'admin' and del_flag = '0' "
+                        + "and (school_id is null or school_name is null or school_name = '')",
+                EduSchoolScopeUtils.DEFAULT_SCHOOL_ID, EduSchoolScopeUtils.DEFAULT_SCHOOL_NAME);
+    }
+
+    private void ensureColumn(String columnName, String sql)
+    {
+        Integer count = jdbcTemplate.queryForObject(
+                "select count(1) from information_schema.columns "
+                        + "where table_schema = database() and table_name = 'sys_user' and column_name = ?",
+                Integer.class, columnName);
+        if (count == null || count == 0)
+        {
+            jdbcTemplate.execute(sql);
+        }
     }
 }

@@ -9,6 +9,7 @@ import com.eapple.common.utils.SecurityUtils;
 import com.eapple.system.domain.edu.EduAiLog;
 import com.eapple.system.mapper.edu.EduAiLogMapper;
 import com.eapple.system.service.edu.IEduAiLogService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 @Service
 public class EduAiLogServiceImpl implements IEduAiLogService
@@ -19,6 +20,7 @@ public class EduAiLogServiceImpl implements IEduAiLogService
     @Override
     public List<EduAiLog> selectAiLogList(EduAiLog log)
     {
+        EduSchoolScopeUtils.applySchoolScope(log);
         return aiLogMapper.selectAiLogList(log);
     }
 
@@ -30,6 +32,7 @@ public class EduAiLogServiceImpl implements IEduAiLogService
             log = new EduAiLog();
         }
         log.setUserId(SecurityUtils.getUserId());
+        EduSchoolScopeUtils.applySchoolScope(log);
         return aiLogMapper.selectAiLogList(log);
     }
 
@@ -72,12 +75,15 @@ public class EduAiLogServiceImpl implements IEduAiLogService
     {
         EduAiLog totalQuery = copyLog(baseLog);
         totalQuery.setStatus(null);
+        EduSchoolScopeUtils.applySchoolScope(totalQuery);
 
         EduAiLog successQuery = copyLog(baseLog);
         successQuery.setStatus("success");
+        EduSchoolScopeUtils.applySchoolScope(successQuery);
 
         EduAiLog failedQuery = copyLog(baseLog);
         failedQuery.setStatus("failed");
+        EduSchoolScopeUtils.applySchoolScope(failedQuery);
 
         Map<String, Long> summary = new HashMap<>(4);
         summary.put("total", aiLogMapper.countAiLogs(totalQuery));

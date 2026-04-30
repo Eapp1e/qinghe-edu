@@ -39,6 +39,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createBy != null and createBy != ''">
 				AND create_by like concat('%', #{createBy}, '%')
 			</if>
+			<if test="status != null and status != ''">
+				AND status = #{status}
+			</if>
+			<if test="params.schoolId != null">
+				AND (
+					create_by = 'admin'
+					OR exists (
+						select 1 from sys_user u
+						where u.user_name = sys_notice.create_by
+						and u.school_id = #{params.schoolId}
+					)
+				)
+			</if>
 		</where>
 		order by notice_id desc
     </select>

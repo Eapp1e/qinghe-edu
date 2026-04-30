@@ -13,6 +13,7 @@ import com.eapple.system.mapper.edu.EduHomeworkQuestionMapper;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.edu.IEduAiService;
 import com.eapple.system.service.edu.IEduHomeworkQuestionService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 @Service
 public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionService
@@ -44,6 +45,7 @@ public class EduHomeworkQuestionServiceImpl implements IEduHomeworkQuestionServi
         {
             question.setStudentUserId(SecurityUtils.getUserId());
         }
+        EduSchoolScopeUtils.applySchoolScope(question);
         return questionMapper.selectQuestionList(question);
     }
 

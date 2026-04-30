@@ -24,5 +24,5 @@ public interface EduCourseMapper
 
     Long countCourses(EduCourse course);
 
-    Long countActiveTeachers();
+    Long countActiveTeachers(EduCourse course);
 }

@@ -30,6 +30,7 @@ import com.eapple.system.mapper.edu.EduEnrollmentMapper;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.edu.IEduAiService;
 import com.eapple.system.service.edu.IEduCourseService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 @Service
 public class EduCourseServiceImpl implements IEduCourseService
@@ -245,6 +246,7 @@ public class EduCourseServiceImpl implements IEduCourseService
 
         EduCourse query = new EduCourse();
         query.setStatus("0");
+        EduSchoolScopeUtils.applySchoolScope(query);
         List<EduCourse> allCourses = courseMapper.selectCourseList(query);
         List<EduCourse> recommendations = new ArrayList<>();
         Set<String> interestKeywords = extractKeywords(profile.getInterestTags());
@@ -295,6 +297,7 @@ public class EduCourseServiceImpl implements IEduCourseService
 
     private void fillQueryScope(EduCourse course, boolean onlyMine)
     {
+        EduSchoolScopeUtils.applySchoolScope(course);
         if (SecurityUtils.hasExactRole("edu_teacher"))
         {
             course.setTeacherUserId(SecurityUtils.getUserId());
@@ -318,6 +321,7 @@ public class EduCourseServiceImpl implements IEduCourseService
             course.getParams().put("onlyMine", onlyMine);
             EduStudentProfile profileQuery = new EduStudentProfile();
             profileQuery.setParentUserId(SecurityUtils.getUserId());
+            EduSchoolScopeUtils.applySchoolScope(profileQuery);
             List<EduStudentProfile> children = profileMapper.selectProfileList(profileQuery);
             EduStudentProfile selectedChild = resolveParentSelectedChild(course, children);
             if (selectedChild != null)

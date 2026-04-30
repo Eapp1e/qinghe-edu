@@ -24,33 +24,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="logSelect">
-        select log_id, business_type, biz_id, user_id, user_name, role_type, prompt_content, response_content,
-               model_name, status, risk_flag, error_message, prompt_tokens, completion_tokens, latency_ms, create_time
-        from edu_ai_log
+        select l.log_id, l.business_type, l.biz_id, l.user_id, l.user_name, l.role_type, l.prompt_content, l.response_content,
+               l.model_name, l.status, l.risk_flag, l.error_message, l.prompt_tokens, l.completion_tokens, l.latency_ms, l.create_time
+        from edu_ai_log l
+        left join sys_user u on u.user_id = l.user_id
     </sql>
 
     <sql id="logWhere">
         <where>
             <if test="businessType != null and businessType != ''">
-                and business_type = #{businessType}
+                and l.business_type = #{businessType}
             </if>
             <if test="userId != null">
-                and user_id = #{userId}
+                and l.user_id = #{userId}
             </if>
             <if test="bizId != null">
-                and biz_id = #{bizId}
+                and l.biz_id = #{bizId}
             </if>
             <if test="studentName != null and studentName != ''">
-                and prompt_content like concat('%学生：', #{studentName}, '%')
+                and l.prompt_content like concat('%学生：', #{studentName}, '%')
             </if>
             <if test="concern != null and concern != ''">
-                and prompt_content like concat('%家长补充关注：%', #{concern}, '%')
+                and l.prompt_content like concat('%家长补充关注：%', #{concern}, '%')
             </if>
             <if test="promptContent != null and promptContent != ''">
-                and prompt_content like concat('%', #{promptContent}, '%')
+                and l.prompt_content like concat('%', #{promptContent}, '%')
             </if>
             <if test="status != null and status != ''">
-                and status = #{status}
+                and l.status = #{status}
+            </if>
+            <if test="params.schoolId != null">
+                and u.school_id = #{params.schoolId}
             </if>
         </where>
     </sql>
@@ -58,7 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectAiLogList" parameterType="EduAiLog" resultMap="EduAiLogResult">
         <include refid="logSelect"/>
         <include refid="logWhere"/>
-        order by create_time desc, log_id desc
+        order by l.create_time desc, l.log_id desc
         <if test="params.limitTop != null">
             limit #{params.limitTop}
         </if>
@@ -90,7 +94,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <select id="countAiLogs" parameterType="EduAiLog" resultType="Long">
-        select count(1) from edu_ai_log
+        select count(1) from edu_ai_log l
+        left join sys_user u on u.user_id = l.user_id
         <include refid="logWhere"/>
     </select>
 </mapper>

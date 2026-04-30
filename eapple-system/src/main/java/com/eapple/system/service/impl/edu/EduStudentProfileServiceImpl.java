@@ -9,6 +9,7 @@ import com.eapple.system.domain.edu.EduStudentProfile;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.ISysUserService;
 import com.eapple.system.service.edu.IEduStudentProfileService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         {
             profile.setStudentUserId(SecurityUtils.getUserId());
         }
+        EduSchoolScopeUtils.applySchoolScope(profile);
         return profileMapper.selectProfileList(profile);
     }
 
@@ -50,6 +52,7 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     {
         EduStudentProfile profile = new EduStudentProfile();
         profile.setParentUserId(SecurityUtils.getUserId());
+        EduSchoolScopeUtils.applySchoolScope(profile);
         return profileMapper.selectProfileList(profile);
     }
 
@@ -135,6 +138,11 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         if (!hasParentRole(parentUser))
         {
             throw new ServiceException("绑定失败，所填账号不是家长账号");
+        }
+        Long currentSchoolId = EduSchoolScopeUtils.getCurrentSchoolId();
+        if (!SecurityUtils.isAdmin() && currentSchoolId != null && !currentSchoolId.equals(parentUser.getSchoolId()))
+        {
+            throw new ServiceException("只能绑定本学校的家长账号");
         }
         profile.setParentUserId(parentUser.getUserId());
         profile.setParentName(StringUtils.defaultString(parentUser.getNickName(), parentUser.getUserName()));

@@ -75,6 +75,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">
                 and e.status = #{status}
             </if>
+            <if test="params.schoolId != null">
+                and (
+                    su.school_id = #{params.schoolId}
+                    or pu.school_id = #{params.schoolId}
+                    or tu.school_id = #{params.schoolId}
+                )
+            </if>
         </where>
     </sql>
 
@@ -136,6 +143,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="countEnrollments" parameterType="EduCourseEnrollment" resultType="Long">
         select count(1) from edu_course_enrollment e
         left join sys_user su on su.user_id = e.student_user_id
+        left join sys_user pu on pu.user_id = e.parent_user_id
         left join sys_user tu on tu.user_id = e.teacher_user_id
         <include refid="enrollmentWhere"/>
     </select>

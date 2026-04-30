@@ -35,6 +35,10 @@
             <strong>{{ user.userId || '--' }}</strong>
           </div>
           <div class="fact-item">
+            <span>所属学校</span>
+            <strong>{{ schoolName }}</strong>
+          </div>
+          <div class="fact-item">
             <span>手机号码</span>
             <strong>{{ user.phonenumber || '--' }}</strong>
           </div>
@@ -91,6 +95,14 @@ export default {
       roleGroup: '',
       postGroup: '',
       selectedTab: 'userinfo'
+    }
+  },
+  computed: {
+    schoolName() {
+      if (this.user && this.user.userName === 'admin') {
+        return '全平台'
+      }
+      return (this.user && this.user.schoolName) || '青禾学校'
     }
   },
   created() {

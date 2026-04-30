@@ -60,6 +60,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">
                 and p.status = #{status}
             </if>
+            <if test="params.schoolId != null">
+                and (
+                    su.school_id = #{params.schoolId}
+                    or pu.school_id = #{params.schoolId}
+                )
+            </if>
         </where>
     </sql>
 
@@ -112,14 +118,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <select id="countActiveStudents" parameterType="EduStudentProfile" resultType="Long">
-        select count(1) from edu_student_profile
+        select count(1) from edu_student_profile p
+        left join sys_user su on su.user_id = p.student_user_id
+        left join sys_user pu on pu.user_id = p.parent_user_id
         <where>
-            status = '0'
+            p.status = '0'
             <if test="studentUserId != null">
-                and student_user_id = #{studentUserId}
+                and p.student_user_id = #{studentUserId}
             </if>
             <if test="parentUserId != null">
-                and parent_user_id = #{parentUserId}
+                and p.parent_user_id = #{parentUserId}
+            </if>
+            <if test="params.schoolId != null">
+                and (
+                    su.school_id = #{params.schoolId}
+                    or pu.school_id = #{params.schoolId}
+                )
             </if>
         </where>
     </select>

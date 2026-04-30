@@ -8,6 +8,7 @@ import com.eapple.common.utils.SecurityUtils;
 import com.eapple.system.domain.edu.EduCourseEnrollment;
 import com.eapple.system.mapper.edu.EduEnrollmentMapper;
 import com.eapple.system.service.edu.IEduEnrollmentService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 @Service
 public class EduEnrollmentServiceImpl implements IEduEnrollmentService
@@ -30,6 +31,7 @@ public class EduEnrollmentServiceImpl implements IEduEnrollmentService
         {
             enrollment.setStudentUserId(SecurityUtils.getUserId());
         }
+        EduSchoolScopeUtils.applySchoolScope(enrollment);
         return enrollmentMapper.selectEnrollmentList(enrollment);
     }
 

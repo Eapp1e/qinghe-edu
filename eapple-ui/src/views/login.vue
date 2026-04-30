@@ -167,6 +167,14 @@
           <el-input v-model.trim="registerForm.username" placeholder="请输入字母或数字账号" maxlength="20" />
         </el-form-item>
 
+        <el-form-item prop="schoolName">
+          <template slot="label">
+            <span class="required-label"><i>*</i> 所属学校</span>
+          </template>
+          <el-input v-model="registerForm.schoolName" disabled />
+          <div class="school-lock-tip">当前测试阶段，无法绑定其他学校</div>
+        </el-form-item>
+
         <el-form-item v-if="registerForm.loginRole === 'edu_teacher'" prop="teacherType">
           <template slot="label">
             <span class="required-label"><i>*</i> 教师类型</span>
@@ -312,10 +320,13 @@ export default {
         password: '',
         confirmPassword: '',
         loginRole: 'edu_student',
-        teacherType: ''
+        teacherType: '',
+        schoolId: 1,
+        schoolName: '青禾学校'
       },
       registerRules: {
         loginRole: [{ required: true, trigger: 'change', message: '请选择注册身份' }],
+        schoolName: [{ required: true, trigger: 'blur', message: '请选择所属学校' }],
         teacherType: [{ required: true, trigger: 'change', message: '请选择教师类型' }],
         username: [{ validator: validateRegisterUsername, trigger: 'blur' }],
         password: [
@@ -376,7 +387,9 @@ export default {
         password: '',
         confirmPassword: '',
         loginRole: 'edu_student',
-        teacherType: ''
+        teacherType: '',
+        schoolId: 1,
+        schoolName: '青禾学校'
       }
     },
     selectRegisterRole(role) {
@@ -424,7 +437,9 @@ export default {
           username: this.registerForm.username,
           password: this.registerForm.password,
           loginRole: this.registerForm.loginRole,
-          teacherType: this.registerForm.teacherType
+          teacherType: this.registerForm.teacherType,
+          schoolId: this.registerForm.schoolId,
+          schoolName: this.registerForm.schoolName
         }).then(response => {
           this.$message.success(response.msg || '注册成功，请返回登录')
           this.loginForm.username = this.registerForm.username
@@ -1259,6 +1274,13 @@ export default {
   color: #718797;
   font-size: 13px;
   line-height: 1.6;
+}
+
+.school-lock-tip {
+  margin-top: 6px;
+  color: #6f8796;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .register-teacher-type {

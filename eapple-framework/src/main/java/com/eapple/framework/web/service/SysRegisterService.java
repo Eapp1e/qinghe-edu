@@ -19,6 +19,7 @@ import com.eapple.framework.manager.factory.AsyncFactory;
 import com.eapple.system.mapper.SysRoleMapper;
 import com.eapple.system.service.ISysConfigService;
 import com.eapple.system.service.ISysUserService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -102,6 +103,7 @@ public class SysRegisterService
                 return "请选择有效的教师类型";
             }
             sysUser.setNickName(username);
+            EduSchoolScopeUtils.bindDefaultSchool(sysUser);
             if (StringUtils.equals(loginRole, "edu_teacher"))
             {
                 sysUser.setTeacherType(teacherType);

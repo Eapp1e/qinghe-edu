@@ -20,6 +20,7 @@ import com.eapple.system.mapper.edu.EduFamilyTaskMapper;
 import com.eapple.system.mapper.edu.EduHomeworkQuestionMapper;
 import com.eapple.system.mapper.edu.EduStudentProfileMapper;
 import com.eapple.system.service.edu.IEduDashboardService;
+import com.eapple.system.util.EduSchoolScopeUtils;
 
 @Service
 public class EduDashboardServiceImpl implements IEduDashboardService
@@ -64,6 +65,11 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         EduFamilyTask dynamicFamilyTaskQuery = new EduFamilyTask();
         SysNotice noticeQuery = new SysNotice();
 
+        applySchoolScope(courseQuery, enrollmentQuery, questionQuery, logQuery, parentAdviceQuery,
+                familyTaskQuery, completedFamilyTaskQuery, profileQuery);
+        applySchoolScope(dynamicCourseQuery, new EduCourseEnrollment(), dynamicQuestionQuery, dynamicLogQuery,
+                new EduAiLog(), dynamicFamilyTaskQuery, new EduFamilyTask(), new EduStudentProfile());
+        EduSchoolScopeUtils.applySchoolScope(noticeQuery);
         applyDashboardScope(dynamicCourseQuery, new EduCourseEnrollment(), dynamicQuestionQuery, dynamicLogQuery,
                 new EduAiLog(), dynamicFamilyTaskQuery, new EduFamilyTask(), new EduStudentProfile());
 
@@ -82,10 +88,10 @@ public class EduDashboardServiceImpl implements IEduDashboardService
         vo.setTotalQuestions(questionMapper.countQuestions(questionQuery));
         vo.setTotalAiCalls(aiLogMapper.countAiLogs(logQuery));
         vo.setTotalParentAdvices(aiLogMapper.countAiLogs(parentAdviceQuery));
-        vo.setTotalFamilyTasks(familyTaskMapper.countTasks(new EduFamilyTask()));
+        vo.setTotalFamilyTasks(familyTaskMapper.countTasks(familyTaskQuery));
         vo.setCompletedFamilyTasks(familyTaskMapper.countTasks(completedFamilyTaskQuery));
         vo.setActiveStudents(profileMapper.countActiveStudents(profileQuery));
-        vo.setActiveTeachers(courseMapper.countActiveTeachers());
+        vo.setActiveTeachers(courseMapper.countActiveTeachers(courseQuery));
 
         List<EduCourse> recentCourses = courseMapper.selectCourseList(courseQuery);
         List<EduCourse> popularCourses = courseMapper.selectPopularCourses(courseQuery);
@@ -154,5 +160,19 @@ public class EduDashboardServiceImpl implements IEduDashboardService
             courseQuery.getParams().put("currentRole", "student");
             courseQuery.getParams().put("onlyMine", true);
         }
+    }
+
+    private void applySchoolScope(EduCourse courseQuery, EduCourseEnrollment enrollmentQuery,
+            EduHomeworkQuestion questionQuery, EduAiLog logQuery, EduAiLog parentAdviceQuery,
+            EduFamilyTask familyTaskQuery, EduFamilyTask completedFamilyTaskQuery, EduStudentProfile profileQuery)
+    {
+        EduSchoolScopeUtils.applySchoolScope(courseQuery);
+        EduSchoolScopeUtils.applySchoolScope(enrollmentQuery);
+        EduSchoolScopeUtils.applySchoolScope(questionQuery);
+        EduSchoolScopeUtils.applySchoolScope(logQuery);
+        EduSchoolScopeUtils.applySchoolScope(parentAdviceQuery);
+        EduSchoolScopeUtils.applySchoolScope(familyTaskQuery);
+        EduSchoolScopeUtils.applySchoolScope(completedFamilyTaskQuery);
+        EduSchoolScopeUtils.applySchoolScope(profileQuery);
     }
 }
