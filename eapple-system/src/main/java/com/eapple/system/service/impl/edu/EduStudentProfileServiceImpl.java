@@ -1,5 +1,6 @@
 package com.eapple.system.service.impl.edu;
 
+import java.util.List;
 import com.eapple.common.core.domain.entity.SysRole;
 import com.eapple.common.core.domain.entity.SysUser;
 import com.eapple.common.exception.ServiceException;
@@ -12,8 +13,6 @@ import com.eapple.system.service.edu.IEduStudentProfileService;
 import com.eapple.system.util.EduSchoolScopeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class EduStudentProfileServiceImpl implements IEduStudentProfileService
@@ -63,6 +62,42 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     }
 
     @Override
+    public EduStudentProfile validateManagedStudent(Long studentUserId)
+    {
+        SysUser studentUser = requireUser(studentUserId, "学生账号不存在");
+        if (!hasRole(studentUser, "edu_student"))
+        {
+            throw new ServiceException("所选账号不是学生账号");
+        }
+        ensureSameSchool(studentUser, "只能为本学校学生账号新建档案");
+        if (profileMapper.selectProfileByStudentUserId(studentUserId) != null)
+        {
+            throw new ServiceException("该学生档案已存在");
+        }
+
+        EduStudentProfile profile = new EduStudentProfile();
+        profile.setStudentUserId(studentUser.getUserId());
+        profile.setStudentName(displayName(studentUser));
+        return profile;
+    }
+
+    @Override
+    public EduStudentProfile validateManagedParent(Long parentUserId)
+    {
+        SysUser parentUser = requireUser(parentUserId, "家长账号不存在");
+        if (!hasRole(parentUser, "edu_parent"))
+        {
+            throw new ServiceException("所选家长账号不是家长账号");
+        }
+        ensureSameSchool(parentUser, "只能绑定本学校家长账号");
+
+        EduStudentProfile profile = new EduStudentProfile();
+        profile.setParentUserId(parentUser.getUserId());
+        profile.setParentName(displayName(parentUser));
+        return profile;
+    }
+
+    @Override
     public int insertProfile(EduStudentProfile profile)
     {
         if (SecurityUtils.hasExactRole("edu_student"))
@@ -71,19 +106,21 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
             if (StringUtils.isEmpty(profile.getStudentName()))
             {
                 SysUser currentUser = userService.selectUserById(SecurityUtils.getUserId());
-                profile.setStudentName(currentUser == null
-                        ? SecurityUtils.getUsername()
-                        : StringUtils.defaultString(currentUser.getNickName(), currentUser.getUserName()));
+                profile.setStudentName(currentUser == null ? SecurityUtils.getUsername() : displayName(currentUser));
             }
             bindParentByAccount(profile);
             if (profile.getParentUserId() == null)
             {
                 throw new ServiceException("首次完善档案时，请先绑定家长账号");
             }
+            if (profileMapper.selectProfileByStudentUserId(profile.getStudentUserId()) != null)
+            {
+                throw new ServiceException("该学生档案已存在");
+            }
         }
-        if (profileMapper.selectProfileByStudentUserId(profile.getStudentUserId()) != null)
+        else
         {
-            throw new ServiceException("该学生档案已存在");
+            prepareManagedProfileForCreate(profile);
         }
         ensureProfileEditable(profile);
         profile.setCreateBy(SecurityUtils.getUsername());
@@ -97,9 +134,10 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
     {
         EduStudentProfile currentProfile = profileMapper.selectProfileById(profile.getProfileId());
         ensureProfileEditable(currentProfile);
+        profile.setStudentUserId(currentProfile.getStudentUserId());
+        profile.setParentUserId(currentProfile.getParentUserId());
         if (SecurityUtils.hasExactRole("edu_student"))
         {
-            profile.setStudentUserId(currentProfile.getStudentUserId());
             profile.setStatus(currentProfile.getStatus());
             bindParentByAccount(profile);
             if (StringUtils.isEmpty(profile.getParentAccount()))
@@ -107,6 +145,10 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
                 profile.setParentUserId(currentProfile.getParentUserId());
                 profile.setParentName(currentProfile.getParentName());
             }
+        }
+        else
+        {
+            profile.setParentName(currentProfile.getParentName());
         }
         profile.setUpdateBy(SecurityUtils.getUsername());
         int rows = profileMapper.updateProfile(profile);
@@ -124,6 +166,18 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         return profileMapper.deleteProfileByIds(profileIds);
     }
 
+    private void prepareManagedProfileForCreate(EduStudentProfile profile)
+    {
+        EduStudentProfile studentProfile = validateManagedStudent(profile.getStudentUserId());
+        EduStudentProfile parentProfile = validateManagedParent(profile.getParentUserId());
+
+        if (StringUtils.isEmpty(profile.getStudentName()))
+        {
+            profile.setStudentName(studentProfile.getStudentName());
+        }
+        profile.setParentName(parentProfile.getParentName());
+    }
+
     private void bindParentByAccount(EduStudentProfile profile)
     {
         if (StringUtils.isEmpty(profile.getParentAccount()))
@@ -135,17 +189,13 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         {
             throw new ServiceException("未找到对应的家长账号");
         }
-        if (!hasParentRole(parentUser))
+        if (!hasRole(parentUser, "edu_parent"))
         {
             throw new ServiceException("绑定失败，所填账号不是家长账号");
         }
-        Long currentSchoolId = EduSchoolScopeUtils.getCurrentSchoolId();
-        if (!SecurityUtils.isAdmin() && currentSchoolId != null && !currentSchoolId.equals(parentUser.getSchoolId()))
-        {
-            throw new ServiceException("只能绑定本学校的家长账号");
-        }
+        ensureSameSchool(parentUser, "只能绑定本学校的家长账号");
         profile.setParentUserId(parentUser.getUserId());
-        profile.setParentName(StringUtils.defaultString(parentUser.getNickName(), parentUser.getUserName()));
+        profile.setParentName(displayName(parentUser));
     }
 
     private void syncStudentNickname(EduStudentProfile profile)
@@ -160,14 +210,42 @@ public class EduStudentProfileServiceImpl implements IEduStudentProfileService
         userService.updateUserProfile(user);
     }
 
-    private boolean hasParentRole(SysUser user)
+    private SysUser requireUser(Long userId, String message)
+    {
+        if (userId == null)
+        {
+            throw new ServiceException(message);
+        }
+        SysUser user = userService.selectUserById(userId);
+        if (user == null)
+        {
+            throw new ServiceException(message);
+        }
+        return user;
+    }
+
+    private boolean hasRole(SysUser user, String roleKey)
     {
         List<SysRole> roles = user.getRoles();
         if (roles == null)
         {
             return false;
         }
-        return roles.stream().anyMatch(role -> "edu_parent".equals(role.getRoleKey()));
+        return roles.stream().anyMatch(role -> roleKey.equals(role.getRoleKey()));
+    }
+
+    private String displayName(SysUser user)
+    {
+        return StringUtils.defaultString(user.getNickName(), user.getUserName());
+    }
+
+    private void ensureSameSchool(SysUser user, String message)
+    {
+        Long currentSchoolId = EduSchoolScopeUtils.getCurrentSchoolId();
+        if (!SecurityUtils.isAdmin() && currentSchoolId != null && !currentSchoolId.equals(user.getSchoolId()))
+        {
+            throw new ServiceException(message);
+        }
     }
 
     private void ensureProfileAccessible(EduStudentProfile profile)

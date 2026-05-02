@@ -13,6 +13,10 @@ public interface IEduStudentProfileService
 
     EduStudentProfile selectProfileByStudentUserId(Long studentUserId);
 
+    EduStudentProfile validateManagedStudent(Long studentUserId);
+
+    EduStudentProfile validateManagedParent(Long parentUserId);
+
     int insertProfile(EduStudentProfile profile);
 
     int updateProfile(EduStudentProfile profile);

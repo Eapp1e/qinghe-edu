@@ -1058,7 +1058,7 @@ export default {
     },
     courseRuntimeStatus(course) {
       if (course.status !== '0') {
-        return { code: 'closed', text: this.isTeacherView ? '已停开' : '已关闭', tag: 'info', canEnroll: false }
+        return { code: 'closed', text: '已停开', tag: 'info', canEnroll: false }
       }
       const now = new Date()
       const sessions = this.enumerateClassSessions(course)

@@ -72,7 +72,7 @@
               <span>已上课 {{ getPastSessions(course).length }} 次，未反馈 {{ getTeacherMissingFeedbackCount(course) }} 次</span>
               <div class="teacher-action-buttons">
                 <el-button size="mini" class="toolbar-plain-btn" @click="handleTeacherRoster(course)">学生名单</el-button>
-                <el-button v-if="isAdminView" size="mini" class="toolbar-plain-btn" @click="handleCourseRecordView(course)">查看记录</el-button>
+                <el-button v-if="isAdminView" size="mini" class="toolbar-plain-btn" @click="handleCourseRecordView(course, false)">查看记录</el-button>
                 <el-button v-if="isTeacherView" size="mini" class="toolbar-plain-btn" @click="handleTeacherCourse(course)">填写课次反馈</el-button>
               </div>
             </div>
@@ -100,7 +100,7 @@
               <span>已上课 {{ getPastSessions(course).length }} 次，结课反馈{{ getTeacherFinalFeedback(course) ? '已填写' : '未填写' }}</span>
               <div class="teacher-action-buttons">
                 <el-button size="mini" class="toolbar-plain-btn" @click="handleTeacherRoster(course)">学生名单</el-button>
-                <el-button v-if="isAdminView" size="mini" class="toolbar-plain-btn" @click="handleCourseRecordView(course)">查看记录</el-button>
+                <el-button v-if="isAdminView" size="mini" class="toolbar-plain-btn" @click="handleCourseRecordView(course, true)">查看记录</el-button>
                 <el-button v-if="isTeacherView" size="mini" class="toolbar-plain-btn" @click="handleTeacherFinal(course)">
                   {{ getTeacherFinalFeedback(course) ? '修改结课反馈' : '填写结课反馈' }}
                 </el-button>
@@ -376,21 +376,21 @@
           <span>{{ courseRecordFinalMode ? '结课归档' : (currentCourseRecordSession ? `${currentCourseRecordSession.label} ${currentCourseRecordSession.time}` : '未选择课次') }}</span>
         </header>
         <div v-if="courseRecordFinalMode" class="session-detail-grid">
-          <section>
+          <section v-if="isCourseRecordStudent">
             <label>学生课程总结</label>
             <p>{{ getCourseRecordFinalText('student') }}</p>
           </section>
-          <section>
+          <section v-if="isCourseRecordTeacher">
             <label>教师结课反馈</label>
             <p>{{ getCourseRecordFinalText('teacher') }}</p>
           </section>
         </div>
         <div v-else class="session-detail-grid">
-          <section>
+          <section v-if="isCourseRecordStudent">
             <label>学生学习记录</label>
             <p>{{ getCourseRecordText('student') }}</p>
           </section>
-          <section>
+          <section v-if="isCourseRecordTeacher">
             <label>教师本次反馈</label>
             <p>{{ getCourseRecordText('teacher') }}</p>
           </section>
@@ -513,7 +513,7 @@ export default {
       return '已完成'
     },
     activeEnrollmentList() {
-      return this.filteredEnrollmentList.filter(item => this.recordRuntimeStatus(item).code !== 'closed')
+      return this.sortMidCourseRecords(this.filteredEnrollmentList.filter(item => this.recordRuntimeStatus(item).code !== 'closed'))
     },
     activePagedEnrollmentList() {
       return this.paginateRows(this.activeEnrollmentList, this.activePageNum, this.activePageSize)
@@ -550,6 +550,9 @@ export default {
         .filter(course => this.recordRuntimeStatus(course).code !== 'closed')
         .filter(course => !this.queryParams.runtimeStatus || this.recordRuntimeStatus(course).code === this.queryParams.runtimeStatus)
       return sections.sort((a, b) => {
+        const aFinished = this.isCourseFinished(a) ? 1 : 0
+        const bFinished = this.isCourseFinished(b) ? 1 : 0
+        if (aFinished !== bFinished) return aFinished - bFinished
         const aTime = a.sessions[0] ? a.sessions[0].start.getTime() : 0
         const bTime = b.sessions[0] ? b.sessions[0].start.getTime() : 0
         return aTime - bTime
@@ -639,6 +642,12 @@ export default {
     },
     currentCourseRecordPerson() {
       return this.courseRecordPeople.find(item => item.key === this.courseRecordPersonKey)
+    },
+    isCourseRecordTeacher() {
+      return this.currentCourseRecordPerson && this.currentCourseRecordPerson.key === 'teacher'
+    },
+    isCourseRecordStudent() {
+      return this.currentCourseRecordPerson && this.currentCourseRecordPerson.key !== 'teacher'
     }
   },
   created() {
@@ -713,6 +722,16 @@ export default {
     paginateRows(rows, pageNum, pageSize) {
       const start = (Number(pageNum || 1) - 1) * Number(pageSize || 10)
       return rows.slice(start, start + Number(pageSize || 10))
+    },
+    sortMidCourseRecords(rows) {
+      return (rows || []).slice().sort((a, b) => {
+        const aFinished = this.isCourseFinished(a) ? 1 : 0
+        const bFinished = this.isCourseFinished(b) ? 1 : 0
+        if (aFinished !== bFinished) return aFinished - bFinished
+        const aTime = this.enumerateClassSessions(a)[0]
+        const bTime = this.enumerateClassSessions(b)[0]
+        return (aTime ? aTime.start.getTime() : 0) - (bTime ? bTime.start.getTime() : 0)
+      })
     },
     getCourseKey(row) {
       return String((row && (row.courseId || row.courseName)) || '')
@@ -977,10 +996,10 @@ export default {
       this.teacherRosterRows = course.rows || []
       this.teacherRosterOpen = true
     },
-    handleCourseRecordView(course) {
+    handleCourseRecordView(course, finalMode = false) {
       this.courseRecordCourse = course
       const sessions = this.getPastSessions(course)
-      this.courseRecordFinalMode = this.isCourseFinished(course)
+      this.courseRecordFinalMode = finalMode
       this.courseRecordSessionKey = sessions.length ? sessions[sessions.length - 1].key : ''
       this.courseRecordPersonKey = 'teacher'
       this.courseRecordOpen = true

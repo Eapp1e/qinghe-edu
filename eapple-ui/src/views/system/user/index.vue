@@ -146,8 +146,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择角色">
+            <el-form-item label="角色" :prop="isCreateUser ? 'roleId' : undefined">
+              <el-select v-if="isCreateUser" v-model="form.roleId" placeholder="请选择角色">
+                <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId" :disabled="item.status == 1"></el-option>
+              </el-select>
+              <el-select v-else v-model="form.roleIds" multiple placeholder="请选择角色">
                 <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId" :disabled="item.status == 1"></el-option>
               </el-select>
             </el-form-item>
@@ -266,8 +269,16 @@ export default {
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
+        ],
+        roleId: [
+          { required: true, message: "请选择角色", trigger: "change" }
         ]
       }
+    }
+  },
+  computed: {
+    isCreateUser() {
+      return this.form.userId === undefined
     }
   },
   created() {
@@ -341,6 +352,7 @@ export default {
         status: "0",
         remark: undefined,
         postIds: [],
+        roleId: undefined,
         roleIds: []
       }
       this.resetForm("form")
@@ -438,7 +450,9 @@ export default {
               this.getList()
             })
           } else {
-            addUser(this.form).then(() => {
+            const form = { ...this.form, roleIds: this.form.roleId ? [this.form.roleId] : [] }
+            delete form.roleId
+            addUser(form).then(() => {
               this.$modal.msgSuccess("新增成功")
               this.open = false
               this.getList()

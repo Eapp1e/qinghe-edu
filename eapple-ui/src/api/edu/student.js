@@ -23,6 +23,22 @@ export function getStudent(profileId) {
   })
 }
 
+export function validateStudentAccount(studentUserId) {
+  return request({
+    url: '/edu/student/validate/student',
+    method: 'get',
+    params: { studentUserId }
+  })
+}
+
+export function validateParentAccount(parentUserId) {
+  return request({
+    url: '/edu/student/validate/parent',
+    method: 'get',
+    params: { parentUserId }
+  })
+}
+
 export function addStudent(data) {
   return request({
     url: '/edu/student',

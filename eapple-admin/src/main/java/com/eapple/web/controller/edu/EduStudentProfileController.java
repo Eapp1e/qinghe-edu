@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.eapple.common.annotation.Log;
 import com.eapple.common.core.controller.BaseController;
@@ -59,6 +60,20 @@ public class EduStudentProfileController extends BaseController
     public AjaxResult getInfo(@PathVariable Long profileId)
     {
         return success(profileService.selectProfileById(profileId));
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:student:add')")
+    @GetMapping("/validate/student")
+    public AjaxResult validateStudent(@RequestParam Long studentUserId)
+    {
+        return success(profileService.validateManagedStudent(studentUserId));
+    }
+
+    @PreAuthorize("@ss.hasPermi('edu:student:add')")
+    @GetMapping("/validate/parent")
+    public AjaxResult validateParent(@RequestParam Long parentUserId)
+    {
+        return success(profileService.validateManagedParent(parentUserId));
     }
 
     @PreAuthorize("@ss.hasPermi('edu:student:add') or @ss.hasRole('edu_student')")

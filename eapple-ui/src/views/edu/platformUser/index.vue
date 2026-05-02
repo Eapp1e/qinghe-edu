@@ -71,6 +71,7 @@
 
     <section class="table-section-card">
     <el-table v-loading="loading" :data="userList" class="content-table">
+      <el-table-column label="ID" prop="userId" width="90" align="center" />
       <el-table-column label="账号" prop="userName" min-width="140" />
       <el-table-column label="姓名" min-width="120">
         <template slot-scope="scope">
@@ -129,8 +130,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="角色类型" prop="roleIds">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择角色">
+            <el-form-item label="角色类型" prop="roleId">
+              <el-select v-model="form.roleId" placeholder="请选择角色">
                 <el-option
                   v-for="item in eduRoleOptions"
                   :key="item.roleId"
@@ -239,6 +240,7 @@ export default {
         teacherType: '',
         schoolId: 1,
         schoolName: '青禾学校',
+        roleId: undefined,
         postIds: [],
         roleIds: []
       },
@@ -260,7 +262,7 @@ export default {
         userName: [{ required: true, message: '请输入账号', trigger: 'blur' }],
         nickName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        roleIds: [{ type: 'array', required: true, message: '请选择角色类型', trigger: 'change' }],
+        roleId: [{ required: true, message: '请选择角色类型', trigger: 'change' }],
         teacherType: [{ required: true, message: '请选择教师类型', trigger: 'change' }]
       }
     }
@@ -274,7 +276,7 @@ export default {
     },
     isTeacherRoleSelected() {
       const teacherRole = this.allRoles.find(item => item.roleKey === 'edu_teacher')
-      return teacherRole && (this.form.roleIds || []).includes(teacherRole.roleId)
+      return teacherRole && this.form.roleId === teacherRole.roleId
     },
     isSystemAdmin() {
       return Number(this.$store.getters.id) === 1 || (this.$store.getters.roles || []).includes('admin')
@@ -335,9 +337,10 @@ export default {
           .sort((a, b) => (a.userId || 0) - (b.userId || 0))
         const enrichedRows = (await this.enrichUserRoles(filteredRows)).filter(item => this.matchesRoleFilter(item))
         const csvRows = [
-          ['账号', '姓名', '角色类型', '联系方式', '状态', '备注']
+          ['用户ID', '账号', '姓名', '角色类型', '联系方式', '状态', '备注']
         ].concat(
           enrichedRows.map(item => [
+            this.escapeCsvValue(item.userId),
             this.escapeCsvValue(item.userName),
             this.escapeCsvValue(this.resolveDisplayName(item)),
             this.escapeCsvValue(this.resolveRoleLabel(item)),
@@ -367,6 +370,7 @@ export default {
         teacherType: '',
         schoolId: 1,
         schoolName: '青禾学校',
+        roleId: undefined,
         postIds: [],
         roleIds: []
       }
@@ -524,12 +528,6 @@ export default {
       return (row && row.schoolName) || '青禾学校'
     },
     handleAdd() {
-      if (!this.isSystemAdmin) {
-        const adminRole = this.allRoles.find(item => item.roleKey === 'edu_admin')
-        if (adminRole) {
-          this.form.roleIds = (this.form.roleIds || []).filter(id => id !== adminRole.roleId)
-        }
-      }
       this.resetFormData()
       this.dialogTitle = '新增平台用户'
       this.open = true
@@ -546,6 +544,7 @@ export default {
           ...res.data,
           password: '',
           schoolName: this.resolveSchoolName(res.data),
+          roleId: this.resolveEditableRoleId(res.roleIds || []),
           roleIds: res.roleIds || [],
           postIds: res.postIds || []
         }
@@ -589,18 +588,27 @@ export default {
         }
         if (!this.isSystemAdmin && Number(this.form.userId) !== Number(this.$store.getters.id)) {
           const adminRole = this.allRoles.find(item => item.roleKey === 'edu_admin')
-          if (adminRole && (this.form.roleIds || []).includes(adminRole.roleId)) {
+          if (adminRole && this.form.roleId === adminRole.roleId) {
             this.$modal.msgWarning('只有系统管理员可以创建或编辑管理员账号')
             return
           }
         }
-        const request = this.form.userId ? updateUser(this.form) : addUser(this.form)
+        const payload = {
+          ...this.form,
+          roleIds: this.form.roleId ? [this.form.roleId] : []
+        }
+        const request = this.form.userId ? updateUser(payload) : addUser(payload)
         request.then(() => {
           this.$modal.msgSuccess(this.form.userId ? '保存成功' : '新增成功')
           this.open = false
           this.getList()
         })
       })
+    },
+    resolveEditableRoleId(roleIds) {
+      const ids = roleIds || []
+      const eduRoleIds = this.eduRoleOptions.map(item => item.roleId)
+      return ids.find(id => eduRoleIds.includes(id)) || ids[0]
     }
   }
 }

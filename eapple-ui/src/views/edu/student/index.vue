@@ -124,7 +124,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="班级" prop="className">
-              <el-input v-model="queryParams.className" placeholder="请输入班级" clearable @keyup.enter.native="handleQuery" />
+              <el-input v-model="queryParams.className" placeholder="3班" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item label="状态" prop="status" class="status-select">
               <el-select v-model="queryParams.status" placeholder="全部状态" clearable>
@@ -233,12 +233,95 @@
     </template>
 
     <el-dialog :title="title" :visible.sync="open" width="700px">
+      <div v-if="isManagedProfileCreate" class="managed-create-steps">
+        <el-steps :active="managedCreateActiveStep" finish-status="success" simple>
+          <el-step title="检索学生ID" />
+          <el-step title="绑定家长ID" />
+          <el-step title="填写档案信息" />
+        </el-steps>
+      </div>
       <el-form ref="form" :model="form" :rules="formRules" label-width="90px">
-        <el-row :gutter="12">
-          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="学生ID" prop="studentUserId"><el-input v-model="form.studentUserId" /></el-form-item></el-col>
+        <template v-if="isManagedProfileCreate">
+          <section v-if="!managedStudentValidated" class="managed-step-panel">
+            <el-form-item label="学生ID" prop="studentUserId">
+              <div class="managed-id-action">
+                <el-input
+                  v-model="form.studentUserId"
+                  placeholder="请输入已存在的学生账号ID"
+                  @input="resetManagedValidation('student')"
+                />
+                <el-button type="primary" plain :loading="validatingStudent" @click="validateStudentId">检索学生</el-button>
+              </div>
+              <div class="field-tip">先确认学生账号存在、角色正确且尚未创建档案。</div>
+            </el-form-item>
+          </section>
+          <section v-else-if="!managedParentValidated" class="managed-step-panel">
+            <div class="managed-summary">
+              <span>已匹配学生</span>
+              <strong>{{ form.studentName }}</strong>
+              <em>ID {{ form.studentUserId }}</em>
+            </div>
+            <el-form-item label="家长ID" prop="parentUserId">
+              <div class="managed-id-action">
+                <el-input
+                  v-model="form.parentUserId"
+                  placeholder="请输入已存在的家长账号ID"
+                  clearable
+                  @keyup.enter.native="validateParentId"
+                />
+                <el-button type="primary" plain :loading="validatingParent" @click="validateParentId">绑定家长</el-button>
+              </div>
+              <div class="field-tip">家长账号校验通过后，才能继续填写档案信息。</div>
+            </el-form-item>
+          </section>
+          <section v-else class="managed-step-panel">
+            <div class="managed-summary-grid">
+              <div class="managed-summary">
+                <span>学生</span>
+                <strong>{{ form.studentName }}</strong>
+                <em>ID {{ form.studentUserId }}</em>
+              </div>
+              <div class="managed-summary">
+                <span>家长</span>
+                <strong>{{ form.parentName }}</strong>
+                <em>ID {{ form.parentUserId }}</em>
+              </div>
+            </div>
+            <el-row :gutter="12">
+              <el-col :span="12"><el-form-item label="学生姓名" prop="studentName"><el-input v-model="form.studentName" /></el-form-item></el-col>
+              <el-col :span="12">
+                <el-form-item label="年级" prop="gradeName">
+                  <el-select v-model="form.gradeName" class="full-width" placeholder="请选择年级">
+                    <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" placeholder="3班" /></el-form-item></el-col>
+              <el-col :span="12">
+                <el-form-item label="性别">
+                  <el-select v-model="form.gender" placeholder="请选择性别">
+                    <el-option label="男" value="男" />
+                    <el-option label="女" value="女" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="状态">
+                  <el-radio-group v-model="form.status">
+                    <el-radio label="0">正常</el-radio>
+                    <el-radio label="1">停用</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+              <el-col :span="24"><el-form-item label="兴趣标签"><el-input v-model="form.interestTags" placeholder="例如：编程, 绘画, 篮球" /></el-form-item></el-col>
+            </el-row>
+          </section>
+        </template>
+        <el-row v-else :gutter="12">
+          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="学生ID" prop="studentUserId"><el-input v-model="form.studentUserId" :disabled="isProfileEdit" placeholder="请输入已存在的学生账号ID" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="学生姓名" prop="studentName"><el-input v-model="form.studentName" /></el-form-item></el-col>
-          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长ID" prop="parentUserId"><el-input v-model="form.parentUserId" /></el-form-item></el-col>
-          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长姓名"><el-input v-model="form.parentName" /></el-form-item></el-col>
+          <el-col v-if="!isStudentOwner" :span="12"><el-form-item label="家长ID" prop="parentUserId"><el-input v-model="form.parentUserId" placeholder="请输入已存在的家长账号ID" /></el-form-item></el-col>
+          <el-col v-if="!isStudentOwner && isProfileEdit" :span="12"><el-form-item label="家长姓名"><el-input v-model="form.parentName" disabled /></el-form-item></el-col>
           <el-col v-if="isStudentOwner" :span="24">
             <el-form-item label="家长账号" prop="parentAccount">
               <el-input v-model="form.parentAccount" placeholder="请输入家长登录账号进行绑定" />
@@ -246,13 +329,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="年级">
+            <el-form-item label="年级" prop="gradeName">
               <el-select v-model="form.gradeName" class="full-width" placeholder="请选择年级">
                 <el-option v-for="item in gradeOptions" :key="item" :label="item" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="班级"><el-input v-model="form.className" placeholder="3班" /></el-form-item></el-col>
           <el-col :span="12">
             <el-form-item label="性别">
               <el-select v-model="form.gender" placeholder="请选择性别">
@@ -273,7 +356,7 @@
         </el-row>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="submitForm">确定</el-button>
+        <el-button v-if="!isManagedProfileCreate || canEditManagedCreateDetails" type="primary" @click="submitForm">确定</el-button>
         <el-button @click="open = false">取消</el-button>
       </div>
     </el-dialog>
@@ -313,7 +396,7 @@
 </template>
 
 <script>
-import { addStudent, delStudent, exportStudent, listStudent, updateStudent } from '@/api/edu/student'
+import { addStudent, delStudent, exportStudent, listStudent, updateStudent, validateParentAccount, validateStudentAccount } from '@/api/edu/student'
 import { recommendCourse } from '@/api/edu/course'
 import { renderAiContentHtml } from '@/utils/aiContent'
 
@@ -329,6 +412,10 @@ export default {
       recommendLoading: false,
       title: '',
       recommendTitle: '智能推荐课程',
+      managedStudentValidated: false,
+      managedParentValidated: false,
+      validatingStudent: false,
+      validatingParent: false,
       gradeOptions: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级'],
       studentList: [],
       statsStudentList: [],
@@ -372,6 +459,24 @@ export default {
     isStudentOwner() {
       return this.roleKeys.includes('edu_student')
     },
+    isProfileEdit() {
+      return this.form && this.form.profileId !== undefined
+    },
+    isManagedProfileCreate() {
+      return !this.isStudentOwner && !this.isProfileEdit
+    },
+    canEditManagedCreateDetails() {
+      return !this.isManagedProfileCreate || (this.managedStudentValidated && this.managedParentValidated)
+    },
+    managedCreateActiveStep() {
+      if (this.managedParentValidated) {
+        return 3
+      }
+      if (this.managedStudentValidated) {
+        return 1
+      }
+      return 0
+    },
     ownerEmptyDescription() {
       if (this.isStudentOwner) {
         return '当前还没有个人档案，请先完善基础信息'
@@ -380,7 +485,8 @@ export default {
     },
     formRules() {
       const rules = {
-        studentName: [{ required: true, message: '请输入学生姓名', trigger: 'blur' }]
+        studentName: [{ required: true, message: '请输入学生姓名', trigger: 'blur' }],
+        gradeName: [{ required: true, message: '请选择年级', trigger: 'change' }]
       }
       if (!this.isStudentOwner) {
         rules.studentUserId = [{ required: true, message: '请输入学生ID', trigger: 'blur' }]
@@ -460,11 +566,23 @@ export default {
       exportStudent(this.queryParams)
     },
     handleAdd() {
-      this.form = { status: '0', gender: '男' }
+      this.resetManagedCreateState()
+      this.form = {
+        studentUserId: '',
+        studentName: '',
+        parentUserId: '',
+        parentName: '',
+        status: '0',
+        gender: '男',
+        gradeName: '',
+        className: '',
+        interestTags: ''
+      }
       this.title = '新增学生档案'
       this.open = true
     },
     handleOwnerAdd() {
+      this.resetManagedCreateState()
       this.form = {
         status: '0',
         gender: '男',
@@ -480,11 +598,13 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.resetManagedCreateState()
       this.form = { ...row }
       this.title = '编辑学生档案'
       this.open = true
     },
     handleOwnerEdit(row) {
+      this.resetManagedCreateState()
       this.form = { ...row, parentAccount: row.parentAccount || '' }
       this.title = '修改我的档案'
       this.open = true
@@ -495,6 +615,10 @@ export default {
     submitForm() {
       this.$refs.form.validate(valid => {
         if (!valid) return
+        if (this.isManagedProfileCreate && !this.canEditManagedCreateDetails) {
+          this.$modal.msgError('请先完成学生ID检索和家长ID绑定')
+          return
+        }
         if (this.isStudentOwner) {
           this.form.studentUserId = this.$store.getters.id
           if (!this.form.profileId && !this.form.parentAccount) {
@@ -511,6 +635,65 @@ export default {
             this.$store.dispatch('GetInfo')
           }
         })
+      })
+    },
+    resetManagedCreateState() {
+      this.managedStudentValidated = false
+      this.managedParentValidated = false
+      this.validatingStudent = false
+      this.validatingParent = false
+    },
+    resetManagedValidation(type) {
+      if (!this.isManagedProfileCreate) {
+        return
+      }
+      if (type === 'student') {
+        this.managedStudentValidated = false
+        this.managedParentValidated = false
+        this.$set(this.form, 'parentUserId', '')
+        this.$set(this.form, 'parentName', '')
+      } else if (type === 'parent') {
+        this.managedParentValidated = false
+        this.$set(this.form, 'parentName', '')
+      }
+    },
+    validateStudentId() {
+      if (!this.form.studentUserId) {
+        this.$modal.msgError('请先输入学生ID')
+        return
+      }
+      this.validatingStudent = true
+      validateStudentAccount(this.form.studentUserId).then(res => {
+        const data = res.data || {}
+        this.$set(this.form, 'studentUserId', data.studentUserId)
+        this.$set(this.form, 'studentName', data.studentName)
+        this.$set(this.form, 'parentUserId', '')
+        this.$set(this.form, 'parentName', '')
+        this.managedStudentValidated = true
+        this.managedParentValidated = false
+        this.$modal.msgSuccess('学生ID校验通过，请继续绑定家长ID')
+      }).finally(() => {
+        this.validatingStudent = false
+      })
+    },
+    validateParentId() {
+      if (!this.managedStudentValidated) {
+        this.$modal.msgError('请先检索并确认学生ID')
+        return
+      }
+      if (!this.form.parentUserId) {
+        this.$modal.msgError('请先输入家长ID')
+        return
+      }
+      this.validatingParent = true
+      validateParentAccount(this.form.parentUserId).then(res => {
+        const data = res.data || {}
+        this.$set(this.form, 'parentUserId', data.parentUserId)
+        this.$set(this.form, 'parentName', data.parentName)
+        this.managedParentValidated = true
+        this.$modal.msgSuccess('家长ID绑定通过，可以继续填写档案信息')
+      }).finally(() => {
+        this.validatingParent = false
       })
     },
     handleDelete(row) {
@@ -561,6 +744,81 @@ export default {
   font-size: 12px;
   line-height: 1.6;
   color: #7a8a9d;
+}
+
+.managed-create-steps {
+  margin: -4px 0 18px;
+}
+
+.managed-step-panel {
+  min-height: 180px;
+  padding: 18px 6px 4px;
+}
+
+.managed-id-action {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  gap: 10px;
+  align-items: center;
+}
+
+.managed-id-action .el-input {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.managed-id-action .el-button {
+  position: relative;
+  z-index: 1;
+  height: 38px;
+  border-radius: 14px;
+  color: #168b82;
+  border-color: rgba(53, 190, 179, 0.32);
+  background: linear-gradient(135deg, #f7fffd, #eefbf8);
+}
+
+.managed-id-action .el-button:hover,
+.managed-id-action .el-button:focus {
+  color: #ffffff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #56d4ba, #4f9bf0);
+}
+
+.managed-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.managed-summary {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(74, 199, 190, 0.18);
+  border-radius: 16px;
+  background: rgba(247, 253, 253, 0.92);
+}
+
+.managed-summary span,
+.managed-summary em {
+  display: block;
+  color: #718993;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.managed-summary strong {
+  display: block;
+  margin: 6px 0;
+  color: #173848;
+  font-size: 17px;
+}
+
+.success-tip {
+  color: #119f86;
 }
 
 .student-page::after {
