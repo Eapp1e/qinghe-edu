@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.eapple</groupId>
+    <groupId>com.qinghe</groupId>
     <artifactId>qinghe-after-school-service-platform</artifactId>
     <version>1.0</version>
 
@@ -108,28 +108,28 @@
                 <version>${kaptcha.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.eapple</groupId>
-                <artifactId>eapple-framework</artifactId>
+                <groupId>com.qinghe</groupId>
+                <artifactId>qinghe-framework</artifactId>
                 <version>${platform.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.eapple</groupId>
-                <artifactId>eapple-system</artifactId>
+                <groupId>com.qinghe</groupId>
+                <artifactId>qinghe-system</artifactId>
                 <version>${platform.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.eapple</groupId>
-                <artifactId>eapple-common</artifactId>
+                <groupId>com.qinghe</groupId>
+                <artifactId>qinghe-common</artifactId>
                 <version>${platform.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>eapple-admin</module>
-        <module>eapple-framework</module>
-        <module>eapple-system</module>
-        <module>eapple-common</module>
+        <module>qinghe-admin</module>
+        <module>qinghe-framework</module>
+        <module>qinghe-system</module>
+        <module>qinghe-common</module>
     </modules>
     <packaging>pom</packaging>
 

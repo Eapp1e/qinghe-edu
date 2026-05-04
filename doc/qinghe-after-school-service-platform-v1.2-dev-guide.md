@@ -60,7 +60,7 @@ qinghe_edu
 后端连接配置位于：
 
 ```text
-eapple-admin/src/main/resources/application-druid.yml
+qinghe-admin/src/main/resources/application-druid.yml
 ```
 
 默认 JDBC URL 已带 `createDatabaseIfNotExist=true`，如果 MySQL 账号有建库权限，启动时会自动创建 `qinghe_edu`。首次运行仍需要导入表结构和演示数据。
@@ -92,7 +92,7 @@ mvn clean compile -DskipTests
 后端启动类：
 
 ```text
-eapple-admin/src/main/java/com/eapple/EduPlatformApplication.java
+qinghe-admin/src/main/java/com/qinghe/EduPlatformApplication.java
 ```
 
 启动成功后默认访问：
@@ -114,7 +114,7 @@ http://localhost:8080/
 进入前端目录：
 
 ```powershell
-cd eapple-ui
+cd qinghe-ui
 ```
 
 安装依赖：
@@ -140,13 +140,13 @@ http://localhost/
 平台 AI 默认配置位于：
 
 ```text
-eapple-admin/src/main/resources/application.yml
+qinghe-admin/src/main/resources/application.yml
 ```
 
 项目支持按工作树维护本地私有配置文件：
 
 ```text
-eapple-admin/src/main/resources/application-private.yml
+qinghe-admin/src/main/resources/application-private.yml
 ```
 
 该文件已在 `.gitignore` 中忽略，适合为 `qinghe-edu` 单独配置 API Key，避免写入 Windows 用户级环境变量，也避免提交到 Gitee 或 GitHub。示例：
@@ -166,8 +166,8 @@ edu:
 提交前建议检查真实密钥未进入仓库：
 
 ```powershell
-rg -n "sk-[A-Za-z0-9]{20,}" . -g "!**/target/**" -g "!**/dist/**" -g "!**/node_modules/**" -g "!eapple-admin/src/main/resources/application-private.yml"
-git check-ignore -v eapple-admin/src/main/resources/application-private.yml
+rg -n "sk-[A-Za-z0-9]{20,}" . -g "!**/target/**" -g "!**/dist/**" -g "!**/node_modules/**" -g "!qinghe-admin/src/main/resources/application-private.yml"
+git check-ignore -v qinghe-admin/src/main/resources/application-private.yml
 ```
 
 ## 7. 常见问题
@@ -202,5 +202,5 @@ chcp 65001
 2. 导入数据库脚本。
 3. 使用 JDK 17 执行 `mvn clean compile -DskipTests`。
 4. 启动 `EduPlatformApplication`。
-5. 进入 `eapple-ui` 执行 `npm run dev`。
+5. 进入 `qinghe-ui` 执行 `npm run dev`。
 6. 浏览器访问 `http://localhost/`。

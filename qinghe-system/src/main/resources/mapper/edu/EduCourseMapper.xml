@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qinghe.system.mapper.edu.EduCourseMapper">
+
+    <resultMap id="EduCourseResult" type="EduCourse">
+        <id property="courseId" column="course_id"/>
+        <result property="courseCode" column="course_code"/>
+        <result property="courseName" column="course_name"/>
+        <result property="category" column="category"/>
+        <result property="gradeScope" column="grade_scope"/>
+        <result property="teacherUserId" column="teacher_user_id"/>
+        <result property="teacherName" column="teacher_name"/>
+        <result property="campus" column="campus"/>
+        <result property="weekDay" column="week_day"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="maxCapacity" column="max_capacity"/>
+        <result property="currentCapacity" column="current_capacity"/>
+        <result property="status" column="status"/>
+        <result property="description" column="description"/>
+        <result property="aiNotice" column="ai_notice"/>
+        <result property="aiSuggestion" column="ai_suggestion"/>
+        <result property="enrollCount" column="enroll_count"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <result property="enrolled" column="enrolled"/>
+    </resultMap>
+
+    <sql id="baseCourseColumns">
+        select distinct c.course_id, c.course_code, c.course_name, c.category, c.grade_scope, c.teacher_user_id, c.teacher_name, c.campus,
+               c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as current_capacity,
+               c.status, c.description, c.ai_notice, c.ai_suggestion,
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               'N' as enrolled,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as enroll_count
+        from edu_course c
+    </sql>
+
+    <sql id="courseColumns">
+        select distinct c.course_id, c.course_code, c.course_name, c.category, c.grade_scope, c.teacher_user_id, c.teacher_name, c.campus,
+               c.week_day, c.start_time, c.end_time, c.start_date, c.end_date, c.max_capacity,
+               (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as current_capacity,
+               c.status, c.description, c.ai_notice, c.ai_suggestion,
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+                (select count(1) from edu_course_enrollment e where e.course_id = c.course_id and e.status = '0') as enroll_count
+        <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'student'">
+            , case when exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0') then 'Y' else 'N' end as enrolled
+        </if>
+        <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.currentUserId != null and params.currentRole == 'parent'">
+            , case when exists (
+                select 1 from edu_course_enrollment e
+                where e.course_id = c.course_id
+                and e.parent_user_id = #{params.currentUserId}
+                <if test="params.targetStudentUserId != null">
+                    and e.student_user_id = #{params.targetStudentUserId}
+                </if>
+                and e.status = '0'
+              ) then 'Y' else 'N' end as enrolled
+        </if>
+        <if test="_parameter == null or _parameter.getClass().name == 'java.lang.Long' or params.currentUserId == null">
+            , 'N' as enrolled
+        </if>
+        from edu_course c
+    </sql>
+
+    <sql id="courseWhere">
+        <where>
+            <if test="courseName != null and courseName != ''">
+                and c.course_name like concat('%', #{courseName}, '%')
+            </if>
+            <if test="courseCode != null and courseCode != ''">
+                and c.course_code like concat('%', #{courseCode}, '%')
+            </if>
+            <if test="category != null and category != ''">
+                and c.category like concat('%', #{category}, '%')
+            </if>
+            <if test="gradeScope != null and gradeScope != ''">
+                and c.grade_scope like concat('%', #{gradeScope}, '%')
+            </if>
+            <if test="teacherName != null and teacherName != ''">
+                and c.teacher_name like concat('%', #{teacherName}, '%')
+            </if>
+            <if test="campus != null and campus != ''">
+                and c.campus like concat('%', #{campus}, '%')
+            </if>
+            <if test="weekDay != null and weekDay != ''">
+                and c.week_day like concat('%', #{weekDay}, '%')
+            </if>
+            <if test="teacherUserId != null">
+                and c.teacher_user_id = #{teacherUserId}
+            </if>
+            <if test="status != null and status != ''">
+                and c.status = #{status}
+            </if>
+            <if test="runtimeStatus != null and runtimeStatus != ''">
+                <choose>
+                    <when test="runtimeStatus == 'closed'">
+                        and c.status = '1'
+                    </when>
+                    <when test="runtimeStatus == 'pending'">
+                        and c.status = '0' and c.start_date is not null and c.start_date &gt; curdate()
+                    </when>
+                    <when test="runtimeStatus == 'finished'">
+                        and c.status = '0' and c.end_date is not null and c.end_date &lt; curdate()
+                    </when>
+                    <when test="runtimeStatus == 'active'">
+                        and c.status = '0'
+                        and (c.start_date is null or c.start_date &lt;= curdate())
+                        and (c.end_date is null or c.end_date &gt;= curdate())
+                    </when>
+                </choose>
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.gradeStage == 'elementary'">
+                and (
+                    c.grade_scope is null or c.grade_scope = ''
+                    or c.grade_scope regexp '一年级|二年级|三年级|四年级|五年级|六年级'
+                )
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.gradeStage == 'middle'">
+                and (
+                    c.grade_scope is null or c.grade_scope = ''
+                    or c.grade_scope regexp '七年级|八年级|九年级'
+                )
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.studentGrade != null and params.studentGrade != ''">
+                and (c.grade_scope is null or c.grade_scope = '' or find_in_set(#{params.studentGrade}, c.grade_scope))
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'student'">
+                and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId})
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.onlyMine != null and params.onlyMine and params.currentRole == 'parent'">
+                and exists (
+                    select 1 from edu_course_enrollment e
+                    where e.course_id = c.course_id
+                    and e.parent_user_id = #{params.currentUserId}
+                    <if test="params.targetStudentUserId != null">
+                        and e.student_user_id = #{params.targetStudentUserId}
+                    </if>
+                )
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and enrolled != null and enrolled != '' and params.currentRole == 'student'">
+                <choose>
+                    <when test='enrolled == "Y"'>
+                        and exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0')
+                    </when>
+                    <when test='enrolled == "N"'>
+                        and not exists (select 1 from edu_course_enrollment e where e.course_id = c.course_id and e.student_user_id = #{params.currentUserId} and e.status = '0')
+                    </when>
+                </choose>
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and enrolled != null and enrolled != '' and params.currentRole == 'parent'">
+                <choose>
+                    <when test='enrolled == "Y"'>
+                        and exists (
+                            select 1 from edu_course_enrollment e
+                            where e.course_id = c.course_id
+                            and e.parent_user_id = #{params.currentUserId}
+                            <if test="params.targetStudentUserId != null">
+                                and e.student_user_id = #{params.targetStudentUserId}
+                            </if>
+                            and e.status = '0'
+                        )
+                    </when>
+                    <when test='enrolled == "N"'>
+                        and not exists (
+                            select 1 from edu_course_enrollment e
+                            where e.course_id = c.course_id
+                            and e.parent_user_id = #{params.currentUserId}
+                            <if test="params.targetStudentUserId != null">
+                                and e.student_user_id = #{params.targetStudentUserId}
+                            </if>
+                            and e.status = '0'
+                        )
+                    </when>
+                </choose>
+            </if>
+            <if test="_parameter != null and _parameter.getClass().name != 'java.lang.Long' and params.schoolId != null">
+                and exists (
+                    select 1 from sys_user tu
+                    where tu.user_id = c.teacher_user_id
+                    and tu.school_id = #{params.schoolId}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectCourseById" parameterType="Long" resultMap="EduCourseResult">
+        <include refid="baseCourseColumns"/>
+        where c.course_id = #{courseId}
+    </select>
+
+    <select id="selectCourseList" parameterType="EduCourse" resultMap="EduCourseResult">
+        <include refid="courseColumns"/>
+        <include refid="courseWhere"/>
+        order by c.create_time desc, c.course_id desc
+        <if test="params.limitTop != null">
+            limit #{params.limitTop}
+        </if>
+    </select>
+
+    <select id="selectPopularCourses" parameterType="EduCourse" resultMap="EduCourseResult">
+        <include refid="courseColumns"/>
+        <include refid="courseWhere"/>
+        order by enroll_count desc, c.course_id desc
+        <if test="params.limitTop != null">
+            limit #{params.limitTop}
+        </if>
+    </select>
+
+    <insert id="insertCourse" parameterType="EduCourse" useGeneratedKeys="true" keyProperty="courseId">
+        insert into edu_course
+        (course_code, course_name, category, grade_scope, teacher_user_id, teacher_name, campus, week_day, start_time, end_time, start_date, end_date,
+         max_capacity, current_capacity, status, description, ai_notice, ai_suggestion, remark, create_by, create_time)
+        values
+        (#{courseCode}, #{courseName}, #{category}, #{gradeScope}, #{teacherUserId}, #{teacherName}, #{campus}, #{weekDay}, #{startTime}, #{endTime}, #{startDate}, #{endDate},
+         #{maxCapacity}, #{currentCapacity}, #{status}, #{description}, #{aiNotice}, #{aiSuggestion}, #{remark}, #{createBy}, sysdate())
+    </insert>
+
+    <update id="updateCourse" parameterType="EduCourse">
+        update edu_course
+        <set>
+            <if test="courseName != null">course_name = #{courseName},</if>
+            <if test="courseCode != null">course_code = #{courseCode},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="gradeScope != null">grade_scope = #{gradeScope},</if>
+            <if test="teacherName != null">teacher_name = #{teacherName},</if>
+            <if test="campus != null">campus = #{campus},</if>
+            <if test="weekDay != null">week_day = #{weekDay},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="maxCapacity != null">max_capacity = #{maxCapacity},</if>
+            <if test="currentCapacity != null">current_capacity = #{currentCapacity},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where course_id = #{courseId}
+    </update>
+
+    <update id="updateAiNotice">
+        update edu_course set ai_notice = #{aiNotice}, update_time = sysdate() where course_id = #{courseId}
+    </update>
+
+    <update id="updateAiSuggestion">
+        update edu_course set ai_suggestion = #{aiSuggestion}, update_time = sysdate() where course_id = #{courseId}
+    </update>
+
+    <delete id="deleteCourseByIds" parameterType="Long">
+        delete from edu_course where course_id in
+        <foreach collection="array" item="courseId" open="(" separator="," close=")">
+            #{courseId}
+        </foreach>
+    </delete>
+
+    <select id="countCourses" parameterType="EduCourse" resultType="Long">
+        select count(1) from edu_course c
+        <include refid="courseWhere"/>
+    </select>
+
+    <select id="countActiveTeachers" parameterType="EduCourse" resultType="Long">
+        select count(distinct c.teacher_user_id) from edu_course c
+        <where>
+            c.status = '0'
+            <if test="params.schoolId != null">
+                and exists (
+                    select 1 from sys_user tu
+                    where tu.user_id = c.teacher_user_id
+                    and tu.school_id = #{params.schoolId}
+                )
+            </if>
+        </where>
+    </select>
+</mapper>

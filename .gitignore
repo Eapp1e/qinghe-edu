@@ -51,9 +51,10 @@ application-local.yml
 application-local.yaml
 application-secret.yml
 application-secret.yaml
-eapple-admin/src/main/resources/application-private.yml
+qinghe-admin/src/main/resources/application-private.yml
+.git-github-snapshot
 runtime/
-eapple-ui/dist-stage-check/
+qinghe-ui/dist-stage-check/
 
 !*/build/*.java
 !*/build/*.html

@@ -1,0 +1,16 @@
+package com.qinghe.common.exception.file;
+
+/**
+ * File size limit exceeded exception.
+ *
+ * @author EAPPLE
+ */
+public class FileSizeLimitExceededException extends FileException
+{
+    private static final long serialVersionUID = 1L;
+
+    public FileSizeLimitExceededException(long defaultMaxSize)
+    {
+        super("upload.exceed.maxSize", new Object[] { defaultMaxSize });
+    }
+}

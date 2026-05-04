@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qinghe.system.mapper.edu.EduEnrollmentMapper">
+
+    <resultMap id="EduEnrollmentResult" type="EduCourseEnrollment">
+        <id property="enrollmentId" column="enrollment_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="courseName" column="course_name"/>
+        <result property="studentUserId" column="student_user_id"/>
+        <result property="studentName" column="student_name"/>
+        <result property="parentUserId" column="parent_user_id"/>
+        <result property="parentName" column="parent_name"/>
+        <result property="teacherUserId" column="teacher_user_id"/>
+        <result property="teacherName" column="teacher_name"/>
+        <result property="status" column="status"/>
+        <result property="courseStatus" column="course_status"/>
+        <result property="signupSource" column="signup_source"/>
+        <result property="learningRecord" column="learning_record"/>
+        <result property="interactionSummary" column="interaction_summary"/>
+        <result property="campus" column="campus"/>
+        <result property="weekDay" column="week_day"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="enrollmentSelect">
+        select e.enrollment_id, e.course_id, e.course_name, e.student_user_id,
+               coalesce(nullif(su.nick_name, ''), su.user_name, e.student_name) as student_name,
+               e.parent_user_id,
+               coalesce(nullif(pu.nick_name, ''), pu.user_name, e.parent_name) as parent_name,
+               e.teacher_user_id,
+               coalesce(nullif(tu.nick_name, ''), tu.user_name, e.teacher_name) as teacher_name,
+               e.status, e.signup_source, e.learning_record, e.interaction_summary,
+               e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
+               c.status as course_status, c.campus, c.week_day, c.start_time, c.end_time, c.start_date, c.end_date
+        from edu_course_enrollment e
+        left join edu_course c on c.course_id = e.course_id
+        left join sys_user su on su.user_id = e.student_user_id
+        left join sys_user pu on pu.user_id = e.parent_user_id
+        left join sys_user tu on tu.user_id = e.teacher_user_id
+    </sql>
+
+    <sql id="enrollmentWhere">
+        <where>
+            <if test="courseId != null">
+                and e.course_id = #{courseId}
+            </if>
+            <if test="teacherUserId != null">
+                and e.teacher_user_id = #{teacherUserId}
+            </if>
+            <if test="parentUserId != null">
+                and e.parent_user_id = #{parentUserId}
+            </if>
+            <if test="studentUserId != null">
+                and e.student_user_id = #{studentUserId}
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and coalesce(nullif(su.nick_name, ''), su.user_name, e.student_name) like concat('%', #{studentName}, '%')
+            </if>
+            <if test="courseName != null and courseName != ''">
+                and e.course_name like concat('%', #{courseName}, '%')
+            </if>
+            <if test="teacherName != null and teacherName != ''">
+                and coalesce(nullif(tu.nick_name, ''), tu.user_name, e.teacher_name) like concat('%', #{teacherName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                and e.status = #{status}
+            </if>
+            <if test="params.schoolId != null">
+                and (
+                    su.school_id = #{params.schoolId}
+                    or pu.school_id = #{params.schoolId}
+                    or tu.school_id = #{params.schoolId}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectEnrollmentById" parameterType="Long" resultMap="EduEnrollmentResult">
+        <include refid="enrollmentSelect"/>
+        where e.enrollment_id = #{enrollmentId}
+    </select>
+
+    <select id="selectEnrollmentByCourseAndStudent" resultMap="EduEnrollmentResult">
+        <include refid="enrollmentSelect"/>
+        where e.course_id = #{courseId} and e.student_user_id = #{studentUserId}
+    </select>
+
+    <select id="selectEnrollmentList" parameterType="EduCourseEnrollment" resultMap="EduEnrollmentResult">
+        <include refid="enrollmentSelect"/>
+        <include refid="enrollmentWhere"/>
+        order by e.enrollment_id desc
+    </select>
+
+    <insert id="insertEnrollment" parameterType="EduCourseEnrollment" useGeneratedKeys="true" keyProperty="enrollmentId">
+        insert into edu_course_enrollment
+        (course_id, course_name, student_user_id, student_name, parent_user_id, parent_name, teacher_user_id, teacher_name,
+         status, signup_source, learning_record, interaction_summary, remark, create_by, create_time)
+        values
+        (#{courseId}, #{courseName}, #{studentUserId}, #{studentName}, #{parentUserId}, #{parentName}, #{teacherUserId}, #{teacherName},
+         #{status}, #{signupSource}, #{learningRecord}, #{interactionSummary}, #{remark}, #{createBy}, sysdate())
+    </insert>
+
+    <update id="updateEnrollment" parameterType="EduCourseEnrollment">
+        update edu_course_enrollment
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="learningRecord != null">learning_record = #{learningRecord},</if>
+            <if test="interactionSummary != null">interaction_summary = #{interactionSummary},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where enrollment_id = #{enrollmentId}
+    </update>
+
+    <update id="increaseCourseCapacity" parameterType="Long">
+        update edu_course set current_capacity = ifnull(current_capacity, 0) + 1 where course_id = #{courseId}
+    </update>
+
+    <update id="decreaseCourseCapacity" parameterType="Long">
+        update edu_course
+        set current_capacity = case
+            when ifnull(current_capacity, 0) > 0 then current_capacity - 1
+            else 0
+        end
+        where course_id = #{courseId}
+    </update>
+
+    <delete id="deleteEnrollmentById" parameterType="Long">
+        delete from edu_course_enrollment where enrollment_id = #{enrollmentId}
+    </delete>
+
+    <select id="countEnrollments" parameterType="EduCourseEnrollment" resultType="Long">
+        select count(1) from edu_course_enrollment e
+        left join sys_user su on su.user_id = e.student_user_id
+        left join sys_user pu on pu.user_id = e.parent_user_id
+        left join sys_user tu on tu.user_id = e.teacher_user_id
+        <include refid="enrollmentWhere"/>
+    </select>
+</mapper>

@@ -42,11 +42,11 @@
 ## 系统模块
 
 ```text
-eapple-admin        后端启动与接口控制模块
-eapple-common       通用工具、基础模型和公共封装
-eapple-framework    安全认证、权限控制和 Web 基础能力
-eapple-system       课后服务业务核心模块
-eapple-ui           前端交互界面
+qinghe-admin        后端启动与接口控制模块
+qinghe-common       通用工具、基础模型和公共封装
+qinghe-framework    安全认证、权限控制和 Web 基础能力
+qinghe-system       课后服务业务核心模块
+qinghe-ui           前端交互界面
 sql                 数据库初始化、升级和演示数据脚本
 doc                 项目文档与补充材料
 runtime             本地运行临时目录
@@ -82,7 +82,7 @@ mvn -U clean compile -DskipTests
 启动类：
 
 ```text
-eapple-admin/src/main/java/com/eapple/EduPlatformApplication.java
+qinghe-admin/src/main/java/com/qinghe/EduPlatformApplication.java
 ```
 
 默认后端地址：
@@ -94,7 +94,7 @@ eapple-admin/src/main/java/com/eapple/EduPlatformApplication.java
 进入前端目录后执行：
 
 ```powershell
-cd eapple-ui
+cd qinghe-ui
 npm install
 npm run dev
 ```
